@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\LEGION\Desktop\Freakto\files\paper_trading_dashboard.py", line 86, in <module>
+    main()
+  File "C:\Users\LEGION\Desktop\Freakto\files\paper_trading_dashboard.py", line 73, in main
+    print(text)
+  File "C:\Users\LEGION\AppData\Local\Programs\Python\Python310\lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4ca' in position 112: character maps to <undefined>

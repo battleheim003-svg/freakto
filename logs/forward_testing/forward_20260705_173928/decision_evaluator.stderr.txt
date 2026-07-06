@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "C:\Users\LEGION\Desktop\Freakto\files\decision_evaluator.py", line 270, in <module>
+    evaluate_decisions()
+  File "C:\Users\LEGION\Desktop\Freakto\files\decision_evaluator.py", line 184, in evaluate_decisions
+    market_df = _load_market_data()
+  File "C:\Users\LEGION\Desktop\Freakto\files\decision_evaluator.py", line 80, in _load_market_data
+    raw = fetch_ohlcv(symbol=SYMBOL, timeframe=TIMEFRAME, limit=500)
+  File "C:\Users\LEGION\Desktop\Freakto\files\data_fetcher.py", line 58, in fetch_ohlcv
+    print("\U0001f4e5 \u062f\u0631\u06cc\u0627\u0641\u062a \u06a9\u0646\u062f\u0644\u200c\u0647\u0627 \u0628\u0627 CCXT")
+  File "C:\Users\LEGION\AppData\Local\Programs\Python\Python310\lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4e5' in position 0: character maps to <undefined>
