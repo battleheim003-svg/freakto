@@ -1,0 +1,362 @@
+==============================================================================================================
+📘 Freakto Metric Definitions v4.7.1
+==============================================================================================================
+هدف: حذف ابهام بین Directional Win Rate، Target Hit Rate و Paper Trade Win Rate.
+
+--------------------------------------------------------------------------------------------------------------
+Metric    : Directional Win Rate
+Label     : Dir Win
+Source    : decision_evaluations.csv
+Formula   : count(return_after_24h_pct > 0) / count(valid evaluated returns)
+Meaning   : درصد تصمیم‌هایی که بازده ارزیابی‌شده آن‌ها مثبت شده است. اگر 24h هنوز موجود نباشد، ماژول‌های ارزیابی ممکن است به 12h یا 4h fallback کنند.
+Used In   : Edge Validation, Walk-Forward, Live Readiness notes
+--------------------------------------------------------------------------------------------------------------
+Metric    : Target 1 Hit Rate
+Label     : T1 Hit
+Source    : decision_evaluations.csv
+Formula   : count(target_1_hit == True) / count(COMPLETE evaluations)
+Meaning   : درصد تصمیم‌هایی که تارگت اول را زده‌اند. این با مثبت بودن بازده یکی نیست؛ ممکن است بازده مثبت باشد ولی T1 نخورده باشد.
+Used In   : Strategy Lab, Regime Matrix, historical target validation
+--------------------------------------------------------------------------------------------------------------
+Metric    : Paper Trade Win Rate
+Label     : Paper Win
+Source    : paper_trade_evaluations.csv
+Formula   : count(closed paper trades with positive R or WIN result) / count(closed paper trades)
+Meaning   : درصد معاملات فرضی بسته‌شده که بر اساس R Multiple یا نتیجه ثبت‌شده سودده بوده‌اند.
+Used In   : Paper Trading, Live Readiness
+--------------------------------------------------------------------------------------------------------------
+Metric    : Expectancy
+Label     : Expectancy
+Source    : decision_evaluations.csv / paper_trade_evaluations.csv
+Formula   : average(return_after_24h_pct) for decisions OR average(r_multiple) for paper trades
+Meaning   : میانگین سود/زیان مورد انتظار در نمونه‌های موجود. برای تصمیم‌ها درصدی و برای Paper Trade بر حسب R است.
+Used In   : Edge Validation, Live Readiness, Strategy Lab
+--------------------------------------------------------------------------------------------------------------
+Metric    : Profit Factor
+Label     : PF
+Source    : evaluated returns
+Formula   : gross positive returns / abs(gross negative returns)
+Meaning   : نسبت مجموع سودها به مجموع زیان‌ها. در نمونه‌های خیلی کم یا بدون زیان می‌تواند بزرگ و ناپایدار باشد.
+Used In   : Edge Validation, Regime Matrix, Live Readiness
+==============================================================================================================
+
+==============================================================================================================
+📐 Freakto Edge Validation Engine v4.7.1
+==============================================================================================================
+Created UTC      : 2026-07-06T17:58:00.989447+00:00
+Combined Quality : EARLY_EDGE_OBSERVED
+
+--------------------------------------------------------------------------------------------------------------
+Source       : decision_evaluations
+Quality      : MIXED_VALIDATION
+Samples      : 32 | Positive/Negative/Flat: 28/4/0
+Directional Win Rate: 87.50%
+Expectancy   : 0.8367pct
+ProfitFactor : 16.6334
+Sharpe-like  : 7.0286 | Sortino-like: 17.8572
+Max Drawdown : -1.7127pct
+Best/Worst   : 1.8346pct / -0.6451pct
+Avg Win/Loss : 1.0174pct / -0.4282pct
+Stop Rate    : 56.25%
+Target Hit   : T1 71.88% | T2 21.88% | T3 0.00%
+Definition   : Directional Win = positive evaluated return; Target Hit = target_1_hit.
+MFE/MAE Avg  : 2.1883% / -2.0899%
+Note         : Expectancy و Directional Win Rate فعلاً مثبت هستند.
+Warning      : نمونه هنوز کمتر از 100 است؛ برای تصمیم عملی باید داده بیشتری جمع شود.
+--------------------------------------------------------------------------------------------------------------
+Source       : paper_trade_evaluations
+Quality      : NO_DATA
+Samples      : 0 | Wins/Losses/Flat: 0/0/0
+Paper Trade Win Rate: 0.00%
+Expectancy   : 0.0000R
+ProfitFactor : 0.0000
+Sharpe-like  : 0.0000 | Sortino-like: 0.0000
+Max Drawdown : 0.0000R
+Best/Worst   : 0.0000R / 0.0000R
+Avg Win/Loss : 0.0000R / 0.0000R
+Stop Rate    : 0.00%
+Definition   : Paper Trade Win = closed paper trades with positive R multiple.
+Warning      : هنوز Paper Trade ارزیابی‌شده وجود ندارد.
+
+Overall Notes:
+✓ Decision Directional Win Rate و Expectancy فعلاً مثبت‌اند، اما تا رسیدن به نمونه کافی فقط تحقیقاتی محسوب می‌شوند.
+✓ Paper edge هنوز شروع نشده یا معامله بسته‌شده ندارد.
+
+Validation Blockers:
+⛔ Decision COMPLETE کمتر از 100 است: 32
+⛔ Paper trades بسته‌شده کمتر از 30 است: 0
+==============================================================================================================
+
+==============================================================================================================
+🧬 Freakto Regime Performance Matrix v4.7.1
+==============================================================================================================
+Created UTC          : 2026-07-06T17:58:01.010334+00:00
+Overall Verdict      : REGIME_DATA_COLLECTING
+Known/Unknown Regime : 1 / 31
+Best/Worst Regime    : UNKNOWN / UNKNOWN
+
+Warnings:
+⚠️ بیشتر نمونه‌ها regime_label ندارند؛ چند اجرای جدید monitor.py بعد از v4.7 لازم است.
+--------------------------------------------------------------------------------------------------------------
+Regime/Side/Action : UNKNOWN / LONG / WATCHLIST
+Samples            : 20
+Target 1 Hit       : 100.00%
+Directional Win    : 90.00%
+Avg 24h            : 0.6932%
+Profit Factor      : 12.0253
+Stop Rate          : 85.00%
+Avg Score          : 65.35
+Verdict            : MIXED_POSITIVE
+Note               : Regime در لاگ‌های قدیمی ثبت نشده؛ برای تصمیم‌گیری نیاز به داده v4.7 به بعد است.
+Note               : بازده مثبت است اما کیفیت آماری کامل نیست.
+--------------------------------------------------------------------------------------------------------------
+Regime/Side/Action : UNKNOWN / NEUTRAL / MONITOR_ONLY
+Samples            : 8
+Target 1 Hit       : 0.00%
+Directional Win    : 75.00%
+Avg 24h            : 0.9059%
+Profit Factor      : 16.9168
+Stop Rate          : 0.00%
+Avg Score          : 29.00
+Verdict            : MIXED_POSITIVE
+Note               : Regime در لاگ‌های قدیمی ثبت نشده؛ برای تصمیم‌گیری نیاز به داده v4.7 به بعد است.
+Note               : بازده مثبت است اما کیفیت آماری کامل نیست.
+--------------------------------------------------------------------------------------------------------------
+Regime/Side/Action : UNKNOWN / LONG / NOT_ACTIONABLE
+Samples            : 2
+Target 1 Hit       : 100.00%
+Directional Win    : 100.00%
+Avg 24h            : 1.8308%
+Profit Factor      : 3.6617
+Stop Rate          : 0.00%
+Avg Score          : 53.00
+Verdict            : LOW_SAMPLE
+Note               : نمونه کمتر از 5 است؛ فقط برای رصد.
+--------------------------------------------------------------------------------------------------------------
+Regime/Side/Action : TRENDING_BULL / NEUTRAL / MONITOR_ONLY
+Samples            : 1
+Target 1 Hit       : 0.00%
+Directional Win    : 100.00%
+Avg 24h            : 1.5138%
+Profit Factor      : 1.5138
+Stop Rate          : 0.00%
+Avg Score          : 18.00
+Verdict            : LOW_SAMPLE
+Note               : نمونه کمتر از 5 است؛ فقط برای رصد.
+--------------------------------------------------------------------------------------------------------------
+Regime/Side/Action : UNKNOWN / LONG / ACTIONABLE
+Samples            : 1
+Target 1 Hit       : 100.00%
+Directional Win    : 100.00%
+Avg 24h            : 0.4897%
+Profit Factor      : 0.4897
+Stop Rate          : 100.00%
+Avg Score          : 70.00
+Verdict            : LOW_SAMPLE
+Note               : نمونه کمتر از 5 است؛ فقط برای رصد.
+==============================================================================================================
+
+==============================================================================================================
+🧠 Freakto Portfolio Memory Engine v5.0
+==============================================================================================================
+Created UTC       : 2026-07-06T17:58:01.018261+00:00
+Portfolio Status  : MEMORY_BUILDING
+Symbols           : 1
+Total scans       : 0
+Complete evals    : 32
+Closed paper      : 0
+Best memory symbol: BTC/USDT
+Best paper symbol : NONE
+
+Warnings:
+⚠️ Closed paper trades کل پورتفو کمتر از 30 است: 0
+--------------------------------------------------------------------------------------------------------------
+Symbol        : BTC/USDT
+Status        : SYMBOL_EDGE_EARLY | Confidence MEDIUM
+Scans/Dec/Eval: 0 / 37 / 32
+Latest        : UNKNOWN | Rec UNKNOWN | MTF UNKNOWN
+Avg Score/Conf/Opp: 0.00 / 0.00% / 0.00
+Directional/T1/Avg24: 87.50% / 71.88% / 0.8367%
+Paper        : closed 0 | win 0.00% | exp 0.0000R | PF 0.0000
+Rec rates    : actionable 0.00% | monitor 0.00% | ignore 0.00%
+Note         : Decision edge اولیه برای این نماد مثبت است.
+Blocker      : Closed paper trades کمتر از 30 است: 0
+==============================================================================================================
+
+==============================================================================================================
+🎯 Freakto Confidence Calibration Engine v5.0
+==============================================================================================================
+Created UTC       : 2026-07-06T17:58:01.027771+00:00
+Quality           : CALIBRATION_WEAK
+Samples           : 32
+Overall Dir Win   : 87.50%
+Overall T1 Hit    : 71.88%
+Mean Calib Error  : 36.34 pts
+
+Blockers:
+⛔ Confidence داخلی با outcome واقعی فاصله زیادی دارد.
+⛔ برای استفاده عملی، حداقل 100 ارزیابی لازم است: 32/100
+--------------------------------------------------------------------------------------------------------------
+Confidence Label Buckets
+Low            | n= 11 | Pred  25.0% | Dir  81.82% | T1  18.18% | Gap +56.82 | UNDER_CONFIDENT
+Medium         | n= 13 | Pred  55.0% | Dir  84.62% | T1 100.00% | Gap +29.62 | UNDER_CONFIDENT
+Medium-High    | n=  8 | Pred  67.5% | Dir 100.00% | T1 100.00% | Gap +32.50 | LOW_SAMPLE
+--------------------------------------------------------------------------------------------------------------
+Score Buckets
+score_10_19    | n=  3 | Pred  14.5% | Dir  66.67% | T1   0.00% | Gap +52.17 | LOW_SAMPLE
+score_30_39    | n=  6 | Pred  34.5% | Dir  83.33% | T1   0.00% | Gap +48.83 | LOW_SAMPLE
+score_50_59    | n=  7 | Pred  54.5% | Dir  85.71% | T1 100.00% | Gap +31.21 | LOW_SAMPLE
+score_60_69    | n=  8 | Pred  64.5% | Dir  87.50% | T1 100.00% | Gap +23.00 | LOW_SAMPLE
+score_70_79    | n=  8 | Pred  74.5% | Dir 100.00% | T1 100.00% | Gap +25.50 | LOW_SAMPLE
+==============================================================================================================
+
+==============================================================================================================
+🎲 Freakto Monte Carlo Risk Lab v5.0
+==============================================================================================================
+Created UTC      : 2026-07-06T17:58:01.068490+00:00
+Risk Quality     : RISK_PROFILE_ACCEPTABLE
+Source           : decision_evaluations_fallback (pct)
+Samples          : 32
+Iterations       : 2000
+Trades / Run     : 100
+Expected / Trade : 0.8367pct
+Best / Worst Samp: 1.8346pct / -0.6451pct
+--------------------------------------------------------------------------------------------------------------
+Median Final     : 83.5906pct
+Mean Final       : 83.4969pct
+P05 / P95 Final  : 72.5277pct / 94.1418pct
+Median Max DD    : -0.9971pct
+P95 Max DD       : -1.6422pct
+Prob Loss        : 0.00%
+Prob Ruin        : 0.00% | Threshold -10.00pct
+
+Notes:
+✓ Median path مثبت و Probability of ruin پایین است.
+
+Warnings:
+⚠️ Paper Trade کافی نبود؛ شبیه‌سازی با decision returns درصدی انجام شد، نه R واقعی.
+==============================================================================================================
+
+==============================================================================================================
+🧭 Freakto Forward Test Status v5.1.2
+==============================================================================================================
+Status          : FORWARD_TEST_COLLECTING
+Progress Score  : 12/100
+Readiness Level : RESEARCH_ONLY
+Paper Ready     : False
+Live Ready      : False
+
+Data Progress:
+- Complete evaluations : 32/100
+- Closed paper trades  : 0/30
+- Open paper trades    : 0
+- Total paper trades   : 0
+- Regime-labeled       : 0/30
+- Unknown regime       : 32
+- Symbols evaluated    : 1
+- Symbols scanned      : 0
+- Forward runs         : 5/7 successful
+- Forward days         : 2/30
+- First run UTC        : 2026-07-05T17:39:28.376869+00:00
+- Last run UTC         : 2026-07-06T14:23:43.425644+00:00
+
+Blockers:
+⛔ Complete evaluations کمتر از 100 است: 32
+⛔ Closed paper trades کمتر از 30 است: 0
+⛔ Regime-labeled samples کمتر از 30 است: 0
+⛔ روزهای Forward Test کمتر از 30 است: 2
+
+Next Actions:
+→ اجرای منظم decision_evaluator.py بعد از ثبت تصمیم‌های جدید.
+→ اجرای portfolio_scanner.py --paper تا فقط فرصت‌های مجاز Paper ثبت شوند.
+→ چند اجرای جدید monitor.py --once پس از v4.7 لازم است تا regime_label وارد لاگ‌ها شود.
+→ این چرخه را روزانه یا هر کندل 4h اجرا کن تا حداقل 30 روز داده Forward جمع شود.
+
+Safe cycle command:
+python forward_test_dashboard.py --cycle --validate
+
+Windows scheduled-task/batch friendly command:
+python forward_test_dashboard.py --cycle --validate --continue-on-error
+==============================================================================================================
+
+==============================================================================================================
+🚦 Freakto Advanced Live Readiness Score v4.7.1
+==============================================================================================================
+Created UTC       : 2026-07-06T17:58:01.110349+00:00
+Readiness Level   : RESEARCH_ONLY
+Readiness Score   : 43/100
+Paper Ready       : False
+Live Ready        : False
+Allowed Risk      : 0.00%
+Edge Quality      : EARLY_EDGE_OBSERVED
+Regime Verdict    : REGIME_DATA_COLLECTING
+
+Core Stats:
+- Complete evaluations: 32
+- Closed paper trades: 0
+- Paper expectancy: 0.0000R
+- Decision Profit Factor: 16.6334
+--------------------------------------------------------------------------------------------------------------
+Component : Data Sufficiency
+Score     : 4/20
+Status    : LOW
+Note      : Complete evaluations: 32/100
+Note      : Closed paper trades: 0/30
+Blocker   : Complete evaluations هنوز کافی نیست: 32/100
+Blocker   : Closed paper trades هنوز کافی نیست: 0/30
+--------------------------------------------------------------------------------------------------------------
+Component : Decision Edge
+Score     : 20/23
+Status    : PARTIAL
+Note      : Decision quality: MIXED_VALIDATION
+Note      : Directional Win 87.50% | Expectancy 0.8367pct | PF 16.6334
+Note      : Stop 56.25% | Sharpe-like 7.0286
+Blocker   : Decision sample کمتر از 100 است: 32
+--------------------------------------------------------------------------------------------------------------
+Component : Paper Edge
+Score     : 0/20
+Status    : LOW
+Note      : Paper quality: NO_DATA
+Note      : Closed 0 | Paper Win 0.00% | Expectancy 0.0000R | PF 0.0000
+Note      : Max drawdown 0.0000R
+Blocker   : Paper sample کمتر از 30 معامله بسته‌شده است: 0
+Blocker   : Paper expectancy هنوز مثبت نیست.
+--------------------------------------------------------------------------------------------------------------
+Component : Regime Stability
+Score     : 2/18
+Status    : LOW
+Note      : Regime verdict: REGIME_DATA_COLLECTING
+Note      : Known/Unknown: 1/31
+Note      : Best/Worst: UNKNOWN/UNKNOWN
+Blocker   : Regime-labeled samples کمتر از 30 است: 1
+Blocker   : هنوز هیچ رژیم با Edge مثبت قابل اتکا مشخص نشده است.
+--------------------------------------------------------------------------------------------------------------
+Component : Validation Stability
+Score     : 12/12
+Status    : PASS
+Note      : Strategy Lab اجرا شده و نمونه دارد.
+Note      : Walk-Forward Validation اجرا شده و test sample دارد.
+--------------------------------------------------------------------------------------------------------------
+Component : Operational Safety
+Score     : 5/7
+Status    : PARTIAL
+Note      : Auto-live trading در پروژه فعال نیست.
+Note      : Readiness Gate قبل از هر تست عملی باید بررسی شود.
+Blocker   : Stop Hit Rate بالاست: 56.25%
+
+Warnings:
+⚠️ Paper Trading هنوز نتیجه بسته‌شده ندارد.
+⚠️ Regime Matrix برای لاگ‌های قدیمی هنوز UNKNOWN زیادی دارد؛ چند روز داده جدید لازم است.
+
+Hard Blockers:
+⛔ Complete evaluations هنوز کافی نیست: 32/100
+⛔ Closed paper trades هنوز کافی نیست: 0/30
+⛔ Decision sample کمتر از 100 است: 32
+⛔ Paper sample کمتر از 30 معامله بسته‌شده است: 0
+⛔ Paper expectancy هنوز مثبت نیست.
+⛔ Regime-labeled samples کمتر از 30 است: 1
+⛔ هنوز هیچ رژیم با Edge مثبت قابل اتکا مشخص نشده است.
+⛔ Stop Hit Rate بالاست: 56.25%
+
+Conclusion: پروژه هنوز در Research/Observation است؛ داده و Paper Trade بیشتری لازم است.
+==============================================================================================================

@@ -1,0 +1,78 @@
+{
+  "created_utc": "2026-07-06T17:58:05.008608+00:00",
+  "decision_edge": {
+    "source": "decision_evaluations",
+    "unit": "pct",
+    "win_rate_label": "Directional Win Rate",
+    "sample_count": 32,
+    "win_count": 28,
+    "loss_count": 4,
+    "flat_count": 0,
+    "win_rate": 87.5,
+    "avg_return": 0.8367,
+    "median_return": 0.8328,
+    "avg_win": 1.0174,
+    "avg_loss": -0.4282,
+    "best_return": 1.8346,
+    "worst_return": -0.6451,
+    "expectancy": 0.8367,
+    "profit_factor": 16.6334,
+    "sharpe_like": 7.0286,
+    "sortino_like": 17.8572,
+    "max_drawdown": -1.7127,
+    "stop_hit_rate": 56.25,
+    "target_1_hit_rate": 71.88,
+    "target_2_hit_rate": 21.88,
+    "target_3_hit_rate": 0.0,
+    "avg_mfe_pct": 2.1883,
+    "avg_mae_pct": -2.0899,
+    "quality": "MIXED_VALIDATION",
+    "warnings": [
+      "نمونه هنوز کمتر از 100 است؛ برای تصمیم عملی باید داده بیشتری جمع شود."
+    ],
+    "notes": [
+      "Expectancy و Directional Win Rate فعلاً مثبت هستند."
+    ]
+  },
+  "paper_edge": {
+    "source": "paper_trade_evaluations",
+    "unit": "R",
+    "win_rate_label": "Paper Trade Win Rate",
+    "sample_count": 0,
+    "win_count": 0,
+    "loss_count": 0,
+    "flat_count": 0,
+    "win_rate": 0.0,
+    "avg_return": 0.0,
+    "median_return": 0.0,
+    "avg_win": 0.0,
+    "avg_loss": 0.0,
+    "best_return": 0.0,
+    "worst_return": 0.0,
+    "expectancy": 0.0,
+    "profit_factor": 0.0,
+    "sharpe_like": 0.0,
+    "sortino_like": 0.0,
+    "max_drawdown": 0.0,
+    "stop_hit_rate": 0.0,
+    "target_1_hit_rate": 0.0,
+    "target_2_hit_rate": 0.0,
+    "target_3_hit_rate": 0.0,
+    "avg_mfe_pct": 0.0,
+    "avg_mae_pct": 0.0,
+    "quality": "NO_DATA",
+    "warnings": [
+      "هنوز Paper Trade ارزیابی‌شده وجود ندارد."
+    ],
+    "notes": []
+  },
+  "combined_quality": "EARLY_EDGE_OBSERVED",
+  "overall_notes": [
+    "Decision Directional Win Rate و Expectancy فعلاً مثبت‌اند، اما تا رسیدن به نمونه کافی فقط تحقیقاتی محسوب می‌شوند.",
+    "Paper edge هنوز شروع نشده یا معامله بسته‌شده ندارد."
+  ],
+  "blockers": [
+    "Decision COMPLETE کمتر از 100 است: 32",
+    "Paper trades بسته‌شده کمتر از 30 است: 0"
+  ]
+}
