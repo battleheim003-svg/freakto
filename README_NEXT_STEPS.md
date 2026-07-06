@@ -46,3 +46,34 @@ GitHub Actions workflow:
 ```
 
 این workflow هر 4 ساعت اجرا می‌شود و لاگ‌ها را در branch `data-logs` ذخیره می‌کند.
+
+---
+
+## v5.2.1 — بعد از فعال شدن GitHub Actions
+
+اگر `Freakto Forward Test Collector` روی GitHub سبز شده، قدم بعدی نصب v5.2.1 است.
+
+این نسخه دو کار عملیاتی اضافه می‌کند:
+
+```text
+1. Health Check Workflow برای چک سبک وضعیت بدون اجرای چرخه کامل
+2. GitHub Actions Health Summary برای دیدن وضعیت در صفحه Summary هر run
+```
+
+بعد از push کردن v5.2.1 به GitHub، در تب Actions باید دو workflow داشته باشی:
+
+```text
+Freakto Forward Test Collector
+Freakto Health Check
+```
+
+Workflow اصلی هر ۴ ساعت دیتا جمع می‌کند. Health Check فقط وضعیت را از لاگ‌های ذخیره‌شده می‌خواند.
+
+فعلاً هدف پروژه همچنان جمع‌آوری داده است، نه live trading:
+
+```text
+30 Forward Days
+100 Complete Evaluations
+30 Closed Paper Trades
+30 Regime-labeled Samples
+```

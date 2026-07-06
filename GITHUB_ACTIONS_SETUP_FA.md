@@ -279,3 +279,129 @@ Telegram report
 ```
 
 وقتی پروژه به Micro Live یا اجرای واقعی نزدیک شد، VPS بهتر و امن‌تر است.
+
+---
+
+# بعد از اولین اجرای موفق چه کار کنم؟ — v5.2.1
+
+اگر workflow اصلی سبز شد، یعنی GitHub Actions Collector فعال است. از اینجا به بعد این چک‌ها را انجام بده:
+
+## 1. چک کن branch دیتای لاگ ساخته شده باشد
+
+در صفحه GitHub repo، بالای لیست فایل‌ها روی منوی branch بزن. باید branch زیر را ببینی:
+
+```text
+data-logs
+```
+
+این branch برای کد نیست؛ فقط برای خروجی‌های runtime مثل `logs/` و `history/` است.
+
+## 2. چک کن Artifact ساخته شده باشد
+
+در همان run موفق، پایین صفحه Summary باید بخشی به اسم Artifacts ببینی. فایل artifact معمولاً با این اسم ساخته می‌شود:
+
+```text
+freakto-logs-<run_id>
+```
+
+این artifact بکاپ ۳۰ روزه خروجی‌های همان اجرای GitHub Actions است.
+
+## 3. Health Check را تست کن
+
+بعد از نصب v5.2.1 در GitHub، در تب Actions باید workflow جدید زیر را ببینی:
+
+```text
+Freakto Health Check
+```
+
+این workflow سبک است و فقط status را از لاگ‌های ذخیره‌شده می‌خواند. برای اجرای دستی:
+
+```text
+Actions → Freakto Health Check → Run workflow
+```
+
+برای بار اول `send_telegram` را می‌توانی `false` بگذاری. اگر خواستی status به تلگرام هم بیاید، آن را `true` کن.
+
+## 4. Summary هر run را بخوان
+
+در v5.2.1، workflow اصلی و Health Check یک خلاصه Markdown می‌سازند. در صفحه run، بخش Summary باید شامل این عنوان باشد:
+
+```text
+Freakto GitHub Actions Health Summary
+```
+
+در آنجا این‌ها را می‌بینی:
+
+```text
+Progress Score
+Readiness Level
+Complete Evaluations
+Closed Paper Trades
+Regime-labeled Samples
+Forward Runs
+Forward Days
+Recent Runs
+```
+
+## 5. وضعیت طبیعی فعلی چیست؟
+
+تا وقتی پروژه هنوز در فاز جمع‌آوری داده است، دیدن این وضعیت طبیعی است:
+
+```text
+Readiness Level: RESEARCH_ONLY
+Live Ready: False
+Paper Ready: False
+```
+
+هدف فعلی این است:
+
+```text
+Complete Evaluations >= 100
+Closed Paper Trades >= 30
+Regime-labeled Samples >= 30
+Forward Days >= 30
+```
+
+## 6. روزانه چه چیزهایی را چک کنم؟
+
+روزانه فقط این چهار چیز را نگاه کن:
+
+```text
+1. آخرین workflow سبز باشد
+2. Telegram report آمده باشد
+3. data-logs branch آپدیت شده باشد
+4. Forward Runs و Forward Days کم‌کم زیاد شوند
+```
+
+## 7. اگر workflow قرمز شد چه کار کنم؟
+
+روی workflow قرمز کلیک کن و step قرمز را باز کن. مهم‌ترین stepها:
+
+```text
+Install dependencies
+Restore previous Freakto logs
+Run Freakto forward cycle with Telegram
+Push logs to data-logs branch
+```
+
+متن خطا را کامل کپی کن و برای بررسی بفرست.
+
+## 8. چه چیزی را تغییر ندهم؟
+
+این‌ها را در GitHub تغییر نده مگر دقیقاً بدانی چه می‌کنی:
+
+```text
+.github/workflows/freakto-forward-test.yml
+scripts/github_actions_push_logs.py
+scripts/github_actions_restore_logs.py
+```
+
+و هیچ‌وقت این فایل‌ها را به repo اضافه نکن:
+
+```text
+.env
+API keys
+Telegram tokens
+Exchange keys
+.venv
+```

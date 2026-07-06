@@ -1,0 +1,86 @@
+name: Freakto Health Check
+
+on:
+  # Lightweight daily status check. This does not run market collection.
+  schedule:
+    - cron: "41 6 * * *"
+  workflow_dispatch:
+    inputs:
+      send_telegram:
+        description: "Send Forward status to Telegram"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  FREAKTO_LOG_BRANCH: "data-logs"
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+concurrency:
+  group: freakto-health-check
+  cancel-in-progress: true
+
+jobs:
+  health-check:
+    name: Restore logs and show status
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Restore previous Freakto logs
+        run: |
+          python -X utf8 scripts/github_actions_restore_logs.py
+
+      - name: Show forward status without Telegram
+        if: ${{ github.event_name == 'schedule' || inputs.send_telegram == 'false' }}
+        run: |
+          python -X utf8 forward_test_dashboard.py --status
+
+      - name: Show forward status with Telegram
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.send_telegram == 'true' }}
+        run: |
+          python -X utf8 forward_test_dashboard.py --status --send
+
+      - name: Build GitHub Actions health summary
+        if: always()
+        run: |
+          python -X utf8 scripts/github_actions_health_summary.py || true
+
+      - name: Upload health artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freakto-health-${{ github.run_id }}
+          if-no-files-found: ignore
+          retention-days: 30
+          path: |
+            logs/forward_testing/forward_test_status_*.json
+            logs/forward_testing/forward_test_status_*.md
+            logs/github_actions/*.md
+            logs/forward_test_runs.csv

@@ -38,6 +38,7 @@ permissions:
 env:
   PYTHONUTF8: "1"
   PYTHONIOENCODING: "utf-8"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
   FREAKTO_LOG_BRANCH: "data-logs"
   TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
   TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -95,6 +96,11 @@ jobs:
         if: ${{ always() && (github.event_name == 'schedule' || inputs.run_validation == 'true') }}
         run: |
           python -X utf8 validation_suite_dashboard.py || true
+
+      - name: Build GitHub Actions health summary
+        if: always()
+        run: |
+          python -X utf8 scripts/github_actions_health_summary.py || true
 
       - name: Upload logs as workflow artifact
         if: always()
