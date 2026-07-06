@@ -1,0 +1,25 @@
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: BTC/USDT
+تایم‌فریم: 4h
+تعداد: 500
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 500 کندل از kucoin دریافت شد
+آخرین قیمت: 61556.1
+Provider ذخیره شد: kucoin
+⏳ هنوز حتی یک کندل بعد از این تصمیم موجود نیست: 2026-07-06 12:00:00
+⏳ هنوز حتی یک کندل بعد از این تصمیم موجود نیست: 2026-07-06 12:00:00
+✅ ارزیابی‌ها ذخیره شد: logs/decision_evaluations.csv
+     decision_id    candle_timestamp   symbol timeframe    side  score confidence_label risk_label actionability  entry_price  available_future_candles evaluation_status  return_after_4h_pct  return_after_12h_pct  return_after_24h_pct  target_1_hit  target_2_hit  target_3_hit  stop_hit  mfe_pct  mae_pct  evaluated_candles
+3ed3beb8a0142741 2026-07-05 08:00:00 BTC/USDT        4h NEUTRAL     33              Low        Low  MONITOR_ONLY      62729.4                         7          COMPLETE               0.0120                1.4674               -0.3848         False         False         False     False   2.1414  -2.0031                  7
+d20cf69165d7b25f 2026-07-05 08:00:00 BTC/USDT        4h NEUTRAL     16              Low        Low  MONITOR_ONLY      62532.1                         7          COMPLETE               0.3275                1.7876               -0.0705         False         False         False     False   2.1414  -2.0031                  7
+b2ff192282909211 2026-07-05 12:00:00 BTC/USDT        4h NEUTRAL     31              Low        Low  MONITOR_ONLY      62707.0                         6          COMPLETE               0.1108                0.9439               -1.8354         False         False         False     False   2.0025  -2.1364                  6
+120e189be1e70388 2026-07-05 12:00:00 BTC/USDT        4h NEUTRAL     36              Low        Low  MONITOR_ONLY      62822.7                         6          COMPLETE              -0.0735                0.7580               -2.0162         False         False         False     False   2.0025  -2.1364                  6
+6343d5fda70f7ead 2026-07-05 12:00:00 BTC/USDT        4h NEUTRAL     31              Low        Low  MONITOR_ONLY      62739.2                         6          COMPLETE               0.0595                0.8921               -1.8857         False         False         False     False   2.0025  -2.1364                  6
+e4b687ee00cfdd03 2026-07-05 12:00:00 BTC/USDT        4h NEUTRAL     36              Low        Low  MONITOR_ONLY      62831.1                         6          COMPLETE              -0.0869                0.7445               -2.0292         False         False         False     False   2.0025  -2.1364                  6
+af0089d5a911079a 2026-07-05 12:00:00 BTC/USDT        4h NEUTRAL     31              Low        Low  MONITOR_ONLY      62723.8                         6          COMPLETE               0.0840                0.9169               -1.8617         False         False         False     False   2.0025  -2.1364                  6
+90ceec3959a268ff 2026-07-05 16:00:00 BTC/USDT        4h NEUTRAL     18              Low        Low  MONITOR_ONLY      62645.6                         5           PARTIAL               1.6031                0.7174                   NaN         False         False         False     False   1.9381  -2.1981                  5
+0678ab66434e5aeb 2026-07-05 16:00:00 BTC/USDT        4h NEUTRAL     18              Low        Low  MONITOR_ONLY      62628.6                         5           PARTIAL               1.6307                0.7447                   NaN         False         False         False     False   1.9381  -2.1981                  5
+740c9e42772549f9 2026-07-06 04:00:00 BTC/USDT        4h NEUTRAL     35              Low     Medium  MONITOR_ONLY      63133.5                         2           PARTIAL              -1.0224                   NaN                   NaN         False         False         False     False   0.2439  -2.6918                  2
