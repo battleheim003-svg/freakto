@@ -47,32 +47,38 @@ def clean_tmp() -> None:
         shutil.rmtree(TMP_DIR, ignore_errors=True)
 
 
+def _available_restore_paths() -> list[str]:
+    """Return only runtime paths that currently exist on the remote data branch."""
+    available: list[str] = []
+    for rel in RESTORE_PATHS:
+        probe = run(["git", "ls-tree", "-d", "--name-only", f"origin/{DATA_BRANCH}", rel], check=False)
+        if probe.returncode == 0 and probe.stdout.strip() == rel:
+            available.append(rel)
+    return available
+
+
 def restore_from_branch() -> None:
     clean_tmp()
     TMP_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Archive only allowed runtime paths from the remote data branch.
-    archive = run([
-        "git",
-        "archive",
-        f"origin/{DATA_BRANCH}",
-        *RESTORE_PATHS,
-    ], check=False)
-
-    if archive.returncode != 0:
+    available_paths = _available_restore_paths()
+    if not available_paths:
         print_step("No logs/history paths found in data branch yet.")
         clean_tmp()
         return
 
-    # git archive wrote binary to stdout; rerun in binary mode for extraction.
+    # IMPORTANT: git archive outputs binary tar bytes. Do not run it through text=True.
     proc = subprocess.run(
-        ["git", "archive", f"origin/{DATA_BRANCH}", *RESTORE_PATHS],
+        ["git", "archive", f"origin/{DATA_BRANCH}", *available_paths],
         cwd=str(ROOT),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         check=False,
     )
     if proc.returncode != 0:
+        err = proc.stderr.decode("utf-8", errors="replace").strip()
+        if err:
+            print_step(err.splitlines()[-1])
         print_step("Could not archive data branch paths; continuing with current workspace logs.")
         clean_tmp()
         return

@@ -405,3 +405,18 @@ Telegram tokens
 Exchange keys
 .venv
 ```
+
+## خطای UnicodeDecodeError در Restore logs
+اگر در workflow `Freakto Health Check` مرحله زیر قرمز شد:
+
+```text
+Restore previous Freakto logs
+```
+
+و خطا شبیه این بود:
+
+```text
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xb6
+```
+
+یعنی نسخه قدیمی `scripts/github_actions_restore_logs.py` هنوز روی GitHub است یا patch درست push نشده. نسخه v5.2.3 را نصب کن، commit بزن، push کن و دوباره Health Check را اجرا کن.
