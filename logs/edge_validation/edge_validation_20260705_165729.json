@@ -1,0 +1,76 @@
+{
+  "created_utc": "2026-07-05T16:57:29.157846+00:00",
+  "decision_edge": {
+    "source": "decision_evaluations",
+    "unit": "pct",
+    "sample_count": 17,
+    "win_count": 17,
+    "loss_count": 0,
+    "flat_count": 0,
+    "win_rate": 100.0,
+    "avg_return": 1.047,
+    "median_return": 0.8457,
+    "avg_win": 1.047,
+    "avg_loss": 0.0,
+    "best_return": 1.8346,
+    "worst_return": 0.4897,
+    "expectancy": 1.047,
+    "profit_factor": 17.7989,
+    "sharpe_like": 8.6425,
+    "sortino_like": 0.0,
+    "max_drawdown": 0.0,
+    "stop_hit_rate": 0.0,
+    "target_1_hit_rate": 64.71,
+    "target_2_hit_rate": 0.0,
+    "target_3_hit_rate": 0.0,
+    "avg_mfe_pct": 1.5843,
+    "avg_mae_pct": -0.2997,
+    "quality": "EARLY_POSITIVE_LOW_SAMPLE",
+    "warnings": [
+      "نمونه کمتر از 30 است؛ نتیجه فقط سیگنال اولیه است."
+    ],
+    "notes": [
+      "Expectancy و Win Rate فعلاً مثبت هستند."
+    ]
+  },
+  "paper_edge": {
+    "source": "paper_trade_evaluations",
+    "unit": "R",
+    "sample_count": 0,
+    "win_count": 0,
+    "loss_count": 0,
+    "flat_count": 0,
+    "win_rate": 0.0,
+    "avg_return": 0.0,
+    "median_return": 0.0,
+    "avg_win": 0.0,
+    "avg_loss": 0.0,
+    "best_return": 0.0,
+    "worst_return": 0.0,
+    "expectancy": 0.0,
+    "profit_factor": 0.0,
+    "sharpe_like": 0.0,
+    "sortino_like": 0.0,
+    "max_drawdown": 0.0,
+    "stop_hit_rate": 0.0,
+    "target_1_hit_rate": 0.0,
+    "target_2_hit_rate": 0.0,
+    "target_3_hit_rate": 0.0,
+    "avg_mfe_pct": 0.0,
+    "avg_mae_pct": 0.0,
+    "quality": "NO_DATA",
+    "warnings": [
+      "هنوز Paper Trade ارزیابی‌شده وجود ندارد."
+    ],
+    "notes": []
+  },
+  "combined_quality": "EARLY_EDGE_OBSERVED",
+  "overall_notes": [
+    "Decision edge فعلاً مثبت است، اما تا رسیدن به نمونه کافی فقط تحقیقاتی محسوب می‌شود.",
+    "Paper edge هنوز شروع نشده یا معامله بسته‌شده ندارد."
+  ],
+  "blockers": [
+    "Decision COMPLETE کمتر از 100 است: 17",
+    "Paper trades بسته‌شده کمتر از 30 است: 0"
+  ]
+}

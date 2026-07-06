@@ -1,0 +1,21 @@
+# Secrets
+.env
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Runtime data / generated artifacts
+*.log
+live_enriched_data_log.csv
+paper_trading_log.json
+*.joblib
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

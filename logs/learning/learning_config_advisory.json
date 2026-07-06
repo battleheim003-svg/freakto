@@ -1,0 +1,77 @@
+{
+  "version": "3.3.0",
+  "created_at_utc": "2026-07-05T15:15:46.835349+00:00",
+  "mode": "advisory_config",
+  "auto_apply": false,
+  "sample_size": 25,
+  "complete_evaluations": 17,
+  "data_readiness": "OBSERVE_ONLY",
+  "summary": [
+    "Recommendation source version: 3.1.0",
+    "Sample size: 25 | Complete evaluations: 17",
+    "Data readiness: OBSERVE_ONLY"
+  ],
+  "warnings": [
+    "نمونه‌های COMPLETE کمتر از 30 است؛ هیچ تغییر اجرایی پیشنهاد نمی‌شود، فقط مانیتورینگ."
+  ],
+  "actions": [
+    {
+      "key": "learning.auto_apply",
+      "current_value": false,
+      "proposed_value": false,
+      "confidence": "HIGH",
+      "apply_mode": "LOCKED",
+      "reason": "اعمال خودکار وزن‌ها تا قبل از رسیدن به نمونه‌های کافی غیرفعال می‌ماند.",
+      "source_signal": "Safety Policy"
+    },
+    {
+      "key": "learning.min_complete_evaluations_for_auto_tuning",
+      "current_value": 30,
+      "proposed_value": 30,
+      "confidence": "HIGH",
+      "apply_mode": "REFERENCE",
+      "reason": "تا قبل از حداقل 30 ارزیابی کامل، فقط پیشنهاد تولید می‌شود و وزن اجرایی تغییر نمی‌کند.",
+      "source_signal": "Data Readiness"
+    },
+    {
+      "key": "component_multipliers.volume",
+      "current_value": 1.0,
+      "proposed_value": 1.0,
+      "confidence": "LOW",
+      "apply_mode": "OBSERVE_ONLY",
+      "reason": "Volume در داده فعلی مشکوک است، اما نمونه COMPLETE هنوز برای کاهش وزن کافی نیست. Evidence: High Volume Avg24=0.74% vs Low Avg24=1.77%",
+      "source_signal": "Component Weight: Volume | QUESTIONABLE"
+    },
+    {
+      "key": "component_multipliers.structure",
+      "current_value": 1.0,
+      "proposed_value": 1.0,
+      "confidence": "LOW",
+      "apply_mode": "OBSERVE_ONLY",
+      "reason": "Structure در داده فعلی مشکوک است، اما نمونه COMPLETE هنوز برای کاهش وزن کافی نیست. Evidence: High Structure Avg24=0.88% vs Low Avg24=1.81%",
+      "source_signal": "Component Weight: Structure | QUESTIONABLE"
+    }
+  ],
+  "raw_recommendations": {
+    "version": "3.1.0",
+    "created_at_utc": "2026-07-05T15:15:46.221650+00:00",
+    "sample_size": 25,
+    "complete_evaluations": 17,
+    "mode": "advisory_only",
+    "auto_apply": false,
+    "suggested_actions": [
+      {
+        "name": "Component Weight: Volume",
+        "status": "QUESTIONABLE",
+        "recommendation": "اثر Volume در داده فعلی ضعیف/معکوس است؛ بعد از افزایش نمونه‌ها کاهش وزن آزمایشی بررسی شود.",
+        "evidence": "High Volume Avg24=0.74% vs Low Avg24=1.77%"
+      },
+      {
+        "name": "Component Weight: Structure",
+        "status": "QUESTIONABLE",
+        "recommendation": "اثر Structure در داده فعلی ضعیف/معکوس است؛ بعد از افزایش نمونه‌ها کاهش وزن آزمایشی بررسی شود.",
+        "evidence": "High Structure Avg24=0.88% vs Low Avg24=1.81%"
+      }
+    ]
+  }
+}

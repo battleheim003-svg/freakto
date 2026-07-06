@@ -1,0 +1,281 @@
+# راهنمای فارسی GitHub Actions برای Freakto v5.2
+
+این راهنما برای حالتی است که هنوز VPS نمی‌خواهی و فقط می‌خواهی Freakto روی GitHub هر چند ساعت یک‌بار اجرا شود، داده جمع کند، گزارش تلگرام بفرستد، و لاگ‌ها را ذخیره کند.
+
+## ایده کلی
+
+GitHub Actions مثل یک کامپیوتر موقت رایگان/ابری است که GitHub برای چند دقیقه روشن می‌کند، پروژه را اجرا می‌کند، بعد خاموش می‌شود.
+
+مشکل مهم این است که این کامپیوتر موقت حافظه دائمی ندارد. برای همین در v5.2 این سیستم اضافه شده:
+
+```text
+main branch      = کد پروژه
+
+data-logs branch = فقط لاگ‌ها و خروجی‌های runtime
+```
+
+هر بار workflow اجرا می‌شود:
+
+```text
+1. کد پروژه را از main می‌گیرد
+2. لاگ‌های قبلی را از branch data-logs برمی‌گرداند
+3. Forward Test Cycle را اجرا می‌کند
+4. گزارش تلگرام می‌فرستد
+5. لاگ‌های جدید را دوباره در branch data-logs ذخیره می‌کند
+6. یک artifact هم از لاگ‌ها نگه می‌دارد
+```
+
+هیچ سفارش واقعی ارسال نمی‌شود. این فقط برای جمع‌آوری دیتا، Paper Gate و Validation است.
+
+---
+
+## مرحله 1: ساخت repository در GitHub
+
+1. وارد github.com شو.
+2. بالا سمت راست روی `+` بزن.
+3. گزینه `New repository` را انتخاب کن.
+4. یک نام بده، مثلاً:
+
+```text
+freakto
+```
+
+5. برای شروع می‌توانی repository را `Private` بگذاری.
+6. روی `Create repository` بزن.
+
+نکته: اگر repository خصوصی باشد، GitHub Actions سهمیه رایگان محدودتری دارد. برای شروع تست معمولاً کافی است، ولی اگر دیدی زیاد مصرف می‌شود، یا باید public کنی یا VPS بگیری.
+
+---
+
+## مرحله 2: آپلود پروژه روی GitHub
+
+### راه ساده با GitHub Desktop
+
+اگر GitHub را زیاد بلد نیستی، این راحت‌ترین راه است:
+
+1. برنامه GitHub Desktop را نصب کن.
+2. وارد اکانت GitHub شو.
+3. از منو بزن:
+
+```text
+File → Add local repository
+```
+
+4. فولدر پروژه Freakto را انتخاب کن.
+5. اگر گفت repository نیست، گزینه create repository را انتخاب کن.
+6. فایل‌ها را commit کن.
+7. روی `Publish repository` یا `Push origin` بزن.
+
+### راه با command line
+
+داخل فولدر پروژه:
+
+```bash
+git init
+git add .
+git commit -m "Initial Freakto project"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/freakto.git
+git push -u origin main
+```
+
+---
+
+## مرحله 3: مطمئن شو فایل workflow وجود دارد
+
+این نسخه این فایل را اضافه کرده:
+
+```text
+.github/workflows/freakto-forward-test.yml
+```
+
+اگر این فایل در GitHub دیده شود، از تب `Actions` قابل اجراست.
+
+---
+
+## مرحله 4: فعال کردن Actions
+
+1. وارد صفحه repository شو.
+2. برو به تب `Actions`.
+3. اگر GitHub پرسید workflows را فعال کنم یا نه، روی Enable بزن.
+4. workflow با نام زیر را پیدا کن:
+
+```text
+Freakto Forward Test Collector
+```
+
+---
+
+## مرحله 5: اضافه کردن Secrets
+
+Secrets یعنی مقادیر محرمانه‌ای مثل Telegram token که نباید داخل کد پروژه ذخیره شوند.
+
+مسیر:
+
+```text
+Repository → Settings → Secrets and variables → Actions → New repository secret
+```
+
+حداقل این دو Secret را بساز:
+
+```text
+TELEGRAM_BOT_TOKEN
+TELEGRAM_CHAT_ID
+```
+
+اگر Coinalyze یا OpenAI یا Anthropic استفاده می‌کنی، این‌ها هم اختیاری‌اند:
+
+```text
+COINALYZE_API_KEY
+OPENAI_API_KEY
+ANTHROPIC_API_KEY
+```
+
+نام Secret باید دقیقاً همین باشد.
+
+---
+
+## مرحله 6: اجازه نوشتن به GitHub Actions
+
+چون workflow باید لاگ‌ها را در branch `data-logs` ذخیره کند، باید اجازه write داشته باشد.
+
+مسیر:
+
+```text
+Repository → Settings → Actions → General → Workflow permissions
+```
+
+گزینه را روی این بگذار:
+
+```text
+Read and write permissions
+```
+
+بعد Save کن.
+
+---
+
+## مرحله 7: اجرای دستی برای تست
+
+1. برو به تب `Actions`.
+2. workflow زیر را باز کن:
+
+```text
+Freakto Forward Test Collector
+```
+
+3. روی `Run workflow` بزن.
+4. گزینه‌ها را همین‌طور بگذار:
+
+```text
+send_telegram = true
+commit_logs = true
+run_validation = true
+```
+
+5. Run را بزن.
+
+اگر موفق باشد، باید در Telegram پیام بگیری و در GitHub یک اجرای سبز ببینی.
+
+---
+
+## مرحله 8: اجرای خودکار
+
+Workflow هر 4 ساعت یک‌بار اجرا می‌شود:
+
+```yaml
+cron: "17 */4 * * *"
+```
+
+یعنی حدود دقیقه 17 هر 4 ساعت. GitHub ممکن است دقیقاً رأس همان ثانیه اجرا نکند، ولی برای تایم‌فریم 4h کافی است.
+
+---
+
+## مرحله 9: لاگ‌ها کجا ذخیره می‌شوند؟
+
+دو جا:
+
+### 1. Artifacts
+
+در صفحه هر workflow run، پایین صفحه بخشی به نام Artifacts می‌بینی. آنجا فایل‌های خروجی همان اجرا قابل دانلود هستند.
+
+### 2. Branch جدا به نام data-logs
+
+بعد از اجرای موفق، یک branch ساخته می‌شود:
+
+```text
+data-logs
+```
+
+داخل آن branch، فقط لاگ‌ها و فایل‌های runtime ذخیره می‌شوند.
+
+برای دیدن آن:
+
+1. در صفحه repo، روی branch dropdown بزن.
+2. به جای `main`، branch `data-logs` را انتخاب کن.
+3. فولدر `logs/` را ببین.
+
+---
+
+## مرحله 10: چیزهایی که نباید در GitHub بگذاری
+
+این‌ها را هرگز commit نکن:
+
+```text
+.env
+API keys
+Telegram token
+Private keys
+Exchange API secret
+فایل‌های شامل پسورد
+```
+
+در v5.2 اسکریپت push logs فقط مسیرهای whitelist شده را ذخیره می‌کند، ولی باز هم خودت مراقب باش.
+
+---
+
+## دستور اصلی که GitHub اجرا می‌کند
+
+درون workflow، این چرخه اجرا می‌شود:
+
+```bash
+python -X utf8 scripts/github_actions_restore_logs.py
+python -X utf8 forward_test_dashboard.py --cycle --validate --continue-on-error --send
+python -X utf8 validation_suite_dashboard.py
+python -X utf8 scripts/github_actions_push_logs.py
+```
+
+---
+
+## اگر workflow قرمز شد چه کنم؟
+
+1. روی اجرای قرمز در تب Actions کلیک کن.
+2. وارد job شو.
+3. مرحله‌ای که fail شده را باز کن.
+4. متن خطا را کپی کن و برای بررسی بده.
+
+خطاهای رایج:
+
+```text
+Secret تنظیم نشده
+requirements نصب نشده
+API صرافی موقتاً جواب نداده
+GitHub permission روی read-only مانده
+data-logs branch conflict دارد
+```
+
+---
+
+## وضعیت مناسب فعلی پروژه
+
+GitHub Actions جایگزین دائمی VPS نیست، ولی برای مرحله فعلی عالی است:
+
+```text
+Forward Test Collection
+Data gathering
+Paper Gate
+Validation Suite
+Telegram report
+```
+
+وقتی پروژه به Micro Live یا اجرای واقعی نزدیک شد، VPS بهتر و امن‌تر است.

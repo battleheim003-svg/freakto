@@ -1,0 +1,4 @@
+﻿regime,side,actionability,samples,win_rate,avg_24h_return_pct,profit_factor,stop_hit_rate,avg_score,avg_mfe_pct,avg_mae_pct,verdict,notes
+UNKNOWN,LONG,WATCHLIST,14,64.29,0.9748,13.6475,0.0,66.5,1.5351,-0.3298,REGIME_POSITIVE,Regime در لاگ‌های قدیمی ثبت نشده؛ برای تصمیم‌گیری نیاز به داده v4.7 به بعد است. | در این رژیم نشانه اولیه Edge مثبت دیده می‌شود.
+UNKNOWN,LONG,NOT_ACTIONABLE,2,100.0,1.8308,3.6617,0.0,53.0,2.0189,-0.0334,LOW_SAMPLE,نمونه کمتر از 5 است؛ فقط برای رصد.
+UNKNOWN,LONG,ACTIONABLE,1,0.0,0.4897,0.4897,0.0,70.0,1.4032,-0.4106,LOW_SAMPLE,نمونه کمتر از 5 است؛ فقط برای رصد.
