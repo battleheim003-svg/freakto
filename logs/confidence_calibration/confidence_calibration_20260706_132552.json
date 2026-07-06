@@ -1,0 +1,132 @@
+{
+  "created_utc": "2026-07-06T13:25:51.929790+00:00",
+  "source": "decision_evaluations",
+  "sample_count": 30,
+  "overall_directional_win_rate": 70.0,
+  "overall_target_1_hit_rate": 76.67,
+  "mean_calibration_error": 24.97,
+  "confidence_quality": "CALIBRATION_WEAK",
+  "label_buckets": [
+    {
+      "bucket": "Low",
+      "sample_count": 9,
+      "predicted_confidence": 25.0,
+      "directional_win_rate": 22.22,
+      "target_1_hit_rate": 22.22,
+      "avg_return_pct": -0.7604,
+      "calibration_gap": -2.78,
+      "target_gap": -2.78,
+      "verdict": "LOW_SAMPLE",
+      "notes": [
+        "نمونه کمتر از 10 است؛ Calibration فقط برای رصد است."
+      ]
+    },
+    {
+      "bucket": "Medium",
+      "sample_count": 13,
+      "predicted_confidence": 55.0,
+      "directional_win_rate": 84.62,
+      "target_1_hit_rate": 100.0,
+      "avg_return_pct": 0.6765,
+      "calibration_gap": 29.62,
+      "target_gap": 45.0,
+      "verdict": "UNDER_CONFIDENT",
+      "notes": [
+        "عملکرد واقعی بالاتر از confidence داخلی بوده است."
+      ]
+    },
+    {
+      "bucket": "Medium-High",
+      "sample_count": 8,
+      "predicted_confidence": 67.5,
+      "directional_win_rate": 100.0,
+      "target_1_hit_rate": 100.0,
+      "avg_return_pct": 0.6948,
+      "calibration_gap": 32.5,
+      "target_gap": 32.5,
+      "verdict": "LOW_SAMPLE",
+      "notes": [
+        "نمونه کمتر از 10 است؛ Calibration فقط برای رصد است."
+      ]
+    }
+  ],
+  "score_buckets": [
+    {
+      "bucket": "score_10_19",
+      "sample_count": 1,
+      "predicted_confidence": 14.5,
+      "directional_win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "avg_return_pct": -0.0705,
+      "calibration_gap": -14.5,
+      "target_gap": -14.5,
+      "verdict": "LOW_SAMPLE",
+      "notes": [
+        "نمونه کمتر از 10 است؛ Calibration فقط برای رصد است."
+      ]
+    },
+    {
+      "bucket": "score_30_39",
+      "sample_count": 6,
+      "predicted_confidence": 34.5,
+      "directional_win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "avg_return_pct": -1.7392,
+      "calibration_gap": -34.5,
+      "target_gap": -34.5,
+      "verdict": "LOW_SAMPLE",
+      "notes": [
+        "نمونه کمتر از 10 است؛ Calibration فقط برای رصد است.",
+        "Target 1 Hit نسبت به confidence پایین‌تر است؛ برای اهداف قیمتی محافظه‌کار باشید."
+      ]
+    },
+    {
+      "bucket": "score_50_59",
+      "sample_count": 7,
+      "predicted_confidence": 54.5,
+      "directional_win_rate": 85.71,
+      "target_1_hit_rate": 100.0,
+      "avg_return_pct": 0.9107,
+      "calibration_gap": 31.21,
+      "target_gap": 45.5,
+      "verdict": "LOW_SAMPLE",
+      "notes": [
+        "نمونه کمتر از 10 است؛ Calibration فقط برای رصد است."
+      ]
+    },
+    {
+      "bucket": "score_60_69",
+      "sample_count": 8,
+      "predicted_confidence": 64.5,
+      "directional_win_rate": 87.5,
+      "target_1_hit_rate": 100.0,
+      "avg_return_pct": 0.7601,
+      "calibration_gap": 23.0,
+      "target_gap": 35.5,
+      "verdict": "LOW_SAMPLE",
+      "notes": [
+        "نمونه کمتر از 10 است؛ Calibration فقط برای رصد است."
+      ]
+    },
+    {
+      "bucket": "score_70_79",
+      "sample_count": 8,
+      "predicted_confidence": 74.5,
+      "directional_win_rate": 100.0,
+      "target_1_hit_rate": 100.0,
+      "avg_return_pct": 0.6948,
+      "calibration_gap": 25.5,
+      "target_gap": 25.5,
+      "verdict": "LOW_SAMPLE",
+      "notes": [
+        "نمونه کمتر از 10 است؛ Calibration فقط برای رصد است."
+      ]
+    }
+  ],
+  "notes": [],
+  "warnings": [],
+  "blockers": [
+    "Confidence داخلی با outcome واقعی فاصله زیادی دارد.",
+    "برای استفاده عملی، حداقل 100 ارزیابی لازم است: 30/100"
+  ]
+}
