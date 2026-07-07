@@ -1,0 +1,43 @@
+==============================================================================================================
+🧪 Freakto Candidate Gate Shadow Validator v5.3.3
+==============================================================================================================
+Status                 : SHADOW_COLLECTING_FORWARD_DATA
+Run ID                 : shadow_gate_20260707_192117
+Horizon                : 24h
+Min Samples            : 30
+Decisions              : 42
+Directional Decisions  : 27
+Gates Tracked          : 7
+Shadow Signals         : 16
+Evaluated Shadow       : 14
+Pending Shadow         : 0
+Confirmed Candidates   : 0
+Building Candidates    : 7
+Rejected Candidates    : 0
+
+Gate Shadow Metrics:
+- STRUCTURE_SCORE_GE_10 [SHADOW_BUILDING]: signals=14 | eval=14 | pending=0 | avg=0.8834% | win=100.0% | T1=100.0% | Stop=85.71% | MFE/MAE=1.785 | warn=Forward evaluated samples کمتر از حداقل 30 است: 14
+- VOLUME_SCORE_GE_10 [SHADOW_BUILDING]: signals=0 | eval=0 | pending=0 | avg=0.0% | win=0.0% | T1=0.0% | Stop=0.0% | MFE/MAE=0.0 | warn=هنوز هیچ تصمیم Forward این gate را پاس نکرده است.
+- RISK_MEDIUM [SHADOW_BUILDING]: signals=0 | eval=0 | pending=0 | avg=0.0% | win=0.0% | T1=0.0% | Stop=0.0% | MFE/MAE=0.0 | warn=هنوز هیچ تصمیم Forward این gate را پاس نکرده است.
+- HISTORICAL_EDGE_SCORE_GE_1 [SHADOW_BUILDING]: signals=2 | eval=0 | pending=0 | avg=0.0% | win=0.0% | T1=0.0% | Stop=0.0% | MFE/MAE=0.0 | warn=Forward evaluated samples کمتر از حداقل 30 است: 0
+- SCORE_GE_80 [SHADOW_BUILDING]: signals=0 | eval=0 | pending=0 | avg=0.0% | win=0.0% | T1=0.0% | Stop=0.0% | MFE/MAE=0.0 | warn=هنوز هیچ تصمیم Forward این gate را پاس نکرده است.
+- DOGE_SHORT_WATCH [SHADOW_BUILDING]: signals=0 | eval=0 | pending=0 | avg=0.0% | win=0.0% | T1=0.0% | Stop=0.0% | MFE/MAE=0.0 | warn=هنوز هیچ تصمیم Forward این gate را پاس نکرده است.
+- BNB_LONG_SCORE_GE_60 [SHADOW_BUILDING]: signals=0 | eval=0 | pending=0 | avg=0.0% | win=0.0% | T1=0.0% | Stop=0.0% | MFE/MAE=0.0 | warn=هنوز هیچ تصمیم Forward این gate را پاس نکرده است.
+
+Shadow Blockers:
+⛔ کل نمونه‌های ارزیابی‌شده Shadow کمتر از 30 است: 14
+
+Shadow Recommendations:
+→ Shadow هنوز در حال ساخت داده است؛ فعال‌ترین gate: STRUCTURE_SCORE_GE_10 | signals=14, evaluated=14.
+→ برای هر gate حداقل 30 نمونه Forward کامل لازم است.
+→ سه gate اصلی که باید زیر نظر بمانند: VOLUME_SCORE_GE_10، RISK_MEDIUM، HISTORICAL_EDGE_SCORE_GE_1.
+
+Warnings:
+⚠️ Shadow Gate هیچ Paper Trade و هیچ سفارش واقعی ایجاد نمی‌کند؛ فقط برچسب تحقیقاتی می‌زند.
+⚠️ Gateها از خروجی Backtest آمده‌اند و باید در Forward مستقل تأیید شوند.
+⚠️ تا وقتی هر gate حداقل 30 نمونه Forward کامل ندارد، نتیجه آماری قابل اتکا نیست.
+==============================================================================================================
+🧪 Shadow gate JSON ذخیره شد: logs/shadow_gates/shadow_gate_status_shadow_gate_20260707_192117.json
+📝 Shadow gate report ذخیره شد: logs/shadow_gates/shadow_gate_report_shadow_gate_20260707_192117.md
+📊 Shadow gate metrics ذخیره شد: logs/shadow_gates/shadow_gate_metrics_shadow_gate_20260707_192117.csv
+🧾 Shadow gate signals ذخیره شد: logs/shadow_gates/shadow_gate_signals.csv
