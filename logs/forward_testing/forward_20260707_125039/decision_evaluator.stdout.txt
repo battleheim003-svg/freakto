@@ -1,0 +1,24 @@
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: BTC/USDT
+تایم‌فریم: 4h
+تعداد: 500
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 500 کندل از kucoin دریافت شد
+آخرین قیمت: 63511.8
+Provider ذخیره شد: kucoin
+⏳ هنوز حتی یک کندل بعد از این تصمیم موجود نیست: 2026-07-07 12:00:00
+✅ ارزیابی‌ها ذخیره شد: logs/decision_evaluations.csv
+     decision_id    candle_timestamp   symbol timeframe    side  score confidence_label risk_label  actionability  entry_price  available_future_candles evaluation_status  return_after_4h_pct  return_after_12h_pct  return_after_24h_pct  target_1_hit  target_2_hit  target_3_hit  stop_hit  mfe_pct  mae_pct  evaluated_candles
+af0089d5a911079a 2026-07-05 12:00:00 BTC/USDT        4h NEUTRAL     31              Low        Low   MONITOR_ONLY      62723.8                        12          COMPLETE               0.0840                0.9169                1.3092         False         False         False     False   3.1307  -2.2679                 12
+90ceec3959a268ff 2026-07-05 16:00:00 BTC/USDT        4h NEUTRAL     18              Low        Low   MONITOR_ONLY      62645.6                        11          COMPLETE               1.6031                0.7174                1.7500         False         False         False     False   3.0656  -2.3295                 11
+0678ab66434e5aeb 2026-07-05 16:00:00 BTC/USDT        4h NEUTRAL     18              Low        Low   MONITOR_ONLY      62628.6                        11          COMPLETE               1.6307                0.7447                1.7776         False         False         False     False   3.0656  -2.3295                 11
+740c9e42772549f9 2026-07-06 04:00:00 BTC/USDT        4h NEUTRAL     35              Low     Medium   MONITOR_ONLY      63133.5                         8          COMPLETE              -1.0224                0.9637               -0.0735         False         False         False     False   2.5454  -2.8226                  8
+e19f2e26336bad6a 2026-07-06 12:00:00 BTC/USDT        4h NEUTRAL     38              Low        Low   MONITOR_ONLY      61545.5                         6          COMPLETE               3.5687                2.6688                3.1949         False         False         False     False   1.8192  -1.1727                  6
+055d1880dfc7312a 2026-07-06 12:00:00 BTC/USDT        4h NEUTRAL     38              Low        Low   MONITOR_ONLY      61561.9                         6          COMPLETE               3.5412                2.6414                3.1674         False         False         False     False   1.8192  -1.1727                  6
+09ce1fb638454be2 2026-07-06 12:00:00 BTC/USDT        4h NEUTRAL     38              Low        Low   MONITOR_ONLY      61992.4                         6          COMPLETE               2.8221                1.9286                2.4509         False         False         False     False   1.8192  -1.1727                  6
+1102b59be0b7de01 2026-07-06 16:00:00 BTC/USDT        4h    LONG     49              Low        Low NOT_ACTIONABLE      63576.7                         5           PARTIAL               0.7273               -0.7701                   NaN          True         False         False     False   1.5047  -1.4780                  5
+86f05b0fe8adfbd6 2026-07-06 20:00:00 BTC/USDT        4h    LONG     63           Medium        Low      WATCHLIST      64112.3                         4           PARTIAL              -1.4417               -1.1059                   NaN         False         False         False      True   0.4290  -1.9352                  4
+2eaf3b9ad9adfdef 2026-07-07 08:00:00 BTC/USDT        4h NEUTRAL     22              Low        Low   MONITOR_ONLY      63203.1                         1           PARTIAL               0.4884                   NaN                   NaN         False         False         False     False   0.7438  -0.0104                  1

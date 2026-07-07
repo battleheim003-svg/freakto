@@ -1,0 +1,4 @@
+﻿run_id,generated_utc,status,horizon,min_samples,shadow_signals,evaluated_shadow_samples,confirmed_candidates,building_candidates,rejected_candidates,json_path,report_path
+shadow_gate_20260707_125125,2026-07-07T12:51:25.622198+00:00,SHADOW_COLLECTING_FORWARD_DATA,24h,30,15,14,0,7,0,logs/shadow_gates/shadow_gate_status_shadow_gate_20260707_125125.json,logs/shadow_gates/shadow_gate_report_shadow_gate_20260707_125125.md
+shadow_gate_20260707_125127,2026-07-07T12:51:27.191573+00:00,SHADOW_COLLECTING_FORWARD_DATA,24h,30,15,14,0,7,0,logs/shadow_gates/shadow_gate_status_shadow_gate_20260707_125127.json,logs/shadow_gates/shadow_gate_report_shadow_gate_20260707_125127.md
+shadow_gate_20260707_125132,2026-07-07T12:51:32.656725+00:00,SHADOW_COLLECTING_FORWARD_DATA,24h,30,15,14,0,7,0,logs/shadow_gates/shadow_gate_status_shadow_gate_20260707_125132.json,logs/shadow_gates/shadow_gate_report_shadow_gate_20260707_125132.md

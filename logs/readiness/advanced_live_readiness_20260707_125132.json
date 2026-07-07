@@ -1,0 +1,113 @@
+{
+  "created_utc": "2026-07-07T12:51:32.723143+00:00",
+  "level": "RESEARCH_ONLY",
+  "score": 47,
+  "live_ready": false,
+  "paper_ready": false,
+  "allowed_risk_pct": 0.0,
+  "components": [
+    {
+      "name": "Data Sufficiency",
+      "score": 4,
+      "max_score": 20,
+      "status": "LOW",
+      "notes": [
+        "Complete evaluations: 36/100",
+        "Closed paper trades: 0/30"
+      ],
+      "blockers": [
+        "Complete evaluations هنوز کافی نیست: 36/100",
+        "Closed paper trades هنوز کافی نیست: 0/30"
+      ]
+    },
+    {
+      "name": "Decision Edge",
+      "score": 20,
+      "max_score": 23,
+      "status": "PARTIAL",
+      "notes": [
+        "Decision quality: MIXED_VALIDATION",
+        "Directional Win 86.11% | Expectancy 1.0012pct | PF 21.1783",
+        "Stop 50.00% | Sharpe-like 6.6744"
+      ],
+      "blockers": [
+        "Decision sample کمتر از 100 است: 36"
+      ]
+    },
+    {
+      "name": "Paper Edge",
+      "score": 0,
+      "max_score": 20,
+      "status": "LOW",
+      "notes": [
+        "Paper quality: NO_DATA",
+        "Closed 0 | Paper Win 0.00% | Expectancy 0.0000R | PF 0.0000",
+        "Max drawdown 0.0000R"
+      ],
+      "blockers": [
+        "Paper sample کمتر از 30 معامله بسته‌شده است: 0",
+        "Paper expectancy هنوز مثبت نیست."
+      ]
+    },
+    {
+      "name": "Regime Stability",
+      "score": 6,
+      "max_score": 18,
+      "status": "PARTIAL",
+      "notes": [
+        "Regime verdict: REGIME_DATA_COLLECTING",
+        "Known/Unknown: 5/31",
+        "Best/Worst: TRENDING_BULL/UNKNOWN"
+      ],
+      "blockers": [
+        "Regime-labeled samples کمتر از 30 است: 5",
+        "هنوز هیچ رژیم با Edge مثبت قابل اتکا مشخص نشده است."
+      ]
+    },
+    {
+      "name": "Validation Stability",
+      "score": 12,
+      "max_score": 12,
+      "status": "PASS",
+      "notes": [
+        "Strategy Lab اجرا شده و نمونه دارد.",
+        "Walk-Forward Validation اجرا شده و test sample دارد."
+      ],
+      "blockers": []
+    },
+    {
+      "name": "Operational Safety",
+      "score": 5,
+      "max_score": 7,
+      "status": "PARTIAL",
+      "notes": [
+        "Auto-live trading در پروژه فعال نیست.",
+        "Readiness Gate قبل از هر تست عملی باید بررسی شود."
+      ],
+      "blockers": [
+        "Stop Hit Rate بالاست: 50.00%"
+      ]
+    }
+  ],
+  "blockers": [
+    "Complete evaluations هنوز کافی نیست: 36/100",
+    "Closed paper trades هنوز کافی نیست: 0/30",
+    "Decision sample کمتر از 100 است: 36",
+    "Paper sample کمتر از 30 معامله بسته‌شده است: 0",
+    "Paper expectancy هنوز مثبت نیست.",
+    "Regime-labeled samples کمتر از 30 است: 5",
+    "هنوز هیچ رژیم با Edge مثبت قابل اتکا مشخص نشده است.",
+    "Stop Hit Rate بالاست: 50.00%"
+  ],
+  "warnings": [
+    "Paper Trading هنوز نتیجه بسته‌شده ندارد.",
+    "Regime Matrix برای لاگ‌های قدیمی هنوز UNKNOWN زیادی دارد؛ چند روز داده جدید لازم است."
+  ],
+  "conclusion": "پروژه هنوز در Research/Observation است؛ داده و Paper Trade بیشتری لازم است.",
+  "edge_quality": "EARLY_EDGE_OBSERVED",
+  "regime_verdict": "REGIME_DATA_COLLECTING",
+  "complete_evaluations": 36,
+  "closed_paper_trades": 0,
+  "paper_expectancy_r": 0.0,
+  "decision_profit_factor": 21.1783
+}
