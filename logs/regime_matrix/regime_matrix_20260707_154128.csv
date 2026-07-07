@@ -1,0 +1,6 @@
+﻿regime,side,actionability,samples,target_1_hit_rate,directional_win_rate,avg_24h_return_pct,profit_factor,stop_hit_rate,avg_score,avg_mfe_pct,avg_mae_pct,verdict,notes
+UNKNOWN,LONG,WATCHLIST,20,100.0,90.0,0.6932,12.0253,85.0,65.35,3.3232,-2.0854,MIXED_POSITIVE,Regime در لاگ‌های قدیمی ثبت نشده؛ برای تصمیم‌گیری نیاز به داده v4.7 به بعد است. | بازده مثبت است اما کیفیت آماری کامل نیست.
+UNKNOWN,NEUTRAL,MONITOR_ONLY,8,0.0,75.0,0.9388,17.4959,0.0,29.0,3.1577,-2.2423,MIXED_POSITIVE,Regime در لاگ‌های قدیمی ثبت نشده؛ برای تصمیم‌گیری نیاز به داده v4.7 به بعد است. | بازده مثبت است اما کیفیت آماری کامل نیست.
+TRENDING_BULL,NEUTRAL,MONITOR_ONLY,5,0.0,80.0,2.3233,159.0503,0.0,33.4,2.2137,-1.8503,MIXED_POSITIVE,بازده مثبت است اما کیفیت آماری کامل نیست.
+UNKNOWN,LONG,NOT_ACTIONABLE,2,100.0,100.0,1.8308,3.6617,0.0,53.0,4.0095,-1.4351,LOW_SAMPLE,نمونه کمتر از 5 است؛ فقط برای رصد.
+UNKNOWN,LONG,ACTIONABLE,1,100.0,100.0,0.4897,0.4897,100.0,70.0,3.3818,-2.0299,LOW_SAMPLE,نمونه کمتر از 5 است؛ فقط برای رصد.
