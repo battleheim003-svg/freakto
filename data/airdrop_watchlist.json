@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "name": "Example Placeholder - Replace Me",
+      "slug": "example-placeholder-replace-me",
+      "source": "configured_watchlist",
+      "source_url": "",
+      "official_url": "",
+      "docs_url": "",
+      "twitter_url": "",
+      "category": "example",
+      "chains": [],
+      "task_type": "research",
+      "token_status": "unknown",
+      "description": "این فقط نمونه فرمت است و عمداً امتیاز پایین می‌گیرد. قبل از استفاده واقعی، آن را با پروژه‌های واقعی جایگزین کن.",
+      "estimated_minutes": 90,
+      "estimated_cost_usd": 50,
+      "priority_hint": -8,
+      "tags": ["example", "remove-before-production"]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+name: Airdrop Radar Test
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "airdrop/**"
+      - "airdrop_radar.py"
+      - "data/airdrop_watchlist.json"
+      - "requirements.txt"
+      - ".github/workflows/airdrop-radar-test.yml"
+
+jobs:
+  test-airdrop-radar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Compile
+        run: python -m compileall -q airdrop airdrop_radar.py
+      - name: Dry run without external collectors
+        env:
+          AIRDROP_USE_DEFILLAMA: "false"
+        run: python airdrop_radar.py --once --dry-run --include-sent --min-score 1 --max-items 5

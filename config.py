@@ -38,7 +38,6 @@ def _get_list(name: str, default: str = "") -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
-
 _load_dotenv()
 
 # ========== مسیرهای فایل‌ها ==========
@@ -83,10 +82,12 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 
 # ========== اجرای زنده ==========
 CHECK_INTERVAL_MINUTES = int(os.getenv("CHECK_INTERVAL_MINUTES", "60"))
+
 # ========== Opportunity Engine ==========
 OPPORTUNITY_ENGINE_ENABLED = _get_bool("OPPORTUNITY_ENGINE_ENABLED", True)
 OPPORTUNITY_MIN_SCORE = int(os.getenv("OPPORTUNITY_MIN_SCORE", "70"))
 SEND_NEUTRAL_REPORTS = _get_bool("SEND_NEUTRAL_REPORTS", False)
+
 # ========== Portfolio Scanner ==========
 PORTFOLIO_SYMBOLS = _get_list(
     "PORTFOLIO_SYMBOLS",
@@ -94,7 +95,6 @@ PORTFOLIO_SYMBOLS = _get_list(
 )
 PORTFOLIO_TOP_N = int(os.getenv("PORTFOLIO_TOP_N", "8"))
 PORTFOLIO_SEND_TELEGRAM = _get_bool("PORTFOLIO_SEND_TELEGRAM", False)
-
 
 # ========== Portfolio Scanner v2.6 ==========
 PORTFOLIO_MIN_OPPORTUNITY_SCORE = float(os.getenv("PORTFOLIO_MIN_OPPORTUNITY_SCORE", "55"))
@@ -107,3 +107,16 @@ PORTFOLIO_SHOW_MONITOR_CANDIDATES = _get_bool("PORTFOLIO_SHOW_MONITOR_CANDIDATES
 TRADE_ACCOUNT_SIZE = float(os.getenv("TRADE_ACCOUNT_SIZE", "10000"))
 TRADE_RISK_PCT = float(os.getenv("TRADE_RISK_PCT", "1.0"))
 TRADE_MAX_RISK_PCT = float(os.getenv("TRADE_MAX_RISK_PCT", "2.0"))
+
+# ========== Airdrop Radar ==========
+AIRDROP_MIN_SCORE = int(os.getenv("AIRDROP_MIN_SCORE", "65"))
+AIRDROP_MAX_ITEMS_PER_RUN = int(os.getenv("AIRDROP_MAX_ITEMS_PER_RUN", "8"))
+AIRDROP_CHECK_INTERVAL_MINUTES = int(os.getenv("AIRDROP_CHECK_INTERVAL_MINUTES", "360"))
+AIRDROP_USE_DEFILLAMA = _get_bool("AIRDROP_USE_DEFILLAMA", True)
+AIRDROP_DEFILLAMA_MIN_TVL = float(os.getenv("AIRDROP_DEFILLAMA_MIN_TVL", "1000000"))
+AIRDROP_DEFILLAMA_MAX_ITEMS = int(os.getenv("AIRDROP_DEFILLAMA_MAX_ITEMS", "200"))
+AIRDROP_WATCHLIST_FILE = os.getenv("AIRDROP_WATCHLIST_FILE", str(BASE_DIR / "data" / "airdrop_watchlist.json"))
+AIRDROP_DB_PATH = os.getenv("AIRDROP_DB_PATH", str(BASE_DIR / "history" / "airdrop_radar.db"))
+AIRDROP_RSS_FEEDS = os.getenv("AIRDROP_RSS_FEEDS", "")
+AIRDROP_DOMAIN_BLACKLIST = os.getenv("AIRDROP_DOMAIN_BLACKLIST", "")
+GOPLUS_API_TOKEN = os.getenv("GOPLUS_API_TOKEN", "")
