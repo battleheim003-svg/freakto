@@ -131,3 +131,31 @@ python backtest_diagnostics_dashboard.py --send
 ```
 
 این گزارش مشخص می‌کند کدام سمت، نماد، score bucket، holding period و target/stop path بهتر یا بدتر عمل کرده‌اند. خروجی فقط تحقیقاتی است و اجازه Paper/Live نمی‌دهد.
+
+## v5.3.2 - Backtest Gate Simulator
+
+بعد از Diagnostics، برای اینکه بفهمی آیا subset قابل تحقیق وجود دارد یا نه، Gate Simulator را اجرا کن:
+
+```cmd
+python backtest_gate_simulator_dashboard.py --compact
+```
+
+اجرای دقیق‌تر با حداقل sample:
+
+```cmd
+python backtest_gate_simulator_dashboard.py --compact --min-samples 30 --horizon 24h
+```
+
+و برای بررسی خروج 4h:
+
+```cmd
+python backtest_gate_simulator_dashboard.py --compact --min-samples 30 --horizon 4h
+```
+
+خروجی‌ها در این مسیر ذخیره می‌شوند:
+
+```text
+logs/backtests/gate_simulator/
+```
+
+قانون مهم: حتی اگر یک gate در Backtest مثبت شد، فقط `RESEARCH_CANDIDATE` است. برای Paper/Live باید در Forward Test و Paper Trades واقعی هم تأیید شود.
