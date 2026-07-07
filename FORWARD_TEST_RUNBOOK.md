@@ -66,3 +66,18 @@ python decision_evaluator.py
 ```
 
 The Forward Test cycle now runs the repair step automatically before evaluation.
+
+
+## v5.3.3 Shadow Gate Step
+
+از v5.3.3 چرخه Forward Test بعد از `decision_evaluator.py` این مرحله optional را اجرا می‌کند:
+
+```cmd
+python -X utf8 shadow_gate_dashboard.py --compact
+```
+
+این مرحله فقط Gateهای تحقیقاتی را روی تصمیم‌های Forward علامت‌گذاری می‌کند و هیچ Paper/Live ایجاد نمی‌کند. خروجی‌های آن در مسیر زیر ذخیره می‌شوند:
+
+```text
+logs/shadow_gates/
+```

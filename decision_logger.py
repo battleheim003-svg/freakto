@@ -100,6 +100,8 @@ def log_decision(opportunity, latest_timestamp, price, provider=None):
         "volume_max": _component_max(opportunity, "Volume"),
         "structure_score": _component_score(opportunity, "Structure"),
         "structure_max": _component_max(opportunity, "Structure"),
+        "historical_edge_score": _component_score(opportunity, "Historical Edge"),
+        "historical_edge_max": _component_max(opportunity, "Historical Edge"),
         "risk_penalty": _component_score(opportunity, "Risk Penalty"),
         "risk_max": _component_max(opportunity, "Risk Penalty"),
         "regime_label": getattr(opportunity, "raw", {}).get("regime_label", ""),

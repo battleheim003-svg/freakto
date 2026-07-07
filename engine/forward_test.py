@@ -23,7 +23,7 @@ except Exception:  # pragma: no cover
     pd = None
 
 
-VERSION = "v5.1.2"
+VERSION = "v5.3.3"
 LOG_DIR = Path("logs")
 FORWARD_DIR = LOG_DIR / "forward_testing"
 RUNS_CSV = LOG_DIR / "forward_test_runs.csv"
@@ -192,6 +192,14 @@ def build_forward_test_plan(
                 command=_python_cmd("decision_evaluator.py"),
                 required=True,
                 description="به‌روزرسانی ارزیابی تصمیم‌ها با کندل‌های جدید.",
+            )
+        )
+        tasks.append(
+            ForwardTask(
+                name="shadow_gate_validator",
+                command=_python_cmd("shadow_gate_dashboard.py", "--compact"),
+                required=False,
+                description="برچسب‌گذاری و ارزیابی Shadow Gateهای تحقیقاتی بدون ثبت Paper/Live.",
             )
         )
 

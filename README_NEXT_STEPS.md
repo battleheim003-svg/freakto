@@ -159,3 +159,28 @@ logs/backtests/gate_simulator/
 ```
 
 قانون مهم: حتی اگر یک gate در Backtest مثبت شد، فقط `RESEARCH_CANDIDATE` است. برای Paper/Live باید در Forward Test و Paper Trades واقعی هم تأیید شود.
+
+
+## v5.3.3 — Candidate Gate Shadow Validator
+
+بعد از v5.3.2 چند Gate تحقیقاتی مثبت در Backtest پیدا شد. از v5.3.3 این Gateها وارد Shadow Mode شدند:
+
+```text
+VOLUME_SCORE_GE_10
+RISK_MEDIUM
+HISTORICAL_EDGE_SCORE_GE_1
+STRUCTURE_SCORE_GE_10
+SCORE_GE_80
+DOGE_SHORT_WATCH
+BNB_LONG_SCORE_GE_60
+```
+
+اجرای دستی:
+
+```cmd
+python shadow_gate_dashboard.py --compact
+```
+
+از این نسخه به بعد Forward Cycle و GitHub Actions به صورت خودکار Shadow Gate Validator را بعد از `decision_evaluator.py` اجرا می‌کنند.
+
+هدف: تأیید یا رد Gateهای مثبت Backtest روی Forward Test واقعی، بدون Paper/Live.
