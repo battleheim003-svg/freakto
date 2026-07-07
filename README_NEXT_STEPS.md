@@ -86,3 +86,36 @@ UnicodeDecodeError: 'utf-8' codec can't decode byte 0xb6
 ```
 
 نسخه v5.2.3 را نصب کن. این نسخه `scripts/github_actions_restore_logs.py` را اصلاح می‌کند تا خروجی باینری `git archive` به اشتباه به‌صورت متن UTF-8 decode نشود.
+
+## v5.2.4 نکته عملیاتی GitHub Actions
+
+اگر در Health Summary دیدی `Last Forward Run` وجود دارد اما `Forward Runs` یا `Forward Days` صفر هستند، نسخه v5.2.4 را نصب کن. این نسخه Health Summary را با schemaهای مختلف لاگ سازگار می‌کند و در صورت نیاز از `logs/forward_test_runs.csv` برای شمارش runها fallback می‌گیرد.
+
+---
+
+## v5.2.5 — GitHub Actions Health Counter Hotfix
+
+اگر Health Check سبز است ولی هنوز `Forward Runs` را `0/0 successful` نشان می‌دهد، نسخه v5.2.5 را نصب کن و دوباره Health Check را اجرا کن.
+
+بعد از نصب، انتظار می‌رود Health Summary از `logs/forward_test_runs.csv` شمارش کند و حداقل آخرین اجرای موفق را به‌درستی در Forward Runs و Forward Days نشان دهد.
+
+
+## Freakto v5.3 — Historical Backfill & Backtest
+
+بعد از پایدار شدن GitHub Actions، مسیر دوم تحقیق اضافه شد: Backtest تاریخی.
+
+دستور وضعیت:
+
+```cmd
+python historical_backtest_dashboard.py --status
+```
+
+اجرای پیشنهادی اولیه:
+
+```cmd
+python historical_backtest_dashboard.py --symbols BTC/USDT,ETH/USDT,SOL/USDT,BNB/USDT,XRP/USDT,DOGE/USDT --limit 800 --step 6
+```
+
+خروجی‌ها در `logs/backtests/` و `logs/historical_backtest_evaluations.csv` ذخیره می‌شوند.
+
+قانون مهم: `BACKTEST` جای `FORWARD_TEST` را نمی‌گیرد. Live یا Paper جدی فقط وقتی قابل بررسی است که Forward/Paper واقعی هم به حد کافی رسیده باشد.
