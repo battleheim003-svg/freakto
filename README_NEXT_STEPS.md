@@ -119,3 +119,15 @@ python historical_backtest_dashboard.py --symbols BTC/USDT,ETH/USDT,SOL/USDT,BNB
 خروجی‌ها در `logs/backtests/` و `logs/historical_backtest_evaluations.csv` ذخیره می‌شوند.
 
 قانون مهم: `BACKTEST` جای `FORWARD_TEST` را نمی‌گیرد. Live یا Paper جدی فقط وقتی قابل بررسی است که Forward/Paper واقعی هم به حد کافی رسیده باشد.
+
+## v5.3.1 - Backtest Diagnostics
+
+بعد از اجرای Historical Backtest، برای فهمیدن علت Edge منفی اجرا کن:
+
+```cmd
+python backtest_diagnostics_dashboard.py
+python backtest_diagnostics_dashboard.py --compact
+python backtest_diagnostics_dashboard.py --send
+```
+
+این گزارش مشخص می‌کند کدام سمت، نماد، score bucket، holding period و target/stop path بهتر یا بدتر عمل کرده‌اند. خروجی فقط تحقیقاتی است و اجازه Paper/Live نمی‌دهد.

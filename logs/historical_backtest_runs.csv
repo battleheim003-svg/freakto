@@ -1,0 +1,3 @@
+﻿run_id,started_utc,finished_utc,ok,symbols_requested,symbols_completed,rows_written,errors,output_csv,output_report
+backtest_20260707_115523,2026-07-07T11:55:23.687436+00:00,2026-07-07T11:55:57.193569+00:00,True,1,1,12,,logs\backtests\historical_backtest_backtest_20260707_115523.csv,logs\backtests\historical_backtest_report_backtest_20260707_115523.md
+backtest_20260707_115623,2026-07-07T11:56:23.845732+00:00,2026-07-07T11:57:21.792295+00:00,True,6,6,642,,logs\backtests\historical_backtest_backtest_20260707_115623.csv,logs\backtests\historical_backtest_report_backtest_20260707_115623.md

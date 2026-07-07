@@ -9,7 +9,8 @@ Runs validation + risk intelligence together:
 6) Monte Carlo Risk Lab
 7) Forward Test Status
 8) Historical Backtest Status
-9) Advanced Live Readiness Score
+9) Backtest Diagnostics
+10) Advanced Live Readiness Score
 """
 
 import argparse
@@ -29,6 +30,7 @@ from engine.live_readiness_score import (
 )
 from engine.forward_test import build_forward_progress, format_forward_progress_console, save_forward_progress
 from engine.historical_backtest import load_all_backtest_summary, format_summary_console as format_backtest_summary_console
+from engine.backtest_diagnostics import run_backtest_diagnostics, format_diagnostics_console as format_backtest_diagnostics_console, save_backtest_diagnostics
 from telegram_notifier import send_telegram_message
 
 SUITE_DIR = Path("logs") / "validation_suite"
@@ -55,6 +57,7 @@ def main():
     monte = run_monte_carlo(iterations=args.iterations, trades_per_run=args.trades)
     forward_progress = build_forward_progress()
     backtest_summary = load_all_backtest_summary()
+    backtest_diag = run_backtest_diagnostics()
     readiness = assess_advanced_live_readiness()
 
     metric_text = format_metric_definitions_console()
@@ -65,9 +68,10 @@ def main():
     monte_text = format_monte_carlo_console(monte)
     forward_text = format_forward_progress_console(forward_progress)
     backtest_text = format_backtest_summary_console(backtest_summary)
+    backtest_diag_text = format_backtest_diagnostics_console(backtest_diag, detail=False)
     readiness_text = format_advanced_readiness_console(readiness)
 
-    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, readiness_text])
+    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, readiness_text])
     print(combined)
 
     metric_report = save_metric_definitions_report()
@@ -77,6 +81,7 @@ def main():
     cal_json, cal_report = save_confidence_calibration(calibration)
     mc_json, mc_report = save_monte_carlo(monte)
     forward_json, forward_report = save_forward_progress(forward_progress)
+    backtest_diag_json, backtest_diag_report = save_backtest_diagnostics(backtest_diag)
     readiness_json, readiness_report = save_advanced_readiness(readiness)
     combined_path = _save_combined_report(combined)
 
@@ -93,6 +98,8 @@ def main():
     print(f"📝 Monte Carlo report ذخیره شد: {mc_report}")
     print(f"🧭 Forward status JSON ذخیره شد: {forward_json}")
     print(f"📝 Forward status report ذخیره شد: {forward_report}")
+    print(f"🧪 Backtest diagnostics JSON ذخیره شد: {backtest_diag_json}")
+    print(f"📝 Backtest diagnostics report ذخیره شد: {backtest_diag_report}")
     print(f"🚦 Advanced readiness JSON ذخیره شد: {readiness_json}")
     print(f"📝 Advanced readiness report ذخیره شد: {readiness_report}")
     print(f"📦 Combined validation suite report ذخیره شد: {combined_path}")

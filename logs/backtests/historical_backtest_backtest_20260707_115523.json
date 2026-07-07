@@ -1,0 +1,136 @@
+{
+  "run": {
+    "run_id": "backtest_20260707_115523",
+    "started_utc": "2026-07-07T11:55:23.687436+00:00",
+    "finished_utc": "2026-07-07T11:55:57.193569+00:00",
+    "ok": true,
+    "symbols_requested": 1,
+    "symbols_completed": 1,
+    "rows_written": 12,
+    "errors": [],
+    "output_csv": "logs\\backtests\\historical_backtest_backtest_20260707_115523.csv",
+    "output_json": "logs\\backtests\\historical_backtest_backtest_20260707_115523.json",
+    "output_report": "logs\\backtests\\historical_backtest_report_backtest_20260707_115523.md"
+  },
+  "summary": {
+    "run_id": "backtest_20260707_115523",
+    "status": "BACKTEST_BUILDING",
+    "symbols": 1,
+    "rows": 12,
+    "actionable_rows": 0,
+    "monitor_rows": 12,
+    "complete_rows": 12,
+    "avg_score": 42.17,
+    "directional_samples": 6,
+    "directional_win_rate": 66.67,
+    "target_1_hit_rate": 83.33,
+    "stop_hit_rate": 33.33,
+    "avg_24h_return_pct": 0.1463,
+    "best_24h_return_pct": 1.943,
+    "worst_24h_return_pct": -3.1522,
+    "by_symbol": [
+      {
+        "symbol": "BTC/USDT",
+        "rows": 12,
+        "complete": 12,
+        "directional_samples": 6,
+        "directional_win_rate": 66.67,
+        "target_1_hit_rate": 83.33,
+        "stop_hit_rate": 33.33,
+        "avg_24h_return_pct": 0.1463
+      }
+    ],
+    "by_actionability": [
+      {
+        "actionability": "MONITOR_ONLY",
+        "rows": 6,
+        "complete": 6,
+        "directional_samples": 0,
+        "directional_win_rate": 0.0,
+        "target_1_hit_rate": 0.0,
+        "stop_hit_rate": 0.0,
+        "avg_24h_return_pct": 0.0
+      },
+      {
+        "actionability": "NOT_ACTIONABLE",
+        "rows": 3,
+        "complete": 3,
+        "directional_samples": 3,
+        "directional_win_rate": 66.67,
+        "target_1_hit_rate": 66.67,
+        "stop_hit_rate": 33.33,
+        "avg_24h_return_pct": 0.9441
+      },
+      {
+        "actionability": "WATCHLIST",
+        "rows": 3,
+        "complete": 3,
+        "directional_samples": 3,
+        "directional_win_rate": 66.67,
+        "target_1_hit_rate": 100.0,
+        "stop_hit_rate": 33.33,
+        "avg_24h_return_pct": -0.6514
+      }
+    ],
+    "by_regime": [
+      {
+        "regime_label": "TRENDING_BEAR",
+        "rows": 5,
+        "complete": 5,
+        "directional_samples": 1,
+        "directional_win_rate": 0.0,
+        "target_1_hit_rate": 100.0,
+        "stop_hit_rate": 100.0,
+        "avg_24h_return_pct": -3.1522
+      },
+      {
+        "regime_label": "TRENDING_BULL",
+        "rows": 4,
+        "complete": 4,
+        "directional_samples": 4,
+        "directional_win_rate": 100.0,
+        "target_1_hit_rate": 100.0,
+        "stop_hit_rate": 0.0,
+        "avg_24h_return_pct": 1.1832
+      },
+      {
+        "regime_label": "SIDEWAYS",
+        "rows": 1,
+        "complete": 1,
+        "directional_samples": 0,
+        "directional_win_rate": 0.0,
+        "target_1_hit_rate": 0.0,
+        "stop_hit_rate": 0.0,
+        "avg_24h_return_pct": 0.0
+      },
+      {
+        "regime_label": "UNKNOWN",
+        "rows": 1,
+        "complete": 1,
+        "directional_samples": 1,
+        "directional_win_rate": 0.0,
+        "target_1_hit_rate": 0.0,
+        "stop_hit_rate": 100.0,
+        "avg_24h_return_pct": -0.7027
+      },
+      {
+        "regime_label": "VOLATILE",
+        "rows": 1,
+        "complete": 1,
+        "directional_samples": 0,
+        "directional_win_rate": 0.0,
+        "target_1_hit_rate": 0.0,
+        "stop_hit_rate": 0.0,
+        "avg_24h_return_pct": 0.0
+      }
+    ],
+    "blockers": [
+      "Backtest complete samples کمتر از 100 است: 12",
+      "Directional backtest samples کمتر از 30 است: 6"
+    ],
+    "warnings": [
+      "BACKTEST با FORWARD_TEST یکی نیست؛ خروجی تاریخی فقط برای تحقیق و اعتبارسنجی اولیه است.",
+      "برای جلوگیری از اعتماد کاذب، Live/Paper جدی فقط بعد از Forward/Paper کافی مجاز است."
+    ]
+  }
+}
