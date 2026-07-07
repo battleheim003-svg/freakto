@@ -72,6 +72,11 @@ jobs:
         run: |
           python -X utf8 scripts/github_actions_health_summary.py || true
 
+      - name: Run v6 pipeline health monitor
+        if: always()
+        run: |
+          python -X utf8 pipeline_health_dashboard.py || true
+
       - name: Upload health artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -84,3 +89,5 @@ jobs:
             logs/forward_testing/forward_test_status_*.md
             logs/github_actions/*.md
             logs/forward_test_runs.csv
+            logs/research/**/*.json
+            logs/research/**/*.md

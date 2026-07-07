@@ -184,3 +184,32 @@ python shadow_gate_dashboard.py --compact
 از این نسخه به بعد Forward Cycle و GitHub Actions به صورت خودکار Shadow Gate Validator را بعد از `decision_evaluator.py` اجرا می‌کنند.
 
 هدف: تأیید یا رد Gateهای مثبت Backtest روی Forward Test واقعی، بدون Paper/Live.
+
+---
+
+# v6.0 — Research Robustness & Intelligence Suite
+
+بعد از فعال شدن Backtest، Gate Simulator و Shadow Gate، نسخه v6 اضافه شد تا ۱۱ مسیر بهبود زیر را در حالت research-only اجرا کند:
+
+```cmd
+python freakto_research_suite_dashboard.py
+```
+
+مهم‌ترین خروجی‌ها:
+
+```text
+logs/research/v6_suite/
+logs/research/freakto_research.db
+logs/research_dashboard/index.html
+```
+
+قدم بعدی بعد از اجرای v6 این است که خروجی‌های زیر بررسی شوند:
+
+```cmd
+python gate_robustness_dashboard.py --horizon 24h --min-samples 30
+python cost_adjusted_backtest_dashboard.py
+python statistical_readiness_dashboard.py
+python pipeline_health_dashboard.py
+```
+
+تا وقتی Strict Readiness و Shadow Gate Forward sample کافی نداشته باشند، پروژه همچنان RESEARCH_ONLY است.

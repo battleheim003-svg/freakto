@@ -12,7 +12,8 @@ Runs validation + risk intelligence together:
 9) Backtest Diagnostics
 10) Backtest Gate Simulator
 11) Candidate Gate Shadow Validator
-12) Advanced Live Readiness Score
+12) Research Robustness & Intelligence Suite
+13) Advanced Live Readiness Score
 """
 
 import argparse
@@ -35,6 +36,7 @@ from engine.historical_backtest import load_all_backtest_summary, format_summary
 from engine.backtest_diagnostics import run_backtest_diagnostics, format_diagnostics_console as format_backtest_diagnostics_console, save_backtest_diagnostics
 from engine.backtest_gate_simulator import run_gate_simulation, format_gate_simulation_console, save_gate_simulation
 from engine.shadow_gates import run_shadow_gate_validation, format_shadow_gate_console, save_shadow_gate_validation
+from engine.research_upgrade_suite import run_full_research_suite, format_full_suite_console, save_full_suite
 from telegram_notifier import send_telegram_message
 
 SUITE_DIR = Path("logs") / "validation_suite"
@@ -64,6 +66,7 @@ def main():
     backtest_diag = run_backtest_diagnostics()
     gate_sim = run_gate_simulation()
     shadow_gates = run_shadow_gate_validation()
+    research_suite = run_full_research_suite(save=False)
     readiness = assess_advanced_live_readiness()
 
     metric_text = format_metric_definitions_console()
@@ -77,9 +80,10 @@ def main():
     backtest_diag_text = format_backtest_diagnostics_console(backtest_diag, detail=False)
     gate_sim_text = format_gate_simulation_console(gate_sim, detail=False, top=8)
     shadow_gate_text = format_shadow_gate_console(shadow_gates, detail=False, top=8)
+    research_suite_text = format_full_suite_console(research_suite)
     readiness_text = format_advanced_readiness_console(readiness)
 
-    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, gate_sim_text, shadow_gate_text, readiness_text])
+    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, gate_sim_text, shadow_gate_text, research_suite_text, readiness_text])
     print(combined)
 
     metric_report = save_metric_definitions_report()
@@ -92,6 +96,7 @@ def main():
     backtest_diag_json, backtest_diag_report = save_backtest_diagnostics(backtest_diag)
     gate_sim_json, gate_sim_report, gate_sim_csv = save_gate_simulation(gate_sim)
     shadow_json, shadow_report, shadow_metrics_csv, shadow_signals_csv = save_shadow_gate_validation(shadow_gates)
+    research_suite_json, research_suite_report = save_full_suite(research_suite)
     readiness_json, readiness_report = save_advanced_readiness(readiness)
     combined_path = _save_combined_report(combined)
 
@@ -117,6 +122,8 @@ def main():
     print(f"📝 Shadow gate report ذخیره شد: {shadow_report}")
     print(f"📊 Shadow gate metrics ذخیره شد: {shadow_metrics_csv}")
     print(f"🧾 Shadow gate signals ذخیره شد: {shadow_signals_csv}")
+    print(f"🧠 Research suite JSON ذخیره شد: {research_suite_json}")
+    print(f"📝 Research suite report ذخیره شد: {research_suite_report}")
     print(f"🚦 Advanced readiness JSON ذخیره شد: {readiness_json}")
     print(f"📝 Advanced readiness report ذخیره شد: {readiness_report}")
     print(f"📦 Combined validation suite report ذخیره شد: {combined_path}")
