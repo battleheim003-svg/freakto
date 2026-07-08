@@ -1,0 +1,947 @@
+{
+  "run_id": "research_suite_20260708_093408",
+  "generated_utc": "2026-07-08T09:34:08.400678+00:00",
+  "version": "v6.0.0",
+  "status": "RESEARCH_SUITE_WITH_BLOCKERS",
+  "sections": {
+    "gate_robustness": {
+      "run_id": "gate_robustness_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.305483+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "results": [],
+      "blockers": [
+        "هیچ دیتای backtest کامل برای robust validation وجود ندارد."
+      ],
+      "warnings": []
+    },
+    "cost_adjusted_backtest": {
+      "run_id": "cost_backtest_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.305995+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "groups": [],
+      "blockers": [
+        "Backtest data موجود نیست."
+      ]
+    },
+    "meta_labeling": {
+      "run_id": "meta_label_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.306524+00:00",
+      "status": "LOW_SAMPLE_META_LABELING",
+      "samples": 0,
+      "blockers": [
+        "برای meta-labeling حداقل 120 نمونه لازم است."
+      ],
+      "warnings": [],
+      "top_features": []
+    },
+    "ensemble_explainability": {
+      "run_id": "ensemble_explain_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.324131+00:00",
+      "status": "EXPLAINABILITY_READY",
+      "rows": 44,
+      "recent_count": 25,
+      "avg_ensemble_agreement": 57.52,
+      "recent_explanations": [
+        {
+          "decision_id": "bfa73053330f4640",
+          "candle_timestamp": "2026-07-05 04:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 73.0,
+          "actionability": "WATCHLIST",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 49.1
+            },
+            {
+              "feature": "momentum_score",
+              "value": 23.0,
+              "share_pct": 40.4
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 10.5
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "4ec6a78928f39356",
+          "candle_timestamp": "2026-07-05 04:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 67.0,
+          "actionability": "WATCHLIST",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 47.5
+            },
+            {
+              "feature": "momentum_score",
+              "value": 25.0,
+              "share_pct": 42.4
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 10.2
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "d3963955fcdedca9",
+          "candle_timestamp": "2026-07-05 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 63.0,
+          "actionability": "WATCHLIST",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 52.8
+            },
+            {
+              "feature": "momentum_score",
+              "value": 17.0,
+              "share_pct": 32.1
+            },
+            {
+              "feature": "structure_score",
+              "value": 8.0,
+              "share_pct": 15.1
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "9d6fb5dfbac52331",
+          "candle_timestamp": "2026-07-05 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 59.0,
+          "actionability": "WATCHLIST",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 52.8
+            },
+            {
+              "feature": "momentum_score",
+              "value": 17.0,
+              "share_pct": 32.1
+            },
+            {
+              "feature": "structure_score",
+              "value": 8.0,
+              "share_pct": 15.1
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "3ed3beb8a0142741",
+          "candle_timestamp": "2026-07-05 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 33.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 40.5
+            },
+            {
+              "feature": "momentum_score",
+              "value": 17.0,
+              "share_pct": 40.5
+            },
+            {
+              "feature": "structure_score",
+              "value": 8.0,
+              "share_pct": 19.0
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "d20cf69165d7b25f",
+          "candle_timestamp": "2026-07-05 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 16.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 44.0
+            },
+            {
+              "feature": "momentum_score",
+              "value": 8.0,
+              "share_pct": 32.0
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 24.0
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "b2ff192282909211",
+          "candle_timestamp": "2026-07-05 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 31.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 43.6
+            },
+            {
+              "feature": "momentum_score",
+              "value": 16.0,
+              "share_pct": 41.0
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 15.4
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "120e189be1e70388",
+          "candle_timestamp": "2026-07-05 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 36.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 42.5
+            },
+            {
+              "feature": "momentum_score",
+              "value": 17.0,
+              "share_pct": 42.5
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 15.0
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "6343d5fda70f7ead",
+          "candle_timestamp": "2026-07-05 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 31.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 43.6
+            },
+            {
+              "feature": "momentum_score",
+              "value": 16.0,
+              "share_pct": 41.0
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 15.4
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "e4b687ee00cfdd03",
+          "candle_timestamp": "2026-07-05 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 36.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 42.5
+            },
+            {
+              "feature": "momentum_score",
+              "value": 17.0,
+              "share_pct": 42.5
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 15.0
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "af0089d5a911079a",
+          "candle_timestamp": "2026-07-05 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 31.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 43.6
+            },
+            {
+              "feature": "momentum_score",
+              "value": 16.0,
+              "share_pct": 41.0
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 15.4
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "90ceec3959a268ff",
+          "candle_timestamp": "2026-07-05 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 18.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 40.7
+            },
+            {
+              "feature": "momentum_score",
+              "value": 8.0,
+              "share_pct": 29.6
+            },
+            {
+              "feature": "structure_score",
+              "value": 8.0,
+              "share_pct": 29.6
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "0678ab66434e5aeb",
+          "candle_timestamp": "2026-07-05 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 18.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 52.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 40.7
+            },
+            {
+              "feature": "momentum_score",
+              "value": 8.0,
+              "share_pct": 29.6
+            },
+            {
+              "feature": "structure_score",
+              "value": 8.0,
+              "share_pct": 29.6
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "740c9e42772549f9",
+          "candle_timestamp": "2026-07-06 04:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 35.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 62.2
+            },
+            {
+              "feature": "momentum_score",
+              "value": 11.0,
+              "share_pct": 24.4
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 13.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "e19f2e26336bad6a",
+          "candle_timestamp": "2026-07-06 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 38.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 81.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 30.0,
+              "share_pct": 48.4
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 27.4
+            },
+            {
+              "feature": "volume_score",
+              "value": 11.0,
+              "share_pct": 17.7
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "055d1880dfc7312a",
+          "candle_timestamp": "2026-07-06 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 38.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 81.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 30.0,
+              "share_pct": 48.4
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 27.4
+            },
+            {
+              "feature": "volume_score",
+              "value": 11.0,
+              "share_pct": 17.7
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "09ce1fb638454be2",
+          "candle_timestamp": "2026-07-06 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 38.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 73.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 28.0,
+              "share_pct": 46.7
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 28.3
+            },
+            {
+              "feature": "volume_score",
+              "value": 11.0,
+              "share_pct": 18.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "1102b59be0b7de01",
+          "candle_timestamp": "2026-07-06 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 49.0,
+          "actionability": "NOT_ACTIONABLE",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 52.8
+            },
+            {
+              "feature": "momentum_score",
+              "value": 19.0,
+              "share_pct": 35.8
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 11.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "86f05b0fe8adfbd6",
+          "candle_timestamp": "2026-07-06 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 63.0,
+          "actionability": "WATCHLIST",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 49.1
+            },
+            {
+              "feature": "momentum_score",
+              "value": 22.0,
+              "share_pct": 38.6
+            },
+            {
+              "feature": "structure_score",
+              "value": 7.0,
+              "share_pct": 12.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "2eaf3b9ad9adfdef",
+          "candle_timestamp": "2026-07-07 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 22.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 59.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 13.0,
+              "share_pct": 40.6
+            },
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 34.4
+            },
+            {
+              "feature": "volume_score",
+              "value": 5.0,
+              "share_pct": 15.6
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "c773f3c70658f65e",
+          "candle_timestamp": "2026-07-07 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 49.0,
+          "actionability": "NOT_ACTIONABLE",
+          "ensemble_agreement_score": 88.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 49.1
+            },
+            {
+              "feature": "momentum_score",
+              "value": 19.0,
+              "share_pct": 33.3
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 10.5
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "0a09219f00e35fac",
+          "candle_timestamp": "2026-07-07 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 66.0,
+          "actionability": "WATCHLIST",
+          "ensemble_agreement_score": 100.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 43.1
+            },
+            {
+              "feature": "momentum_score",
+              "value": 21.0,
+              "share_pct": 32.3
+            },
+            {
+              "feature": "historical_edge_score",
+              "value": 8.0,
+              "share_pct": 12.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "c1076bda549a5f61",
+          "candle_timestamp": "2026-07-07 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 30.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 68.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 62.2
+            },
+            {
+              "feature": "momentum_score",
+              "value": 11.0,
+              "share_pct": 24.4
+            },
+            {
+              "feature": "structure_score",
+              "value": 3.0,
+              "share_pct": 6.7
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "a2775e3a287b70db",
+          "candle_timestamp": "2026-07-07 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 35.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 88.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 60.9
+            },
+            {
+              "feature": "momentum_score",
+              "value": 11.0,
+              "share_pct": 23.9
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 13.0
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "6a43591943ce3847",
+          "candle_timestamp": "2026-07-08 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 41.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 88.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 30.0,
+              "share_pct": 47.6
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 27.0
+            },
+            {
+              "feature": "structure_score",
+              "value": 7.0,
+              "share_pct": 11.1
+            }
+          ],
+          "note": "high_agreement"
+        }
+      ],
+      "warnings": [
+        "Explainability سهم featureها را برای دیباگ نشان می‌دهد؛ به تنهایی سیگنال معاملاتی نیست."
+      ],
+      "blockers": []
+    },
+    "data_enrichment": {
+      "run_id": "data_enrichment_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.332336+00:00",
+      "status": "ENRICHMENT_CONNECTORS_PRESENT",
+      "features": [
+        {
+          "feature": "funding_rate",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "open_interest",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "long_short_ratio",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "liquidations",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "order_book_imbalance",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "exchange_inflow_outflow",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        }
+      ],
+      "connectors": {
+        "coinalyze_fetcher.py": true,
+        "futures_data_fetcher.py": true,
+        "news_sentiment.py": true,
+        "airdrop_radar.py": true
+      },
+      "recommendations": [
+        "Funding/Open Interest/Long-Short را اول به Shadow features اضافه کن، نه به decision live.",
+        "Order book برای تایم‌فریم 4h اولویت پایین‌تر از derivatives aggregate دارد."
+      ],
+      "warnings": [
+        "عدم وجود ستون یعنی feature هنوز در لاگ تصمیم‌ها persist نشده است، نه اینکه collector حتماً وجود ندارد."
+      ]
+    },
+    "regime_research": {
+      "run_id": "regime_research_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.332913+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "regimes": [],
+      "blockers": [
+        "Backtest data موجود نیست."
+      ]
+    },
+    "cross_exchange_validation": {
+      "run_id": "cross_exchange_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.333442+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "providers": [],
+      "blockers": [
+        "Backtest data موجود نیست."
+      ]
+    },
+    "research_db": {
+      "run_id": "research_db_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.373791+00:00",
+      "status": "RESEARCH_DB_READY",
+      "db_path": "logs/research/freakto_research.db",
+      "tables": [
+        {
+          "table": "decision_evaluations",
+          "rows": 43,
+          "source": "logs/decision_evaluations.csv"
+        },
+        {
+          "table": "decisions",
+          "rows": 44,
+          "source": "logs/decisions.csv"
+        },
+        {
+          "table": "forward_test_runs",
+          "rows": 14,
+          "source": "logs/forward_test_runs.csv"
+        },
+        {
+          "table": "shadow_gate_signals",
+          "rows": 16,
+          "source": "logs/shadow_gates/shadow_gate_signals.csv"
+        }
+      ]
+    },
+    "pipeline_health": {
+      "run_id": "pipeline_health_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.379756+00:00",
+      "status": "PIPELINE_ATTENTION_REQUIRED",
+      "alerts": [
+        "بیش از 8.0 ساعت از آخرین Forward Run گذشته است."
+      ],
+      "latest_forward_run": {
+        "run_id": "forward_20260707_233410",
+        "started_utc": "2026-07-07T23:34:10.364226+00:00",
+        "finished_utc": "2026-07-07T23:35:03.425297+00:00",
+        "duration_seconds": "53.06",
+        "mode": "EXECUTE",
+        "ok": "True",
+        "task_count": "7",
+        "failed_tasks": "nan",
+        "report_file": "logs/forward_testing/forward_20260707_233410_report.md",
+        "hours_since_last_run": 10.0
+      },
+      "forward_eval_rows": 43,
+      "shadow_signal_rows": 16
+    },
+    "strict_readiness": {
+      "run_id": "strict_readiness_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.398620+00:00",
+      "status": "STRICT_READINESS_RESEARCH_ONLY",
+      "backtest_net": {
+        "samples": 0,
+        "avg_return_pct": 0.0,
+        "median_return_pct": 0.0,
+        "win_rate": 0.0,
+        "target_1_hit_rate": 0.0,
+        "stop_hit_rate": 0.0,
+        "mfe_mean_pct": 0.0,
+        "mae_mean_pct": 0.0,
+        "mfe_mae_ratio": 0.0,
+        "best_return_pct": 0.0,
+        "worst_return_pct": 0.0,
+        "std_return_pct": 0.0,
+        "t_stat": 0.0,
+        "confidence_95_low_pct": 0.0,
+        "confidence_95_high_pct": 0.0
+      },
+      "forward_net": {
+        "samples": 25,
+        "avg_return_pct": 0.5395,
+        "median_return_pct": 0.6356,
+        "win_rate": 88.0,
+        "target_1_hit_rate": 96.0,
+        "stop_hit_rate": 80.0,
+        "mfe_mean_pct": 3.192,
+        "mae_mean_pct": -2.1328,
+        "mfe_mae_ratio": 1.497,
+        "best_return_pct": 1.6846,
+        "worst_return_pct": -1.3204,
+        "std_return_pct": 0.7551,
+        "t_stat": 3.5722,
+        "confidence_95_low_pct": 0.2435,
+        "confidence_95_high_pct": 0.8355
+      },
+      "regime_labels": [],
+      "btc_beta_check": {
+        "samples": 0,
+        "correlation_to_btc": 0.0,
+        "note": "insufficient_data"
+      },
+      "blockers": [
+        "Backtest sample کمتر از 100 است.",
+        "Backtest net expectancy از نظر CI95 بالای صفر نیست.",
+        "Forward complete samples کمتر از 30 است.",
+        "پوشش regime کافی نیست؛ حداقل دو رژیم معتبر لازم است."
+      ],
+      "warnings": [
+        "این readiness سخت‌گیرانه‌تر از نسخه‌های قبلی است و به تنهایی مجوز Live نیست."
+      ]
+    },
+    "position_sizing_lab": {
+      "run_id": "position_sizing_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.399220+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "rows": []
+    },
+    "airdrop_shadow_research": {
+      "run_id": "airdrop_shadow_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.399338+00:00",
+      "status": "AIRDROP_SHADOW_READY",
+      "items": [
+        {
+          "name": "Example Placeholder - Replace Me",
+          "score": 0,
+          "shadow_gates": "",
+          "cost_usd": 50.0,
+          "minutes": 90.0,
+          "token_status": "unknown",
+          "verdict": "WATCH_OR_IGNORE"
+        }
+      ],
+      "warnings": [
+        "Airdrop shadow فقط امتیازدهی تحقیقاتی است؛ نباید wallet connect یا signature خودکار انجام شود."
+      ]
+    },
+    "static_dashboard": {
+      "run_id": "static_dashboard_20260708_093408",
+      "generated_utc": "2026-07-08T09:34:08.400653+00:00",
+      "status": "STATIC_DASHBOARD_READY",
+      "html_path": "logs/research_dashboard/index.html"
+    }
+  },
+  "blockers": [
+    "gate_robustness: هیچ دیتای backtest کامل برای robust validation وجود ندارد.",
+    "cost_adjusted_backtest: Backtest data موجود نیست.",
+    "meta_labeling: برای meta-labeling حداقل 120 نمونه لازم است.",
+    "regime_research: Backtest data موجود نیست.",
+    "cross_exchange_validation: Backtest data موجود نیست.",
+    "strict_readiness: Backtest sample کمتر از 100 است.",
+    "strict_readiness: Backtest net expectancy از نظر CI95 بالای صفر نیست.",
+    "strict_readiness: Forward complete samples کمتر از 30 است.",
+    "strict_readiness: پوشش regime کافی نیست؛ حداقل دو رژیم معتبر لازم است."
+  ]
+}
