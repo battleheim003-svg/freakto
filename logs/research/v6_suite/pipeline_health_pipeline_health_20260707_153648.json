@@ -1,0 +1,22 @@
+{
+  "run_id": "pipeline_health_20260707_153648",
+  "generated_utc": "2026-07-07T15:36:48.662127+00:00",
+  "status": "PIPELINE_ATTENTION_REQUIRED",
+  "alerts": [
+    "بیش از 8.0 ساعت از آخرین Forward Run گذشته است."
+  ],
+  "latest_forward_run": {
+    "run_id": "forward_20260705_175826",
+    "started_utc": "2026-07-05T17:58:26.845133+00:00",
+    "finished_utc": "2026-07-05T18:01:31.805102+00:00",
+    "duration_seconds": "184.96",
+    "mode": "EXECUTE",
+    "ok": "True",
+    "task_count": "6",
+    "failed_tasks": "nan",
+    "report_file": "logs\\forward_testing\\forward_20260705_175826_report.md",
+    "hours_since_last_run": 45.64
+  },
+  "forward_eval_rows": 30,
+  "shadow_signal_rows": 14
+}

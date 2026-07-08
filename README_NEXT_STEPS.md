@@ -213,3 +213,42 @@ python pipeline_health_dashboard.py
 ```
 
 تا وقتی Strict Readiness و Shadow Gate Forward sample کافی نداشته باشند، پروژه همچنان RESEARCH_ONLY است.
+
+---
+
+# v6.1 — Regime-Split Gate Matrix
+
+بعد از v6.0 مشخص شد که Regime خام به‌تنهایی Edge مثبت ندارد و Gateهای 4h/12h هم robust نیستند. v6.1 برای بررسی ترکیب‌های دقیق‌تر اضافه شد:
+
+```text
+Regime × Gate
+Regime × Side
+Regime × Symbol
+Regime × Gate × Side
+```
+
+اجرای پیشنهادی:
+
+```cmd
+python regime_gate_matrix_dashboard.py --compact
+```
+
+اجرای دقیق‌تر:
+
+```cmd
+python regime_gate_matrix_dashboard.py --compact --horizon 24h --min-samples 10 --candidate-min-samples 30
+```
+
+اگر خواستی فقط Gateهای اصلی v6 بررسی شوند:
+
+```cmd
+python regime_gate_matrix_dashboard.py --compact --primary-only
+```
+
+خروجی‌ها در این مسیر ذخیره می‌شوند:
+
+```text
+logs/research/v6_suite/
+```
+
+قانون مهم: هر خروجی مثبت v6.1 فقط Shadow/Research candidate است. Paper/Live تا وقتی Forward sample، Strict Readiness و Shadow validation کافی نباشد ممنوع می‌ماند.

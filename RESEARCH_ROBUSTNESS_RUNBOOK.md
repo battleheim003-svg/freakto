@@ -57,3 +57,26 @@ logs/research_dashboard/index.html
 ## محدودیت مهم
 
 خروجی‌های v6 برای تصمیم live کافی نیستند. هر gate یا مدل باید بعد از Backtest، در Shadow/Forward نمونه کافی بگیرد.
+
+---
+
+## v6.1 — Regime-Split Gate Matrix
+
+برای بررسی اینکه Gateهای مثبت فقط در بعضی Regimeها Edge دارند یا نه:
+
+```cmd
+python regime_gate_matrix_dashboard.py --compact
+python regime_gate_matrix_dashboard.py --compact --primary-only
+```
+
+این بخش خروجی‌های زیر را می‌سازد:
+
+```text
+logs/research/v6_suite/regime_gate_matrix_*.json
+logs/research/v6_suite/regime_gate_matrix_results_*.csv
+logs/research/v6_suite/regime_gate_side_matrix_results_*.csv
+logs/research/v6_suite/regime_avoid_candidates_*.csv
+logs/research/v6_suite/regime_shadow_proposals_*.json
+```
+
+v6.1 به `freakto_research_suite_dashboard.py` و `validation_suite_dashboard.py` هم وصل شده است.

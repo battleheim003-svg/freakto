@@ -1,0 +1,781 @@
+<!doctype html><html lang='fa'><head><meta charset='utf-8'><title>Freakto Research Dashboard</title>
+<style>body{font-family:Arial,sans-serif;direction:rtl;background:#111;color:#eee;padding:24px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #555;padding:8px;vertical-align:top}pre{white-space:pre-wrap;direction:ltr;text-align:left}</style></head>
+<body><h1>Freakto Research Dashboard v6</h1><p>Generated UTC: 2026-07-07T15:33:41.315111+00:00</p><table><tr><th>Section</th><th>Status</th><th>Details</th></tr><tr><td>gate_robustness</td><td>ROBUST_GATES_FOUND</td><td><pre>{
+  "run_id": "gate_robustness_20260707_153340",
+  "generated_utc": "2026-07-07T15:33:40.719470+00:00",
+  "status": "ROBUST_GATES_FOUND",
+  "horizon": "24h",
+  "min_samples": 30,
+  "windows": 5,
+  "embargo_rows": 2,
+  "fee_bps": 10.0,
+  "slippage_bps": 5.0,
+  "baseline_gross": {
+    "samples": 295,
+    "avg_return_pct": -0.2509,
+    "median_return_pct": -0.2506,
+    "win_rate": 46.1,
+    "target_1_hit_rate": 48.14,
+    "stop_hit_rate": 47.12,
+    "mfe_mean_pct": 1.9292,
+    "mae_mean_pct": -2.2058,
+    "mfe_mae_ratio": 0.875,
+    "best_return_pct": 9.0062,
+    "worst_return_pct": -10.3172,
+    "std_return_pct": 2.4807,
+    "t_stat": -1.7373,
+    "confidence_95_low_pct": -0.534,
+    "confidence_95_high_pct": 0.0322
+  },
+  "baseline_net": {
+    "samples": 295,
+    "avg_return_pct": -0.4009,
+    "median_return_pct": -0.4006,
+    "win_rate": 43.73,
+    "target_1_hit_rate": 48.14,
+    "stop_hit_rate": 47.12,
+    "mfe_mean_pct": 1.9292,
+    "mae_mean_pct": -2.2058,
+    "mfe_mae_ratio": 0.875,
+    "best_return_pct": 8.8562,
+    "worst_return_pct": -10.4672,
+    "std_return_pct": 2.4807,
+    "t_stat": -2.7759,
+    "confidence_95_low_pct": -0.684,
+    "confidence_95_high_pct": -0.1178
+  },
+  "gates_tested": 17,
+  "robust_candidates": 2,
+  "fragile_positive": 1,
+  "results": [
+    {
+      "gate": "VOLUME_SCORE_GE_10",
+      "family": "component",
+      "filters": {
+        "volume_score__ge": 10
+      },
+      "samples": 34,
+      "gross_avg_pct": 0.713,
+      "net_avg_pct": 0.5631,
+      "net_win_rate": 64.71,
+      "net_t_stat": 1.4538,
+      "net_ci_low": -0.1961,
+      "net_ci_high": 1.3222,
+      "target_1_hit_rate": 76.47,
+      "stop_hit_rate": 44.12,
+      "mfe_mae_ratio": 1.314,
+      "valid_windows": 5,
+      "positive_windows": 3,
+      "stability_pct": 60.0,
+      "min_window_net_avg_pct": -1.6683,
+      "multiple_testing_penalty": 0.0704,
+      "stability_penalty": 0.0,
+      "robust_score": 0.6784,
+      "verdict": "ROBUST_RESEARCH_CANDIDATE",
+      "window_results": [
+        {
+          "window": 1,
+          "samples": 5,
+          "net_avg": -0.0885,
+          "win": 60.0
+        },
+        {
+          "window": 2,
+          "samples": 11,
+          "net_avg": 0.5518,
+          "win": 63.64
+        },
+        {
+          "window": 3,
+          "samples": 6,
+          "net_avg": 0.6874,
+          "win": 66.67
+        },
+        {
+          "window": 4,
+          "samples": 9,
+          "net_avg": 1.9943,
+          "win": 88.89
+        },
+        {
+ </pre></td></tr><tr><td>cost_adjusted_backtest</td><td>COST_ADJUSTED_READY</td><td><pre>{
+  "run_id": "cost_backtest_20260707_153340",
+  "generated_utc": "2026-07-07T15:33:40.845134+00:00",
+  "status": "COST_ADJUSTED_READY",
+  "horizon": "24h",
+  "fee_bps": 10.0,
+  "slippage_bps": 5.0,
+  "groups": [
+    {
+      "name": "GATE_QUALITY_VOLUME_HEDGE",
+      "samples": 2,
+      "gross_avg_pct": 1.6792,
+      "net_avg_pct": 1.5292,
+      "net_win_rate": 100.0,
+      "net_t_stat": 3.4826,
+      "verdict": "LOW_SAMPLE"
+    },
+    {
+      "name": "GATE_VOLUME_SCORE_GE_10",
+      "samples": 34,
+      "gross_avg_pct": 0.7131,
+      "net_avg_pct": 0.563,
+      "net_win_rate": 64.71,
+      "net_t_stat": 1.4538,
+      "verdict": "RESEARCH_CANDIDATE"
+    },
+    {
+      "name": "GATE_BNB_LONG_SCORE_GE_60",
+      "samples": 11,
+      "gross_avg_pct": 0.5033,
+      "net_avg_pct": 0.3533,
+      "net_win_rate": 72.73,
+      "net_t_stat": 0.7231,
+      "verdict": "LOW_SAMPLE"
+    },
+    {
+      "name": "GATE_QUALITY_STRUCTURE_RISK_MEDIUM",
+      "samples": 41,
+      "gross_avg_pct": 0.4569,
+      "net_avg_pct": 0.3069,
+      "net_win_rate": 51.22,
+      "net_t_stat": 0.7912,
+      "verdict": "RESEARCH_CANDIDATE"
+    },
+    {
+      "name": "GATE_SCORE_GE_80",
+      "samples": 20,
+      "gross_avg_pct": 0.3797,
+      "net_avg_pct": 0.2297,
+      "net_win_rate": 60.0,
+      "net_t_stat": 0.3834,
+      "verdict": "LOW_SAMPLE"
+    },
+    {
+      "name": "GATE_STRUCTURE_SCORE_GE_10",
+      "samples": 86,
+      "gross_avg_pct": 0.266,
+      "net_avg_pct": 0.116,
+      "net_win_rate": 50.0,
+      "net_t_stat": 0.4791,
+      "verdict": "POSITIVE_BUT_FRAGILE"
+    },
+    {
+      "name": "GATE_DOGE_SHORT_WATCH",
+      "samples": 25,
+      "gross_avg_pct": 0.2309,
+      "net_avg_pct": 0.0809,
+      "net_win_rate": 40.0,
+      "net_t_stat": 0.1309,
+      "verdict": "LOW_SAMPLE"
+    },
+    {
+      "name": "GATE_RISK_MEDIUM",
+      "samples": 76,
+      "gross_avg_pct": 0.2106,
+      "net_avg_pct": 0.0606,
+      "net_win_rate": 50.0,
+      "net_t_stat": 0.1938,
+      "verdict": "RESEARCH_CANDIDATE"
+    },
+    {
+      "name": "GATE_ACTIONABLE_SCORE_GE_80",
+      "samples": 18,
+      "gross_avg_pct": 0.2069,
+      "net_avg_pct": 0.0569,
+      "net_win_rate": 55.56,
+      "net_t_stat": 0.087,
+      "verdict": "LOW_SAMPLE"
+    },
+    {
+      "name": "GATE_HISTORICAL_EDGE_SCORE_GE_1",
+      "samples": 40,
+      "gross_avg_pct": 0.1026,
+      "net_avg_pct": -0.0474,
+      "net_win_rate": 55.0,
+      "net_t_stat": -0.1471,
+      "verdict": "NEGATIVE_OR_FLAT"
+    },
+    {
+      "name": "</pre></td></tr><tr><td>meta_labeling</td><td>META_LABEL_BUILDING</td><td><pre>{
+  "run_id": "meta_label_20260707_153340",
+  "generated_utc": "2026-07-07T15:33:40.884283+00:00",
+  "status": "META_LABEL_BUILDING",
+  "samples": 295,
+  "train_samples": 206,
+  "test_samples": 89,
+  "accuracy": 49.44,
+  "auc": 0.5207,
+  "top_features": [
+    {
+      "feature": "long_score",
+      "weight": 0.4314,
+      "abs_weight": 0.4314
+    },
+    {
+      "feature": "momentum_score",
+      "weight": -0.414,
+      "abs_weight": 0.414
+    },
+    {
+      "feature": "volume_score",
+      "weight": 0.2651,
+      "abs_weight": 0.2651
+    },
+    {
+      "feature": "structure_score",
+      "weight": -0.1736,
+      "abs_weight": 0.1736
+    },
+    {
+      "feature": "trend_score",
+      "weight": 0.0954,
+      "abs_weight": 0.0954
+    },
+    {
+      "feature": "score",
+      "weight": -0.0683,
+      "abs_weight": 0.0683
+    },
+    {
+      "feature": "historical_edge_score",
+      "weight": -0.0348,
+      "abs_weight": 0.0348
+    },
+    {
+      "feature": "short_score",
+      "weight": 0.0067,
+      "abs_weight": 0.0067
+    }
+  ],
+  "threshold_study": [
+    {
+      "threshold": 0.5,
+      "samples": 36,
+      "avg_return_pct": -0.2479,
+      "win_rate": 47.22
+    },
+    {
+      "threshold": 0.55,
+      "samples": 26,
+      "avg_return_pct": -0.4995,
+      "win_rate": 42.31
+    },
+    {
+      "threshold": 0.6,
+      "samples": 23,
+      "avg_return_pct": -0.5403,
+      "win_rate": 39.13
+    },
+    {
+      "threshold": 0.65,
+      "samples": 14,
+      "avg_return_pct": -0.9186,
+      "win_rate": 35.71
+    },
+    {
+      "threshold": 0.7,
+      "samples": 3,
+      "avg_return_pct": -1.4041,
+      "win_rate": 33.33
+    }
+  ],
+  "blockers": [
+    "AUC یا sample هنوز برای استفاده عملی کافی نیست."
+  ],
+  "warnings": [
+    "Meta-labeling فعلاً فقط Shadow/Research است و actionability را تغییر نمی‌دهد."
+  ],
+  "recommendations": [
+    "اگر AUC در Forward هم بالای 0.55 بماند، مرحله بعدی meta-label shadow gate است."
+  ]
+}</pre></td></tr><tr><td>ensemble_explainability</td><td>EXPLAINABILITY_READY</td><td><pre>{
+  "run_id": "ensemble_explain_20260707_153340",
+  "generated_utc": "2026-07-07T15:33:40.920187+00:00",
+  "status": "EXPLAINABILITY_READY",
+  "rows": 32,
+  "recent_count": 25,
+  "avg_ensemble_agreement": 41.44,
+  "recent_explanations": [
+    {
+      "decision_id": "bbfd193a5c358ccd",
+      "candle_timestamp": "2026-07-03 20:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 70.0,
+      "actionability": "ACTIONABLE",
+      "ensemble_agreement_score": 48.0,
+      "top_contributors": [
+        {
+          "feature": "trend_score",
+          "value": 28.0,
+          "share_pct": 41.8
+        },
+        {
+          "feature": "momentum_score",
+          "value": 27.0,
+          "share_pct": 40.3
+        },
+        {
+          "feature": "structure_score",
+          "value": 10.0,
+          "share_pct": 14.9
+        }
+      ],
+      "note": "mixed_or_building"
+    },
+    {
+      "decision_id": "3106fe3470593c27",
+      "candle_timestamp": "2026-07-03 20:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 68.0,
+      "actionability": "WATCHLIST",
+      "ensemble_agreement_score": 48.0,
+      "top_contributors": [
+        {
+          "feature": "trend_score",
+          "value": 28.0,
+          "share_pct": 44.4
+        },
+        {
+          "feature": "momentum_score",
+          "value": 23.0,
+          "share_pct": 36.5
+        },
+        {
+          "feature": "structure_score",
+          "value": 10.0,
+          "share_pct": 15.9
+        }
+      ],
+      "note": "mixed_or_building"
+    },
+    {
+      "decision_id": "42234f23363549ef",
+      "candle_timestamp": "2026-07-03 20:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 68.0,
+      "actionability": "WATCHLIST",
+      "ensemble_agreement_score": 48.0,
+      "top_contributors": [
+        {
+          "feature": "trend_score",
+          "value": 28.0,
+          "share_pct": 44.4
+        },
+        {
+          "feature": "momentum_score",
+          "value": 23.0,
+          "share_pct": 36.5
+        },
+        {
+          "feature": "structure_score",
+          "value": 10.0,
+          "share_pct": 15.9
+        }
+      ],
+      "note": "mixed_or_building"
+    },
+    {
+      "decision_id": "095125c6703b6951",
+      "candle_timestamp": "2026-07-03 20:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 67.0,
+      "actionability": "WATCHLIST",
+      "ensemble_agreement_score": 48.0,
+      "top_contributors": [
+        {
+        </pre></td></tr><tr><td>data_enrichment</td><td>ENRICHMENT_CONNECTORS_PRESENT</td><td><pre>{
+  "run_id": "data_enrichment_20260707_153340",
+  "generated_utc": "2026-07-07T15:33:40.951199+00:00",
+  "status": "ENRICHMENT_CONNECTORS_PRESENT",
+  "features": [
+    {
+      "feature": "funding_rate",
+      "present": false,
+      "column": "",
+      "coverage_pct": 0.0
+    },
+    {
+      "feature": "open_interest",
+      "present": false,
+      "column": "",
+      "coverage_pct": 0.0
+    },
+    {
+      "feature": "long_short_ratio",
+      "present": false,
+      "column": "",
+      "coverage_pct": 0.0
+    },
+    {
+      "feature": "liquidations",
+      "present": false,
+      "column": "",
+      "coverage_pct": 0.0
+    },
+    {
+      "feature": "order_book_imbalance",
+      "present": false,
+      "column": "",
+      "coverage_pct": 0.0
+    },
+    {
+      "feature": "exchange_inflow_outflow",
+      "present": false,
+      "column": "",
+      "coverage_pct": 0.0
+    }
+  ],
+  "connectors": {
+    "coinalyze_fetcher.py": true,
+    "futures_data_fetcher.py": true,
+    "news_sentiment.py": true,
+    "airdrop_radar.py": true
+  },
+  "recommendations": [
+    "Funding/Open Interest/Long-Short را اول به Shadow features اضافه کن، نه به decision live.",
+    "Order book برای تایم‌فریم 4h اولویت پایین‌تر از derivatives aggregate دارد."
+  ],
+  "warnings": [
+    "عدم وجود ستون یعنی feature هنوز در لاگ تصمیم‌ها persist نشده است، نه اینکه collector حتماً وجود ندارد."
+  ]
+}</pre></td></tr><tr><td>regime_research</td><td>REGIME_RESEARCH_READY</td><td><pre>{
+  "run_id": "regime_research_20260707_153340",
+  "generated_utc": "2026-07-07T15:33:40.982104+00:00",
+  "status": "REGIME_RESEARCH_READY",
+  "regime_count": 5,
+  "regimes": [
+    {
+      "regime": "QUIET",
+      "samples": 1,
+      "avg_return_pct": -0.182,
+      "median_return_pct": -0.182,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 1.4364,
+      "mae_mean_pct": -1.3413,
+      "mfe_mae_ratio": 1.071,
+      "best_return_pct": -0.182,
+      "worst_return_pct": -0.182,
+      "std_return_pct": 0.0,
+      "t_stat": 0.0,
+      "confidence_95_low_pct": -0.182,
+      "confidence_95_high_pct": -0.182
+    },
+    {
+      "regime": "TRENDING_BEAR",
+      "samples": 138,
+      "avg_return_pct": -0.1894,
+      "median_return_pct": -0.4333,
+      "win_rate": 41.3,
+      "target_1_hit_rate": 50.0,
+      "stop_hit_rate": 44.2,
+      "mfe_mean_pct": 2.1768,
+      "mae_mean_pct": -2.2881,
+      "mfe_mae_ratio": 0.951,
+      "best_return_pct": 9.0062,
+      "worst_return_pct": -10.3172,
+      "std_return_pct": 2.6886,
+      "t_stat": -0.8274,
+      "confidence_95_low_pct": -0.6379,
+      "confidence_95_high_pct": 0.2592
+    },
+    {
+      "regime": "TRENDING_BULL",
+      "samples": 136,
+      "avg_return_pct": -0.1985,
+      "median_return_pct": 0.1493,
+      "win_rate": 53.68,
+      "target_1_hit_rate": 48.53,
+      "stop_hit_rate": 50.0,
+      "mfe_mean_pct": 1.7052,
+      "mae_mean_pct": -2.1211,
+      "mfe_mae_ratio": 0.804,
+      "best_return_pct": 5.4035,
+      "worst_return_pct": -6.4619,
+      "std_return_pct": 2.3426,
+      "t_stat": -0.9882,
+      "confidence_95_low_pct": -0.5922,
+      "confidence_95_high_pct": 0.1952
+    },
+    {
+      "regime": "SIDEWAYS",
+      "samples": 10,
+      "avg_return_pct": -0.5985,
+      "median_return_pct": -1.1648,
+      "win_rate": 40.0,
+      "target_1_hit_rate": 50.0,
+      "stop_hit_rate": 60.0,
+      "mfe_mean_pct": 2.0087,
+      "mae_mean_pct": -2.2926,
+      "mfe_mae_ratio": 0.876,
+      "best_return_pct": 1.9481,
+      "worst_return_pct": -3.3227,
+      "std_return_pct": 1.8759,
+      "t_stat": -1.009,
+      "confidence_95_low_pct": -1.7612,
+      "confidence_95_high_pct": 0.5642
+    },
+    {
+      "regime": "UNKNOWN",
+      "samples": 10,
+      "avg_return_pct": -1.4731,
+      "median_return_pct": -1.4772,
+      "win_rate": 20.0,
+      "target_1_hit_rate": 20.0,
+      "stop_hit_rate": 40.0,
+      "mfe_mean_pct": 1.5277,
+      "mae_mean_pct": -2.2235,
+      "mfe</pre></td></tr><tr><td>cross_exchange_validation</td><td>SINGLE_PROVIDER_ONLY</td><td><pre>{
+  "run_id": "cross_exchange_20260707_153341",
+  "generated_utc": "2026-07-07T15:33:41.007056+00:00",
+  "status": "SINGLE_PROVIDER_ONLY",
+  "providers": [
+    {
+      "provider": "kucoin",
+      "samples": 295,
+      "avg_return_pct": -0.2509,
+      "median_return_pct": -0.2506,
+      "win_rate": 46.1,
+      "target_1_hit_rate": 48.14,
+      "stop_hit_rate": 47.12,
+      "mfe_mean_pct": 1.9292,
+      "mae_mean_pct": -2.2058,
+      "mfe_mae_ratio": 0.875,
+      "best_return_pct": 9.0062,
+      "worst_return_pct": -10.3172,
+      "std_return_pct": 2.4807,
+      "t_stat": -1.7373,
+      "confidence_95_low_pct": -0.534,
+      "confidence_95_high_pct": 0.0322
+    }
+  ],
+  "recommendations": [
+    "اگر فقط یک provider وجود دارد، همان Gate را روی Binance/Bybit/OKX جدا backfill کن."
+  ]
+}</pre></td></tr><tr><td>research_db</td><td>RESEARCH_DB_READY</td><td><pre>{
+  "run_id": "research_db_20260707_153341",
+  "generated_utc": "2026-07-07T15:33:41.081701+00:00",
+  "status": "RESEARCH_DB_READY",
+  "db_path": "logs\\research\\freakto_research.db",
+  "tables": [
+    {
+      "table": "historical_backtest_evaluations",
+      "rows": 654,
+      "source": "logs\\historical_backtest_evaluations.csv"
+    },
+    {
+      "table": "decision_evaluations",
+      "rows": 30,
+      "source": "logs\\decision_evaluations.csv"
+    },
+    {
+      "table": "decisions",
+      "rows": 32,
+      "source": "logs\\decisions.csv"
+    },
+    {
+      "table": "forward_test_runs",
+      "rows": 3,
+      "source": "logs\\forward_test_runs.csv"
+    },
+    {
+      "table": "shadow_gate_signals",
+      "rows": 14,
+      "source": "logs\\shadow_gates\\shadow_gate_signals.csv"
+    }
+  ]
+}</pre></td></tr><tr><td>pipeline_health</td><td>PIPELINE_ATTENTION_REQUIRED</td><td><pre>{
+  "run_id": "pipeline_health_20260707_153341",
+  "generated_utc": "2026-07-07T15:33:41.089710+00:00",
+  "status": "PIPELINE_ATTENTION_REQUIRED",
+  "alerts": [
+    "بیش از 8.0 ساعت از آخرین Forward Run گذشته است."
+  ],
+  "latest_forward_run": {
+    "run_id": "forward_20260705_175826",
+    "started_utc": "2026-07-05T17:58:26.845133+00:00",
+    "finished_utc": "2026-07-05T18:01:31.805102+00:00",
+    "duration_seconds": "184.96",
+    "mode": "EXECUTE",
+    "ok": "True",
+    "task_count": "6",
+    "failed_tasks": "nan",
+    "report_file": "logs\\forward_testing\\forward_20260705_175826_report.md",
+    "hours_since_last_run": 45.59
+  },
+  "forward_eval_rows": 30,
+  "shadow_signal_rows": 14
+}</pre></td></tr><tr><td>strict_readiness</td><td>STRICT_READINESS_RESEARCH_ONLY</td><td><pre>{
+  "run_id": "strict_readiness_20260707_153341",
+  "generated_utc": "2026-07-07T15:33:41.140574+00:00",
+  "status": "STRICT_READINESS_RESEARCH_ONLY",
+  "backtest_net": {
+    "samples": 295,
+    "avg_return_pct": -0.4009,
+    "median_return_pct": -0.4006,
+    "win_rate": 43.73,
+    "target_1_hit_rate": 48.14,
+    "stop_hit_rate": 47.12,
+    "mfe_mean_pct": 1.9292,
+    "mae_mean_pct": -2.2058,
+    "mfe_mae_ratio": 0.875,
+    "best_return_pct": 8.8562,
+    "worst_return_pct": -10.4672,
+    "std_return_pct": 2.4807,
+    "t_stat": -2.7759,
+    "confidence_95_low_pct": -0.684,
+    "confidence_95_high_pct": -0.1178
+  },
+  "forward_net": {
+    "samples": 17,
+    "avg_return_pct": 0.897,
+    "median_return_pct": 0.6957,
+    "win_rate": 100.0,
+    "target_1_hit_rate": 64.71,
+    "stop_hit_rate": 0.0,
+    "mfe_mean_pct": 1.5843,
+    "mae_mean_pct": -0.2997,
+    "mfe_mae_ratio": 5.287,
+    "best_return_pct": 1.6846,
+    "worst_return_pct": 0.3397,
+    "std_return_pct": 0.4995,
+    "t_stat": 7.4043,
+    "confidence_95_low_pct": 0.6596,
+    "confidence_95_high_pct": 1.1344
+  },
+  "regime_labels": [
+    "QUIET",
+    "SIDEWAYS",
+    "TRENDING_BEAR",
+    "TRENDING_BULL",
+    "UNKNOWN"
+  ],
+  "btc_beta_check": {
+    "samples": 44,
+    "correlation_to_btc": 0.7252,
+    "note": "avg_other_symbols_vs_btc"
+  },
+  "blockers": [
+    "Backtest net expectancy از نظر CI95 بالای صفر نیست.",
+    "Forward complete samples کمتر از 30 است."
+  ],
+  "warnings": [
+    "این readiness سخت‌گیرانه‌تر از نسخه‌های قبلی است و به تنهایی مجوز Live نیست."
+  ]
+}</pre></td></tr><tr><td>position_sizing_lab</td><td>POSITION_SIZING_RESEARCH_READY</td><td><pre>{
+  "run_id": "position_sizing_20260707_153341",
+  "generated_utc": "2026-07-07T15:33:41.244301+00:00",
+  "status": "POSITION_SIZING_RESEARCH_READY",
+  "max_risk_pct": 0.5,
+  "rows": [
+    {
+      "gate": "STRUCTURE_SCORE_GE_10",
+      "samples": 86,
+      "net_avg_pct": 0.116,
+      "std_pct": 2.2462,
+      "kelly_proxy_risk_pct": 0.5,
+      "volatility_risk_pct": 0.1113,
+      "suggested_shadow_risk_pct": 0.1113,
+      "verdict": "SIZE_RESEARCH_ONLY"
+    },
+    {
+      "gate": "VOLUME_SCORE_GE_10",
+      "samples": 34,
+      "net_avg_pct": 0.563,
+      "std_pct": 2.2583,
+      "kelly_proxy_risk_pct": 0.5,
+      "volatility_risk_pct": 0.1107,
+      "suggested_shadow_risk_pct": 0.1107,
+      "verdict": "SIZE_RESEARCH_ONLY"
+    },
+    {
+      "gate": "QUALITY_STRUCTURE_RISK_MEDIUM",
+      "samples": 41,
+      "net_avg_pct": 0.3069,
+      "std_pct": 2.4836,
+      "kelly_proxy_risk_pct": 0.5,
+      "volatility_risk_pct": 0.1007,
+      "suggested_shadow_risk_pct": 0.1007,
+      "verdict": "SIZE_RESEARCH_ONLY"
+    },
+    {
+      "gate": "RISK_MEDIUM",
+      "samples": 76,
+      "net_avg_pct": 0.0606,
+      "std_pct": 2.7266,
+      "kelly_proxy_risk_pct": 0.5,
+      "volatility_risk_pct": 0.0917,
+      "suggested_shadow_risk_pct": 0.0917,
+      "verdict": "SIZE_RESEARCH_ONLY"
+    },
+    {
+      "gate": "QUALITY_VOLUME_HEDGE",
+      "samples": 2,
+      "net_avg_pct": 1.5292,
+      "std_pct": 0.621,
+      "kelly_proxy_risk_pct": 0.0,
+      "volatility_risk_pct": 0.0,
+      "suggested_shadow_risk_pct": 0.0,
+      "verdict": "NO_SIZE"
+    },
+    {
+      "gate": "BNB_LONG_SCORE_GE_60",
+      "samples": 11,
+      "net_avg_pct": 0.3533,
+      "std_pct": 1.6203,
+      "kelly_proxy_risk_pct": 0.0,
+      "volatility_risk_pct": 0.0,
+      "suggested_shadow_risk_pct": 0.0,
+      "verdict": "NO_SIZE"
+    },
+    {
+      "gate": "SCORE_GE_80",
+      "samples": 20,
+      "net_avg_pct": 0.2297,
+      "std_pct": 2.6789,
+      "kelly_proxy_risk_pct": 0.0,
+      "volatility_risk_pct": 0.0,
+      "suggested_shadow_risk_pct": 0.0,
+      "verdict": "NO_SIZE"
+    },
+    {
+      "gate": "DOGE_SHORT_WATCH",
+      "samples": 25,
+      "net_avg_pct": 0.0809,
+      "std_pct": 3.0903,
+      "kelly_proxy_risk_pct": 0.0,
+      "volatility_risk_pct": 0.0,
+      "suggested_shadow_risk_pct": 0.0,
+      "verdict": "NO_SIZE"
+    },
+    {
+      "gate": "ACTIONABLE_SCORE_GE_80",
+      "samples": 18,
+      "net_avg_pct": 0.0569,
+      "std_pct": 2.775,
+      "kelly_proxy_risk_pct": 0.0,
+      "volatil</pre></td></tr><tr><td>airdrop_shadow_research</td><td>AIRDROP_SHADOW_READY</td><td><pre>{
+  "run_id": "airdrop_shadow_20260707_153341",
+  "generated_utc": "2026-07-07T15:33:41.296159+00:00",
+  "status": "AIRDROP_SHADOW_READY",
+  "items": [
+    {
+      "name": "Example Placeholder - Replace Me",
+      "score": 0,
+      "shadow_gates": "",
+      "cost_usd": 50.0,
+      "minutes": 90.0,
+      "token_status": "unknown",
+      "verdict": "WATCH_OR_IGNORE"
+    }
+  ],
+  "warnings": [
+    "Airdrop shadow فقط امتیازدهی تحقیقاتی است؛ نباید wallet connect یا signature خودکار انجام شود."
+  ]
+}</pre></td></tr></table></body></html>

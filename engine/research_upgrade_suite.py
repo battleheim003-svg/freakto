@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v6.0.0"
+VERSION = "v6.1.0"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 
@@ -745,6 +745,8 @@ def format_section_console(name: str, data: Dict[str, Any], compact: bool = True
 
 
 def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
+    from engine.regime_gate_matrix import run_regime_gate_matrix
+
     sections = {
         "gate_robustness": run_gate_robustness(),
         "cost_adjusted_backtest": run_cost_adjusted_backtest(),
@@ -752,6 +754,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "ensemble_explainability": run_ensemble_explainability(),
         "data_enrichment": run_data_enrichment_readiness(),
         "regime_research": run_regime_research(),
+        "regime_gate_matrix": run_regime_gate_matrix(),
         "cross_exchange_validation": run_cross_exchange_validation(),
         "research_db": run_research_db_export(),
         "pipeline_health": run_pipeline_health(),
@@ -791,6 +794,13 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nGate Robustness Highlights:")
         for r in gr.get("top_results", [])[:5]:
             lines.append(f"- {r.get('gate')}: {r.get('verdict')} | n={r.get('samples')} | net={r.get('net_avg_pct')}% | stability={r.get('stability_pct')}%")
+    rgm = report.get("sections", {}).get("regime_gate_matrix", {})
+    if rgm:
+        lines.append("\nRegime-Gate Matrix Highlights:")
+        lines.append(f"- {rgm.get('status')} | candidates={rgm.get('candidate_count', 0)} | horizon={rgm.get('horizon')}")
+        for r in (rgm.get("regime_candidates", []) + rgm.get("regime_gate_side_candidates", []))[:5]:
+            label = f"{r.get('regime')} × {r.get('gate')}" + (f" × {r.get('side')}" if r.get('side') else "")
+            lines.append(f"- {label}: n={r.get('samples')} | net={r.get('net_avg_pct')}% | verdict={r.get('verdict')}")
     sr = report.get("sections", {}).get("strict_readiness", {})
     if sr:
         lines.append("\nStrict Readiness:")
@@ -805,7 +815,7 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nSuite Blockers:")
         for b in report.get("blockers", [])[:12]:
             lines.append(f"⛔ {b}")
-    lines.append("\nSafety: هیچ بخش v6 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
+    lines.append("\nSafety: هیچ بخش v6/v6.1 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
     lines.append(sep)
     return "\n".join(lines)
 
