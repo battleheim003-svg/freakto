@@ -11,7 +11,7 @@ Runs validation + risk intelligence together:
 8) Historical Backtest Status
 9) Backtest Diagnostics
 10) Backtest Gate Simulator
-11) Candidate Gate Shadow Validator
+11) Regime Shadow Gate Activator
 12) Regime-Split Gate Matrix
 13) Research Robustness & Intelligence Suite
 14) Advanced Live Readiness Score

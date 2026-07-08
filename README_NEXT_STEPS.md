@@ -252,3 +252,27 @@ logs/research/v6_suite/
 ```
 
 قانون مهم: هر خروجی مثبت v6.1 فقط Shadow/Research candidate است. Paper/Live تا وقتی Forward sample، Strict Readiness و Shadow validation کافی نباشد ممنوع می‌ماند.
+
+
+---
+
+# Current Next Step — v6.2 Regime Shadow Gate Activator
+
+نسخه v6.2 چهار پیشنهاد Regime/Gate از v6.1 را وارد Shadow Forward کرده است:
+
+```text
+REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10
+REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT
+REGIME_TRENDING_BEAR__RISK_MEDIUM
+REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT
+```
+
+بعد از نصب نسخه، این دستورها را اجرا کن:
+
+```cmd
+python shadow_gate_dashboard.py --compact
+python regime_shadow_gate_dashboard.py --compact
+python freakto_research_suite_dashboard.py
+```
+
+هنوز Live/Paper فعال نیست. هدف فقط جمع‌آوری Forward sample برای Regime Shadow Gates است.

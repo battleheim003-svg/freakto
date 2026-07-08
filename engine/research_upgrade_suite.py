@@ -1,5 +1,5 @@
 """
-Freakto v6.0.0 - Research Robustness & Intelligence Suite
+Freakto v6.2.0 - Research Robustness & Regime Shadow Intelligence Suite
 
 Implements the 11 requested improvement areas in research-only mode:
 1) Gate robustness / multiple-testing guard / walk-forward / embargo proxy
@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v6.1.0"
+VERSION = "v6.2.0"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 
@@ -744,8 +744,23 @@ def format_section_console(name: str, data: Dict[str, Any], compact: bool = True
     return "\n".join(lines)
 
 
+
+def _shadow_report_to_dict(report: Any) -> Dict[str, Any]:
+    """Convert ShadowGateReport dataclass to a compact dict for the v6.2 suite."""
+    try:
+        data = asdict(report)
+    except Exception:
+        data = dict(report) if isinstance(report, dict) else {}
+    regime_metrics = [m for m in data.get("gate_metrics", []) if m.get("family") == "regime_gate_matrix_candidate"]
+    data["regime_gate_metrics"] = regime_metrics[:12]
+    data["regime_gate_count"] = len(regime_metrics)
+    data["regime_gate_signals"] = sum(int(m.get("total_signals", 0) or 0) for m in regime_metrics)
+    data["status"] = "REGIME_SHADOW_GATES_ACTIVE" if regime_metrics else data.get("status", "UNKNOWN")
+    return data
+
 def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
     from engine.regime_gate_matrix import run_regime_gate_matrix
+    from engine.shadow_gates import run_shadow_gate_validation
 
     sections = {
         "gate_robustness": run_gate_robustness(),
@@ -755,6 +770,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "data_enrichment": run_data_enrichment_readiness(),
         "regime_research": run_regime_research(),
         "regime_gate_matrix": run_regime_gate_matrix(),
+        "regime_shadow_gates": _shadow_report_to_dict(run_shadow_gate_validation()),
         "cross_exchange_validation": run_cross_exchange_validation(),
         "research_db": run_research_db_export(),
         "pipeline_health": run_pipeline_health(),
@@ -801,6 +817,12 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         for r in (rgm.get("regime_candidates", []) + rgm.get("regime_gate_side_candidates", []))[:5]:
             label = f"{r.get('regime')} × {r.get('gate')}" + (f" × {r.get('side')}" if r.get('side') else "")
             lines.append(f"- {label}: n={r.get('samples')} | net={r.get('net_avg_pct')}% | verdict={r.get('verdict')}")
+    rsg = report.get("sections", {}).get("regime_shadow_gates", {})
+    if rsg:
+        lines.append("\nRegime Shadow Gate Highlights:")
+        lines.append(f"- {rsg.get('status')} | regime_gates={rsg.get('regime_gate_count', 0)} | signals={rsg.get('regime_gate_signals', 0)} | eval={rsg.get('evaluated_shadow_samples', 0)}")
+        for r in rsg.get("regime_gate_metrics", [])[:4]:
+            lines.append(f"- {r.get('gate')}: {r.get('verdict')} | signals={r.get('total_signals')} | eval={r.get('evaluated_samples')} | avg={r.get('avg_return_pct')}%")
     sr = report.get("sections", {}).get("strict_readiness", {})
     if sr:
         lines.append("\nStrict Readiness:")
@@ -815,7 +837,7 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nSuite Blockers:")
         for b in report.get("blockers", [])[:12]:
             lines.append(f"⛔ {b}")
-    lines.append("\nSafety: هیچ بخش v6/v6.1 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
+    lines.append("\nSafety: هیچ بخش v6/v6.1/v6.2 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
     lines.append(sep)
     return "\n".join(lines)
 

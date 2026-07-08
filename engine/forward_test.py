@@ -199,7 +199,7 @@ def build_forward_test_plan(
                 name="shadow_gate_validator",
                 command=_python_cmd("shadow_gate_dashboard.py", "--compact"),
                 required=False,
-                description="برچسب‌گذاری و ارزیابی Shadow Gateهای تحقیقاتی بدون ثبت Paper/Live.",
+                description="برچسب‌گذاری و ارزیابی Shadow Gateهای پایه و Regime-specific بدون ثبت Paper/Live.",
             )
         )
 

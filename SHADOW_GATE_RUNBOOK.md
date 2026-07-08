@@ -79,3 +79,24 @@ MFE/MAE >= 1
 ## چرا این مهم است؟
 
 v5.3.2 نشان داد baseline کلی منفی است، اما چند Gate تاریخی مثبت‌اند. v5.3.3 بررسی می‌کند این Gateها در آینده واقعی هم جواب می‌دهند یا فقط روی گذشته خوب دیده شده‌اند.
+
+---
+
+## v6.2 Update — Regime Shadow Gate Activator
+
+از v6.2 به بعد، Shadow Gate فقط gateهای پایه v5.3.2/v6.0 را رصد نمی‌کند؛ چهار gate جدید از v6.1 هم فعال شده‌اند:
+
+```text
+REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10
+REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT
+REGIME_TRENDING_BEAR__RISK_MEDIUM
+REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT
+```
+
+برای دیدن نمای focused:
+
+```cmd
+python regime_shadow_gate_dashboard.py --compact
+```
+
+این gateها فقط Shadow هستند و هیچ اثری روی Paper/Live ندارند.

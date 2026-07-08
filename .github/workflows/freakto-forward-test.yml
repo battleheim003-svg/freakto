@@ -112,6 +112,11 @@ jobs:
         run: |
           python -X utf8 regime_gate_matrix_dashboard.py --compact || true
 
+      - name: Run v6.2 regime shadow gate activator
+        if: always()
+        run: |
+          python -X utf8 regime_shadow_gate_dashboard.py --compact || true
+
       - name: Upload logs as workflow artifact
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,2 +1,3 @@
 ﻿run_id,generated_utc,status,horizon,min_samples,shadow_signals,evaluated_shadow_samples,confirmed_candidates,building_candidates,rejected_candidates,json_path,report_path
 shadow_gate_20260707_124845,2026-07-07T12:48:45.998967+00:00,SHADOW_COLLECTING_FORWARD_DATA,24h,30,14,14,0,7,0,logs\shadow_gates\shadow_gate_status_shadow_gate_20260707_124845.json,logs\shadow_gates\shadow_gate_report_shadow_gate_20260707_124845.md
+shadow_gate_20260708_164059,2026-07-08T16:40:59.407424+00:00,SHADOW_COLLECTING_FORWARD_DATA,24h,30,14,14,0,7,0,logs\shadow_gates\shadow_gate_status_shadow_gate_20260708_164059.json,logs\shadow_gates\shadow_gate_report_shadow_gate_20260708_164059.md

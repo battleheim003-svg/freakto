@@ -81,3 +81,26 @@ python -X utf8 shadow_gate_dashboard.py --compact
 ```text
 logs/shadow_gates/
 ```
+
+---
+
+## v6.2 Regime Shadow Gate Activator داخل Forward Cycle
+
+از v6.2 به بعد، مرحله `shadow_gate_validator` علاوه بر gateهای پایه، gateهای Regime-specific را هم رصد می‌کند:
+
+```text
+REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10
+REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT
+REGIME_TRENDING_BEAR__RISK_MEDIUM
+REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT
+```
+
+برای تست دستی:
+
+```cmd
+python forward_test_dashboard.py --cycle --validate --continue-on-error
+python shadow_gate_dashboard.py --compact
+python regime_shadow_gate_dashboard.py --compact
+```
+
+این مرحله هیچ Paper/Live ایجاد نمی‌کند.

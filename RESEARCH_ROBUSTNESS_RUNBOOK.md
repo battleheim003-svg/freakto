@@ -80,3 +80,21 @@ logs/research/v6_suite/regime_shadow_proposals_*.json
 ```
 
 v6.1 به `freakto_research_suite_dashboard.py` و `validation_suite_dashboard.py` هم وصل شده است.
+
+---
+
+## v6.2 — Regime Shadow Gate Activator
+
+بعد از اینکه v6.1 ترکیب‌های Regime/Gate را پیدا کرد، v6.2 آن‌ها را در Shadow Forward فعال می‌کند. این بخش داخل Research Suite با نام زیر دیده می‌شود:
+
+```text
+regime_shadow_gates
+```
+
+دستورهای اصلی:
+
+```cmd
+python shadow_gate_dashboard.py --compact
+python regime_shadow_gate_dashboard.py --compact
+python freakto_research_suite_dashboard.py
+```

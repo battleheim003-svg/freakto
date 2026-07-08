@@ -1,7 +1,7 @@
 """
 engine/shadow_gates.py
 
-Freakto v5.3.3 - Candidate Gate Shadow Validator
+Freakto v6.2.0 - Candidate + Regime Shadow Gate Activator
 
 Purpose:
 - Take the best research gates found by Backtest Gate Simulator.
@@ -29,6 +29,7 @@ import pandas as pd
 from engine.csv_utils import read_csv_dicts_lenient
 
 
+VERSION = "v6.2.0"
 LOG_DIR = Path("logs")
 DECISIONS_FILE = LOG_DIR / "decisions.csv"
 EVALUATIONS_FILE = LOG_DIR / "decision_evaluations.csv"
@@ -250,12 +251,8 @@ def _prepare_evaluations(df: pd.DataFrame) -> pd.DataFrame:
     return work
 
 
-def candidate_shadow_gates() -> List[ShadowGateSpec]:
-    """Backtest-derived gates to track in Forward/Shadow mode.
-
-    These came from v5.3.2 Gate Simulator. They must remain shadow-only until
-    each gate gets enough Forward/Paper evidence.
-    """
+def base_shadow_gates() -> List[ShadowGateSpec]:
+    """Backtest-derived gates from v5.3.2/v6.0 to track in Forward/Shadow mode."""
     return [
         ShadowGateSpec(
             name="VOLUME_SCORE_GE_10",
@@ -263,6 +260,7 @@ def candidate_shadow_gates() -> List[ShadowGateSpec]:
             priority=1,
             description="Backtest candidate قوی: volume_score >= 10.",
             filters={"volume_score_min": 10},
+            origin="BACKTEST_GATE_SIMULATOR_v5.3.2",
         ),
         ShadowGateSpec(
             name="RISK_MEDIUM",
@@ -270,6 +268,7 @@ def candidate_shadow_gates() -> List[ShadowGateSpec]:
             priority=2,
             description="Backtest candidate با sample بیشتر: risk_label = Medium.",
             filters={"risk_normalized_in": ["MEDIUM"]},
+            origin="BACKTEST_GATE_SIMULATOR_v5.3.2",
         ),
         ShadowGateSpec(
             name="HISTORICAL_EDGE_SCORE_GE_1",
@@ -277,6 +276,7 @@ def candidate_shadow_gates() -> List[ShadowGateSpec]:
             priority=3,
             description="Backtest candidate با stop کمتر: historical_edge_score >= 1.",
             filters={"historical_edge_score_min": 1},
+            origin="BACKTEST_GATE_SIMULATOR_v5.3.2",
         ),
         ShadowGateSpec(
             name="STRUCTURE_SCORE_GE_10",
@@ -284,6 +284,7 @@ def candidate_shadow_gates() -> List[ShadowGateSpec]:
             priority=4,
             description="مثبت ولی نیازمند review: structure_score >= 10.",
             filters={"structure_score_min": 10},
+            origin="BACKTEST_GATE_SIMULATOR_v5.3.2",
         ),
         ShadowGateSpec(
             name="SCORE_GE_80",
@@ -291,6 +292,7 @@ def candidate_shadow_gates() -> List[ShadowGateSpec]:
             priority=5,
             description="مثبت کم‌نمونه: score >= 80؛ فقط watchlist تحقیقاتی.",
             filters={"score_min": 80},
+            origin="BACKTEST_GATE_SIMULATOR_v5.3.2",
         ),
         ShadowGateSpec(
             name="DOGE_SHORT_WATCH",
@@ -298,6 +300,7 @@ def candidate_shadow_gates() -> List[ShadowGateSpec]:
             priority=6,
             description="مثبت کم‌نمونه: DOGE/USDT SHORT.",
             filters={"symbol_in": ["DOGE/USDT"], "side_in": ["SHORT"]},
+            origin="BACKTEST_GATE_SIMULATOR_v5.3.2",
         ),
         ShadowGateSpec(
             name="BNB_LONG_SCORE_GE_60",
@@ -305,9 +308,67 @@ def candidate_shadow_gates() -> List[ShadowGateSpec]:
             priority=7,
             description="مثبت کم‌نمونه: BNB/USDT LONG + score>=60.",
             filters={"symbol_in": ["BNB/USDT"], "side_in": ["LONG"], "score_min": 60},
+            origin="BACKTEST_GATE_SIMULATOR_v5.3.2",
         ),
     ]
 
+
+def regime_shadow_gates() -> List[ShadowGateSpec]:
+    """Regime-specific shadow gates activated from v6.1 Regime-Gate Matrix.
+
+    These are deliberately SHADOW_ONLY. They do not change Paper/Live behavior.
+    They are encoded statically from the v6.1 proposals so GitHub Actions can
+    keep collecting Forward samples even before the next matrix report is saved.
+    """
+    return [
+        ShadowGateSpec(
+            name="REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10",
+            family="regime_gate_matrix_candidate",
+            priority=0,
+            description="v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10.",
+            filters={"regime_label_in": ["TRENDING_BEAR"], "structure_score_min": 10},
+            origin="REGIME_GATE_MATRIX_v6.1.0",
+        ),
+        ShadowGateSpec(
+            name="REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT",
+            family="regime_gate_matrix_candidate",
+            priority=0,
+            description="v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10 + SHORT.",
+            filters={"regime_label_in": ["TRENDING_BEAR"], "structure_score_min": 10, "side_in": ["SHORT"]},
+            origin="REGIME_GATE_MATRIX_v6.1.0",
+        ),
+        ShadowGateSpec(
+            name="REGIME_TRENDING_BEAR__RISK_MEDIUM",
+            family="regime_gate_matrix_candidate",
+            priority=0,
+            description="v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium.",
+            filters={"regime_label_in": ["TRENDING_BEAR"], "risk_normalized_in": ["MEDIUM"]},
+            origin="REGIME_GATE_MATRIX_v6.1.0",
+        ),
+        ShadowGateSpec(
+            name="REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT",
+            family="regime_gate_matrix_candidate",
+            priority=0,
+            description="v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium + SHORT.",
+            filters={"regime_label_in": ["TRENDING_BEAR"], "risk_normalized_in": ["MEDIUM"], "side_in": ["SHORT"]},
+            origin="REGIME_GATE_MATRIX_v6.1.0",
+        ),
+    ]
+
+
+def candidate_shadow_gates(*, include_regime: bool = True) -> List[ShadowGateSpec]:
+    """All shadow gates currently tracked.
+
+    Base gates come from v5.3.2/v6.0. Regime-specific gates come from v6.1 and
+    are activated in v6.2 for Forward-only validation. All gates are live-known:
+    they use only decision-time fields such as symbol, side, regime_label,
+    risk_label and component scores. Outcome columns are used only for evaluation.
+    """
+    gates = base_shadow_gates()
+    if include_regime:
+        gates = regime_shadow_gates() + gates
+    # Deterministic order: regime activators first, then older gates.
+    return sorted(gates, key=lambda g: (g.priority, g.name))
 
 def _apply_gate(df: pd.DataFrame, spec: ShadowGateSpec) -> pd.DataFrame:
     if df.empty:
@@ -318,16 +379,29 @@ def _apply_gate(df: pd.DataFrame, spec: ShadowGateSpec) -> pd.DataFrame:
     def has(col: str) -> bool:
         return col in df.columns
 
+    # Exact/list filters. Support both native shadow filter keys and the v6 research_utils filter style.
+    if "symbol" in filters and has("symbol"):
+        mask &= df["symbol"].astype(str).str.upper() == str(filters["symbol"]).upper()
     if "symbol_in" in filters and has("symbol"):
-        mask &= df["symbol"].astype(str).isin([str(x) for x in filters["symbol_in"]])
+        mask &= df["symbol"].astype(str).str.upper().isin([str(x).upper() for x in filters["symbol_in"]])
+    if "side" in filters and has("side"):
+        mask &= df["side"].astype(str).str.upper() == str(filters["side"]).upper()
     if "side_in" in filters and has("side"):
-        mask &= df["side"].astype(str).isin([str(x).upper() for x in filters["side_in"]])
+        mask &= df["side"].astype(str).str.upper().isin([str(x).upper() for x in filters["side_in"]])
+    if "regime_label" in filters and has("regime_label"):
+        mask &= df["regime_label"].astype(str).str.upper() == str(filters["regime_label"]).upper()
+    if "regime_label_in" in filters and has("regime_label"):
+        mask &= df["regime_label"].astype(str).str.upper().isin([str(x).upper() for x in filters["regime_label_in"]])
+    if "actionability" in filters and has("actionability"):
+        mask &= df["actionability"].astype(str).str.upper() == str(filters["actionability"]).upper()
     if "actionability_in" in filters and has("actionability"):
-        mask &= df["actionability"].astype(str).isin([str(x) for x in filters["actionability_in"]])
+        mask &= df["actionability"].astype(str).str.upper().isin([str(x).upper() for x in filters["actionability_in"]])
+    if "risk_label" in filters and has("risk_normalized"):
+        mask &= df["risk_normalized"].astype(str).str.upper() == _normalize_risk(filters["risk_label"])
     if "risk_normalized_in" in filters and has("risk_normalized"):
-        mask &= df["risk_normalized"].astype(str).isin([str(x) for x in filters["risk_normalized_in"]])
+        mask &= df["risk_normalized"].astype(str).str.upper().isin([str(x).upper() for x in filters["risk_normalized_in"]])
     if "confidence_in" in filters and has("confidence_label"):
-        mask &= df["confidence_label"].astype(str).isin([str(x) for x in filters["confidence_in"]])
+        mask &= df["confidence_label"].astype(str).str.upper().isin([str(x).upper() for x in filters["confidence_in"]])
 
     for col in LIVE_KNOWN_NUMERIC_COLUMNS:
         if not has(col):
@@ -335,10 +409,16 @@ def _apply_gate(df: pd.DataFrame, spec: ShadowGateSpec) -> pd.DataFrame:
         values = pd.to_numeric(df[col], errors="coerce")
         min_key = f"{col}_min"
         max_key = f"{col}_max"
+        ge_key = f"{col}__ge"
+        le_key = f"{col}__le"
         if min_key in filters:
             mask &= values >= float(filters[min_key])
         if max_key in filters:
             mask &= values <= float(filters[max_key])
+        if ge_key in filters:
+            mask &= values >= float(filters[ge_key])
+        if le_key in filters:
+            mask &= values <= float(filters[le_key])
 
     return df[mask].copy()
 
@@ -548,9 +628,17 @@ def _build_recommendations(metrics: List[ShadowGateMetric], min_samples: int) ->
     else:
         recs.append("هیچ gate در Forward Shadow مثبت نیست؛ candidateهای Backtest فعلاً تأیید نشده‌اند.")
 
+    regime = [m for m in metrics if m.family == "regime_gate_matrix_candidate"]
+    if regime:
+        active_regime = [m for m in regime if m.total_signals > 0]
+        if active_regime:
+            top_regime = sorted(active_regime, key=lambda m: (m.evaluated_samples, m.avg_return_pct), reverse=True)[0]
+            recs.append(f"فعال‌ترین Regime Shadow gate: {top_regime.gate} | signals={top_regime.total_signals}, eval={top_regime.evaluated_samples}.")
+        else:
+            recs.append("Regime Shadow gateهای v6.1 فعال شده‌اند، اما هنوز هیچ تصمیم Forward آن‌ها را پاس نکرده است.")
     primary = [m for m in metrics if m.family == "primary_backtest_candidate"]
     if primary:
-        recs.append("سه gate اصلی که باید زیر نظر بمانند: VOLUME_SCORE_GE_10، RISK_MEDIUM، HISTORICAL_EDGE_SCORE_GE_1.")
+        recs.append("سه gate پایه که باید زیر نظر بمانند: VOLUME_SCORE_GE_10، RISK_MEDIUM، HISTORICAL_EDGE_SCORE_GE_1.")
     return blockers, recs
 
 
@@ -627,7 +715,7 @@ def run_shadow_gate_validation(
     recent: List[Dict] = []
     if not signals.empty:
         display_cols = [
-            "gate_name", "shadow_status", "decision_logged_at_utc", "candle_timestamp", "symbol", "side", "score", "selected_return_pct", "actionability", "risk_label",
+            "gate_name", "gate_family", "shadow_status", "decision_logged_at_utc", "candle_timestamp", "symbol", "side", "score", "selected_return_pct", "actionability", "risk_label", "regime_label",
         ]
         for col in display_cols:
             if col not in signals.columns:
@@ -636,8 +724,8 @@ def run_shadow_gate_validation(
 
     warnings = [
         "Shadow Gate هیچ Paper Trade و هیچ سفارش واقعی ایجاد نمی‌کند؛ فقط برچسب تحقیقاتی می‌زند.",
-        "Gateها از خروجی Backtest آمده‌اند و باید در Forward مستقل تأیید شوند.",
-        "تا وقتی هر gate حداقل 30 نمونه Forward کامل ندارد، نتیجه آماری قابل اتکا نیست.",
+        "Gateهای پایه از Backtest و Gateهای Regime از v6.1 Regime-Gate Matrix آمده‌اند و باید در Forward مستقل تأیید شوند.",
+        "تا وقتی هر gate، مخصوصاً gateهای Regime، حداقل 30 نمونه Forward کامل ندارد، نتیجه آماری قابل اتکا نیست.",
     ]
 
     return ShadowGateReport(
@@ -679,7 +767,7 @@ def _fmt_metric(row: Dict) -> str:
 def format_shadow_gate_console(report: ShadowGateReport, *, detail: bool = True, top: int = 10) -> str:
     lines: List[str] = []
     lines.append("=" * 110)
-    lines.append("🧪 Freakto Candidate Gate Shadow Validator v5.3.3")
+    lines.append("🧪 Freakto Regime Shadow Gate Activator v6.2.0")
     lines.append("=" * 110)
     lines.append(f"Status                 : {report.status}")
     lines.append(f"Run ID                 : {report.run_id}")
@@ -733,7 +821,7 @@ def format_shadow_gate_console(report: ShadowGateReport, *, detail: bool = True,
 
 def format_shadow_gate_report(report: ShadowGateReport) -> str:
     lines: List[str] = []
-    lines.append("# Freakto Candidate Gate Shadow Validator v5.3.3")
+    lines.append("# Freakto Regime Shadow Gate Activator v6.2.0")
     lines.append("")
     lines.append("## Summary")
     for key in [
