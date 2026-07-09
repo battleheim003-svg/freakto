@@ -107,3 +107,8 @@ python narrative_decision_dashboard.py --compact
 
 این لایه هیچ Paper/Live/Order واقعی فعال نمی‌کند.
 
+
+
+## اتصال به v8 Root Cause Discovery
+
+Causal Intelligence در v8 به عنوان یکی از evidence sourceهای موتور کشف علت استفاده می‌شود. خروجی‌های `primary_cause`, `catalyst_score`, `causal_verdict` و source health در وزن‌دهی علت‌ها اثر می‌گذارند.

@@ -381,3 +381,14 @@ python narrative_decision_dashboard.py --compact
 
 این لایه هیچ Paper/Live/Order واقعی فعال نمی‌کند.
 
+
+
+## v8.0.0 — Root Cause Discovery Engine
+
+مرحله بعد از Narrative/Decision Conflict، کشف علت‌های محتمل حرکت بازار است. دستور اصلی:
+
+```cmd
+python root_cause_dashboard.py --compact
+```
+
+این خروجی فقط Research است و علت قطعی یا سیگنال ورود محسوب نمی‌شود.

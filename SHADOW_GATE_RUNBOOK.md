@@ -189,3 +189,8 @@ python narrative_decision_dashboard.py --compact
 
 این لایه هیچ Paper/Live/Order واقعی فعال نمی‌کند.
 
+
+
+## Root Cause Gates هنوز فعال نیستند
+
+v8 فقط root cause را گزارش می‌کند. هیچ Shadow/Paper gate بر اساس root cause فعال نشده است. قدم بعدی بعد از sample کافی، Root-Cause Outcome Validator است.

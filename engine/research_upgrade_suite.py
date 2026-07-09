@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v7.1.0"
+VERSION = "v8.0.0"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 
@@ -777,6 +777,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
     from engine.auto_event_collector import run_auto_event_collector
     from engine.market_narrative import run_market_narrative
     from engine.narrative_decision_conflict import run_latest_decision_narrative_conflict
+    from engine.root_cause_discovery import run_root_cause_discovery
 
     sections = {
         "gate_robustness": run_gate_robustness(),
@@ -793,6 +794,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "causal_intelligence": asdict(run_causal_intelligence(collect_live=False)),
         "market_narrative": asdict(run_market_narrative()),
         "narrative_decision_conflict": asdict(run_latest_decision_narrative_conflict()),
+        "root_cause_discovery": asdict(run_root_cause_discovery()),
         "cross_exchange_validation": run_cross_exchange_validation(),
         "research_db": run_research_db_export(),
         "pipeline_health": run_pipeline_health(),
@@ -871,6 +873,11 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nNarrative/Decision Conflict:")
         lines.append(f"- {ndc.get('status')} | side={ndc.get('decision_side')} | narrative={ndc.get('narrative_direction')} | alignment={ndc.get('narrative_alignment')}")
         lines.append(f"- conflict={ndc.get('narrative_conflict_score')}/100 | adj={ndc.get('narrative_adjustment')} | verdict={ndc.get('narrative_decision_verdict')}")
+    rcd = report.get("sections", {}).get("root_cause_discovery", {})
+    if rcd:
+        lines.append("\nRoot Cause Discovery:")
+        lines.append(f"- {rcd.get('status')} | primary={rcd.get('primary_root_cause')} | dir={rcd.get('root_cause_direction')} | conf={rcd.get('root_cause_confidence')} | p={rcd.get('root_cause_probability_pct')}%")
+        lines.append(f"- quality={rcd.get('root_cause_evidence_quality')} | evidence={rcd.get('evidence_total')} | verdict={rcd.get('root_cause_verdict')}")
     sr = report.get("sections", {}).get("strict_readiness", {})
     if sr:
         lines.append("\nStrict Readiness:")
@@ -885,7 +892,7 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nSuite Blockers:")
         for b in report.get("blockers", [])[:12]:
             lines.append(f"⛔ {b}")
-    lines.append("\nSafety: هیچ بخش v6/v7 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
+    lines.append("\nSafety: هیچ بخش v6/v7/v8 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
     lines.append(sep)
     return "\n".join(lines)
 

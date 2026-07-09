@@ -45,3 +45,8 @@ python narrative_decision_dashboard.py --compact
 - سفارش واقعی ارسال نمی‌کند
 - Paper Trade جدید ایجاد نمی‌کند
 - فقط metadata پژوهشی و forward-validation می‌سازد
+
+
+## اتصال به v8 Root Cause Discovery
+
+Narrative/Decision Conflict در v8 context تصمیم را کنار root cause قرار می‌دهد تا بفهمیم علت محتمل بازار با bias تصمیم هماهنگ است یا صرفاً context ریسکی است.

@@ -52,3 +52,8 @@ python narrative_decision_dashboard.py --compact
 
 این لایه هیچ Paper/Live/Order واقعی فعال نمی‌کند.
 
+
+
+## اتصال به v8 Root Cause Discovery
+
+Market Narrative در v8 دیگر فقط روایت نهایی نیست؛ `dominant_theme`, `dominant_direction`, `net_direction_score` و contradictions به عنوان evidence برای root-cause hypothesis ranking استفاده می‌شوند.

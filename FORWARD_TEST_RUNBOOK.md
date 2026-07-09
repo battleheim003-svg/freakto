@@ -207,3 +207,15 @@ python narrative_decision_dashboard.py --compact
 
 این لایه هیچ Paper/Live/Order واقعی فعال نمی‌کند.
 
+
+
+## v8 Root Cause step
+
+در چرخه Forward مرحله زیر بعد از narrative_decision_conflict_probe اجرا می‌شود:
+
+```text
+root_cause_discovery_probe
+Command: python -X utf8 root_cause_dashboard.py --compact
+```
+
+این مرحله Paper/Live فعال نمی‌کند.

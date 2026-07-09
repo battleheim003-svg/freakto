@@ -115,6 +115,11 @@ jobs:
         run: |
           python -X utf8 narrative_decision_dashboard.py --compact || true
 
+      - name: Run v8 root cause discovery
+        if: always()
+        run: |
+          python -X utf8 root_cause_dashboard.py --compact || true
+
       - name: Upload health artifacts
         if: always()
         uses: actions/upload-artifact@v4

@@ -175,3 +175,8 @@ python narrative_decision_dashboard.py --compact
 
 این لایه هیچ Paper/Live/Order واقعی فعال نمی‌کند.
 
+
+
+## v8 Root Cause Discovery
+
+Root Cause Discovery به Research Suite اضافه شد و باید قبل از هر گونه فعال‌سازی gate با forward outcomeها اعتبارسنجی شود.

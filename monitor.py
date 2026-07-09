@@ -38,6 +38,7 @@ from engine.trade_quality import build_trade_intelligence_card
 from engine.intelligence import build_intelligence_report, format_intelligence_console
 from engine.causal_intelligence import attach_causal_context
 from engine.market_narrative import attach_market_narrative_to_opportunity
+from engine.root_cause_discovery import attach_root_cause_to_opportunity
 from engine.multi_timeframe import (
     TimeframeSignal,
     calculate_consensus,
@@ -496,6 +497,22 @@ def check_market():
         print("=" * 70)
     except Exception as error:
         print(f"⚠️ Market narrative attach skipped: {type(error).__name__}: {error}")
+
+    try:
+        root_cause = attach_root_cause_to_opportunity(
+            opportunity,
+            symbol=SYMBOL,
+            timeframe=PRIMARY_TIMEFRAME,
+        )
+        print("\n" + "=" * 70)
+        print("🧬 Root Cause Discovery Context v8")
+        print("=" * 70)
+        print(f"Primary Cause : {root_cause.primary_root_cause} ({root_cause.root_cause_confidence})")
+        print(f"Direction     : {root_cause.root_cause_direction} | Share: {root_cause.root_cause_probability_pct}%")
+        print(f"Verdict       : {root_cause.root_cause_verdict}")
+        print("=" * 70)
+    except Exception as error:
+        print(f"⚠️ Root cause attach skipped: {type(error).__name__}: {error}")
 
     similarity = find_similar_snapshots(opportunity)
     format_similarity_for_console(similarity)

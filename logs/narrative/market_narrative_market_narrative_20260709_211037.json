@@ -1,0 +1,176 @@
+{
+  "run_id": "market_narrative_20260709_211037",
+  "generated_utc": "2026-07-09T21:10:37.982011+00:00",
+  "version": "v7.1.0",
+  "status": "MARKET_NARRATIVE_WITH_CONFLICTS",
+  "symbol": "BTC/USDT",
+  "timeframe": "4h",
+  "lookback_hours": 168,
+  "auto_events_loaded": 12,
+  "manual_events_loaded": 2,
+  "accepted_events": 7,
+  "noise_filtered_events": 0,
+  "narrative_label": "MIXED_NARRATIVE_CONFLICT",
+  "narrative_confidence": "MEDIUM",
+  "net_direction_score": -25.5164,
+  "dominant_direction": "BEARISH",
+  "dominant_theme": "MACRO_POLICY",
+  "event_risk": "HIGH",
+  "technical_event_conflict": "LOW",
+  "narrative_summary": "Narrative=MIXED_NARRATIVE_CONFLICT; direction=BEARISH; theme=MACRO_POLICY; net_score=-25.5164; risk=HIGH. محرک اصلی فعلی از federal_reserve_press است: Federal Reserve Board issues enforcement action with TS Banking Group, Inc. and TS Contrarian Bancshares, Inc.",
+  "driver_count": 7,
+  "top_drivers": [
+    {
+      "theme": "MACRO_POLICY",
+      "title": "Federal Reserve Board issues enforcement action with TS Banking Group, Inc. and TS Contrarian Bancshares, Inc.",
+      "source_id": "federal_reserve_press",
+      "source_tier": "TIER_1_OFFICIAL_MACRO",
+      "direction": "BEARISH",
+      "impact": "HIGH",
+      "confidence": "HIGH",
+      "weight": -11.0848,
+      "timestamp_utc": "2026-07-09T15:00:00+00:00",
+      "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/enforcement20260709a.htm",
+      "event_type": "macro",
+      "event_quality": "ACTIONABLE_EVENT_CONTEXT"
+    },
+    {
+      "theme": "REGULATORY_RISK",
+      "title": "SEC to Host Virtual Roundtable on Modernizing IPOs and Expanding Access to Public Markets",
+      "source_id": "sec_press_releases",
+      "source_tier": "TIER_1_OFFICIAL_REGULATOR",
+      "direction": "BULLISH",
+      "impact": "HIGH",
+      "confidence": "HIGH",
+      "weight": 9.7769,
+      "timestamp_utc": "2026-07-08T17:54:26+00:00",
+      "source_url": "https://www.sec.gov/newsroom/press-releases/2026-65-sec-host-virtual-roundtable-modernizing-ipos-expanding-access-public-markets",
+      "event_type": "regulatory",
+      "event_quality": "SIGNIFICANT_EVENT"
+    },
+    {
+      "theme": "MACRO_POLICY",
+      "title": "Federal Reserve Board requests comment on a proposal to amend its requirements for banks to maintain anti-money laundering programs",
+      "source_id": "federal_reserve_press",
+      "source_tier": "TIER_1_OFFICIAL_MACRO",
+      "direction": "BEARISH",
+      "impact": "HIGH",
+      "confidence": "HIGH",
+      "weight": -8.5307,
+      "timestamp_utc": "2026-07-07T19:00:00+00:00",
+      "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/bcreg20260707a.htm",
+      "event_type": "macro",
+      "event_quality": "ACTIONABLE_EVENT_CONTEXT"
+    },
+    {
+      "theme": "REGULATORY_RISK",
+      "title": "SEC Forms New Retail Fraud Working Group",
+      "source_id": "sec_press_releases",
+      "source_tier": "TIER_1_OFFICIAL_REGULATOR",
+      "direction": "BEARISH",
+      "impact": "HIGH",
+      "confidence": "HIGH",
+      "weight": -8.3134,
+      "timestamp_utc": "2026-07-07T14:39:57+00:00",
+      "source_url": "https://www.sec.gov/newsroom/press-releases/2026-63-sec-forms-new-retail-fraud-working-group",
+      "event_type": "regulatory",
+      "event_quality": "ACTIONABLE_EVENT_CONTEXT"
+    },
+    {
+      "theme": "REGULATORY_RISK",
+      "title": "Example: enforcement headline increasing crypto regulatory risk",
+      "source_id": "manual_events",
+      "source_tier": "TIER_0_MANUAL_CURATED",
+      "direction": "BEARISH",
+      "impact": "HIGH",
+      "confidence": "MEDIUM",
+      "weight": -8.0967,
+      "timestamp_utc": "2026-07-09T15:00:00+00:00",
+      "source_url": "",
+      "event_type": "regulatory",
+      "event_quality": "CURATED_MANUAL_EVENT"
+    },
+    {
+      "theme": "MACRO_POLICY",
+      "title": "Example: dovish macro interpretation supporting risk assets",
+      "source_id": "manual_events",
+      "source_tier": "TIER_0_MANUAL_CURATED",
+      "direction": "BULLISH",
+      "impact": "HIGH",
+      "confidence": "MEDIUM",
+      "weight": 7.9534,
+      "timestamp_utc": "2026-07-09T12:00:00+00:00",
+      "source_url": "",
+      "event_type": "macro",
+      "event_quality": "CURATED_MANUAL_EVENT"
+    },
+    {
+      "theme": "MACRO_POLICY",
+      "title": "Waller, Two Thoughts on the Transmission of Monetary Policy",
+      "source_id": "federal_reserve_speeches",
+      "source_tier": "TIER_1_OFFICIAL_MACRO",
+      "direction": "BEARISH",
+      "impact": "HIGH",
+      "confidence": "HIGH",
+      "weight": -7.2211,
+      "timestamp_utc": "2026-07-06T15:00:00+00:00",
+      "source_url": "https://www.federalreserve.gov/newsevents/speech/waller20260706a.htm",
+      "event_type": "macro",
+      "event_quality": "SIGNIFICANT_EVENT"
+    }
+  ],
+  "theme_scores": [
+    {
+      "theme": "MACRO_POLICY",
+      "score": -18.8832,
+      "drivers": 4,
+      "bullish": 1,
+      "bearish": 3,
+      "abs_score": 18.8832
+    },
+    {
+      "theme": "REGULATORY_RISK",
+      "score": -6.6332,
+      "drivers": 3,
+      "bullish": 1,
+      "bearish": 2,
+      "abs_score": 6.6332
+    }
+  ],
+  "contradictions": [
+    "همزمان eventهای bullish و bearish قوی دیده شد: bull=17.73, bear=43.25"
+  ],
+  "latest_causal_context": {
+    "run_id": "causal_intel_20260709_210959",
+    "generated_utc": "2026-07-09T21:10:37.001535+00:00",
+    "version": "v7.0.0",
+    "status": "CAUSAL_CONTEXT_PARTIAL_SOURCES",
+    "symbol": "BTC/USDT",
+    "timeframe": "4h",
+    "collect_live": "True",
+    "primary_cause": "MULTI_SOURCE_EVENT_CONSENSUS",
+    "cause_confidence": "HIGH",
+    "catalyst_score": "25",
+    "event_risk": "HIGH",
+    "technical_event_conflict": "LOW",
+    "causal_alignment": "NEUTRAL_DECISION_CONTEXT_ONLY",
+    "causal_verdict": "CAUSAL_CONTEXT_WEAK_OR_RISKY",
+    "source_count": "19",
+    "successful_sources": "16",
+    "trusted_successful_sources": "15",
+    "manual_events_loaded": "2",
+    "null": [
+      "10"
+    ]
+  },
+  "blockers": [],
+  "warnings": [
+    "Market Narrative فقط روایت پژوهشی می‌سازد؛ سیگنال خرید/فروش مستقل نیست.",
+    "اگر event sourceها نویز HTML/marketing بدهند، v7 آن‌ها را فیلتر می‌کند اما همچنان باید source health بررسی شود."
+  ],
+  "recommendations": [
+    "automatic_event_collector_dashboard.py --compact باید قبل از market_narrative_dashboard.py اجرا شود.",
+    "اگر Narrative و Technical conflict بالا باشد، تصمیم فقط Research/Watchlist بماند.",
+    "برای ارتقا به Gate، narrative باید در Forward با outcomeهای بعدی validate شود."
+  ]
+}
