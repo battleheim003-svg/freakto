@@ -233,3 +233,9 @@ python root_cause_forward_validation_dashboard.py --compact
 این مرحله از `logs/decision_evaluations.csv` استفاده می‌کند و hit-rate علت‌ها را در افق‌های 4h، 12h و 24h می‌سنجد.
 
 هیچ سفارش واقعی و هیچ Paper Trade جدیدی ایجاد نمی‌شود.
+
+---
+
+## v8.1.1 Root Cause Bridge Note
+
+`decision_evaluator.py` اکنون اگر آخرین Root Cause report با `decision_id` تصمیم جاری match شود، فیلدهای `root_cause_*` را به `decision_evaluations.csv` منتقل می‌کند. این باعث می‌شود `root_cause_forward_validation_dashboard.py` بتواند sampleهای واقعی بسازد.

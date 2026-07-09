@@ -74,3 +74,23 @@ WEAK_OR_NEGATIVE_FORWARD_EVIDENCE
 ## نکته مهم
 
 تا وقتی sample کافی نباشد، حتی Root Causeهای promising هم فقط Research/Shadow هستند و نباید Paper/Live را فعال کنند.
+
+---
+
+## v8.1.1 Bridge Patch
+
+اگر `root_cause_forward_validation_dashboard.py` مقدار `Root Cause Rows: 0` نشان داد، با v8.1.1 این مسیر بررسی می‌شود:
+
+1. آخرین فایل `logs/root_cause/root_cause_*.json` خوانده می‌شود.
+2. اگر `latest_decision_id` آن با `decision_id` یک ردیف در `decisions.csv` برابر باشد، فیلدهای `root_cause_*` هنگام `decision_evaluator.py` به `decision_evaluations.csv` تزریق می‌شوند.
+3. سپس Forward Validation می‌تواند جهت Root Cause را با `market_return_after_4h/12h/24h` بسنجد.
+
+ترتیب امن:
+
+```cmd
+python root_cause_dashboard.py --compact
+python decision_evaluator.py
+python root_cause_forward_validation_dashboard.py --compact
+```
+
+این bridge فقط روی ردیف matching decision_id اعمال می‌شود و Root Cause جدید را به همه ردیف‌های تاریخی تعمیم نمی‌دهد.

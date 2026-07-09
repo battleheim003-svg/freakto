@@ -417,3 +417,27 @@ root_cause_forward_validation_probe
 ```
 
 هدف v8.1 این است که بفهمیم کدام Root Causeها در Forward واقعاً با جهت بازار هم‌بستگی دارند. این خروجی هنوز فقط Research/Shadow است و Paper/Live را فعال نمی‌کند.
+
+---
+
+## v8.1.1 Next Step
+
+بعد از نصب Patch:
+
+```cmd
+python root_cause_dashboard.py --compact
+python decision_evaluator.py
+python root_cause_forward_validation_dashboard.py --compact
+```
+
+در خروجی `decision_evaluator.py` باید یکی از این پیام‌ها را ببینی:
+
+```text
+🧬 Root Cause bridge applied rows: 1
+```
+
+یا اگر decision تازه خودش metadata دارد:
+
+```text
+Root Cause snapshot found, but no matching blank decision_id row needed bridge.
+```

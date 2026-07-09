@@ -192,3 +192,9 @@ python root_cause_forward_validation_dashboard.py --compact
 ```
 
 به دلیل کمبود sample اولیه، verdictهای LOW_SAMPLE طبیعی هستند.
+
+---
+
+## v8.1.1 Research Note
+
+Root Cause Forward Validation فقط وقتی معتبر است که ردیف‌های `decision_evaluations.csv` دارای `root_cause_primary` و `root_cause_direction` باشند. v8.1.1 bridge این metadata را برای decision_id matching از آخرین Root Cause JSON تزریق می‌کند.

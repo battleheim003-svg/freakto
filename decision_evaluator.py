@@ -10,6 +10,7 @@ decision_evaluator.py
 
 import ast
 import csv
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -23,6 +24,7 @@ from data_fetcher import fetch_ohlcv
 LOG_DIR = Path("logs")
 DECISIONS_FILE = LOG_DIR / "decisions.csv"
 EVALUATIONS_FILE = LOG_DIR / "decision_evaluations.csv"
+ROOT_CAUSE_DIR = LOG_DIR / "root_cause"
 
 
 HORIZON_CANDLES = {
@@ -30,6 +32,122 @@ HORIZON_CANDLES = {
     "12h": 3,
     "24h": 6,
 }
+
+
+def _is_blank(value):
+    if value is None:
+        return True
+    text = str(value).strip()
+    return text == "" or text.lower() in {"nan", "none", "null"}
+
+
+def _safe_json_load(path):
+    try:
+        with path.open("r", encoding="utf-8-sig") as f:
+            return json.load(f)
+    except Exception:
+        try:
+            with path.open("r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+
+
+def _load_latest_root_cause_snapshot():
+    """Load the latest saved Root Cause report and expose evaluator-ready fields.
+
+    v8.1.1 bridge patch:
+    root_cause_dashboard.py writes the Root Cause report under logs/root_cause,
+    while historical rows in decisions.csv may not yet carry root_cause_* fields.
+    The evaluator uses this latest report only when it can match the report's
+    latest_decision_id to a decision row. This avoids blindly applying today's
+    root cause to all historical decisions.
+    """
+    if not ROOT_CAUSE_DIR.exists():
+        return {}
+
+    candidates = []
+    for pattern in ("root_cause_root_cause_*.json", "root_cause_*.json"):
+        candidates.extend(ROOT_CAUSE_DIR.glob(pattern))
+    candidates = [p for p in candidates if "forward_validation" not in p.name and p.is_file()]
+    if not candidates:
+        return {}
+
+    latest = max(candidates, key=lambda path: path.stat().st_mtime)
+    data = _safe_json_load(latest)
+    if not data:
+        return {}
+
+    top_causes = data.get("top_causes") or []
+    top_summary = ""
+    if isinstance(top_causes, list):
+        compact = []
+        for item in top_causes[:5]:
+            if isinstance(item, dict):
+                cause = item.get("cause") or item.get("root_cause") or item.get("label") or ""
+                prob = item.get("probability_pct") or item.get("probability") or ""
+                if cause:
+                    compact.append(f"{cause}:{prob}%")
+        top_summary = ";".join(compact)
+
+    return {
+        "source_file": str(latest),
+        "latest_decision_id": str(data.get("latest_decision_id") or data.get("decision_id") or "").strip(),
+        "symbol": str(data.get("symbol") or "").strip(),
+        "timeframe": str(data.get("timeframe") or "").strip(),
+        "root_cause_primary": data.get("primary_root_cause") or data.get("root_cause_primary") or "",
+        "root_cause_direction": data.get("root_cause_direction") or "",
+        "root_cause_confidence": data.get("root_cause_confidence") or "",
+        "root_cause_probability_pct": data.get("root_cause_probability_pct") or "",
+        "root_cause_evidence_quality": data.get("root_cause_evidence_quality") or "",
+        "root_cause_verdict": data.get("root_cause_verdict") or "",
+        "root_cause_evidence_total": data.get("evidence_total") or data.get("root_cause_evidence_total") or "",
+        "root_cause_official_evidence_total": data.get("official_evidence_total") or data.get("root_cause_official_evidence_total") or "",
+        "root_cause_top_causes": top_summary,
+        "root_cause_summary": data.get("root_cause_summary") or "",
+    }
+
+
+def _apply_root_cause_bridge(decision, snapshot):
+    """Return root_cause fields for a decision row.
+
+    Existing decision values always win. Snapshot fallback is applied only when
+    the row lacks root_cause_primary and the snapshot matches the row's
+    decision_id. This is intentionally conservative to avoid leakage/mislabeling.
+    """
+    fields = {
+        "root_cause_primary": decision.get("root_cause_primary", ""),
+        "root_cause_direction": decision.get("root_cause_direction", ""),
+        "root_cause_confidence": decision.get("root_cause_confidence", ""),
+        "root_cause_probability_pct": decision.get("root_cause_probability_pct", ""),
+        "root_cause_evidence_quality": decision.get("root_cause_evidence_quality", ""),
+        "root_cause_verdict": decision.get("root_cause_verdict", ""),
+        "root_cause_evidence_total": decision.get("root_cause_evidence_total", ""),
+        "root_cause_official_evidence_total": decision.get("root_cause_official_evidence_total", ""),
+        "root_cause_top_causes": decision.get("root_cause_top_causes", ""),
+        "root_cause_summary": decision.get("root_cause_summary", ""),
+    }
+    if not snapshot or not _is_blank(fields.get("root_cause_primary")):
+        return fields
+
+    row_decision_id = str(decision.get("decision_id", "") or "").strip()
+    snap_decision_id = str(snapshot.get("latest_decision_id", "") or "").strip()
+    if not row_decision_id or row_decision_id != snap_decision_id:
+        return fields
+
+    row_symbol = str(decision.get("symbol", SYMBOL) or SYMBOL).strip()
+    row_tf = str(decision.get("timeframe", TIMEFRAME) or TIMEFRAME).strip()
+    snap_symbol = str(snapshot.get("symbol", "") or "").strip()
+    snap_tf = str(snapshot.get("timeframe", "") or "").strip()
+    if snap_symbol and row_symbol and snap_symbol != row_symbol:
+        return fields
+    if snap_tf and row_tf and snap_tf != row_tf:
+        return fields
+
+    for key in fields:
+        fields[key] = snapshot.get(key, fields[key])
+    fields["root_cause_bridge_source"] = "LATEST_ROOT_CAUSE_JSON_MATCHED_DECISION_ID"
+    return fields
 
 
 def _parse_targets(value):
@@ -143,6 +261,7 @@ def _load_decisions():
         "root_cause_official_evidence_total": "",
         "root_cause_top_causes": "",
         "root_cause_summary": "",
+        "root_cause_bridge_source": "",
     }
     for column, default in required_defaults.items():
         if column not in df.columns:
@@ -306,6 +425,9 @@ def evaluate_decisions():
     if market_df.empty:
         return
 
+    latest_root_cause_snapshot = _load_latest_root_cause_snapshot()
+    bridge_applied = 0
+
     rows = []
 
     for _, decision in decisions.iterrows():
@@ -323,6 +445,9 @@ def evaluate_decisions():
             continue
 
         side = str(decision.get("side", "NEUTRAL"))
+        root_cause_fields = _apply_root_cause_bridge(decision, latest_root_cause_snapshot)
+        if root_cause_fields.get("root_cause_bridge_source"):
+            bridge_applied += 1
         entry_price = _parse_price(decision.get("price"))
         if entry_price is None:
             print(f"⚠️ قیمت ورود نامعتبر است و رد شد: {timestamp}")
@@ -374,16 +499,17 @@ def evaluate_decisions():
             "narrative_action_override": decision.get("narrative_action_override", ""),
             "narrative_decision_verdict": decision.get("narrative_decision_verdict", ""),
             "narrative_decision_notes": decision.get("narrative_decision_notes", ""),
-            "root_cause_primary": decision.get("root_cause_primary", ""),
-            "root_cause_direction": decision.get("root_cause_direction", ""),
-            "root_cause_confidence": decision.get("root_cause_confidence", ""),
-            "root_cause_probability_pct": decision.get("root_cause_probability_pct", ""),
-            "root_cause_evidence_quality": decision.get("root_cause_evidence_quality", ""),
-            "root_cause_verdict": decision.get("root_cause_verdict", ""),
-            "root_cause_evidence_total": decision.get("root_cause_evidence_total", ""),
-            "root_cause_official_evidence_total": decision.get("root_cause_official_evidence_total", ""),
-            "root_cause_top_causes": decision.get("root_cause_top_causes", ""),
-            "root_cause_summary": decision.get("root_cause_summary", ""),
+            "root_cause_primary": root_cause_fields.get("root_cause_primary", ""),
+            "root_cause_direction": root_cause_fields.get("root_cause_direction", ""),
+            "root_cause_confidence": root_cause_fields.get("root_cause_confidence", ""),
+            "root_cause_probability_pct": root_cause_fields.get("root_cause_probability_pct", ""),
+            "root_cause_evidence_quality": root_cause_fields.get("root_cause_evidence_quality", ""),
+            "root_cause_verdict": root_cause_fields.get("root_cause_verdict", ""),
+            "root_cause_evidence_total": root_cause_fields.get("root_cause_evidence_total", ""),
+            "root_cause_official_evidence_total": root_cause_fields.get("root_cause_official_evidence_total", ""),
+            "root_cause_top_causes": root_cause_fields.get("root_cause_top_causes", ""),
+            "root_cause_summary": root_cause_fields.get("root_cause_summary", ""),
+            "root_cause_bridge_source": root_cause_fields.get("root_cause_bridge_source", ""),
             "entry_price": entry_price,
             "available_future_candles": available_candles,
             "evaluation_status": "PARTIAL",
@@ -391,7 +517,7 @@ def evaluate_decisions():
 
         completed_horizons = 0
 
-        root_cause_direction = decision.get("root_cause_direction", "")
+        root_cause_direction = root_cause_fields.get("root_cause_direction", "")
 
         for label, candle_offset in HORIZON_CANDLES.items():
             column_name = f"return_after_{label}_pct"
@@ -449,6 +575,10 @@ def evaluate_decisions():
     output_df.to_csv(EVALUATIONS_FILE, index=False, encoding="utf-8-sig")
 
     print(f"✅ ارزیابی‌ها ذخیره شد: {EVALUATIONS_FILE}")
+    if bridge_applied:
+        print(f"🧬 Root Cause bridge applied rows: {bridge_applied}")
+    elif latest_root_cause_snapshot:
+        print("ℹ️ Root Cause snapshot found, but no matching blank decision_id row needed bridge.")
     print(output_df.tail(10).to_string(index=False))
 
 
