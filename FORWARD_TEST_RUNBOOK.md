@@ -219,3 +219,17 @@ Command: python -X utf8 root_cause_dashboard.py --compact
 ```
 
 این مرحله Paper/Live فعال نمی‌کند.
+
+---
+
+## v8.1 Root Cause Forward Validation در Forward Cycle
+
+از v8.1 به بعد، بعد از `decision_evaluator` مرحله زیر اجرا می‌شود:
+
+```cmd
+python root_cause_forward_validation_dashboard.py --compact
+```
+
+این مرحله از `logs/decision_evaluations.csv` استفاده می‌کند و hit-rate علت‌ها را در افق‌های 4h، 12h و 24h می‌سنجد.
+
+هیچ سفارش واقعی و هیچ Paper Trade جدیدی ایجاد نمی‌شود.

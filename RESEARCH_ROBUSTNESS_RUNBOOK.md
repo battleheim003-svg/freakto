@@ -180,3 +180,15 @@ python narrative_decision_dashboard.py --compact
 ## v8 Root Cause Discovery
 
 Root Cause Discovery به Research Suite اضافه شد و باید قبل از هر گونه فعال‌سازی gate با forward outcomeها اعتبارسنجی شود.
+
+---
+
+## v8.1 Root Cause Forward Validation
+
+این بخش به Research Robustness Suite اضافه شده است تا علت‌های کشف‌شده با outcomeهای آینده سنجیده شوند:
+
+```cmd
+python root_cause_forward_validation_dashboard.py --compact
+```
+
+به دلیل کمبود sample اولیه، verdictهای LOW_SAMPLE طبیعی هستند.

@@ -194,3 +194,9 @@ python narrative_decision_dashboard.py --compact
 ## Root Cause Gates هنوز فعال نیستند
 
 v8 فقط root cause را گزارش می‌کند. هیچ Shadow/Paper gate بر اساس root cause فعال نشده است. قدم بعدی بعد از sample کافی، Root-Cause Outcome Validator است.
+
+---
+
+## v8.1 Root Cause قبل از Gate
+
+Root Cause Forward Validation هنوز Gate نیست. فقط اگر Root Causeها در sample کافی به hit-rate پایدار برسند، در نسخه‌های بعد می‌توانند به Shadow Gate جدا تبدیل شوند.

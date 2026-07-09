@@ -206,6 +206,40 @@ def _evaluate_price_move(side, entry_price, future_price):
     return round(change_pct, 4)
 
 
+def _evaluate_market_move(entry_price, future_price):
+    """Raw market return, independent from decision side.
+
+    v8.1 uses this for Root Cause Forward Validation because root-cause
+    directions such as BULLISH/BEARISH must be validated against actual market
+    movement, not the side-adjusted trade return used by decision evaluation.
+    """
+    if not entry_price or not future_price:
+        return None
+    return round(((future_price - entry_price) / entry_price) * 100, 4)
+
+
+def _root_cause_direction_correct(direction, market_return):
+    direction = str(direction or "").upper().replace("-", "_").replace(" ", "_")
+    if market_return is None:
+        return None
+    if direction == "BULLISH":
+        return bool(market_return > 0)
+    if direction == "BEARISH":
+        return bool(market_return < 0)
+    return None
+
+
+def _root_cause_signed_return(direction, market_return):
+    direction = str(direction or "").upper().replace("-", "_").replace(" ", "_")
+    if market_return is None:
+        return None
+    if direction == "BULLISH":
+        return round(float(market_return), 4)
+    if direction == "BEARISH":
+        return round(float(market_return) * -1, 4)
+    return None
+
+
 def _evaluate_targets_and_stop_partial(side, entry_idx, market_df, targets, stop_price):
     available_future = market_df.iloc[entry_idx + 1:]
 
@@ -357,19 +391,35 @@ def evaluate_decisions():
 
         completed_horizons = 0
 
+        root_cause_direction = decision.get("root_cause_direction", "")
+
         for label, candle_offset in HORIZON_CANDLES.items():
             column_name = f"return_after_{label}_pct"
+            market_column_name = f"market_return_after_{label}_pct"
+            signed_column_name = f"root_cause_signed_return_after_{label}_pct"
+            correct_column_name = f"root_cause_direction_correct_after_{label}"
 
             if available_candles >= candle_offset:
                 future_close = float(market_df.iloc[entry_idx + candle_offset]["close"])
-                result[column_name] = _evaluate_price_move(
+                side_adjusted_return = _evaluate_price_move(
                     side=side,
                     entry_price=entry_price,
                     future_price=future_close,
                 )
+                market_return = _evaluate_market_move(
+                    entry_price=entry_price,
+                    future_price=future_close,
+                )
+                result[column_name] = side_adjusted_return
+                result[market_column_name] = market_return
+                result[signed_column_name] = _root_cause_signed_return(root_cause_direction, market_return)
+                result[correct_column_name] = _root_cause_direction_correct(root_cause_direction, market_return)
                 completed_horizons += 1
             else:
                 result[column_name] = None
+                result[market_column_name] = None
+                result[signed_column_name] = None
+                result[correct_column_name] = None
 
         if completed_horizons == len(HORIZON_CANDLES):
             result["evaluation_status"] = "COMPLETE"

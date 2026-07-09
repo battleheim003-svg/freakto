@@ -120,6 +120,11 @@ jobs:
         run: |
           python -X utf8 root_cause_dashboard.py --compact || true
 
+      - name: Run v8.1 root cause forward validation
+        if: always()
+        run: |
+          python -X utf8 root_cause_forward_validation_dashboard.py --compact || true
+
       - name: Upload health artifacts
         if: always()
         uses: actions/upload-artifact@v4

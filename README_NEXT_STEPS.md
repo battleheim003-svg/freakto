@@ -392,3 +392,28 @@ python root_cause_dashboard.py --compact
 ```
 
 این خروجی فقط Research است و علت قطعی یا سیگنال ورود محسوب نمی‌شود.
+
+---
+
+## v8.1 — Root Cause Forward Validation
+
+بعد از اجرای v8، این چرخه را برای اعتبارسنجی علت‌ها اجرا کن:
+
+```cmd
+python automatic_event_collector_dashboard.py --compact
+python causal_intelligence_dashboard.py --compact
+python market_narrative_dashboard.py --compact
+python narrative_decision_dashboard.py --compact
+python root_cause_dashboard.py --compact
+python decision_evaluator.py
+python root_cause_forward_validation_dashboard.py --compact
+python forward_test_dashboard.py --plan
+```
+
+در plan باید این مرحله دیده شود:
+
+```text
+root_cause_forward_validation_probe
+```
+
+هدف v8.1 این است که بفهمیم کدام Root Causeها در Forward واقعاً با جهت بازار هم‌بستگی دارند. این خروجی هنوز فقط Research/Shadow است و Paper/Live را فعال نمی‌کند.

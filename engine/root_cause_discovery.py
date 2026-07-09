@@ -27,7 +27,7 @@ except Exception:  # pragma: no cover
 
 from engine.research_utils import LOG_DIR, RESEARCH_DIR, run_id, safe_float, safe_int, utc_now_iso, write_json, write_text, save_dataframe_csv
 
-VERSION = "v8.0.0"
+VERSION = "v8.1.0"
 ROOT_CAUSE_DIR = LOG_DIR / "root_cause"
 NARRATIVE_DIR = LOG_DIR / "narrative"
 CAUSAL_DIR = LOG_DIR / "causal"

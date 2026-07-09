@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v8.0.0"
+VERSION = "v8.1.0"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 
@@ -778,6 +778,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
     from engine.market_narrative import run_market_narrative
     from engine.narrative_decision_conflict import run_latest_decision_narrative_conflict
     from engine.root_cause_discovery import run_root_cause_discovery
+    from engine.root_cause_forward_validation import run_root_cause_forward_validation
 
     sections = {
         "gate_robustness": run_gate_robustness(),
@@ -795,6 +796,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "market_narrative": asdict(run_market_narrative()),
         "narrative_decision_conflict": asdict(run_latest_decision_narrative_conflict()),
         "root_cause_discovery": asdict(run_root_cause_discovery()),
+        "root_cause_forward_validation": asdict(run_root_cause_forward_validation()),
         "cross_exchange_validation": run_cross_exchange_validation(),
         "research_db": run_research_db_export(),
         "pipeline_health": run_pipeline_health(),
@@ -878,6 +880,12 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nRoot Cause Discovery:")
         lines.append(f"- {rcd.get('status')} | primary={rcd.get('primary_root_cause')} | dir={rcd.get('root_cause_direction')} | conf={rcd.get('root_cause_confidence')} | p={rcd.get('root_cause_probability_pct')}%")
         lines.append(f"- quality={rcd.get('root_cause_evidence_quality')} | evidence={rcd.get('evidence_total')} | verdict={rcd.get('root_cause_verdict')}")
+    rcf = report.get("sections", {}).get("root_cause_forward_validation", {})
+    if rcf:
+        lines.append("\nRoot Cause Forward Validation:")
+        lines.append(f"- {rcf.get('status')} | rows={rcf.get('root_cause_rows')} | cells={rcf.get('evaluated_cells')} | candidates={rcf.get('research_candidates')} | low_sample={rcf.get('promising_low_sample')}")
+        for r in rcf.get('top_validated_causes', [])[:3]:
+            lines.append(f"- {r.get('root_cause_primary')} {r.get('root_cause_direction')}: n24={r.get('samples_24h')} hit24={r.get('hit_rate_24h')}% avg24={r.get('avg_signed_return_24h_pct')}% | {r.get('verdict')}")
     sr = report.get("sections", {}).get("strict_readiness", {})
     if sr:
         lines.append("\nStrict Readiness:")

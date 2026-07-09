@@ -45,6 +45,7 @@ from engine.regime_gate_matrix import run_regime_gate_matrix, format_regime_gate
 from engine.forward_regime_labeling import run_forward_regime_labeling, format_forward_regime_label_console, save_forward_regime_labeling
 from engine.forward_shadow_coverage import run_forward_shadow_coverage, format_forward_shadow_coverage_console, save_forward_shadow_coverage
 from engine.root_cause_discovery import run_root_cause_discovery, format_root_cause_console, save_root_cause_report
+from engine.root_cause_forward_validation import run_root_cause_forward_validation, format_root_cause_forward_console, save_root_cause_forward_report
 from telegram_notifier import send_telegram_message
 
 SUITE_DIR = Path("logs") / "validation_suite"
@@ -78,6 +79,7 @@ def main():
     regime_gate_matrix = run_regime_gate_matrix()
     forward_shadow_coverage = run_forward_shadow_coverage()
     root_cause = run_root_cause_discovery()
+    root_cause_forward = run_root_cause_forward_validation()
     research_suite = run_full_research_suite(save=False)
     readiness = assess_advanced_live_readiness()
 
@@ -96,10 +98,11 @@ def main():
     regime_gate_matrix_text = format_regime_gate_matrix_console(regime_gate_matrix, compact=True)
     forward_shadow_coverage_text = format_forward_shadow_coverage_console(forward_shadow_coverage, compact=True)
     root_cause_text = format_root_cause_console(root_cause, compact=True)
+    root_cause_forward_text = format_root_cause_forward_console(root_cause_forward, compact=True)
     research_suite_text = format_full_suite_console(research_suite)
     readiness_text = format_advanced_readiness_console(readiness)
 
-    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, gate_sim_text, forward_regime_label_text, shadow_gate_text, regime_gate_matrix_text, forward_shadow_coverage_text, root_cause_text, research_suite_text, readiness_text])
+    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, gate_sim_text, forward_regime_label_text, shadow_gate_text, regime_gate_matrix_text, forward_shadow_coverage_text, root_cause_text, root_cause_forward_text, research_suite_text, readiness_text])
     print(combined)
 
     metric_report = save_metric_definitions_report()
@@ -116,6 +119,7 @@ def main():
     rgm_json, rgm_report, rgm_csv, rgm_side_csv, rgm_avoid_csv, rgm_proposals = save_regime_gate_matrix(regime_gate_matrix)
     fsc_json, fsc_report, fsc_bull_csv, fsc_gate_csv = save_forward_shadow_coverage(forward_shadow_coverage)
     root_cause_json, root_cause_report, root_cause_candidates_csv, root_cause_obs = save_root_cause_report(root_cause)
+    root_cause_forward_json, root_cause_forward_report, root_cause_forward_summary_csv, root_cause_forward_rows_csv, root_cause_forward_obs = save_root_cause_forward_report(root_cause_forward)
     research_suite_json, research_suite_report = save_full_suite(research_suite)
     readiness_json, readiness_report = save_advanced_readiness(readiness)
     combined_path = _save_combined_report(combined)
@@ -157,6 +161,10 @@ def main():
     print(f"🧬 Root cause JSON ذخیره شد: {root_cause_json}")
     print(f"📝 Root cause report ذخیره شد: {root_cause_report}")
     print(f"📊 Root cause candidates CSV ذخیره شد: {root_cause_candidates_csv}")
+    print(f"🧪 Root cause forward JSON ذخیره شد: {root_cause_forward_json}")
+    print(f"📝 Root cause forward report ذخیره شد: {root_cause_forward_report}")
+    print(f"📊 Root cause forward summary CSV ذخیره شد: {root_cause_forward_summary_csv}")
+    print(f"📄 Root cause forward rows CSV ذخیره شد: {root_cause_forward_rows_csv}")
     print(f"🧠 Research suite JSON ذخیره شد: {research_suite_json}")
     print(f"📝 Research suite report ذخیره شد: {research_suite_report}")
     print(f"🚦 Advanced readiness JSON ذخیره شد: {readiness_json}")

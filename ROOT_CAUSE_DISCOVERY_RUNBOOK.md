@@ -60,3 +60,16 @@ Root cause → بعد از 4h/12h/24h چه عملکردی داشته؟
 ```
 
 این مرحله پایه‌ی v8.1 یعنی Root-Cause Outcome Validator خواهد بود.
+
+---
+
+## v8.1 — Forward Validation برای Root Causeها
+
+Root Cause Discovery علت‌های محتمل را تولید می‌کند. برای اینکه بفهمیم این علت‌ها واقعاً ارزش پژوهشی دارند، v8.1 خروجی‌ها را با کندل‌های بعدی می‌سنجد:
+
+```cmd
+python decision_evaluator.py
+python root_cause_forward_validation_dashboard.py --compact
+```
+
+اگر یک Root Cause در چندین نمونه hit-rate و avg_signed_return مثبت بگیرد، بعداً می‌تواند وارد Root-Cause Gate Simulator شود. تا آن زمان فقط Research-only است.
