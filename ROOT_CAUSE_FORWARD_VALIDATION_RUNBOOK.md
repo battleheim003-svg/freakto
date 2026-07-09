@@ -94,3 +94,17 @@ python root_cause_forward_validation_dashboard.py --compact
 ```
 
 این bridge فقط روی ردیف matching decision_id اعمال می‌شود و Root Cause جدید را به همه ردیف‌های تاریخی تعمیم نمی‌دهد.
+
+---
+
+## v8.2 Historical Bridge + Sample Accumulator
+
+در v8.2، `decision_evaluator.py` فقط آخرین Root Cause JSON را نمی‌خواند. همه فایل‌های Root Cause JSON و `root_cause_observations.csv` را بر اساس `decision_id` بررسی می‌کند و metadata علت را به evaluation row مربوط وصل می‌کند.
+
+بعد از اجرای validation این دستور را هم بزن:
+
+```cmd
+python root_cause_sample_dashboard.py --compact
+```
+
+اگر خروجی هنوز `LOW_SAMPLE` بود، طبیعی است. هدف v8.2 این است که sampleها با گذر زمان به 30 تا 90 evaluated cells برسند.

@@ -23,7 +23,7 @@ except Exception:  # pragma: no cover
     pd = None
 
 
-VERSION = "v8.1.0"
+VERSION = "v8.2.0"
 LOG_DIR = Path("logs")
 FORWARD_DIR = LOG_DIR / "forward_testing"
 RUNS_CSV = LOG_DIR / "forward_test_runs.csv"
@@ -248,6 +248,14 @@ def build_forward_test_plan(
                 command=_python_cmd("root_cause_forward_validation_dashboard.py", "--compact"),
                 required=False,
                 description="اعتبارسنجی Forward علت‌های کشف‌شده با return کندل‌های بعدی بدون Paper/Live.",
+            )
+        )
+        tasks.append(
+            ForwardTask(
+                name="root_cause_sample_tracker",
+                command=_python_cmd("root_cause_sample_dashboard.py", "--compact"),
+                required=False,
+                description="پایش بلوغ sampleهای Root Cause و فاصله تا حداقل اعتبارسنجی بدون Paper/Live.",
             )
         )
         tasks.append(

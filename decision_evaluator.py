@@ -53,29 +53,9 @@ def _safe_json_load(path):
             return {}
 
 
-def _load_latest_root_cause_snapshot():
-    """Load the latest saved Root Cause report and expose evaluator-ready fields.
-
-    v8.1.1 bridge patch:
-    root_cause_dashboard.py writes the Root Cause report under logs/root_cause,
-    while historical rows in decisions.csv may not yet carry root_cause_* fields.
-    The evaluator uses this latest report only when it can match the report's
-    latest_decision_id to a decision row. This avoids blindly applying today's
-    root cause to all historical decisions.
-    """
-    if not ROOT_CAUSE_DIR.exists():
-        return {}
-
-    candidates = []
-    for pattern in ("root_cause_root_cause_*.json", "root_cause_*.json"):
-        candidates.extend(ROOT_CAUSE_DIR.glob(pattern))
-    candidates = [p for p in candidates if "forward_validation" not in p.name and p.is_file()]
-    if not candidates:
-        return {}
-
-    latest = max(candidates, key=lambda path: path.stat().st_mtime)
-    data = _safe_json_load(latest)
-    if not data:
+def _extract_root_cause_snapshot(path, data):
+    """Convert a saved Root Cause report JSON into evaluator-ready fields."""
+    if not isinstance(data, dict) or not data:
         return {}
 
     top_causes = data.get("top_causes") or []
@@ -91,7 +71,7 @@ def _load_latest_root_cause_snapshot():
         top_summary = ";".join(compact)
 
     return {
-        "source_file": str(latest),
+        "source_file": str(path),
         "latest_decision_id": str(data.get("latest_decision_id") or data.get("decision_id") or "").strip(),
         "symbol": str(data.get("symbol") or "").strip(),
         "timeframe": str(data.get("timeframe") or "").strip(),
@@ -105,10 +85,92 @@ def _load_latest_root_cause_snapshot():
         "root_cause_official_evidence_total": data.get("official_evidence_total") or data.get("root_cause_official_evidence_total") or "",
         "root_cause_top_causes": top_summary,
         "root_cause_summary": data.get("root_cause_summary") or "",
+        "root_cause_bridge_source": "ROOT_CAUSE_JSON_HISTORY_MATCHED_DECISION_ID",
     }
 
 
-def _apply_root_cause_bridge(decision, snapshot):
+def _load_root_cause_snapshot_map():
+    """Load all saved Root Cause reports keyed by decision_id.
+
+    v8.2.0 sample-accumulation bridge:
+    v8.1.1 only loaded the latest root_cause JSON. That was safe, but it meant
+    old matching root-cause reports were not reattached when decision_evaluator
+    was run later. This function loads the full saved root_cause JSON history
+    and creates a conservative decision_id -> root_cause metadata map.
+
+    It still never applies a root cause to a row unless decision_id matches.
+    """
+    snapshots = {}
+    latest = {}
+    if not ROOT_CAUSE_DIR.exists():
+        return snapshots, latest
+
+    candidates = []
+    for pattern in ("root_cause_root_cause_*.json", "root_cause_*.json"):
+        candidates.extend(ROOT_CAUSE_DIR.glob(pattern))
+    candidates = [
+        p for p in candidates
+        if p.is_file()
+        and "forward_validation" not in p.name
+        and "forward_summary" not in p.name
+        and "forward_rows" not in p.name
+    ]
+    candidates = sorted(set(candidates), key=lambda path: path.stat().st_mtime)
+
+    for path in candidates:
+        data = _safe_json_load(path)
+        snapshot = _extract_root_cause_snapshot(path, data)
+        if not snapshot:
+            continue
+        latest = snapshot
+        decision_id = str(snapshot.get("latest_decision_id") or "").strip()
+        if decision_id:
+            snapshots[decision_id] = snapshot
+
+    # Optional ledger backfill. The observation CSV is useful if JSON artifacts
+    # were pruned but the compact ledger remained. JSON snapshots are preferred.
+    obs_path = ROOT_CAUSE_DIR / "root_cause_observations.csv"
+    if obs_path.exists():
+        try:
+            with obs_path.open("r", encoding="utf-8-sig", newline="") as f:
+                for row in csv.DictReader(f):
+                    decision_id = str(row.get("decision_id") or "").strip()
+                    if not decision_id or decision_id in snapshots:
+                        continue
+                    primary = row.get("primary_root_cause") or row.get("root_cause_primary") or ""
+                    direction = row.get("root_cause_direction") or ""
+                    if _is_blank(primary) or _is_blank(direction):
+                        continue
+                    snapshots[decision_id] = {
+                        "source_file": str(obs_path),
+                        "latest_decision_id": decision_id,
+                        "symbol": str(row.get("symbol") or "").strip(),
+                        "timeframe": str(row.get("timeframe") or "").strip(),
+                        "root_cause_primary": primary,
+                        "root_cause_direction": direction,
+                        "root_cause_confidence": row.get("root_cause_confidence") or "",
+                        "root_cause_probability_pct": row.get("root_cause_probability_pct") or "",
+                        "root_cause_evidence_quality": row.get("root_cause_evidence_quality") or "",
+                        "root_cause_verdict": row.get("root_cause_verdict") or "",
+                        "root_cause_evidence_total": row.get("evidence_total") or "",
+                        "root_cause_official_evidence_total": row.get("official_evidence_total") or "",
+                        "root_cause_top_causes": "",
+                        "root_cause_summary": "Root cause restored from observations ledger.",
+                        "root_cause_bridge_source": "ROOT_CAUSE_OBSERVATION_LEDGER_MATCHED_DECISION_ID",
+                    }
+        except Exception:
+            pass
+
+    return snapshots, latest
+
+
+def _load_latest_root_cause_snapshot():
+    """Backward-compatible latest snapshot loader."""
+    _, latest = _load_root_cause_snapshot_map()
+    return latest
+
+
+def _apply_root_cause_bridge(decision, snapshots_or_snapshot):
     """Return root_cause fields for a decision row.
 
     Existing decision values always win. Snapshot fallback is applied only when
@@ -126,13 +188,27 @@ def _apply_root_cause_bridge(decision, snapshot):
         "root_cause_official_evidence_total": decision.get("root_cause_official_evidence_total", ""),
         "root_cause_top_causes": decision.get("root_cause_top_causes", ""),
         "root_cause_summary": decision.get("root_cause_summary", ""),
+        "root_cause_bridge_source": decision.get("root_cause_bridge_source", ""),
     }
-    if not snapshot or not _is_blank(fields.get("root_cause_primary")):
+    if not snapshots_or_snapshot or not _is_blank(fields.get("root_cause_primary")):
         return fields
 
     row_decision_id = str(decision.get("decision_id", "") or "").strip()
+    if not row_decision_id:
+        return fields
+
+    # v8.2 supports a full map keyed by decision_id. A single latest snapshot
+    # remains supported for older callers/tests.
+    if isinstance(snapshots_or_snapshot, dict) and row_decision_id in snapshots_or_snapshot:
+        snapshot = snapshots_or_snapshot.get(row_decision_id) or {}
+    else:
+        snapshot = snapshots_or_snapshot if isinstance(snapshots_or_snapshot, dict) else {}
+        snap_decision_id = str(snapshot.get("latest_decision_id", "") or "").strip()
+        if row_decision_id != snap_decision_id:
+            return fields
+
     snap_decision_id = str(snapshot.get("latest_decision_id", "") or "").strip()
-    if not row_decision_id or row_decision_id != snap_decision_id:
+    if not snap_decision_id or row_decision_id != snap_decision_id:
         return fields
 
     row_symbol = str(decision.get("symbol", SYMBOL) or SYMBOL).strip()
@@ -145,10 +221,11 @@ def _apply_root_cause_bridge(decision, snapshot):
         return fields
 
     for key in fields:
-        fields[key] = snapshot.get(key, fields[key])
-    fields["root_cause_bridge_source"] = "LATEST_ROOT_CAUSE_JSON_MATCHED_DECISION_ID"
+        if key == "root_cause_bridge_source":
+            fields[key] = snapshot.get(key) or "ROOT_CAUSE_JSON_HISTORY_MATCHED_DECISION_ID"
+        else:
+            fields[key] = snapshot.get(key, fields[key])
     return fields
-
 
 def _parse_targets(value):
     if not value:
@@ -425,7 +502,7 @@ def evaluate_decisions():
     if market_df.empty:
         return
 
-    latest_root_cause_snapshot = _load_latest_root_cause_snapshot()
+    root_cause_snapshots, latest_root_cause_snapshot = _load_root_cause_snapshot_map()
     bridge_applied = 0
 
     rows = []
@@ -445,7 +522,7 @@ def evaluate_decisions():
             continue
 
         side = str(decision.get("side", "NEUTRAL"))
-        root_cause_fields = _apply_root_cause_bridge(decision, latest_root_cause_snapshot)
+        root_cause_fields = _apply_root_cause_bridge(decision, root_cause_snapshots)
         if root_cause_fields.get("root_cause_bridge_source"):
             bridge_applied += 1
         entry_price = _parse_price(decision.get("price"))
@@ -577,6 +654,8 @@ def evaluate_decisions():
     print(f"✅ ارزیابی‌ها ذخیره شد: {EVALUATIONS_FILE}")
     if bridge_applied:
         print(f"🧬 Root Cause bridge applied rows: {bridge_applied}")
+    elif root_cause_snapshots:
+        print(f"ℹ️ Root Cause snapshots loaded: {len(root_cause_snapshots)}, but no matching blank decision_id row needed bridge.")
     elif latest_root_cause_snapshot:
         print("ℹ️ Root Cause snapshot found, but no matching blank decision_id row needed bridge.")
     print(output_df.tail(10).to_string(index=False))

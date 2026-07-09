@@ -239,3 +239,25 @@ python root_cause_forward_validation_dashboard.py --compact
 ## v8.1.1 Root Cause Bridge Note
 
 `decision_evaluator.py` اکنون اگر آخرین Root Cause report با `decision_id` تصمیم جاری match شود، فیلدهای `root_cause_*` را به `decision_evaluations.csv` منتقل می‌کند. این باعث می‌شود `root_cause_forward_validation_dashboard.py` بتواند sampleهای واقعی بسازد.
+
+---
+
+## v8.2 Root Cause Sample Tracker
+
+Forward Plan از v8.2 شامل این مرحله است:
+
+```text
+root_cause_sample_tracker
+Command: python -X utf8 root_cause_sample_dashboard.py --compact
+```
+
+این مرحله باید بعد از `root_cause_forward_validation_probe` اجرا شود. وظیفه آن پایش بلوغ sampleها است، نه تولید سیگنال.
+
+ترتیب پیشنهادی:
+
+```text
+root_cause_discovery_probe
+decision_evaluator
+root_cause_forward_validation_probe
+root_cause_sample_tracker
+```

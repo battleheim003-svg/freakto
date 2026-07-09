@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v8.1.0"
+VERSION = "v8.2.0"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 
@@ -779,6 +779,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
     from engine.narrative_decision_conflict import run_latest_decision_narrative_conflict
     from engine.root_cause_discovery import run_root_cause_discovery
     from engine.root_cause_forward_validation import run_root_cause_forward_validation
+    from engine.root_cause_sample_tracker import run_root_cause_sample_tracker
 
     sections = {
         "gate_robustness": run_gate_robustness(),
@@ -797,6 +798,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "narrative_decision_conflict": asdict(run_latest_decision_narrative_conflict()),
         "root_cause_discovery": asdict(run_root_cause_discovery()),
         "root_cause_forward_validation": asdict(run_root_cause_forward_validation()),
+        "root_cause_sample_tracker": asdict(run_root_cause_sample_tracker()),
         "cross_exchange_validation": run_cross_exchange_validation(),
         "research_db": run_research_db_export(),
         "pipeline_health": run_pipeline_health(),

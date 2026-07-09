@@ -125,6 +125,11 @@ jobs:
         run: |
           python -X utf8 root_cause_forward_validation_dashboard.py --compact || true
 
+      - name: Run v8.2 root cause sample tracker
+        if: always()
+        run: |
+          python -X utf8 root_cause_sample_dashboard.py --compact || true
+
       - name: Upload health artifacts
         if: always()
         uses: actions/upload-artifact@v4

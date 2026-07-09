@@ -198,3 +198,16 @@ python root_cause_forward_validation_dashboard.py --compact
 ## v8.1.1 Research Note
 
 Root Cause Forward Validation فقط وقتی معتبر است که ردیف‌های `decision_evaluations.csv` دارای `root_cause_primary` و `root_cause_direction` باشند. v8.1.1 bridge این metadata را برای decision_id matching از آخرین Root Cause JSON تزریق می‌کند.
+
+---
+
+## v8.2 Root Cause Sample Accumulator
+
+Research Suite از v8.2 شامل Root Cause Sample Tracker است. این بخش نشان می‌دهد:
+
+- چند decision row دارای Root Cause است.
+- چند evaluated cell برای افق‌های 4h/12h/24h ساخته شده.
+- هر Root Cause چقدر تا min/research/candidate sample فاصله دارد.
+- آیا Root Causeها هنوز low-sample هستند یا برای analysis اولیه آماده‌اند.
+
+این خروجی برای فعال کردن Paper/Live کافی نیست و فقط به تصمیم‌گیری پژوهشی کمک می‌کند.

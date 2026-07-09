@@ -441,3 +441,21 @@ python root_cause_forward_validation_dashboard.py --compact
 ```text
 Root Cause snapshot found, but no matching blank decision_id row needed bridge.
 ```
+
+---
+
+## v8.2.0 — Root Cause Sample Accumulator
+
+بعد از نصب v8.2 این چرخه را اجرا کن:
+
+```cmd
+python root_cause_dashboard.py --compact
+python decision_evaluator.py
+python root_cause_forward_validation_dashboard.py --compact
+python root_cause_sample_dashboard.py --compact
+python forward_test_dashboard.py --plan
+```
+
+هدف v8.2 این است که Root Causeهای تولیدشده فقط در گزارش نمانند؛ بلکه به `decision_evaluations.csv` وصل شوند، forward outcome بگیرند و تعداد sampleها به‌صورت شفاف پایش شود.
+
+تا قبل از رسیدن به حداقل sample کافی، خروجی Root Cause فقط Research/Shadow است.
