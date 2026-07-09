@@ -1,0 +1,6 @@
+﻿regime,side,actionability,samples,target_1_hit_rate,directional_win_rate,avg_24h_return_pct,profit_factor,stop_hit_rate,avg_score,avg_mfe_pct,avg_mae_pct,verdict,notes
+TRENDING_BULL,LONG,WATCHLIST,22,90.91,81.82,0.4287,2.6573,86.36,65.2727,3.0622,-2.2424,MIXED_POSITIVE,بازده مثبت است اما کیفیت آماری کامل نیست.
+TRENDING_BULL,NEUTRAL,MONITOR_ONLY,16,0.0,62.5,0.919,3.4814,0.0,30.375,2.4003,-2.6168,MIXED_POSITIVE,بازده مثبت است اما کیفیت آماری کامل نیست.
+TRENDING_BULL,LONG,NOT_ACTIONABLE,4,75.0,75.0,0.3038,1.4278,50.0,51.0,2.4998,-2.5119,LOW_SAMPLE,نمونه کمتر از 5 است؛ فقط برای رصد.
+TRENDING_BEAR,NEUTRAL,MONITOR_ONLY,1,0.0,100.0,1.1157,1.1157,0.0,41.0,1.5581,-1.2055,LOW_SAMPLE,نمونه کمتر از 5 است؛ فقط برای رصد.
+TRENDING_BULL,LONG,ACTIONABLE,1,100.0,100.0,0.4897,0.4897,100.0,70.0,3.3818,-2.0299,LOW_SAMPLE,نمونه کمتر از 5 است؛ فقط برای رصد.
