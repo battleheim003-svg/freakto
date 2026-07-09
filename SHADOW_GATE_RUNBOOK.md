@@ -133,3 +133,8 @@ python forward_shadow_coverage_dashboard.py --compact
 ## v6.3.1 Bull Probe Evaluation Sync Patch
 
 `forward_shadow_coverage_dashboard.py` now syncs Bull probe evaluation counts from the Shadow Ledger when decision evaluation rows are not marked COMPLETE yet. This is reporting-only and research-only.
+
+
+## v6.4 causal context
+
+Shadow Gateها هنوز مستقل از Causal Intelligence هستند. اما از این نسخه، decisions/evaluations می‌توانند causal fields داشته باشند تا بعداً هر gate به تفکیک علت بازار بررسی شود.

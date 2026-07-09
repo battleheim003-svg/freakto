@@ -1,0 +1,3 @@
+timestamp_utc,symbol,event_type,source_name,source_url,impact,direction,confidence,description
+2026-07-09T12:00:00+00:00,BTC/USDT,macro,Reuters,,high,bullish,medium,Example: dovish macro interpretation supporting risk assets
+2026-07-09T15:00:00+00:00,ALL,regulatory,SEC,,high,bearish,medium,Example: enforcement headline increasing crypto regulatory risk

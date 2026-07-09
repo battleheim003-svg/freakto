@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v6.3.1"
+VERSION = "v6.4.0"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 
@@ -773,6 +773,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
     from engine.shadow_gates import run_shadow_gate_validation
     from engine.forward_regime_labeling import run_forward_regime_labeling
     from engine.forward_shadow_coverage import run_forward_shadow_coverage
+    from engine.causal_intelligence import run_causal_intelligence
 
     sections = {
         "gate_robustness": run_gate_robustness(),
@@ -785,6 +786,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "regime_gate_matrix": run_regime_gate_matrix(),
         "regime_shadow_gates": _shadow_report_to_dict(run_shadow_gate_validation()),
         "forward_shadow_coverage": run_forward_shadow_coverage(),
+        "causal_intelligence": asdict(run_causal_intelligence(collect_live=False)),
         "cross_exchange_validation": run_cross_exchange_validation(),
         "research_db": run_research_db_export(),
         "pipeline_health": run_pipeline_health(),
@@ -847,6 +849,12 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append(f"- {fsc.get('status')} | decisions={fsc.get('decision_rows')} | shadow_signals={fsc.get('shadow_signal_rows')} | eval_shadow={fsc.get('evaluated_shadow_rows')}")
         for r in fsc.get("bull_forward_probes", [])[:4]:
             lines.append(f"- {r.get('probe')}: {r.get('verdict')} | fwd_n={r.get('forward_samples')} | fwd_avg={r.get('forward_avg_pct')}% | bt_net={r.get('backtest_net_avg_pct')}%")
+    ci = report.get("sections", {}).get("causal_intelligence", {})
+    if ci:
+        ctx = ci.get("context", {})
+        lines.append("\nCausal/Event Intelligence:")
+        lines.append(f"- {ci.get('status')} | sources_ok={ci.get('successful_sources')} | trusted_ok={ci.get('trusted_successful_sources')} | catalyst={ctx.get('catalyst_score')}/100 | conflict={ctx.get('technical_event_conflict')}")
+        lines.append(f"- primary={ctx.get('primary_cause')} | verdict={ctx.get('causal_verdict')}")
     sr = report.get("sections", {}).get("strict_readiness", {})
     if sr:
         lines.append("\nStrict Readiness:")
@@ -861,7 +869,7 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nSuite Blockers:")
         for b in report.get("blockers", [])[:12]:
             lines.append(f"⛔ {b}")
-    lines.append("\nSafety: هیچ بخش v6/v6.1/v6.2/v6.2.1/v6.3 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
+    lines.append("\nSafety: هیچ بخش v6/v6.1/v6.2/v6.2.1/v6.3/v6.4 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
     lines.append(sep)
     return "\n".join(lines)
 

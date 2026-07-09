@@ -25,6 +25,8 @@ env:
   FREAKTO_LOG_BRANCH: "data-logs"
   TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
   TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+  COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+  FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
 
 concurrency:
   group: freakto-health-check
@@ -96,6 +98,11 @@ jobs:
         if: always()
         run: |
           python -X utf8 forward_shadow_coverage_dashboard.py --compact || true
+
+      - name: Run v6.4 causal/event intelligence
+        if: always()
+        run: |
+          python -X utf8 causal_intelligence_dashboard.py --compact || true
 
       - name: Upload health artifacts
         if: always()

@@ -1,0 +1,533 @@
+{
+  "run_id": "causal_intel_20260709_125408",
+  "generated_utc": "2026-07-09T12:54:45.135374+00:00",
+  "version": "v6.4.0",
+  "status": "CAUSAL_CONTEXT_READY",
+  "symbol": "BTC/USDT",
+  "timeframe": "4h",
+  "collect_live": true,
+  "source_count": 7,
+  "successful_sources": 6,
+  "failed_sources": 0,
+  "trusted_successful_sources": 5,
+  "manual_events_loaded": 0,
+  "context": {
+    "primary_cause": "NO_CLEAR_INTERNAL_CAUSE",
+    "cause_confidence": "LOW",
+    "catalyst_score": 58,
+    "event_risk": "MEDIUM",
+    "technical_event_conflict": "LOW",
+    "causal_alignment": "NEUTRAL_DECISION_CONTEXT_ONLY",
+    "causal_verdict": "CAUSAL_CONTEXT_NEUTRAL",
+    "source_count": 7,
+    "trusted_source_count": 5,
+    "manual_event_count": 0,
+    "top_sources": [
+      "defillama_stablecoins:OK:NEUTRAL:LOW",
+      "binance_futures_open_interest:OK:NEUTRAL:LOW",
+      "binance_futures_premium_funding:OK:NEUTRAL:LOW",
+      "defillama_tvl:OK:BULLISH:MEDIUM",
+      "coingecko_global:OK:NEUTRAL:LOW",
+      "alternative_fng:OK:SENTIMENT_FEAR_RISK:LOW"
+    ],
+    "internal_causes": [
+      {
+        "cause": "NO_CLEAR_INTERNAL_CAUSE",
+        "direction": "NEUTRAL",
+        "confidence": "LOW",
+        "score": 0,
+        "detail": "No strong causal pattern detected from current internal features"
+      }
+    ],
+    "external_sources": [
+      {
+        "source_id": "coingecko_global",
+        "name": "CoinGecko Global Market Data",
+        "category": "market_aggregate",
+        "reliability_tier": "TIER_2_MARKET_AGGREGATOR",
+        "status": "OK",
+        "direction": "NEUTRAL",
+        "confidence": "LOW",
+        "signal_score": 1.906763024551279,
+        "event_risk": "LOW",
+        "summary": "Global crypto cap 24h change=0.636%, BTC dominance=56.08%, volume=$63.34B.",
+        "url": "https://api.coingecko.com/api/v3/global",
+        "fields": {
+          "market_cap_change_24h_pct": 0.6356,
+          "btc_dominance_pct": 56.0819,
+          "eth_dominance_pct": 9.3658,
+          "total_market_cap_usd": 2236952583521.5034,
+          "total_volume_usd": 63337160964.63121
+        },
+        "error": "",
+        "collected_utc": "2026-07-09T12:54:21.140438+00:00"
+      },
+      {
+        "source_id": "defillama_tvl",
+        "name": "DefiLlama Total TVL Chart",
+        "category": "defi_liquidity",
+        "reliability_tier": "TIER_1_PROTOCOL_AGGREGATOR",
+        "status": "OK",
+        "direction": "BULLISH",
+        "confidence": "MEDIUM",
+        "signal_score": 6.980794104800439,
+        "event_risk": "LOW",
+        "summary": "DeFi TVL approx 7d change=3.49%, latest=$134.84B.",
+        "url": "https://api.llama.fi/charts",
+        "fields": {
+          "latest_tvl_usd": 134843954116.0,
+          "approx_7d_change_pct": 3.4904
+        },
+        "error": "",
+        "collected_utc": "2026-07-09T12:54:24.103206+00:00"
+      },
+      {
+        "source_id": "defillama_stablecoins",
+        "name": "DefiLlama Stablecoins",
+        "category": "stablecoin_liquidity",
+        "reliability_tier": "TIER_1_PROTOCOL_AGGREGATOR",
+        "status": "OK",
+        "direction": "NEUTRAL",
+        "confidence": "LOW",
+        "signal_score": 0,
+        "event_risk": "LOW",
+        "summary": "Stablecoin listed circulating supply snapshot=$309.84B across 407 assets.",
+        "url": "https://stablecoins.llama.fi/stablecoins?includePrices=true",
+        "fields": {
+          "stablecoin_assets": 407,
+          "listed_circulating_usd": 309842760370.277
+        },
+        "error": "",
+        "collected_utc": "2026-07-09T12:54:27.935266+00:00"
+      },
+      {
+        "source_id": "binance_futures_open_interest",
+        "name": "Binance USD-M Futures Open Interest",
+        "category": "derivatives",
+        "reliability_tier": "TIER_1_OFFICIAL_EXCHANGE",
+        "status": "OK",
+        "direction": "NEUTRAL",
+        "confidence": "LOW",
+        "signal_score": 0,
+        "event_risk": "LOW",
+        "summary": "BTCUSDT open interest snapshot=98804.078 contracts/units on Binance USD-M Futures.",
+        "url": "https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT",
+        "fields": {
+          "binance_symbol": "BTCUSDT",
+          "open_interest": 98804.078,
+          "time": 1783601673077
+        },
+        "error": "",
+        "collected_utc": "2026-07-09T12:54:40.840065+00:00"
+      },
+      {
+        "source_id": "binance_futures_premium_funding",
+        "name": "Binance USD-M Futures Premium/Funding",
+        "category": "derivatives",
+        "reliability_tier": "TIER_1_OFFICIAL_EXCHANGE",
+        "status": "OK",
+        "direction": "NEUTRAL",
+        "confidence": "LOW",
+        "signal_score": 0,
+        "event_risk": "LOW",
+        "summary": "BTCUSDT funding=0.0064%, mark-index premium=-0.0275%.",
+        "url": "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT",
+        "fields": {
+          "binance_symbol": "BTCUSDT",
+          "funding_rate": 6.358e-05,
+          "funding_pct": 0.006358,
+          "mark_price": 62620.78770615,
+          "index_price": 62638.00891304,
+          "premium_pct": -0.027493,
+          "estimated_settle_price": 62723.290618
+        },
+        "error": "",
+        "collected_utc": "2026-07-09T12:54:42.395997+00:00"
+      },
+      {
+        "source_id": "fred_macro",
+        "name": "FRED Macro Snapshot",
+        "category": "macro",
+        "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+        "status": "SKIPPED_NO_KEY",
+        "direction": "NEUTRAL",
+        "confidence": "LOW",
+        "signal_score": 0.0,
+        "event_risk": "LOW",
+        "summary": "FRED_API_KEY is not configured; macro official-source collection skipped.",
+        "url": "https://fred.stlouisfed.org/docs/api/fred/",
+        "fields": {},
+        "error": "",
+        "collected_utc": "2026-07-09T12:54:42.546008+00:00"
+      },
+      {
+        "source_id": "alternative_fng",
+        "name": "Alternative.me Fear & Greed",
+        "category": "sentiment",
+        "reliability_tier": "TIER_3_SENTIMENT",
+        "status": "OK",
+        "direction": "SENTIMENT_FEAR_RISK",
+        "confidence": "LOW",
+        "signal_score": 0,
+        "event_risk": "MEDIUM",
+        "summary": "Fear & Greed=22.0 (Extreme Fear); used only as sentiment/crowding context.",
+        "url": "https://api.alternative.me/fng/?limit=1&format=json",
+        "fields": {
+          "value": 22.0,
+          "classification": "Extreme Fear",
+          "timestamp": "1783555200"
+        },
+        "error": "",
+        "collected_utc": "2026-07-09T12:54:44.984601+00:00"
+      }
+    ],
+    "warnings": [
+      "Causal Intelligence یک لایه پژوهشی است و به‌تنهایی سیگنال خرید/فروش نمی‌سازد.",
+      "جمع‌آوری APIهای عمومی ممکن است با rate limit یا محدودیت منطقه‌ای روبه‌رو شود؛ شکست source نباید چرخه Forward را fail کند."
+    ],
+    "recommendations": [
+      "برای خبر/رویدادهای خیلی مهم، data/manual_events.csv را از example بساز و فقط منابع معتبر مثل Fed/SEC/Reuters/official project را وارد کن.",
+      "در v6.4 نتایج فقط به decision log و research reports اضافه می‌شود؛ هیچ Paper/Live فعال نمی‌شود."
+    ]
+  },
+  "source_results": [
+    {
+      "source_id": "coingecko_global",
+      "name": "CoinGecko Global Market Data",
+      "category": "market_aggregate",
+      "reliability_tier": "TIER_2_MARKET_AGGREGATOR",
+      "status": "OK",
+      "direction": "NEUTRAL",
+      "confidence": "LOW",
+      "signal_score": 1.906763024551279,
+      "event_risk": "LOW",
+      "summary": "Global crypto cap 24h change=0.636%, BTC dominance=56.08%, volume=$63.34B.",
+      "url": "https://api.coingecko.com/api/v3/global",
+      "fields": {
+        "market_cap_change_24h_pct": 0.6356,
+        "btc_dominance_pct": 56.0819,
+        "eth_dominance_pct": 9.3658,
+        "total_market_cap_usd": 2236952583521.5034,
+        "total_volume_usd": 63337160964.63121
+      },
+      "error": "",
+      "collected_utc": "2026-07-09T12:54:21.140438+00:00"
+    },
+    {
+      "source_id": "defillama_tvl",
+      "name": "DefiLlama Total TVL Chart",
+      "category": "defi_liquidity",
+      "reliability_tier": "TIER_1_PROTOCOL_AGGREGATOR",
+      "status": "OK",
+      "direction": "BULLISH",
+      "confidence": "MEDIUM",
+      "signal_score": 6.980794104800439,
+      "event_risk": "LOW",
+      "summary": "DeFi TVL approx 7d change=3.49%, latest=$134.84B.",
+      "url": "https://api.llama.fi/charts",
+      "fields": {
+        "latest_tvl_usd": 134843954116.0,
+        "approx_7d_change_pct": 3.4904
+      },
+      "error": "",
+      "collected_utc": "2026-07-09T12:54:24.103206+00:00"
+    },
+    {
+      "source_id": "defillama_stablecoins",
+      "name": "DefiLlama Stablecoins",
+      "category": "stablecoin_liquidity",
+      "reliability_tier": "TIER_1_PROTOCOL_AGGREGATOR",
+      "status": "OK",
+      "direction": "NEUTRAL",
+      "confidence": "LOW",
+      "signal_score": 0,
+      "event_risk": "LOW",
+      "summary": "Stablecoin listed circulating supply snapshot=$309.84B across 407 assets.",
+      "url": "https://stablecoins.llama.fi/stablecoins?includePrices=true",
+      "fields": {
+        "stablecoin_assets": 407,
+        "listed_circulating_usd": 309842760370.277
+      },
+      "error": "",
+      "collected_utc": "2026-07-09T12:54:27.935266+00:00"
+    },
+    {
+      "source_id": "binance_futures_open_interest",
+      "name": "Binance USD-M Futures Open Interest",
+      "category": "derivatives",
+      "reliability_tier": "TIER_1_OFFICIAL_EXCHANGE",
+      "status": "OK",
+      "direction": "NEUTRAL",
+      "confidence": "LOW",
+      "signal_score": 0,
+      "event_risk": "LOW",
+      "summary": "BTCUSDT open interest snapshot=98804.078 contracts/units on Binance USD-M Futures.",
+      "url": "https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT",
+      "fields": {
+        "binance_symbol": "BTCUSDT",
+        "open_interest": 98804.078,
+        "time": 1783601673077
+      },
+      "error": "",
+      "collected_utc": "2026-07-09T12:54:40.840065+00:00"
+    },
+    {
+      "source_id": "binance_futures_premium_funding",
+      "name": "Binance USD-M Futures Premium/Funding",
+      "category": "derivatives",
+      "reliability_tier": "TIER_1_OFFICIAL_EXCHANGE",
+      "status": "OK",
+      "direction": "NEUTRAL",
+      "confidence": "LOW",
+      "signal_score": 0,
+      "event_risk": "LOW",
+      "summary": "BTCUSDT funding=0.0064%, mark-index premium=-0.0275%.",
+      "url": "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT",
+      "fields": {
+        "binance_symbol": "BTCUSDT",
+        "funding_rate": 6.358e-05,
+        "funding_pct": 0.006358,
+        "mark_price": 62620.78770615,
+        "index_price": 62638.00891304,
+        "premium_pct": -0.027493,
+        "estimated_settle_price": 62723.290618
+      },
+      "error": "",
+      "collected_utc": "2026-07-09T12:54:42.395997+00:00"
+    },
+    {
+      "source_id": "fred_macro",
+      "name": "FRED Macro Snapshot",
+      "category": "macro",
+      "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+      "status": "SKIPPED_NO_KEY",
+      "direction": "NEUTRAL",
+      "confidence": "LOW",
+      "signal_score": 0.0,
+      "event_risk": "LOW",
+      "summary": "FRED_API_KEY is not configured; macro official-source collection skipped.",
+      "url": "https://fred.stlouisfed.org/docs/api/fred/",
+      "fields": {},
+      "error": "",
+      "collected_utc": "2026-07-09T12:54:42.546008+00:00"
+    },
+    {
+      "source_id": "alternative_fng",
+      "name": "Alternative.me Fear & Greed",
+      "category": "sentiment",
+      "reliability_tier": "TIER_3_SENTIMENT",
+      "status": "OK",
+      "direction": "SENTIMENT_FEAR_RISK",
+      "confidence": "LOW",
+      "signal_score": 0,
+      "event_risk": "MEDIUM",
+      "summary": "Fear & Greed=22.0 (Extreme Fear); used only as sentiment/crowding context.",
+      "url": "https://api.alternative.me/fng/?limit=1&format=json",
+      "fields": {
+        "value": 22.0,
+        "classification": "Extreme Fear",
+        "timestamp": "1783555200"
+      },
+      "error": "",
+      "collected_utc": "2026-07-09T12:54:44.984601+00:00"
+    }
+  ],
+  "source_registry": [
+    {
+      "source_id": "coingecko_global",
+      "name": "CoinGecko Global Market Data",
+      "category": "market_aggregate",
+      "reliability_tier": "TIER_2_MARKET_AGGREGATOR",
+      "requires_key": false,
+      "env_key": "COINGECKO_API_KEY optional",
+      "purpose": "Global crypto market cap, 24h volume, BTC/ETH dominance and 24h aggregate change.",
+      "why_trusted": "Large independent crypto market data aggregator with documented REST endpoints."
+    },
+    {
+      "source_id": "defillama_tvl",
+      "name": "DefiLlama Total TVL Chart",
+      "category": "defi_liquidity",
+      "reliability_tier": "TIER_1_PROTOCOL_AGGREGATOR",
+      "requires_key": false,
+      "env_key": "none",
+      "purpose": "DeFi TVL trend as liquidity/risk-appetite context.",
+      "why_trusted": "Open-source DeFi analytics API with transparent methodology notes."
+    },
+    {
+      "source_id": "defillama_stablecoins",
+      "name": "DefiLlama Stablecoins",
+      "category": "stablecoin_liquidity",
+      "reliability_tier": "TIER_1_PROTOCOL_AGGREGATOR",
+      "requires_key": false,
+      "env_key": "none",
+      "purpose": "Stablecoin supply and liquidity context.",
+      "why_trusted": "Public stablecoin and DeFi analytics used as a neutral aggregator, not a trading venue."
+    },
+    {
+      "source_id": "binance_futures_open_interest",
+      "name": "Binance USD-M Futures Open Interest",
+      "category": "derivatives",
+      "reliability_tier": "TIER_1_OFFICIAL_EXCHANGE",
+      "requires_key": false,
+      "env_key": "none",
+      "purpose": "Present open interest for the mapped futures symbol.",
+      "why_trusted": "Official Binance Futures market-data endpoint for Binance-listed contracts."
+    },
+    {
+      "source_id": "binance_futures_premium_funding",
+      "name": "Binance USD-M Futures Premium/Funding",
+      "category": "derivatives",
+      "reliability_tier": "TIER_1_OFFICIAL_EXCHANGE",
+      "requires_key": false,
+      "env_key": "none",
+      "purpose": "Funding-rate and mark/index price context for crowding risk.",
+      "why_trusted": "Official Binance Futures premium index endpoint."
+    },
+    {
+      "source_id": "fred_macro",
+      "name": "FRED Macro Snapshot",
+      "category": "macro",
+      "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+      "requires_key": true,
+      "env_key": "FRED_API_KEY",
+      "purpose": "US rates/dollar-liquidity macro context when API key is configured.",
+      "why_trusted": "Federal Reserve Economic Data web service from the St. Louis Fed."
+    },
+    {
+      "source_id": "alternative_fng",
+      "name": "Alternative.me Fear & Greed",
+      "category": "sentiment",
+      "reliability_tier": "TIER_3_SENTIMENT",
+      "requires_key": false,
+      "env_key": "none",
+      "purpose": "Sentiment/crowding warning only; never used as a standalone bullish/bearish trigger.",
+      "why_trusted": "Popular sentiment index but lower tier because methodology is not exchange/official data."
+    },
+    {
+      "source_id": "manual_events",
+      "name": "Curated Manual Event Ledger",
+      "category": "news_event",
+      "reliability_tier": "TIER_0_MANUAL_CURATED",
+      "requires_key": false,
+      "env_key": "none",
+      "purpose": "High-trust manually entered events from sources such as Reuters, Fed, SEC, ETF issuers, project official posts.",
+      "why_trusted": "Human-curated provenance lets you reject low-quality rumor sources."
+    }
+  ],
+  "source_health": [
+    {
+      "source_id": "coingecko_global",
+      "status": "OK",
+      "tier": "TIER_2_MARKET_AGGREGATOR",
+      "category": "market_aggregate",
+      "direction": "NEUTRAL",
+      "event_risk": "LOW",
+      "error": ""
+    },
+    {
+      "source_id": "defillama_tvl",
+      "status": "OK",
+      "tier": "TIER_1_PROTOCOL_AGGREGATOR",
+      "category": "defi_liquidity",
+      "direction": "BULLISH",
+      "event_risk": "LOW",
+      "error": ""
+    },
+    {
+      "source_id": "defillama_stablecoins",
+      "status": "OK",
+      "tier": "TIER_1_PROTOCOL_AGGREGATOR",
+      "category": "stablecoin_liquidity",
+      "direction": "NEUTRAL",
+      "event_risk": "LOW",
+      "error": ""
+    },
+    {
+      "source_id": "binance_futures_open_interest",
+      "status": "OK",
+      "tier": "TIER_1_OFFICIAL_EXCHANGE",
+      "category": "derivatives",
+      "direction": "NEUTRAL",
+      "event_risk": "LOW",
+      "error": ""
+    },
+    {
+      "source_id": "binance_futures_premium_funding",
+      "status": "OK",
+      "tier": "TIER_1_OFFICIAL_EXCHANGE",
+      "category": "derivatives",
+      "direction": "NEUTRAL",
+      "event_risk": "LOW",
+      "error": ""
+    },
+    {
+      "source_id": "fred_macro",
+      "status": "SKIPPED_NO_KEY",
+      "tier": "TIER_1_OFFICIAL_MACRO",
+      "category": "macro",
+      "direction": "NEUTRAL",
+      "event_risk": "LOW",
+      "error": ""
+    },
+    {
+      "source_id": "alternative_fng",
+      "status": "OK",
+      "tier": "TIER_3_SENTIMENT",
+      "category": "sentiment",
+      "direction": "SENTIMENT_FEAR_RISK",
+      "event_risk": "MEDIUM",
+      "error": ""
+    }
+  ],
+  "latest_decision": {
+    "decision_id": "0678ab66434e5aeb",
+    "logged_at_utc": "2026-07-05T17:58:49.859999+00:00",
+    "candle_timestamp": "2026-07-05 16:00:00",
+    "symbol": "BTC/USDT",
+    "timeframe": "4h",
+    "price": 62628.6,
+    "side": "NEUTRAL",
+    "score": 18,
+    "confidence_label": "Low",
+    "risk_label": "Low",
+    "actionability": "MONITOR_ONLY",
+    "is_actionable": false,
+    "entry_zone": "نامشخص",
+    "stop_zone": "نامشخص",
+    "targets": "[]",
+    "trend_score": 11,
+    "trend_max": 28,
+    "momentum_score": 8,
+    "momentum_max": 30,
+    "volume_score": 0,
+    "volume_max": 20,
+    "structure_score": 8,
+    "structure_max": 12,
+    "risk_penalty": -5,
+    "risk_max": 25,
+    "regime_label": "TRENDING_BULL",
+    "regime_confidence": 62,
+    "regime_adjustment": 5,
+    "long_score": 24.0,
+    "short_score": 8.0,
+    "reasons": "قیمت بالای میانگین ۳۰ کندلی است؛ فشار روند بیشتر به سمت خریداران است. | RSI در محدوده سالم مومنتوم صعودی است: 58.8 | ساختار Higher High دیده می‌شود؛ سقف جدید بالاتر از سقف قبلی است. | ساختار Higher Low دیده می‌شود؛ کف جدید بالاتر از کف قبلی است. | قیمت نزدیک حمایت ساختاری حوالی 62437.10 قرار دارد. | Market Regime صعودی است و Bias لانگ را تأیید می‌کند. | Learning overrides موجود است اما enabled=false است؛ هیچ تغییری اعمال نمی‌شود.",
+    "warnings": "MACD هنوز ناحیه مثبت را تأیید نکرده است. | MACD نسبت به کندل قبل ضعیف‌تر شده است. | کندل فعلی با سناریوی LONG هم‌راستا نیست. | قیمت زیر EMA10 است؛ مومنتوم کوتاه‌مدت ضعیف‌تر شده است. | حجم فعلی ضعیف‌تر از میانگین اخیر است؛ احتمال شکست فیک بیشتر می‌شود. | کندل فعلی با سناریوی LONG هم‌راستا نیست. | Learning Override اعمال نشد. Status=DISABLED | Adaptive: با وجود رژیم صعودی، حجم هنوز تأیید کافی نداده است. | نمونه تاریخی قابل ارزیابی کافی نیست؛ فقط 0 نمونه نتیجه‌دار وجود دارد. | هیچ نمونه تاریخی مشابهی برای Historical Edge پیدا نشد. | Multi-Timeframe خنثی/ناهم‌راستا است؛ تایم‌فریم‌های بالاتر هنوز Bias NEUTRAL را تأیید نمی‌کنند: 85%",
+    "provider": "kucoin",
+    "regime_source": "decision_engine_raw",
+    "regime_label_quality": "DIRECT_ENGINE",
+    "trend_state": "BULLISH",
+    "volatility_state": "NORMAL_OR_LOW_VOL",
+    "market_phase": "BULLISH__NORMAL_OR_LOW_VOL",
+    "source": "UNKNOWN",
+    "evaluation_status": ""
+  },
+  "blockers": [],
+  "warnings": [
+    "Causal Intelligence یک لایه پژوهشی است و به‌تنهایی سیگنال خرید/فروش نمی‌سازد.",
+    "جمع‌آوری APIهای عمومی ممکن است با rate limit یا محدودیت منطقه‌ای روبه‌رو شود؛ شکست source نباید چرخه Forward را fail کند."
+  ],
+  "recommendations": [
+    "برای خبر/رویدادهای خیلی مهم، data/manual_events.csv را از example بساز و فقط منابع معتبر مثل Fed/SEC/Reuters/official project را وارد کن.",
+    "در v6.4 نتایج فقط به decision log و research reports اضافه می‌شود؛ هیچ Paper/Live فعال نمی‌شود."
+  ]
+}

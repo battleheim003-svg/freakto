@@ -119,3 +119,8 @@ forward_regime_labeling
 ## v6.3.1 Bull Probe Evaluation Sync Patch
 
 `forward_shadow_coverage_dashboard.py` now syncs Bull probe evaluation counts from the Shadow Ledger when decision evaluation rows are not marked COMPLETE yet. This is reporting-only and research-only.
+
+
+## v6.4 Causal/Event Intelligence
+
+Causal Intelligence به Research Suite اضافه شد تا primary_cause، catalyst_score، event_risk، technical_event_conflict و causal_verdict را کنار تصمیم‌ها ذخیره کند. این داده‌ها بعداً برای Conflict Lab و cause/outcome evaluation استفاده می‌شوند.

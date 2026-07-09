@@ -145,3 +145,14 @@ Command: python -X utf8 forward_shadow_coverage_dashboard.py --compact
 ## v6.3.1 Bull Probe Evaluation Sync Patch
 
 `forward_shadow_coverage_dashboard.py` now syncs Bull probe evaluation counts from the Shadow Ledger when decision evaluation rows are not marked COMPLETE yet. This is reporting-only and research-only.
+
+
+## v6.4 causal_intelligence_probe
+
+در چرخه Forward، task جدید `causal_intelligence_probe` اضافه شده است:
+
+```cmd
+python causal_intelligence_dashboard.py --compact
+```
+
+این task منابع بیرونی معتبر و manual_events را جمع‌آوری می‌کند و فقط report/log می‌سازد.

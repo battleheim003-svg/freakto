@@ -23,7 +23,7 @@ except Exception:  # pragma: no cover
     pd = None
 
 
-VERSION = "v6.3.0"
+VERSION = "v6.4.0"
 LOG_DIR = Path("logs")
 FORWARD_DIR = LOG_DIR / "forward_testing"
 RUNS_CSV = LOG_DIR / "forward_test_runs.csv"
@@ -178,6 +178,14 @@ def build_forward_test_plan(
         )
 
     if include_evaluator:
+        tasks.append(
+            ForwardTask(
+                name="causal_intelligence_probe",
+                command=_python_cmd("causal_intelligence_dashboard.py", "--compact"),
+                required=False,
+                description="جمع‌آوری context علّی/رویدادی از منابع معتبر و ثبت catalyst/conflict بدون Paper/Live.",
+            )
+        )
         tasks.append(
             ForwardTask(
                 name="decision_log_repair",

@@ -1,8 +1,8 @@
 <!doctype html><html lang='fa'><head><meta charset='utf-8'><title>Freakto Research Dashboard</title>
 <style>body{font-family:Arial,sans-serif;direction:rtl;background:#111;color:#eee;padding:24px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #555;padding:8px;vertical-align:top}pre{white-space:pre-wrap;direction:ltr;text-align:left}</style></head>
-<body><h1>Freakto Research Dashboard v6</h1><p>Generated UTC: 2026-07-08T17:11:27.942975+00:00</p><table><tr><th>Section</th><th>Status</th><th>Details</th></tr><tr><td>gate_robustness</td><td>ROBUST_GATES_FOUND</td><td><pre>{
-  "run_id": "gate_robustness_20260708_171126",
-  "generated_utc": "2026-07-08T17:11:26.850254+00:00",
+<body><h1>Freakto Research Dashboard v6</h1><p>Generated UTC: 2026-07-09T12:18:00.142468+00:00</p><table><tr><th>Section</th><th>Status</th><th>Details</th></tr><tr><td>gate_robustness</td><td>ROBUST_GATES_FOUND</td><td><pre>{
+  "run_id": "gate_robustness_20260709_121758",
+  "generated_utc": "2026-07-09T12:17:58.790465+00:00",
   "status": "ROBUST_GATES_FOUND",
   "horizon": "24h",
   "min_samples": 30,
@@ -99,8 +99,8 @@
         },
         {
  </pre></td></tr><tr><td>cost_adjusted_backtest</td><td>COST_ADJUSTED_READY</td><td><pre>{
-  "run_id": "cost_backtest_20260708_171126",
-  "generated_utc": "2026-07-08T17:11:26.972916+00:00",
+  "run_id": "cost_backtest_20260709_121758",
+  "generated_utc": "2026-07-09T12:17:58.915148+00:00",
   "status": "COST_ADJUSTED_READY",
   "horizon": "24h",
   "fee_bps": 10.0,
@@ -198,8 +198,8 @@
     },
     {
       "name": "</pre></td></tr><tr><td>meta_labeling</td><td>META_LABEL_BUILDING</td><td><pre>{
-  "run_id": "meta_label_20260708_171126",
-  "generated_utc": "2026-07-08T17:11:27.013849+00:00",
+  "run_id": "meta_label_20260709_121758",
+  "generated_utc": "2026-07-09T12:17:58.961626+00:00",
   "status": "META_LABEL_BUILDING",
   "samples": 295,
   "train_samples": 206,
@@ -290,8 +290,8 @@
     "اگر AUC در Forward هم بالای 0.55 بماند، مرحله بعدی meta-label shadow gate است."
   ]
 }</pre></td></tr><tr><td>ensemble_explainability</td><td>EXPLAINABILITY_READY</td><td><pre>{
-  "run_id": "ensemble_explain_20260708_171127",
-  "generated_utc": "2026-07-08T17:11:27.027811+00:00",
+  "run_id": "ensemble_explain_20260709_121758",
+  "generated_utc": "2026-07-09T12:17:58.977647+00:00",
   "status": "EXPLAINABILITY_READY",
   "rows": 32,
   "recent_count": 25,
@@ -389,8 +389,8 @@
       "top_contributors": [
         {
         </pre></td></tr><tr><td>data_enrichment</td><td>ENRICHMENT_CONNECTORS_PRESENT</td><td><pre>{
-  "run_id": "data_enrichment_20260708_171127",
-  "generated_utc": "2026-07-08T17:11:27.051745+00:00",
+  "run_id": "data_enrichment_20260709_121759",
+  "generated_utc": "2026-07-09T12:17:59.001650+00:00",
   "status": "ENRICHMENT_CONNECTORS_PRESENT",
   "features": [
     {
@@ -444,8 +444,8 @@
     "عدم وجود ستون یعنی feature هنوز در لاگ تصمیم‌ها persist نشده است، نه اینکه collector حتماً وجود ندارد."
   ]
 }</pre></td></tr><tr><td>regime_research</td><td>REGIME_RESEARCH_READY</td><td><pre>{
-  "run_id": "regime_research_20260708_171127",
-  "generated_utc": "2026-07-08T17:11:27.086649+00:00",
+  "run_id": "regime_research_20260709_121759",
+  "generated_utc": "2026-07-09T12:17:59.035536+00:00",
   "status": "REGIME_RESEARCH_READY",
   "regime_count": 5,
   "regimes": [
@@ -531,9 +531,44 @@
       "stop_hit_rate": 40.0,
       "mfe_mean_pct": 1.5277,
       "mae_mean_pct": -2.2235,
-      "mfe</pre></td></tr><tr><td>regime_gate_matrix</td><td>REGIME_GATE_CANDIDATES_FOUND</td><td><pre>{
-  "run_id": "regime_gate_matrix_20260708_171127",
-  "generated_utc": "2026-07-08T17:11:27.629158+00:00",
+      "mfe</pre></td></tr><tr><td>forward_regime_labeling</td><td>FORWARD_REGIME_LABELING_READY</td><td><pre>{
+  "run_id": "forward_regime_label_20260709_121759",
+  "generated_utc": "2026-07-09T12:17:59.035536+00:00",
+  "status": "FORWARD_REGIME_LABELING_READY",
+  "apply_changes": false,
+  "decisions_path": "logs\\decisions.csv",
+  "evaluations_path": "logs\\decision_evaluations.csv",
+  "decision_rows": 32,
+  "known_before": 32,
+  "unknown_before": 0,
+  "known_after": 32,
+  "unknown_after": 0,
+  "injected_decision_rows": 0,
+  "preserved_decision_rows": 32,
+  "direct_engine_rows": 1,
+  "text_inferred_rows": 31,
+  "proxy_inferred_rows": 0,
+  "evaluation_rows": 30,
+  "patched_evaluation_rows": 0,
+  "evaluation_known_after": 30,
+  "label_counts": {
+    "TRENDING_BULL": 32
+  },
+  "evaluation_label_counts": {
+    "TRENDING_BULL": 30
+  },
+  "backup_paths": [],
+  "blockers": [],
+  "recommendations": [
+    "بعد از اجرای cycle جدید، regime_shadow_gate_dashboard.py --compact را دوباره بررسی کن."
+  ],
+  "warnings": [
+    "Regime injection فقط از داده‌های لحظه تصمیم استفاده می‌کند؛ outcome/return/target/stop استفاده نمی‌شود.",
+    "برچسب‌های LOW_CONF_PROXY برای Research هستند و باید در Forward واقعی بیشتر validate شوند."
+  ]
+}</pre></td></tr><tr><td>regime_gate_matrix</td><td>REGIME_GATE_CANDIDATES_FOUND</td><td><pre>{
+  "run_id": "regime_gate_matrix_20260709_121759",
+  "generated_utc": "2026-07-09T12:17:59.558139+00:00",
   "version": "v6.1.0",
   "status": "REGIME_GATE_CANDIDATES_FOUND",
   "horizon": "24h",
@@ -623,8 +658,8 @@
     },
     {
       "regime": "TRENDING_BEAR"</pre></td></tr><tr><td>regime_shadow_gates</td><td>REGIME_SHADOW_GATES_ACTIVE</td><td><pre>{
-  "run_id": "shadow_gate_20260708_171127",
-  "generated_utc": "2026-07-08T17:11:27.671043+00:00",
+  "run_id": "shadow_gate_20260709_121759",
+  "generated_utc": "2026-07-09T12:17:59.601025+00:00",
   "status": "REGIME_SHADOW_GATES_ACTIVE",
   "horizon": "24h",
   "min_samples": 30,
@@ -706,9 +741,95 @@
       "family": "regime_gate_matrix_candidate",
       "priority": 0,
       "verdict": "SHADOW_BUILDING",
-</pre></td></tr><tr><td>cross_exchange_validation</td><td>SINGLE_PROVIDER_ONLY</td><td><pre>{
-  "run_id": "cross_exchange_20260708_171127",
-  "generated_utc": "2026-07-08T17:11:27.701958+00:00",
+</pre></td></tr><tr><td>forward_shadow_coverage</td><td>NO_BEAR_COVERAGE_WITH_BULL_PROBE_CONFLICTS</td><td><pre>{
+  "run_id": "forward_shadow_coverage_20260709_121759",
+  "generated_utc": "2026-07-09T12:17:59.858336+00:00",
+  "status": "NO_BEAR_COVERAGE_WITH_BULL_PROBE_CONFLICTS",
+  "version": "v6.3.1",
+  "horizon": "24h",
+  "min_samples": 30,
+  "decision_rows": 32,
+  "directional_decisions": 23,
+  "evaluation_rows": 30,
+  "complete_evaluations": 14,
+  "shadow_signal_rows": 14,
+  "evaluated_shadow_rows": 14,
+  "forward_regime_counts": [
+    {
+      "regime": "TRENDING_BULL",
+      "rows": 32,
+      "share_pct": 100.0,
+      "directional_rows": 23,
+      "direct_engine_rows": 0,
+      "proxy_or_text_rows": 0
+    }
+  ],
+  "shadow_gate_coverage": [
+    {
+      "gate": "STRUCTURE_SCORE_GE_10",
+      "family": "review_backtest_candidate",
+      "signals": 14,
+      "evaluated": 14,
+      "avg_return_pct": 0.8834,
+      "win_rate": 100.0,
+      "dominant_regime": "TRENDING_BULL",
+      "regime_count": 14
+    }
+  ],
+  "shadow_regime_coverage": [
+    {
+      "regime": "TRENDING_BULL",
+      "shadow_signals": 14,
+      "evaluated": 14,
+      "avg_return_pct": 0.8834,
+      "win_rate": 100.0,
+      "distinct_gates": 1
+    }
+  ],
+  "bull_forward_probes": [
+    {
+      "probe": "BULL_STRUCTURE_SCORE_GE_10",
+      "filters": {
+        "regime_label": "TRENDING_BULL",
+        "structure_score_min": 10
+      },
+      "verdict": "FORWARD_PROMISING_LOW_SAMPLE_BACKTEST_CONFLICT",
+      "forward_data_source": "shadow_ledger_sync",
+      "shadow_gate_source": "STRUCTURE_SCORE_GE_10",
+      "shadow_rows_seen": 14,
+      "forward_samples": 14,
+      "forward_avg_pct": 0.8834,
+      "forward_win_rate": 100.0,
+      "forward_t1_rate": 57.14,
+      "forward_stop_rate": 0.0,
+      "forward_mfe_mae": 4.18,
+      "backtest_samples": 39,
+      "backtest_net_avg_pct": -0.5158,
+      "backtest_win_rate": 41.03,
+      "backtest_t1_rate": 38.46,
+      "backtest_stop_rate": 51.28,
+      "backtest_mfe_mae": 0.643
+    },
+    {
+      "probe": "BULL_STRUCTURE_SCORE_GE_10_LONG",
+      "filters": {
+        "regime_label": "TRENDING_BULL",
+        "structure_score_min": 10,
+        "side": "LONG"
+      },
+      "verdict": "FORWARD_PROMISING_LOW_SAMPLE_BACKTEST_CONFLICT",
+      "forward_data_source": "shadow_ledger_sync",
+      "shadow_gate_source": "STRUCTURE_SCORE_GE_10",
+      "shadow_rows_seen": 14,
+      "forward_samples": 14,
+      "forward_avg_pct": 0.8834,
+      "forward_win_rate": 100.0,
+      "forward_t1_rate": 57.14,
+      "forward_stop_rate": 0.0,
+      "forward_mfe_mae": 4.18,
+      "backtest_s</pre></td></tr><tr><td>cross_exchange_validation</td><td>SINGLE_PROVIDER_ONLY</td><td><pre>{
+  "run_id": "cross_exchange_20260709_121759",
+  "generated_utc": "2026-07-09T12:17:59.884267+00:00",
   "status": "SINGLE_PROVIDER_ONLY",
   "providers": [
     {
@@ -734,8 +855,8 @@
     "اگر فقط یک provider وجود دارد، همان Gate را روی Binance/Bybit/OKX جدا backfill کن."
   ]
 }</pre></td></tr><tr><td>research_db</td><td>RESEARCH_DB_READY</td><td><pre>{
-  "run_id": "research_db_20260708_171127",
-  "generated_utc": "2026-07-08T17:11:27.792842+00:00",
+  "run_id": "research_db_20260709_121759",
+  "generated_utc": "2026-07-09T12:17:59.977214+00:00",
   "status": "RESEARCH_DB_READY",
   "db_path": "logs\\research\\freakto_research.db",
   "tables": [
@@ -766,8 +887,8 @@
     }
   ]
 }</pre></td></tr><tr><td>pipeline_health</td><td>PIPELINE_ATTENTION_REQUIRED</td><td><pre>{
-  "run_id": "pipeline_health_20260708_171127",
-  "generated_utc": "2026-07-08T17:11:27.799826+00:00",
+  "run_id": "pipeline_health_20260709_121759",
+  "generated_utc": "2026-07-09T12:17:59.985529+00:00",
   "status": "PIPELINE_ATTENTION_REQUIRED",
   "alerts": [
     "بیش از 8.0 ساعت از آخرین Forward Run گذشته است."
@@ -782,13 +903,15 @@
     "task_count": "6",
     "failed_tasks": "nan",
     "report_file": "logs\\forward_testing\\forward_20260705_175826_report.md",
-    "hours_since_last_run": 71.22
+    "hours_since_last_run": 90.33
   },
   "forward_eval_rows": 30,
+  "forward_regime_known_rows": 30,
+  "forward_regime_unknown_rows": 0,
   "shadow_signal_rows": 14
 }</pre></td></tr><tr><td>strict_readiness</td><td>STRICT_READINESS_RESEARCH_ONLY</td><td><pre>{
-  "run_id": "strict_readiness_20260708_171127",
-  "generated_utc": "2026-07-08T17:11:27.852224+00:00",
+  "run_id": "strict_readiness_20260709_121800",
+  "generated_utc": "2026-07-09T12:18:00.042734+00:00",
   "status": "STRICT_READINESS_RESEARCH_ONLY",
   "backtest_net": {
     "samples": 295,
@@ -844,8 +967,8 @@
     "این readiness سخت‌گیرانه‌تر از نسخه‌های قبلی است و به تنهایی مجوز Live نیست."
   ]
 }</pre></td></tr><tr><td>position_sizing_lab</td><td>POSITION_SIZING_RESEARCH_READY</td><td><pre>{
-  "run_id": "position_sizing_20260708_171127",
-  "generated_utc": "2026-07-08T17:11:27.934997+00:00",
+  "run_id": "position_sizing_20260709_121800",
+  "generated_utc": "2026-07-09T12:18:00.127508+00:00",
   "status": "POSITION_SIZING_RESEARCH_READY",
   "max_risk_pct": 0.5,
   "rows": [
@@ -936,8 +1059,8 @@
       "std_pct": 2.775,
       "kelly_proxy_risk_pct": 0.0,
       "volatil</pre></td></tr><tr><td>airdrop_shadow_research</td><td>AIRDROP_SHADOW_READY</td><td><pre>{
-  "run_id": "airdrop_shadow_20260708_171127",
-  "generated_utc": "2026-07-08T17:11:27.935994+00:00",
+  "run_id": "airdrop_shadow_20260709_121800",
+  "generated_utc": "2026-07-09T12:18:00.135487+00:00",
   "status": "AIRDROP_SHADOW_READY",
   "items": [
     {

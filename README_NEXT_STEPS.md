@@ -316,3 +316,17 @@ python forward_shadow_coverage_dashboard.py --compact
 ```
 
 Expected improvement: Bull probes can use the evaluated Shadow Ledger as a fallback source and will display `src=shadow_ledger_sync` when that happens.
+
+
+## v6.4 Causal/Event Intelligence
+
+بعد از v6.4 این تست‌ها را بزن:
+
+```cmd
+python causal_intelligence_dashboard.py --compact
+python causal_intelligence_dashboard.py --sources
+python causal_event_dashboard.py --init
+python forward_test_dashboard.py --plan
+```
+
+هدف: جمع‌آوری context معتبر برای اینکه بفهمیم علت حرکت بازار چیست. این لایه فقط Research است و Paper/Live فعال نمی‌کند.

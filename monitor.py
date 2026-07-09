@@ -36,6 +36,7 @@ from engine.score import confidence_label
 from engine.similarity import find_similar_snapshots, format_similarity_for_console
 from engine.trade_quality import build_trade_intelligence_card
 from engine.intelligence import build_intelligence_report, format_intelligence_console
+from engine.causal_intelligence import attach_causal_context
 from engine.multi_timeframe import (
     TimeframeSignal,
     calculate_consensus,
@@ -456,6 +457,24 @@ def check_market():
         _send_alert_report(latest_timestamp, price, alerts)
 
     _print_decision_report(opportunity)
+
+    try:
+        causal_context = attach_causal_context(
+            opportunity,
+            df,
+            symbol=SYMBOL,
+            timeframe=PRIMARY_TIMEFRAME,
+            collect_live=False,
+        )
+        print("\n" + "=" * 70)
+        print("🧠 Causal/Event Intelligence Context v6.4")
+        print("=" * 70)
+        print(f"Primary Cause : {causal_context.primary_cause}")
+        print(f"Catalyst      : {causal_context.catalyst_score}/100 | Risk: {causal_context.event_risk}")
+        print(f"Conflict      : {causal_context.technical_event_conflict} | Verdict: {causal_context.causal_verdict}")
+        print("=" * 70)
+    except Exception as error:
+        print(f"⚠️ Causal context attach skipped: {type(error).__name__}: {error}")
 
     similarity = find_similar_snapshots(opportunity)
     format_similarity_for_console(similarity)
