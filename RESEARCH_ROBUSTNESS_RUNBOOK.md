@@ -135,3 +135,16 @@ python automatic_event_collector_dashboard.py --compact
 ```
 
 خروجی اصلی آن `data/auto_events.csv` است. این فایل از منابع رسمی/معتبر ساخته می‌شود و Causal Intelligence آن را در کنار `manual_events.csv` می‌خواند. این لایه فقط Research است و Paper/Live فعال نمی‌کند.
+
+
+## v6.5.1 Source Resilience Patch
+
+Automatic Event Collector حالا برای sourceهای رسمی چند fallback دارد. بعد از آپدیت، این تست‌ها را اجرا کن:
+
+```cmd
+python automatic_event_collector_dashboard.py --sources
+python automatic_event_collector_dashboard.py --compact
+python causal_intelligence_dashboard.py --compact
+```
+
+اگر Binance/Coinbase/SEC Litigation باز هم fail شدند، چرخه Forward نباید متوقف شود؛ Source Health را بررسی کن و فقط در صورت fail دائمی patch بعدی لازم است.

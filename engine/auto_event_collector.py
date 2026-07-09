@@ -1,6 +1,6 @@
 
 """
-Freakto v6.5.0 - Automatic Event Collector
+Freakto v6.5.1 - Automatic Event Collector Source Resilience Patch
 
 Research-only official/trusted event collection layer for Causal Intelligence.
 It collects public announcements/news-like event feeds, classifies significant
@@ -31,13 +31,13 @@ except Exception:  # pragma: no cover
 
 from engine.research_utils import LOG_DIR, RESEARCH_DIR, run_id, utc_now_iso, write_json, write_text, save_dataframe_csv
 
-VERSION = "v6.5.0"
+VERSION = "v6.5.1"
 EVENT_DIR = LOG_DIR / "events"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 AUTO_EVENTS_FILE = Path("data") / "auto_events.csv"
 AUTO_EVENT_SOURCES_EXAMPLE = Path("data") / "auto_event_sources.example.json"
 EVENT_TIMEOUT_SECONDS = float(os.getenv("FREAKTO_EVENT_TIMEOUT", "14"))
-EVENT_USER_AGENT = os.getenv("FREAKTO_EVENT_USER_AGENT", "FreaktoResearchBot/6.5 (+research-only; contact=local)")
+EVENT_USER_AGENT = os.getenv("FREAKTO_EVENT_USER_AGENT", "Mozilla/5.0 (compatible; FreaktoResearchBot/6.5.1; research-only; +local)")
 DEFAULT_LOOKBACK_HOURS = int(os.getenv("FREAKTO_EVENT_LOOKBACK_HOURS", "168"))
 DEFAULT_MAX_ITEMS_PER_SOURCE = int(os.getenv("FREAKTO_EVENT_MAX_ITEMS", "25"))
 
@@ -67,6 +67,7 @@ class EventSource:
     reliability_tier: str
     category: str
     enabled_by_default: bool = True
+    fallback_urls: List[str] = field(default_factory=list)
     notes: str = ""
 
 
@@ -196,43 +197,55 @@ def build_event_source_registry(include_media: bool = False) -> List[EventSource
         EventSource(
             "sec_press_releases", "SEC Press Releases RSS", "https://www.sec.gov/news/pressreleases.rss", "rss",
             "TIER_1_OFFICIAL_REGULATOR", "regulatory", True,
+            ["https://www.sec.gov/news/press-release/rss", "https://www.sec.gov/news/press-releases"],
             "Official SEC news releases; high value for ETF/enforcement/regulatory catalysts.",
         ),
         EventSource(
-            "sec_litigation_releases", "SEC Litigation Releases RSS", "https://www.sec.gov/litigation/litreleases.rss", "rss",
+            "sec_litigation_releases", "SEC Litigation Releases", "https://www.sec.gov/litigation/litreleases.rss", "rss",
             "TIER_1_OFFICIAL_REGULATOR", "regulatory", True,
-            "Official SEC litigation releases; bearish/regulatory-risk context when crypto-related.",
+            ["https://www.sec.gov/news/litigation/litreleases.rss", "https://www.sec.gov/enforcement-litigation/litigation-releases"],
+            "Official SEC litigation releases; bearish/regulatory-risk context when crypto-related. v6.5.1 can fall back to the official HTML listing page when RSS moves.",
         ),
         EventSource(
             "federal_reserve_press", "Federal Reserve Press Releases RSS", "https://www.federalreserve.gov/feeds/press_all.xml", "rss",
             "TIER_1_OFFICIAL_MACRO", "macro", True,
+            ["https://www.federalreserve.gov/feeds/press_monetary.xml", "https://www.federalreserve.gov/newsevents/pressreleases.htm"],
             "Official Fed press feed; macro and rate-policy context.",
         ),
         EventSource(
             "federal_reserve_speeches", "Federal Reserve Speeches RSS", "https://www.federalreserve.gov/feeds/speeches.xml", "rss",
             "TIER_1_OFFICIAL_MACRO", "macro", True,
+            ["https://www.federalreserve.gov/feeds/testimony.xml", "https://www.federalreserve.gov/newsevents/speeches.htm"],
             "Official Fed speeches/testimony feed; used as event-risk context, not standalone direction.",
         ),
         EventSource(
             "ethereum_foundation_blog", "Ethereum Foundation Blog", "https://blog.ethereum.org/feed.xml", "rss",
             "TIER_1_OFFICIAL_PROTOCOL", "protocol", True,
+            ["https://blog.ethereum.org/rss.xml", "https://blog.ethereum.org/"],
             "Official Ethereum Foundation blog feed for protocol/security/upgrade items.",
         ),
         EventSource(
-            "coinbase_blog", "Coinbase Blog RSS", "https://blog.coinbase.com/feed", "rss",
+            "coinbase_blog", "Coinbase Blog", "https://www.coinbase.com/blog/rss.xml", "rss",
             "TIER_2_OFFICIAL_COMPANY_BLOG", "exchange_company", True,
-            "Coinbase official Medium/blog feed; useful for company/product/listing context.",
+            ["https://www.coinbase.com/blog/feed.xml", "https://www.coinbase.com/blog/feed", "https://www.coinbase.com/blog"],
+            "Coinbase official blog; useful for company/product/listing context. v6.5.1 uses multiple feed/page fallbacks.",
         ),
         EventSource(
             "binance_announcements", "Binance Announcements", "https://www.binance.com/bapi/composite/v1/public/cms/article/list/query?type=1&pageNo=1&pageSize=30", "binance_json",
             "TIER_1_OFFICIAL_EXCHANGE_NEWS", "exchange", True,
-            "Binance official announcement page backend; used defensively and allowed to fail if format changes.",
+            [
+                "https://www.binance.com/bapi/composite/v1/public/cms/article/list/query?type=1&catalogId=48&pageNo=1&pageSize=30",
+                "https://www.binance.com/en/support/announcement/list/48",
+                "https://www.binance.com/en/support/announcement",
+            ],
+            "Binance official announcement source; v6.5.1 tries JSON plus HTML fallbacks because the public endpoint can change.",
         ),
     ]
     if include_media:
         sources.append(EventSource(
             "coindesk_rss", "CoinDesk RSS", "https://www.coindesk.com/arc/outboundfeeds/rss/", "rss",
             "TIER_2_REPUTABLE_MEDIA", "media", True,
+            ["https://www.coindesk.com/arc/outboundfeeds/rss/?outputType=xml", "https://www.coindesk.com/"],
             "Reputable crypto media context only; lower priority than official sources.",
         ))
     return sources
@@ -277,6 +290,72 @@ def _rss_entries(xml_text: str) -> List[Dict[str, Any]]:
     return entries
 
 
+
+
+def _html_entries(html_text: str, base_url: str, max_items: int) -> List[Dict[str, Any]]:
+    """Best-effort fallback parser for official listing pages when RSS/API changes.
+
+    This is intentionally conservative: it only extracts title/link/date-like snippets
+    from the same official source page and then the normal classifier decides whether
+    the item is significant. It is not used as a trading signal by itself.
+    """
+    text = html_text or ""
+    entries: List[Dict[str, Any]] = []
+    seen = set()
+
+    # JSON-LD / embedded metadata titles sometimes appear in HTML even when pages are JS-heavy.
+    meta_titles = re.findall(r'"(?:headline|name|title)"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"', text, flags=re.I)
+    meta_dates = re.findall(r'"(?:datePublished|dateModified|publishDate|releaseDate)"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"', text, flags=re.I)
+    for idx, raw_title in enumerate(meta_titles[:max_items * 2]):
+        title = _strip_html(raw_title.encode("utf-8", errors="ignore").decode("unicode_escape", errors="ignore"))
+        if len(title) < 12:
+            continue
+        key = title.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        entries.append({"title": title, "url": base_url, "published": meta_dates[idx] if idx < len(meta_dates) else "", "description": title})
+        if len(entries) >= max_items:
+            return entries
+
+    # Anchor fallback for official listing pages.
+    for href, raw_title in re.findall(r'<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)</a>', text, flags=re.I | re.S):
+        title = _strip_html(raw_title)
+        if len(title) < 12:
+            continue
+        title_l = title.lower()
+        # Avoid navigation/header noise.
+        if title_l in seen or any(x in title_l for x in ["privacy", "terms", "subscribe", "cookie", "contact us", "careers"]):
+            continue
+        if len(title.split()) < 3:
+            continue
+        seen.add(title_l)
+        url = urllib.parse.urljoin(base_url, html.unescape(href))
+        # Use nearby context to pick up a date if present.
+        published = ""
+        idx = text.find(href)
+        window = _strip_html(text[max(0, idx - 240): idx + 360]) if idx >= 0 else ""
+        m = re.search(r'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},\s+\d{4}\b', window, flags=re.I)
+        if m:
+            published = m.group(0)
+        entries.append({"title": title, "url": url, "published": published, "description": window or title})
+        if len(entries) >= max_items:
+            break
+    return entries
+
+
+def _fetch_rss_or_html(url: str, max_items: int) -> Tuple[List[Dict[str, Any]], str]:
+    text, error = _http_get(url, accept="application/rss+xml, application/atom+xml, application/xml, text/xml, text/html, */*")
+    if error:
+        return [], error
+    try:
+        return _rss_entries(text)[:max_items], ""
+    except Exception as xml_error:
+        fallback_rows = _html_entries(text, url, max_items)
+        if fallback_rows:
+            return fallback_rows[:max_items], ""
+        return [], f"XMLParseError: {xml_error}"
+
 def _find_binance_articles(obj: Any) -> List[Dict[str, Any]]:
     found: List[Dict[str, Any]] = []
     if isinstance(obj, dict):
@@ -301,31 +380,47 @@ def _find_binance_articles(obj: Any) -> List[Dict[str, Any]]:
 
 
 def fetch_source_items(source: EventSource, max_items: int) -> Tuple[List[Dict[str, Any]], str]:
+    urls = [source.url] + [u for u in (source.fallback_urls or []) if u and u != source.url]
+    errors: List[str] = []
+
     if source.source_type == "rss":
-        text, error = _http_get(source.url, accept="application/rss+xml, application/atom+xml, application/xml, text/xml, */*")
-        if error:
-            return [], error
-        try:
-            return _rss_entries(text)[:max_items], ""
-        except Exception as error:
-            return [], f"XMLParseError: {error}"
+        for url in urls:
+            rows, error = _fetch_rss_or_html(url, max_items)
+            if rows:
+                return rows[:max_items], ""
+            if error:
+                errors.append(f"{url} -> {error}")
+        return [], " | ".join(errors[-3:]) or "no_items"
+
     if source.source_type == "binance_json":
-        text, error = _http_get(source.url, accept="application/json, */*")
-        if error:
-            return [], error
-        try:
-            payload = json.loads(text)
-            rows = _find_binance_articles(payload)
-            # Deduplicate noisy nested copies.
-            seen = set(); deduped = []
-            for r in rows:
-                key = (_norm(r.get("title")).lower(), _norm(r.get("url")))
-                if key in seen:
+        for url in urls:
+            if "bapi" in url:
+                text, error = _http_get(url, accept="application/json, text/plain, */*")
+                if error:
+                    errors.append(f"{url} -> {error}")
                     continue
-                seen.add(key); deduped.append(r)
-            return deduped[:max_items], ""
-        except Exception as error:
-            return [], f"JSONParseError: {error}"
+                try:
+                    payload = json.loads(text)
+                    rows = _find_binance_articles(payload)
+                    seen = set(); deduped = []
+                    for r in rows:
+                        key = (_norm(r.get("title")).lower(), _norm(r.get("url")))
+                        if key in seen:
+                            continue
+                        seen.add(key); deduped.append(r)
+                    if deduped:
+                        return deduped[:max_items], ""
+                    errors.append(f"{url} -> no_json_articles")
+                except Exception as error:
+                    errors.append(f"{url} -> JSONParseError: {error}")
+            else:
+                rows, error = _fetch_rss_or_html(url, max_items)
+                if rows:
+                    return rows[:max_items], ""
+                if error:
+                    errors.append(f"{url} -> {error}")
+        return [], " | ".join(errors[-3:]) or "no_items"
+
     return [], f"unsupported_source_type:{source.source_type}"
 
 
@@ -539,7 +634,7 @@ def run_auto_event_collector(
     if fetch_live and ok_count == 0:
         blockers.append("هیچ source رسمی/معتبر با موفقیت fetch نشد؛ network/rate limit/URL sourceها را بررسی کن.")
     if official_failures:
-        warnings.append(f"{len(official_failures)} منبع رسمی fail شد؛ این شکست چرخه Forward را متوقف نمی‌کند.")
+        warnings.append(f"{len(official_failures)} منبع رسمی fail شد؛ v6.5.1 چند fallback را امتحان می‌کند اما شکست source چرخه Forward را متوقف نمی‌کند.")
     if high_events:
         recommendations.append("رویدادهای high-impact جمع شد؛ causal_intelligence_dashboard.py را اجرا کن تا روی تصمیم‌ها اثر context بررسی شود.")
     else:

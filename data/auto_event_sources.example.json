@@ -7,17 +7,25 @@
     "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
     "category": "regulatory",
     "enabled_by_default": true,
+    "fallback_urls": [
+      "https://www.sec.gov/news/press-release/rss",
+      "https://www.sec.gov/news/press-releases"
+    ],
     "notes": "Official SEC news releases; high value for ETF/enforcement/regulatory catalysts."
   },
   {
     "source_id": "sec_litigation_releases",
-    "name": "SEC Litigation Releases RSS",
+    "name": "SEC Litigation Releases",
     "url": "https://www.sec.gov/litigation/litreleases.rss",
     "source_type": "rss",
     "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
     "category": "regulatory",
     "enabled_by_default": true,
-    "notes": "Official SEC litigation releases; bearish/regulatory-risk context when crypto-related."
+    "fallback_urls": [
+      "https://www.sec.gov/news/litigation/litreleases.rss",
+      "https://www.sec.gov/enforcement-litigation/litigation-releases"
+    ],
+    "notes": "Official SEC litigation releases; bearish/regulatory-risk context when crypto-related. v6.5.1 can fall back to the official HTML listing page when RSS moves."
   },
   {
     "source_id": "federal_reserve_press",
@@ -27,6 +35,10 @@
     "reliability_tier": "TIER_1_OFFICIAL_MACRO",
     "category": "macro",
     "enabled_by_default": true,
+    "fallback_urls": [
+      "https://www.federalreserve.gov/feeds/press_monetary.xml",
+      "https://www.federalreserve.gov/newsevents/pressreleases.htm"
+    ],
     "notes": "Official Fed press feed; macro and rate-policy context."
   },
   {
@@ -37,6 +49,10 @@
     "reliability_tier": "TIER_1_OFFICIAL_MACRO",
     "category": "macro",
     "enabled_by_default": true,
+    "fallback_urls": [
+      "https://www.federalreserve.gov/feeds/testimony.xml",
+      "https://www.federalreserve.gov/newsevents/speeches.htm"
+    ],
     "notes": "Official Fed speeches/testimony feed; used as event-risk context, not standalone direction."
   },
   {
@@ -47,17 +63,26 @@
     "reliability_tier": "TIER_1_OFFICIAL_PROTOCOL",
     "category": "protocol",
     "enabled_by_default": true,
+    "fallback_urls": [
+      "https://blog.ethereum.org/rss.xml",
+      "https://blog.ethereum.org/"
+    ],
     "notes": "Official Ethereum Foundation blog feed for protocol/security/upgrade items."
   },
   {
     "source_id": "coinbase_blog",
-    "name": "Coinbase Blog RSS",
-    "url": "https://blog.coinbase.com/feed",
+    "name": "Coinbase Blog",
+    "url": "https://www.coinbase.com/blog/rss.xml",
     "source_type": "rss",
     "reliability_tier": "TIER_2_OFFICIAL_COMPANY_BLOG",
     "category": "exchange_company",
     "enabled_by_default": true,
-    "notes": "Coinbase official Medium/blog feed; useful for company/product/listing context."
+    "fallback_urls": [
+      "https://www.coinbase.com/blog/feed.xml",
+      "https://www.coinbase.com/blog/feed",
+      "https://www.coinbase.com/blog"
+    ],
+    "notes": "Coinbase official blog; useful for company/product/listing context. v6.5.1 uses multiple feed/page fallbacks."
   },
   {
     "source_id": "binance_announcements",
@@ -67,7 +92,12 @@
     "reliability_tier": "TIER_1_OFFICIAL_EXCHANGE_NEWS",
     "category": "exchange",
     "enabled_by_default": true,
-    "notes": "Binance official announcement page backend; used defensively and allowed to fail if format changes."
+    "fallback_urls": [
+      "https://www.binance.com/bapi/composite/v1/public/cms/article/list/query?type=1&catalogId=48&pageNo=1&pageSize=30",
+      "https://www.binance.com/en/support/announcement/list/48",
+      "https://www.binance.com/en/support/announcement"
+    ],
+    "notes": "Binance official announcement source; v6.5.1 tries JSON plus HTML fallbacks because the public endpoint can change."
   },
   {
     "source_id": "coindesk_rss",
@@ -77,6 +107,10 @@
     "reliability_tier": "TIER_2_REPUTABLE_MEDIA",
     "category": "media",
     "enabled_by_default": true,
+    "fallback_urls": [
+      "https://www.coindesk.com/arc/outboundfeeds/rss/?outputType=xml",
+      "https://www.coindesk.com/"
+    ],
     "notes": "Reputable crypto media context only; lower priority than official sources."
   }
 ]

@@ -1,32 +1,64 @@
+# Freakto Automatic Event Collector Runbook — v6.5.1
 
-# Freakto v6.5.0 — Automatic Event Collector Runbook
+این ماژول قبل از Causal Intelligence اجرا می‌شود و رویدادهای رسمی/معتبر را در `data/auto_events.csv` ذخیره می‌کند.
 
-هدف این ماژول این است که `data/manual_events.csv` فقط نقش پشتیبان/curated داشته باشد و رویدادهای روزانه از منابع رسمی یا معتبر به‌صورت خودکار جمع شوند.
+## Research-only
 
-## اجرای سریع
+این collector هیچ سفارش واقعی، هیچ Paper Trade جدید و هیچ تصمیم معاملاتی مستقل ایجاد نمی‌کند. خروجی آن فقط برای context، tagging و research است.
+
+## منابع اصلی
+
+- SEC Press Releases
+- SEC Litigation Releases
+- Federal Reserve Press Releases
+- Federal Reserve Speeches/Testimony
+- Ethereum Foundation Blog
+- Coinbase Blog
+- Binance Announcements
+- CoinDesk RSS اختیاری با `--include-media`
+
+## بهبود v6.5.1
+
+v6.5.1 برای sourceهایی که گاهی fail می‌شوند fallback دارد:
+
+- RSS اصلی
+- RSS/Atom جایگزین
+- HTML listing page رسمی
+- JSON endpoint جایگزین برای Binance
+
+اگر یک source fail شود، چرخه Forward متوقف نمی‌شود. فقط در Source Health گزارش می‌شود.
+
+## دستورات اصلی
 
 ```cmd
 python automatic_event_collector_dashboard.py --sources
 python automatic_event_collector_dashboard.py --compact
-python causal_intelligence_dashboard.py --compact
-python causal_event_dashboard.py --show
+python automatic_event_collector_dashboard.py --compact --include-media
+python automatic_event_collector_dashboard.py --compact --no-fetch
 ```
 
-## خروجی اصلی
+## فایل خروجی
 
 ```text
 data/auto_events.csv
-logs/events/auto_event_collector_*.json
-logs/events/auto_event_collector_report_*.md
-logs/events/auto_event_source_health_*.csv
 ```
 
-## منطق اعتماد منبع
+این فایل توسط Causal Intelligence خوانده می‌شود.
 
-- Tier 1: منبع رسمی regulator/macro/exchange/protocol مثل SEC، Federal Reserve، Binance Announcements، Ethereum Foundation.
-- Tier 2: وبلاگ رسمی شرکت یا رسانه معتبر؛ فقط context، نه سیگنال مستقل.
-- Tier 3: aggregator/sentiment؛ برای نسخه‌های بعدی و فقط با وزن پایین.
+## ترتیب در Forward Cycle
 
-## نکته مهم
+```text
+automatic_event_collector
+causal_intelligence_probe
+monitor_once / decision_logger / evaluator / shadow gates
+```
 
-این ماژول هیچ Paper Trade و هیچ سفارش واقعی ایجاد نمی‌کند. فقط event ledger می‌سازد تا Causal Intelligence بتواند catalyst/conflict را کنار تصمیم‌های تکنیکال بررسی کند.
+## نکته استفاده از manual_events.csv
+
+`manual_events.csv` هنوز مفید است، ولی فقط برای این موارد:
+
+- رویداد بسیار مهمی که collector از دست داده
+- override دستی جهت تحقیق
+- تست سناریوهای خاص
+
+مسیر اصلی از v6.5 به بعد `auto_events.csv` است.
