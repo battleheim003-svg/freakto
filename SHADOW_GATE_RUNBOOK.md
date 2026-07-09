@@ -118,3 +118,13 @@ python regime_shadow_gate_dashboard.py --compact
 ```
 
 بدون `regime_label` قابل‌اعتماد، gateهایی مثل `REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT` نمی‌توانند signal بگیرند.
+
+## v6.3 Coverage Interpretation
+
+اگر Regime Shadow Gates صفر باشند، ابتدا این دستور را اجرا کن:
+
+```cmd
+python forward_shadow_coverage_dashboard.py --compact
+```
+
+اگر Forward فعلی فقط `TRENDING_BULL` باشد، صفر بودن `REGIME_TRENDING_BEAR_*` طبیعی است.

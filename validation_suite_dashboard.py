@@ -14,8 +14,9 @@ Runs validation + risk intelligence together:
 11) Forward Regime Label Injection
 12) Regime Shadow Gate Activator
 13) Regime-Split Gate Matrix
-14) Research Robustness & Intelligence Suite
-15) Advanced Live Readiness Score
+14) Forward Shadow Coverage & Bull Probe
+15) Research Robustness & Intelligence Suite
+16) Advanced Live Readiness Score
 """
 
 import argparse
@@ -41,6 +42,7 @@ from engine.shadow_gates import run_shadow_gate_validation, format_shadow_gate_c
 from engine.research_upgrade_suite import run_full_research_suite, format_full_suite_console, save_full_suite
 from engine.regime_gate_matrix import run_regime_gate_matrix, format_regime_gate_matrix_console, save_regime_gate_matrix
 from engine.forward_regime_labeling import run_forward_regime_labeling, format_forward_regime_label_console, save_forward_regime_labeling
+from engine.forward_shadow_coverage import run_forward_shadow_coverage, format_forward_shadow_coverage_console, save_forward_shadow_coverage
 from telegram_notifier import send_telegram_message
 
 SUITE_DIR = Path("logs") / "validation_suite"
@@ -72,6 +74,7 @@ def main():
     forward_regime_labeling = run_forward_regime_labeling(apply_changes=False)
     shadow_gates = run_shadow_gate_validation()
     regime_gate_matrix = run_regime_gate_matrix()
+    forward_shadow_coverage = run_forward_shadow_coverage()
     research_suite = run_full_research_suite(save=False)
     readiness = assess_advanced_live_readiness()
 
@@ -88,10 +91,11 @@ def main():
     forward_regime_label_text = format_forward_regime_label_console(forward_regime_labeling, compact=True)
     shadow_gate_text = format_shadow_gate_console(shadow_gates, detail=False, top=8)
     regime_gate_matrix_text = format_regime_gate_matrix_console(regime_gate_matrix, compact=True)
+    forward_shadow_coverage_text = format_forward_shadow_coverage_console(forward_shadow_coverage, compact=True)
     research_suite_text = format_full_suite_console(research_suite)
     readiness_text = format_advanced_readiness_console(readiness)
 
-    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, gate_sim_text, forward_regime_label_text, shadow_gate_text, regime_gate_matrix_text, research_suite_text, readiness_text])
+    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, gate_sim_text, forward_regime_label_text, shadow_gate_text, regime_gate_matrix_text, forward_shadow_coverage_text, research_suite_text, readiness_text])
     print(combined)
 
     metric_report = save_metric_definitions_report()
@@ -106,6 +110,7 @@ def main():
     frl_json, frl_report = save_forward_regime_labeling(forward_regime_labeling)
     shadow_json, shadow_report, shadow_metrics_csv, shadow_signals_csv = save_shadow_gate_validation(shadow_gates)
     rgm_json, rgm_report, rgm_csv, rgm_side_csv, rgm_avoid_csv, rgm_proposals = save_regime_gate_matrix(regime_gate_matrix)
+    fsc_json, fsc_report, fsc_bull_csv, fsc_gate_csv = save_forward_shadow_coverage(forward_shadow_coverage)
     research_suite_json, research_suite_report = save_full_suite(research_suite)
     readiness_json, readiness_report = save_advanced_readiness(readiness)
     combined_path = _save_combined_report(combined)
@@ -140,6 +145,10 @@ def main():
     print(f"📊 Regime-Gate-Side matrix CSV ذخیره شد: {rgm_side_csv}")
     print(f"🚫 Regime Avoid CSV ذخیره شد: {rgm_avoid_csv}")
     print(f"🧾 Regime Shadow proposals ذخیره شد: {rgm_proposals}")
+    print(f"🔎 Forward shadow coverage JSON ذخیره شد: {fsc_json}")
+    print(f"📝 Forward shadow coverage report ذخیره شد: {fsc_report}")
+    print(f"📊 Forward bull probes CSV ذخیره شد: {fsc_bull_csv}")
+    print(f"📊 Forward shadow gate coverage CSV ذخیره شد: {fsc_gate_csv}")
     print(f"🧠 Research suite JSON ذخیره شد: {research_suite_json}")
     print(f"📝 Research suite report ذخیره شد: {research_suite_report}")
     print(f"🚦 Advanced readiness JSON ذخیره شد: {readiness_json}")

@@ -129,3 +129,14 @@ trend_state, volatility_state, market_phase
 python forward_regime_label_dashboard.py --compact
 python forward_test_dashboard.py --plan
 ```
+
+## v6.3 Forward Shadow Coverage Probe
+
+در plan چرخه Forward، مرحله زیر اضافه شده است:
+
+```text
+forward_shadow_coverage_probe
+Command: python -X utf8 forward_shadow_coverage_dashboard.py --compact
+```
+
+این مرحله فقط گزارش coverage می‌سازد و هیچ Paper/Live فعال نمی‌کند.

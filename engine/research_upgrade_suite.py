@@ -1,5 +1,5 @@
 """
-Freakto v6.2.1 - Research Robustness & Forward Regime Intelligence Suite
+Freakto v6.3.0 - Research Robustness & Forward Regime Intelligence Suite
 
 Implements the 11 requested improvement areas in research-only mode:
 1) Gate robustness / multiple-testing guard / walk-forward / embargo proxy
@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v6.2.1"
+VERSION = "v6.3.0"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 
@@ -772,6 +772,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
     from engine.regime_gate_matrix import run_regime_gate_matrix
     from engine.shadow_gates import run_shadow_gate_validation
     from engine.forward_regime_labeling import run_forward_regime_labeling
+    from engine.forward_shadow_coverage import run_forward_shadow_coverage
 
     sections = {
         "gate_robustness": run_gate_robustness(),
@@ -783,6 +784,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "forward_regime_labeling": asdict(run_forward_regime_labeling(apply_changes=False)),
         "regime_gate_matrix": run_regime_gate_matrix(),
         "regime_shadow_gates": _shadow_report_to_dict(run_shadow_gate_validation()),
+        "forward_shadow_coverage": run_forward_shadow_coverage(),
         "cross_exchange_validation": run_cross_exchange_validation(),
         "research_db": run_research_db_export(),
         "pipeline_health": run_pipeline_health(),
@@ -839,6 +841,12 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append(f"- {rsg.get('status')} | regime_gates={rsg.get('regime_gate_count', 0)} | signals={rsg.get('regime_gate_signals', 0)} | eval={rsg.get('evaluated_shadow_samples', 0)}")
         for r in rsg.get("regime_gate_metrics", [])[:4]:
             lines.append(f"- {r.get('gate')}: {r.get('verdict')} | signals={r.get('total_signals')} | eval={r.get('evaluated_samples')} | avg={r.get('avg_return_pct')}%")
+    fsc = report.get("sections", {}).get("forward_shadow_coverage", {})
+    if fsc:
+        lines.append("\nForward Shadow Coverage / Bull Probe:")
+        lines.append(f"- {fsc.get('status')} | decisions={fsc.get('decision_rows')} | shadow_signals={fsc.get('shadow_signal_rows')} | eval_shadow={fsc.get('evaluated_shadow_rows')}")
+        for r in fsc.get("bull_forward_probes", [])[:4]:
+            lines.append(f"- {r.get('probe')}: {r.get('verdict')} | fwd_n={r.get('forward_samples')} | fwd_avg={r.get('forward_avg_pct')}% | bt_net={r.get('backtest_net_avg_pct')}%")
     sr = report.get("sections", {}).get("strict_readiness", {})
     if sr:
         lines.append("\nStrict Readiness:")
@@ -853,7 +861,7 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nSuite Blockers:")
         for b in report.get("blockers", [])[:12]:
             lines.append(f"⛔ {b}")
-    lines.append("\nSafety: هیچ بخش v6/v6.1/v6.2/v6.2.1 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
+    lines.append("\nSafety: هیچ بخش v6/v6.1/v6.2/v6.2.1/v6.3 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
     lines.append(sep)
     return "\n".join(lines)
 

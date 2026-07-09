@@ -72,3 +72,7 @@ python forward_regime_label_dashboard.py --compact
 Known Forward regime rows رشد کند
 Regime Shadow signals از صفر خارج شود
 ```
+
+## v6.3 Bull Probe Warning
+
+Bull probeها فقط مشاهده‌ای هستند. اگر Forward کم‌نمونه مثبت باشد ولی Backtest net همان فیلتر منفی باشد، verdict به شکل conflict نمایش داده می‌شود و نباید به candidate تبدیل شود.

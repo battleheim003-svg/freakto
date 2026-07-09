@@ -295,3 +295,13 @@ forward_regime_label_injection
 ```
 
 هدف این است که `regime_label` و metadata آن وارد `decisions.csv` و `decision_evaluations.csv` شود تا gateهای Regime-specific بتوانند در Forward واقعی sample جمع کنند.
+
+## v6.3 — Forward Shadow Coverage & Bull Probe
+
+دستور اصلی:
+
+```cmd
+python forward_shadow_coverage_dashboard.py --compact
+```
+
+این مرحله نشان می‌دهد چرا Regime Bear gates ممکن است signal نگیرند و آیا عملکرد خوب STRUCTURE_SCORE_GE_10 در Bull regime فقط Forward کم‌نمونه است یا با Backtest هم‌خوانی دارد.

@@ -110,3 +110,7 @@ forward_regime_labeling
 ```
 
 این بخش به‌صورت dry-run نشان می‌دهد چند decision/evaluation دارای regime قابل‌استفاده هستند و چند ردیف هنوز UNKNOWN مانده‌اند.
+
+## v6.3 Forward Shadow Coverage
+
+ماژول جدید `forward_shadow_coverage_dashboard.py` به Research Suite اضافه شد. این ماژول coverage تصمیم‌های Forward، Shadow Gateها و Bull regime probes را با Backtest مقایسه می‌کند.

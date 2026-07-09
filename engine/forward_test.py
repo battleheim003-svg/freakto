@@ -23,7 +23,7 @@ except Exception:  # pragma: no cover
     pd = None
 
 
-VERSION = "v6.2.1"
+VERSION = "v6.3.0"
 LOG_DIR = Path("logs")
 FORWARD_DIR = LOG_DIR / "forward_testing"
 RUNS_CSV = LOG_DIR / "forward_test_runs.csv"
@@ -208,6 +208,14 @@ def build_forward_test_plan(
                 command=_python_cmd("shadow_gate_dashboard.py", "--compact"),
                 required=False,
                 description="برچسب‌گذاری و ارزیابی Shadow Gateهای پایه و Regime-specific بدون ثبت Paper/Live.",
+            )
+        )
+        tasks.append(
+            ForwardTask(
+                name="forward_shadow_coverage_probe",
+                command=_python_cmd("forward_shadow_coverage_dashboard.py", "--compact"),
+                required=False,
+                description="بررسی coverage گیت‌ها، دلیل صفر بودن Regime Bear gates و Bull probe بدون Paper/Live.",
             )
         )
 

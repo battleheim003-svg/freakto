@@ -122,6 +122,11 @@ jobs:
         run: |
           python -X utf8 regime_shadow_gate_dashboard.py --compact || true
 
+      - name: Run v6.3 forward shadow coverage probe
+        if: always()
+        run: |
+          python -X utf8 forward_shadow_coverage_dashboard.py --compact || true
+
       - name: Upload logs as workflow artifact
         if: always()
         uses: actions/upload-artifact@v4
