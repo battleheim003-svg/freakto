@@ -62,3 +62,10 @@ monitor_once / decision_logger / evaluator / shadow gates
 - تست سناریوهای خاص
 
 مسیر اصلی از v6.5 به بعد `auto_events.csv` است.
+
+
+## v7.0 — Event Quality Filter
+
+- `automatic_event_collector_dashboard.py --compact` اکنون noiseهای product/navigation را فیلتر می‌کند.
+- `market_narrative_dashboard.py --compact` روایت بازار را از eventهای تمیز، causal context و driverهای اصلی می‌سازد.
+- این لایه فقط Research-only است و هیچ Paper/Live ایجاد نمی‌کند.

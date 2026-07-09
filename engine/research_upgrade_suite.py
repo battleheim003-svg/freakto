@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v6.5.0"
+VERSION = "v7.0.0"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 
@@ -775,6 +775,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
     from engine.forward_shadow_coverage import run_forward_shadow_coverage
     from engine.causal_intelligence import run_causal_intelligence
     from engine.auto_event_collector import run_auto_event_collector
+    from engine.market_narrative import run_market_narrative
 
     sections = {
         "gate_robustness": run_gate_robustness(),
@@ -789,6 +790,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "forward_shadow_coverage": run_forward_shadow_coverage(),
         "automatic_event_collector": asdict(run_auto_event_collector(fetch_live=False, apply_changes=False)),
         "causal_intelligence": asdict(run_causal_intelligence(collect_live=False)),
+        "market_narrative": asdict(run_market_narrative()),
         "cross_exchange_validation": run_cross_exchange_validation(),
         "research_db": run_research_db_export(),
         "pipeline_health": run_pipeline_health(),
@@ -857,6 +859,11 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nCausal/Event Intelligence:")
         lines.append(f"- {ci.get('status')} | sources_ok={ci.get('successful_sources')} | trusted_ok={ci.get('trusted_successful_sources')} | catalyst={ctx.get('catalyst_score')}/100 | conflict={ctx.get('technical_event_conflict')}")
         lines.append(f"- primary={ctx.get('primary_cause')} | verdict={ctx.get('causal_verdict')}")
+    mn = report.get("sections", {}).get("market_narrative", {})
+    if mn:
+        lines.append("\nMarket Narrative Engine:")
+        lines.append(f"- {mn.get('status')} | label={mn.get('narrative_label')} | dir={mn.get('dominant_direction')} | theme={mn.get('dominant_theme')} | score={mn.get('net_direction_score')}")
+        lines.append(f"- accepted={mn.get('accepted_events')} | noise_filtered={mn.get('noise_filtered_events')} | risk={mn.get('event_risk')} | conflict={mn.get('technical_event_conflict')}")
     sr = report.get("sections", {}).get("strict_readiness", {})
     if sr:
         lines.append("\nStrict Readiness:")
@@ -871,7 +878,7 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nSuite Blockers:")
         for b in report.get("blockers", [])[:12]:
             lines.append(f"⛔ {b}")
-    lines.append("\nSafety: هیچ بخش v6/v6.1/v6.2/v6.2.1/v6.3/v6.4/v6.5 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
+    lines.append("\nSafety: هیچ بخش v6/v7 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
     lines.append(sep)
     return "\n".join(lines)
 

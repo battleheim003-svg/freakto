@@ -25,7 +25,7 @@
       "https://www.sec.gov/news/litigation/litreleases.rss",
       "https://www.sec.gov/enforcement-litigation/litigation-releases"
     ],
-    "notes": "Official SEC litigation releases; bearish/regulatory-risk context when crypto-related. v6.5.1 can fall back to the official HTML listing page when RSS moves."
+    "notes": "Official SEC litigation releases; bearish/regulatory-risk context when crypto-related. v7.0.0 can fall back to the official HTML listing page when RSS moves."
   },
   {
     "source_id": "federal_reserve_press",
@@ -82,7 +82,7 @@
       "https://www.coinbase.com/blog/feed",
       "https://www.coinbase.com/blog"
     ],
-    "notes": "Coinbase official blog; useful for company/product/listing context. v6.5.1 uses multiple feed/page fallbacks."
+    "notes": "Coinbase official blog; useful for company/product/listing context. v7.0.0 uses multiple feed/page fallbacks."
   },
   {
     "source_id": "binance_announcements",
@@ -97,7 +97,7 @@
       "https://www.binance.com/en/support/announcement/list/48",
       "https://www.binance.com/en/support/announcement"
     ],
-    "notes": "Binance official announcement source; v6.5.1 tries JSON plus HTML fallbacks because the public endpoint can change."
+    "notes": "Binance official announcement source; v7.0.0 tries JSON plus HTML fallbacks because the public endpoint can change."
   },
   {
     "source_id": "coindesk_rss",

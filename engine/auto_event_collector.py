@@ -1,6 +1,6 @@
 
 """
-Freakto v6.5.1 - Automatic Event Collector Source Resilience Patch
+Freakto v7.0.0 - Automatic Event Collector Event Quality Filter
 
 Research-only official/trusted event collection layer for Causal Intelligence.
 It collects public announcements/news-like event feeds, classifies significant
@@ -31,13 +31,13 @@ except Exception:  # pragma: no cover
 
 from engine.research_utils import LOG_DIR, RESEARCH_DIR, run_id, utc_now_iso, write_json, write_text, save_dataframe_csv
 
-VERSION = "v6.5.1"
+VERSION = "v7.0.0"
 EVENT_DIR = LOG_DIR / "events"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 AUTO_EVENTS_FILE = Path("data") / "auto_events.csv"
 AUTO_EVENT_SOURCES_EXAMPLE = Path("data") / "auto_event_sources.example.json"
 EVENT_TIMEOUT_SECONDS = float(os.getenv("FREAKTO_EVENT_TIMEOUT", "14"))
-EVENT_USER_AGENT = os.getenv("FREAKTO_EVENT_USER_AGENT", "Mozilla/5.0 (compatible; FreaktoResearchBot/6.5.1; research-only; +local)")
+EVENT_USER_AGENT = os.getenv("FREAKTO_EVENT_USER_AGENT", "Mozilla/5.0 (compatible; FreaktoResearchBot/7.0.0; research-only; +local)")
 DEFAULT_LOOKBACK_HOURS = int(os.getenv("FREAKTO_EVENT_LOOKBACK_HOURS", "168"))
 DEFAULT_MAX_ITEMS_PER_SOURCE = int(os.getenv("FREAKTO_EVENT_MAX_ITEMS", "25"))
 
@@ -54,6 +54,7 @@ TRUST_RANK = {
 AUTO_EVENT_COLUMNS = [
     "event_id", "timestamp_utc", "symbol", "event_type", "source_id", "source_name", "source_tier",
     "source_category", "source_url", "impact", "direction", "confidence", "event_risk", "auto_score",
+    "event_quality", "event_relevance", "noise_reason",
     "title", "description", "tags", "matched_keywords", "collected_utc",
 ]
 
@@ -92,6 +93,9 @@ class AutoEventRecord:
     tags: str
     matched_keywords: str
     collected_utc: str
+    event_quality: str = "SIGNIFICANT_EVENT"
+    event_relevance: str = "MARKET_RELEVANT"
+    noise_reason: str = ""
 
 
 @dataclass
@@ -204,7 +208,7 @@ def build_event_source_registry(include_media: bool = False) -> List[EventSource
             "sec_litigation_releases", "SEC Litigation Releases", "https://www.sec.gov/litigation/litreleases.rss", "rss",
             "TIER_1_OFFICIAL_REGULATOR", "regulatory", True,
             ["https://www.sec.gov/news/litigation/litreleases.rss", "https://www.sec.gov/enforcement-litigation/litigation-releases"],
-            "Official SEC litigation releases; bearish/regulatory-risk context when crypto-related. v6.5.1 can fall back to the official HTML listing page when RSS moves.",
+            "Official SEC litigation releases; bearish/regulatory-risk context when crypto-related. v7.0.0 can fall back to the official HTML listing page when RSS moves.",
         ),
         EventSource(
             "federal_reserve_press", "Federal Reserve Press Releases RSS", "https://www.federalreserve.gov/feeds/press_all.xml", "rss",
@@ -228,7 +232,7 @@ def build_event_source_registry(include_media: bool = False) -> List[EventSource
             "coinbase_blog", "Coinbase Blog", "https://www.coinbase.com/blog/rss.xml", "rss",
             "TIER_2_OFFICIAL_COMPANY_BLOG", "exchange_company", True,
             ["https://www.coinbase.com/blog/feed.xml", "https://www.coinbase.com/blog/feed", "https://www.coinbase.com/blog"],
-            "Coinbase official blog; useful for company/product/listing context. v6.5.1 uses multiple feed/page fallbacks.",
+            "Coinbase official blog; useful for company/product/listing context. v7.0.0 uses multiple feed/page fallbacks.",
         ),
         EventSource(
             "binance_announcements", "Binance Announcements", "https://www.binance.com/bapi/composite/v1/public/cms/article/list/query?type=1&pageNo=1&pageSize=30", "binance_json",
@@ -238,7 +242,7 @@ def build_event_source_registry(include_media: bool = False) -> List[EventSource
                 "https://www.binance.com/en/support/announcement/list/48",
                 "https://www.binance.com/en/support/announcement",
             ],
-            "Binance official announcement source; v6.5.1 tries JSON plus HTML fallbacks because the public endpoint can change.",
+            "Binance official announcement source; v7.0.0 tries JSON plus HTML fallbacks because the public endpoint can change.",
         ),
     ]
     if include_media:
@@ -424,6 +428,87 @@ def fetch_source_items(source: EventSource, max_items: int) -> Tuple[List[Dict[s
     return [], f"unsupported_source_type:{source.source_type}"
 
 
+
+# v7.0.0: Event-quality filter. It prevents HTML fallback pages, product pages,
+# navigation links, and static marketing pages from entering the causal ledger as
+# high-impact market events. This is intentionally conservative: missing a weak
+# product page is better than contaminating the research ledger with fake catalysts.
+COINBASE_PRODUCT_NOISE_PATTERNS = [
+    "developer platform", "payments", "business", "verified pools", "government",
+    "asset listings", "list your asset", "derivatives exchange", "international exchange access",
+    "trusted by institutions", "crypto trading and payments", "launch crypto trading and custody",
+]
+SEC_NAV_NOISE_PATTERNS = [
+    "filer support", "enforcement & litigation", "distributions to harmed investors",
+    "submit tips", "whistleblower", "resources", "about the sec", "careers",
+]
+GENERIC_NAV_NOISE_PATTERNS = [
+    "privacy policy", "cookie", "terms of use", "contact us", "subscribe", "sign in",
+    "learn more", "products", "services", "resources", "careers", "about us",
+]
+GENUINE_EVENT_VERBS = [
+    "announces", "announced", "issues", "issued", "charges", "charged", "settles", "sues",
+    "approves", "approved", "rejects", "requests comment", "proposes", "adopts", "releases",
+    "publishes", "launches", "launched", "lists", "will list", "delists", "halts", "suspends",
+    "upgrade", "hard fork", "security alert", "exploit", "hack", "breach", "minutes of",
+]
+
+
+def _compact_noise_text(value: str) -> str:
+    return re.sub(r"\s+", " ", _strip_html(value or "")).strip().lower()
+
+
+def event_quality_decision(source: EventSource, item: Dict[str, Any]) -> Tuple[bool, str, str, str]:
+    """Return (keep, quality, relevance, noise_reason)."""
+    title = _strip_html(_norm(item.get("title")))
+    desc = _strip_html(_norm(item.get("description")))
+    url = _norm(item.get("url") or source.url)
+    text = _compact_noise_text(f"{title} {desc}")
+    title_l = _compact_noise_text(title)
+    url_path = urllib.parse.urlparse(url).path.lower()
+
+    if not title or len(title_l) < 10:
+        return False, "REJECTED_NOISE", "LOW", "missing_or_tiny_title"
+    if any(p in title_l for p in GENERIC_NAV_NOISE_PATTERNS) and not any(v in text for v in GENUINE_EVENT_VERBS):
+        return False, "REJECTED_NAVIGATION", "LOW", "generic_navigation_or_static_page"
+
+    # Coinbase RSS fallbacks can accidentally scrape product/navigation cards from
+    # the marketing site. Keep Coinbase only when it is a real blog/news path or a
+    # headline with explicit event verbs.
+    if source.source_id == "coinbase_blog":
+        if any(p in text for p in COINBASE_PRODUCT_NOISE_PATTERNS):
+            return False, "REJECTED_PRODUCT_PAGE", "LOW", "coinbase_product_or_marketing_page"
+        if "/blog" not in url_path and not any(v in text for v in GENUINE_EVENT_VERBS):
+            return False, "REJECTED_PRODUCT_PAGE", "LOW", "coinbase_non_blog_fallback_link"
+
+    # SEC litigation HTML listing can produce navigation labels when the RSS URL
+    # changes. Keep actual releases/charges/court/litigation-like headlines.
+    if source.source_id == "sec_litigation_releases":
+        if any(p in title_l for p in SEC_NAV_NOISE_PATTERNS):
+            return False, "REJECTED_NAVIGATION", "LOW", "sec_litigation_navigation_link"
+        if not any(v in text for v in ["litigation release", "sec charges", "charges", "charged", "court", "settles", "sues", "complaint", "fraud"]):
+            return False, "REJECTED_LOW_EVENTNESS", "LOW", "sec_litigation_without_release_or_charge_language"
+
+    # Official macro/regulatory feeds are allowed even when neutral, but non-tier-1
+    # company/media pages need explicit event language or matched crypto/market terms.
+    if source.reliability_tier.startswith("TIER_2") and not any(v in text for v in GENUINE_EVENT_VERBS):
+        # A title such as "asset listings list your asset" is not a market event.
+        return False, "REJECTED_LOW_EVENTNESS", "LOW", "tier2_without_event_verb"
+
+    relevance = "HIGH" if source.reliability_tier.startswith("TIER_1") else "MEDIUM"
+    quality = "SIGNIFICANT_EVENT"
+    if any(v in text for v in GENUINE_EVENT_VERBS):
+        quality = "ACTIONABLE_EVENT_CONTEXT"
+    return True, quality, relevance, ""
+
+
+def _row_passes_quality_filter(row: Dict[str, Any]) -> bool:
+    sid = _norm(row.get("source_id"))
+    tier = _norm(row.get("source_tier"), "TIER_2_OFFICIAL_COMPANY_BLOG")
+    source = EventSource(sid, _norm(row.get("source_name"), sid), _norm(row.get("source_url")), "csv", tier, _norm(row.get("source_category"), "unknown"))
+    keep, _, _, _ = event_quality_decision(source, row)
+    return keep
+
 BULLISH_PATTERNS = [
     "approve", "approval", "approved", "launch", "listing", "list", "etf approval", "spot etf", "rate cut", "dovish", "inflow",
     "upgrade", "mainnet", "partnership", "integrat", "support", "expand", "record inflow",
@@ -452,6 +537,10 @@ def classify_event(source: EventSource, item: Dict[str, Any], collected: str) ->
     url = _norm(item.get("url") or source.url)
     text = f"{title} {desc} {source.name}".lower()
     if not title:
+        return None
+
+    keep_event, event_quality, event_relevance, noise_reason = event_quality_decision(source, item)
+    if not keep_event:
         return None
 
     matched: List[str] = []
@@ -517,6 +606,9 @@ def classify_event(source: EventSource, item: Dict[str, Any], collected: str) ->
         confidence=confidence,
         event_risk=event_risk,
         auto_score=auto_score,
+        event_quality=event_quality,
+        event_relevance=event_relevance,
+        noise_reason=noise_reason,
         title=title[:280],
         description=(desc or title)[:800],
         tags=";".join(tags),
@@ -546,7 +638,18 @@ def _write_events(rows: List[Dict[str, Any]]) -> None:
 
 def _merge_events(events: List[AutoEventRecord]) -> Tuple[int, int]:
     existing = _read_existing_events()
-    by_id = {str(r.get("event_id", "")): r for r in existing if r.get("event_id")}
+    # v7: purge previously collected product/nav noise while keeping schema-compatible rows.
+    by_id = {}
+    for r in existing:
+        eid = str(r.get("event_id", ""))
+        if not eid:
+            continue
+        if not _row_passes_quality_filter(r):
+            continue
+        r.setdefault("event_quality", "LEGACY_ACCEPTED")
+        r.setdefault("event_relevance", "UNKNOWN")
+        r.setdefault("noise_reason", "")
+        by_id[eid] = r
     new_count = 0
     for e in events:
         row = asdict(e)
@@ -634,7 +737,7 @@ def run_auto_event_collector(
     if fetch_live and ok_count == 0:
         blockers.append("هیچ source رسمی/معتبر با موفقیت fetch نشد؛ network/rate limit/URL sourceها را بررسی کن.")
     if official_failures:
-        warnings.append(f"{len(official_failures)} منبع رسمی fail شد؛ v6.5.1 چند fallback را امتحان می‌کند اما شکست source چرخه Forward را متوقف نمی‌کند.")
+        warnings.append(f"{len(official_failures)} منبع رسمی fail شد؛ v7.0.0 چند fallback را امتحان می‌کند اما شکست source چرخه Forward را متوقف نمی‌کند.")
     if high_events:
         recommendations.append("رویدادهای high-impact جمع شد؛ causal_intelligence_dashboard.py را اجرا کن تا روی تصمیم‌ها اثر context بررسی شود.")
     else:
@@ -697,7 +800,7 @@ def format_auto_event_console(report: EventCollectionReport, compact: bool = Tru
     if data.get("top_events"):
         lines.append("\nTop Events:")
         for e in data.get("top_events", [])[:8]:
-            lines.append(f"- {e.get('impact')} | {e.get('direction')} | {e.get('event_type')} | {e.get('source_id')} | {e.get('title')}")
+            lines.append(f"- {e.get('impact')} | {e.get('direction')} | {e.get('event_type')} | {e.get('source_id')} | q={e.get('event_quality','')} | {e.get('title')}")
     if data.get("source_health"):
         lines.append("\nSource Health:")
         for s in data.get("source_health", [])[:12]:

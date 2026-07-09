@@ -1,6 +1,6 @@
 
 """
-Freakto v6.5.0 - Causal/Event Intelligence Core
+Freakto v7.0.0 - Causal/Event Intelligence Core
 
 Purpose
 -------
@@ -50,7 +50,7 @@ from engine.research_utils import (
     save_dataframe_csv,
 )
 
-VERSION = "v6.5.0"
+VERSION = "v7.0.0"
 CAUSAL_DIR = LOG_DIR / "causal"
 CAUSAL_SNAPSHOTS_DIR = CAUSAL_DIR / "source_snapshots"
 CAUSAL_EVENTS_FILE = Path("data") / "manual_events.csv"
@@ -60,7 +60,7 @@ CAUSAL_OBSERVATIONS_CSV = CAUSAL_DIR / "causal_observations.csv"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 SOURCE_TIMEOUT_SECONDS = float(os.getenv("FREAKTO_CAUSAL_TIMEOUT", "12"))
-USER_AGENT = os.getenv("FREAKTO_CAUSAL_USER_AGENT", "FreaktoResearchBot/6.5 (+research-only)")
+USER_AGENT = os.getenv("FREAKTO_CAUSAL_USER_AGENT", "FreaktoResearchBot/7.0 (+research-only)")
 
 TRUST_ORDER = {
     "TIER_1_OFFICIAL_EXCHANGE": 1,
@@ -743,6 +743,11 @@ def build_causal_context(
     manual_events = [r for r in successful if r.source_id == "manual_events"]
     auto_events = [r for r in successful if r.source_id == "auto_events"]
 
+    auto_event_score = sum(safe_float(r.signal_score, 0.0) or 0.0 for r in auto_events)
+    manual_event_score = sum(safe_float(r.signal_score, 0.0) or 0.0 for r in manual_events)
+    auto_directional_events = [r for r in auto_events if _direction_sign(r.direction) != 0]
+    auto_high_risk_events = [r for r in auto_events if _upper(r.event_risk) == "HIGH"]
+
     internal_score = sum(safe_float(c.get("score"), 0.0) or 0.0 for c in internal)
     external_score = sum(safe_float(r.signal_score, 0.0) or 0.0 for r in successful)
     raw_catalyst = internal_score + external_score
@@ -756,6 +761,15 @@ def build_causal_context(
         if abs(best_ext.signal_score) > abs(safe_float(top_internal.get("score"), 0.0) or 0.0):
             primary_cause = f"EXTERNAL_{best_ext.source_id.upper()}"
             cause_confidence = best_ext.confidence
+
+    # v7: prefer cleaned automatic multi-source context over a single manual row
+    # when the auto ledger has enough directional/high-risk evidence. Manual rows
+    # remain important overrides, but they should not permanently dominate the
+    # primary cause after the event collector is working.
+    if auto_events and (len(auto_directional_events) >= 3 or len(auto_high_risk_events) >= 3):
+        if abs(auto_event_score) >= max(8.0, abs(manual_event_score) * 0.60):
+            primary_cause = "MULTI_SOURCE_EVENT_CONSENSUS" if len(auto_events) >= 5 else "AUTO_EVENTS_CONTEXT"
+            cause_confidence = "HIGH" if len(auto_directional_events) >= 6 or len(auto_high_risk_events) >= 6 else "MEDIUM"
 
     # Conflict/alignment: compare technical side with external/manual signals.
     external_direction_sum = sum(_direction_sign(r.direction) * _confidence_value(r.confidence) for r in successful)
@@ -814,7 +828,7 @@ def build_causal_context(
         recommendations.append("auto_events.csv فعال است؛ Automatic Event Collector قبل از Causal Intelligence باید اجرا شود.")
     else:
         recommendations.append("برای جمع‌آوری خودکار رویدادها، automatic_event_collector_dashboard.py --compact را اجرا کن.")
-    recommendations.append("در v6.5 نتایج فقط به decision log و research reports اضافه می‌شود؛ هیچ Paper/Live فعال نمی‌شود.")
+    recommendations.append("در v7 نتایج causal/narrative فقط به decision log و research reports اضافه می‌شود؛ هیچ Paper/Live فعال نمی‌شود.")
 
     top_sources = []
     for r in sorted(successful, key=lambda x: (TRUST_ORDER.get(x.reliability_tier, 9), abs(safe_float(x.signal_score, 0.0) or 0.0)), reverse=False)[:6]:

@@ -37,6 +37,7 @@ from engine.similarity import find_similar_snapshots, format_similarity_for_cons
 from engine.trade_quality import build_trade_intelligence_card
 from engine.intelligence import build_intelligence_report, format_intelligence_console
 from engine.causal_intelligence import attach_causal_context
+from engine.market_narrative import attach_market_narrative_to_opportunity
 from engine.multi_timeframe import (
     TimeframeSignal,
     calculate_consensus,
@@ -475,6 +476,22 @@ def check_market():
         print("=" * 70)
     except Exception as error:
         print(f"⚠️ Causal context attach skipped: {type(error).__name__}: {error}")
+
+    try:
+        narrative = attach_market_narrative_to_opportunity(
+            opportunity,
+            symbol=SYMBOL,
+            timeframe=PRIMARY_TIMEFRAME,
+        )
+        print("\n" + "=" * 70)
+        print("🧭 Market Narrative Context v7")
+        print("=" * 70)
+        print(f"Narrative     : {narrative.narrative_label} ({narrative.narrative_confidence})")
+        print(f"Direction     : {narrative.dominant_direction} | Theme: {narrative.dominant_theme}")
+        print(f"Event Risk    : {narrative.event_risk} | Score: {narrative.net_direction_score}")
+        print("=" * 70)
+    except Exception as error:
+        print(f"⚠️ Market narrative attach skipped: {type(error).__name__}: {error}")
 
     similarity = find_similar_snapshots(opportunity)
     format_similarity_for_console(similarity)

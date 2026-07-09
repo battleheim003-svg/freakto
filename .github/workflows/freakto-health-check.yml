@@ -105,6 +105,11 @@ jobs:
           python -X utf8 automatic_event_collector_dashboard.py --compact --no-fetch || true
           python -X utf8 causal_intelligence_dashboard.py --compact || true
 
+      - name: Run v7 market narrative engine
+        if: always()
+        run: |
+          python -X utf8 market_narrative_dashboard.py --compact || true
+
       - name: Upload health artifacts
         if: always()
         uses: actions/upload-artifact@v4

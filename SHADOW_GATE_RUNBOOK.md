@@ -162,3 +162,10 @@ python causal_intelligence_dashboard.py --compact
 ```
 
 اگر Binance/Coinbase/SEC Litigation باز هم fail شدند، چرخه Forward نباید متوقف شود؛ Source Health را بررسی کن و فقط در صورت fail دائمی patch بعدی لازم است.
+
+
+## v7.0 — Narrative remains shadow/research only
+
+- `automatic_event_collector_dashboard.py --compact` اکنون noiseهای product/navigation را فیلتر می‌کند.
+- `market_narrative_dashboard.py --compact` روایت بازار را از eventهای تمیز، causal context و driverهای اصلی می‌سازد.
+- این لایه فقط Research-only است و هیچ Paper/Live ایجاد نمی‌کند.

@@ -1,5 +1,5 @@
 
-"""Freakto v6.5.0 - Automatic Event Collector dashboard."""
+"""Freakto v7.0.0 - Automatic Event Collector dashboard."""
 import argparse
 
 from engine.auto_event_collector import (
