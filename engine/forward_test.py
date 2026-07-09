@@ -23,7 +23,7 @@ except Exception:  # pragma: no cover
     pd = None
 
 
-VERSION = "v7.0.0"
+VERSION = "v7.1.0"
 LOG_DIR = Path("logs")
 FORWARD_DIR = LOG_DIR / "forward_testing"
 RUNS_CSV = LOG_DIR / "forward_test_runs.csv"
@@ -200,6 +200,14 @@ def build_forward_test_plan(
                 command=_python_cmd("market_narrative_dashboard.py", "--compact"),
                 required=False,
                 description="ساخت روایت بازار از eventهای فیلترشده و causal context بدون Paper/Live.",
+            )
+        )
+        tasks.append(
+            ForwardTask(
+                name="narrative_decision_conflict_probe",
+                command=_python_cmd("narrative_decision_dashboard.py", "--compact"),
+                required=False,
+                description="امتیازدهی تضاد/همسویی Narrative با bias تصمیم‌ها بدون Paper/Live.",
             )
         )
         tasks.append(

@@ -1,7 +1,7 @@
 """Repair/migrate logs/decisions.csv to the current Freakto header.
 
 Useful after upgrading from older releases whose decision log had fewer columns.
-This script preserves common fields and rewrites the CSV with the v6.5.0-safe
+This script preserves common fields and rewrites the CSV with the v7.1.0-safe
 header so pandas-based tools can read it again.
 """
 
@@ -61,6 +61,21 @@ CURRENT_HEADER = [
     "causal_auto_event_count",
     "causal_top_sources",
     "causal_notes",
+    "market_narrative_label",
+    "market_narrative_confidence",
+    "market_narrative_direction",
+    "market_narrative_theme",
+    "market_narrative_score",
+    "market_narrative_event_risk",
+    "market_narrative_conflict",
+    "market_narrative_summary",
+    "narrative_alignment",
+    "narrative_conflict_score",
+    "narrative_adjustment",
+    "narrative_adjusted_score",
+    "narrative_action_override",
+    "narrative_decision_verdict",
+    "narrative_decision_notes",
     "long_score",
     "short_score",
     "reasons",
@@ -71,7 +86,7 @@ CURRENT_HEADER = [
 
 def main() -> None:
     print("=" * 110)
-    print("🛠️ Freakto Decision Log Repair v6.5.0")
+    print("🛠️ Freakto Decision Log Repair v7.1.0")
     print("=" * 110)
 
     if not LOG_FILE.exists():
@@ -94,7 +109,7 @@ def main() -> None:
 
     print(f"Backup     : {backup}")
     print(f"New columns: {len(merged_header)}")
-    print("OK: decisions.csv repaired/migrated with v6.5.0 regime + causal/auto-event metadata columns.")
+    print("OK: decisions.csv repaired/migrated with v7.1.0 regime + causal/event/narrative metadata columns.")
     print("=" * 110)
 
 

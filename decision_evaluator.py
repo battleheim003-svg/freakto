@@ -126,6 +126,13 @@ def _load_decisions():
         "market_narrative_event_risk": "",
         "market_narrative_conflict": "",
         "market_narrative_summary": "",
+        "narrative_alignment": "",
+        "narrative_conflict_score": "",
+        "narrative_adjustment": "",
+        "narrative_adjusted_score": "",
+        "narrative_action_override": "",
+        "narrative_decision_verdict": "",
+        "narrative_decision_notes": "",
     }
     for column, default in required_defaults.items():
         if column not in df.columns:
@@ -316,6 +323,13 @@ def evaluate_decisions():
             "market_narrative_event_risk": decision.get("market_narrative_event_risk", ""),
             "market_narrative_conflict": decision.get("market_narrative_conflict", ""),
             "market_narrative_summary": decision.get("market_narrative_summary", ""),
+            "narrative_alignment": decision.get("narrative_alignment", ""),
+            "narrative_conflict_score": decision.get("narrative_conflict_score", ""),
+            "narrative_adjustment": decision.get("narrative_adjustment", ""),
+            "narrative_adjusted_score": decision.get("narrative_adjusted_score", ""),
+            "narrative_action_override": decision.get("narrative_action_override", ""),
+            "narrative_decision_verdict": decision.get("narrative_decision_verdict", ""),
+            "narrative_decision_notes": decision.get("narrative_decision_notes", ""),
             "entry_price": entry_price,
             "available_future_candles": available_candles,
             "evaluation_status": "PARTIAL",

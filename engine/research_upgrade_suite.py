@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v7.0.0"
+VERSION = "v7.1.0"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 
@@ -776,6 +776,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
     from engine.causal_intelligence import run_causal_intelligence
     from engine.auto_event_collector import run_auto_event_collector
     from engine.market_narrative import run_market_narrative
+    from engine.narrative_decision_conflict import run_latest_decision_narrative_conflict
 
     sections = {
         "gate_robustness": run_gate_robustness(),
@@ -791,6 +792,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "automatic_event_collector": asdict(run_auto_event_collector(fetch_live=False, apply_changes=False)),
         "causal_intelligence": asdict(run_causal_intelligence(collect_live=False)),
         "market_narrative": asdict(run_market_narrative()),
+        "narrative_decision_conflict": asdict(run_latest_decision_narrative_conflict()),
         "cross_exchange_validation": run_cross_exchange_validation(),
         "research_db": run_research_db_export(),
         "pipeline_health": run_pipeline_health(),
@@ -864,6 +866,11 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nMarket Narrative Engine:")
         lines.append(f"- {mn.get('status')} | label={mn.get('narrative_label')} | dir={mn.get('dominant_direction')} | theme={mn.get('dominant_theme')} | score={mn.get('net_direction_score')}")
         lines.append(f"- accepted={mn.get('accepted_events')} | noise_filtered={mn.get('noise_filtered_events')} | risk={mn.get('event_risk')} | conflict={mn.get('technical_event_conflict')}")
+    ndc = report.get("sections", {}).get("narrative_decision_conflict", {})
+    if ndc:
+        lines.append("\nNarrative/Decision Conflict:")
+        lines.append(f"- {ndc.get('status')} | side={ndc.get('decision_side')} | narrative={ndc.get('narrative_direction')} | alignment={ndc.get('narrative_alignment')}")
+        lines.append(f"- conflict={ndc.get('narrative_conflict_score')}/100 | adj={ndc.get('narrative_adjustment')} | verdict={ndc.get('narrative_decision_verdict')}")
     sr = report.get("sections", {}).get("strict_readiness", {})
     if sr:
         lines.append("\nStrict Readiness:")

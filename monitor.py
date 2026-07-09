@@ -489,6 +489,10 @@ def check_market():
         print(f"Narrative     : {narrative.narrative_label} ({narrative.narrative_confidence})")
         print(f"Direction     : {narrative.dominant_direction} | Theme: {narrative.dominant_theme}")
         print(f"Event Risk    : {narrative.event_risk} | Score: {narrative.net_direction_score}")
+        raw = getattr(opportunity, "raw", {}) or {}
+        if raw.get("narrative_decision_verdict"):
+            print(f"Decision Link : {raw.get('narrative_alignment')} | conflict={raw.get('narrative_conflict_score')}/100 | adj={raw.get('narrative_adjustment')}")
+            print(f"Narr Verdict  : {raw.get('narrative_decision_verdict')}")
         print("=" * 70)
     except Exception as error:
         print(f"⚠️ Market narrative attach skipped: {type(error).__name__}: {error}")

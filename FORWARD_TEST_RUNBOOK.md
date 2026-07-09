@@ -187,3 +187,23 @@ python causal_intelligence_dashboard.py --compact
 - `automatic_event_collector_dashboard.py --compact` اکنون noiseهای product/navigation را فیلتر می‌کند.
 - `market_narrative_dashboard.py --compact` روایت بازار را از eventهای تمیز، causal context و driverهای اصلی می‌سازد.
 - این لایه فقط Research-only است و هیچ Paper/Live ایجاد نمی‌کند.
+
+## v7.1 — Narrative/Decision Conflict Scoring
+
+مرحله جدید:
+
+```cmd
+python narrative_decision_dashboard.py --compact
+```
+
+این مرحله بررسی می‌کند روایت بازار با تصمیم فعلی هم‌جهت است یا نه و این فیلدها را برای Research/Forward اضافه می‌کند:
+
+- `narrative_alignment`
+- `narrative_conflict_score`
+- `narrative_adjustment`
+- `narrative_adjusted_score`
+- `narrative_action_override`
+- `narrative_decision_verdict`
+
+این لایه هیچ Paper/Live/Order واقعی فعال نمی‌کند.
+

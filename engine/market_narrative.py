@@ -23,7 +23,7 @@ except Exception:  # pragma: no cover
 
 from engine.research_utils import LOG_DIR, RESEARCH_DIR, run_id, safe_float, utc_now_iso, write_json, write_text, save_dataframe_csv
 
-VERSION = "v7.0.0"
+VERSION = "v7.1.0"
 NARRATIVE_DIR = LOG_DIR / "narrative"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 AUTO_EVENTS_FILE = Path("data") / "auto_events.csv"
@@ -486,4 +486,11 @@ def attach_market_narrative_to_opportunity(opportunity: Any, *, symbol: str = "B
         "market_narrative_conflict": report.technical_event_conflict,
         "market_narrative_summary": report.narrative_summary,
     })
+    # v7.1: immediately score the narrative against the Decision Engine bias.
+    # This is research-only metadata and does not modify Paper/Live execution.
+    try:
+        from engine.narrative_decision_conflict import attach_narrative_decision_conflict_to_opportunity
+        attach_narrative_decision_conflict_to_opportunity(opportunity, report, symbol=symbol, timeframe=timeframe)
+    except Exception:
+        raw.setdefault("narrative_decision_verdict", "NARRATIVE_DECISION_SCORING_SKIPPED")
     return report

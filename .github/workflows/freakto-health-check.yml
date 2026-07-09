@@ -110,6 +110,11 @@ jobs:
         run: |
           python -X utf8 market_narrative_dashboard.py --compact || true
 
+      - name: Run v7.1 narrative decision conflict scoring
+        if: always()
+        run: |
+          python -X utf8 narrative_decision_dashboard.py --compact || true
+
       - name: Upload health artifacts
         if: always()
         uses: actions/upload-artifact@v4
