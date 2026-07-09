@@ -1,0 +1,7 @@
+﻿probe,filters,verdict,forward_samples,forward_avg_pct,forward_win_rate,forward_t1_rate,forward_stop_rate,forward_mfe_mae,backtest_samples,backtest_net_avg_pct,backtest_win_rate,backtest_t1_rate,backtest_stop_rate,backtest_mfe_mae
+BULL_STRUCTURE_SCORE_GE_10,"{'regime_label': 'TRENDING_BULL', 'structure_score_min': 10}",NO_FORWARD_SAMPLE,0,0.0,0.0,0.0,0.0,0.0,39,-0.5158,41.03,38.46,51.28,0.643
+BULL_STRUCTURE_SCORE_GE_10_LONG,"{'regime_label': 'TRENDING_BULL', 'structure_score_min': 10, 'side': 'LONG'}",NO_FORWARD_SAMPLE,0,0.0,0.0,0.0,0.0,0.0,39,-0.5158,41.03,38.46,51.28,0.643
+BULL_VOLUME_SCORE_GE_10,"{'regime_label': 'TRENDING_BULL', 'volume_score_min': 10}",NO_FORWARD_SAMPLE,0,0.0,0.0,0.0,0.0,0.0,17,0.4073,70.59,76.47,52.94,1.012
+BULL_RISK_MEDIUM,"{'regime_label': 'TRENDING_BULL', 'risk_medium': True}",NO_FORWARD_SAMPLE,0,0.0,0.0,0.0,0.0,0.0,37,-0.3898,45.95,45.95,54.05,0.661
+BULL_SCORE_GE_80,"{'regime_label': 'TRENDING_BULL', 'score_min': 80}",NO_FORWARD_SAMPLE,0,0.0,0.0,0.0,0.0,0.0,16,-0.0115,56.25,56.25,56.25,0.89
+BULL_BNB_LONG_SCORE_GE_60,"{'regime_label': 'TRENDING_BULL', 'symbol': 'BNB/USDT', 'side': 'LONG', 'score_min': 60}",NO_FORWARD_SAMPLE,0,0.0,0.0,0.0,0.0,0.0,11,0.3533,72.73,72.73,54.55,1.374

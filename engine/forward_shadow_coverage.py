@@ -1,5 +1,5 @@
 """
-Freakto v6.3.0 - Forward Shadow Coverage & Bull Regime Probe
+Freakto v6.3.1 - Bull Probe Evaluation Sync Patch
 
 Purpose:
 - Explain why v6.2 Regime Shadow gates may have zero signals.
@@ -43,7 +43,7 @@ from engine.research_utils import (
     run_id,
 )
 
-VERSION = "v6.3.0"
+VERSION = "v6.3.1"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 REGIME_BEAR_GATES = [
@@ -189,6 +189,70 @@ def _metric(df: pd.DataFrame, horizon: str, use_net: bool = False) -> Dict[str, 
     return metric_summary(df, horizon=horizon, use_net=use_net)
 
 
+def _shadow_metric_summary(df: pd.DataFrame) -> Dict[str, Any]:
+    """Compute a metric summary from shadow_gate_signals.csv rows.
+
+    v6.3.0 measured Bull probes only from decision_evaluations.csv. In some
+    runs, shadow_gate_signals.csv already has evaluated returns while the
+    joined decision/evaluation view is still missing COMPLETE rows. This helper
+    makes the Bull probe read the evaluated shadow ledger as a safe fallback.
+    It still uses only shadow rows that were already evaluated by the normal
+    forward evaluator; it never uses any future data for filtering.
+    """
+    empty = metric_summary(pd.DataFrame(), horizon="24h", use_net=False)
+    if df is None or df.empty or "selected_return_pct" not in df.columns:
+        return empty
+    w = df.copy()
+    if "shadow_status" in w.columns:
+        w = w[_upper_series(w, "shadow_status") == "EVALUATED"].copy()
+    ret = pd.to_numeric(w.get("selected_return_pct", pd.Series(dtype=float)), errors="coerce").dropna()
+    n = int(len(ret))
+    if not n:
+        return empty
+    target = pd.Series([False] * len(w), index=w.index)
+    stop = pd.Series([False] * len(w), index=w.index)
+    if "target_1_hit" in w.columns:
+        target = w["target_1_hit"].astype(str).str.lower().isin({"true", "1", "yes", "y"})
+    if "stop_hit" in w.columns:
+        stop = w["stop_hit"].astype(str).str.lower().isin({"true", "1", "yes", "y"})
+    mfe = pd.to_numeric(w.get("mfe_pct", pd.Series(dtype=float)), errors="coerce")
+    mae = pd.to_numeric(w.get("mae_pct", pd.Series(dtype=float)), errors="coerce")
+    mfe_mean = float(mfe.mean()) if len(mfe.dropna()) else 0.0
+    mae_mean = float(mae.mean()) if len(mae.dropna()) else 0.0
+    ratio = abs(mfe_mean / mae_mean) if mae_mean else 0.0
+    return {
+        "samples": n,
+        "avg_return_pct": round(float(ret.mean()), 4),
+        "median_return_pct": round(float(ret.median()), 4),
+        "win_rate": pct(int((ret > 0).sum()), n),
+        "target_1_hit_rate": pct(int(target.sum()), n),
+        "stop_hit_rate": pct(int(stop.sum()), n),
+        "mfe_mean_pct": round(mfe_mean, 4),
+        "mae_mean_pct": round(mae_mean, 4),
+        "mfe_mae_ratio": round(ratio, 3),
+        "best_return_pct": round(float(ret.max()), 4),
+        "worst_return_pct": round(float(ret.min()), 4),
+        "std_return_pct": round(float(ret.std(ddof=1)), 4) if n > 1 else 0.0,
+        "t_stat": 0.0,
+        "confidence_95_low_pct": 0.0,
+        "confidence_95_high_pct": 0.0,
+    }
+
+
+def _shadow_filter(shadow: pd.DataFrame, *, gate_name: str, regime_label: str = "", side: str = "", symbol: str = "") -> pd.DataFrame:
+    if shadow is None or shadow.empty or "gate_name" not in shadow.columns:
+        return pd.DataFrame()
+    w = shadow.copy()
+    mask = w["gate_name"].fillna("").astype(str).str.upper() == gate_name.upper()
+    if regime_label and "regime_label" in w.columns:
+        mask &= w["regime_label"].fillna("UNKNOWN").astype(str).str.upper() == regime_label.upper()
+    if side and "side" in w.columns:
+        mask &= w["side"].fillna("").astype(str).str.upper() == side.upper()
+    if symbol and "symbol" in w.columns:
+        mask &= w["symbol"].fillna("").astype(str).str.upper() == symbol.upper()
+    return w[mask].copy()
+
+
 def _regime_counts(decisions: pd.DataFrame) -> List[Dict[str, Any]]:
     if decisions.empty:
         return []
@@ -275,20 +339,36 @@ def _historical_metric_for(filters: Dict[str, Any], horizon: str) -> Dict[str, A
     return _metric(selected, horizon, use_net=True)
 
 
-def _forward_bull_probes(joined: pd.DataFrame, horizon: str, min_samples: int) -> List[Dict[str, Any]]:
+def _forward_bull_probes(joined: pd.DataFrame, shadow: pd.DataFrame, horizon: str, min_samples: int) -> List[Dict[str, Any]]:
     complete = _complete_directional(joined)
     probe_specs = [
-        ("BULL_STRUCTURE_SCORE_GE_10", {"regime_label": "TRENDING_BULL", "structure_score_min": 10}),
-        ("BULL_STRUCTURE_SCORE_GE_10_LONG", {"regime_label": "TRENDING_BULL", "structure_score_min": 10, "side": "LONG"}),
-        ("BULL_VOLUME_SCORE_GE_10", {"regime_label": "TRENDING_BULL", "volume_score_min": 10}),
-        ("BULL_RISK_MEDIUM", {"regime_label": "TRENDING_BULL", "risk_medium": True}),
-        ("BULL_SCORE_GE_80", {"regime_label": "TRENDING_BULL", "score_min": 80}),
-        ("BULL_BNB_LONG_SCORE_GE_60", {"regime_label": "TRENDING_BULL", "symbol": "BNB/USDT", "side": "LONG", "score_min": 60}),
+        ("BULL_STRUCTURE_SCORE_GE_10", {"regime_label": "TRENDING_BULL", "structure_score_min": 10}, "STRUCTURE_SCORE_GE_10", "", ""),
+        ("BULL_STRUCTURE_SCORE_GE_10_LONG", {"regime_label": "TRENDING_BULL", "structure_score_min": 10, "side": "LONG"}, "STRUCTURE_SCORE_GE_10", "LONG", ""),
+        ("BULL_VOLUME_SCORE_GE_10", {"regime_label": "TRENDING_BULL", "volume_score_min": 10}, "VOLUME_SCORE_GE_10", "", ""),
+        ("BULL_RISK_MEDIUM", {"regime_label": "TRENDING_BULL", "risk_medium": True}, "RISK_MEDIUM", "", ""),
+        ("BULL_SCORE_GE_80", {"regime_label": "TRENDING_BULL", "score_min": 80}, "SCORE_GE_80", "", ""),
+        ("BULL_BNB_LONG_SCORE_GE_60", {"regime_label": "TRENDING_BULL", "symbol": "BNB/USDT", "side": "LONG", "score_min": 60}, "BNB_LONG_SCORE_GE_60", "LONG", "BNB/USDT"),
     ]
     rows: List[Dict[str, Any]] = []
-    for name, filters in probe_specs:
+    for name, filters, shadow_gate, shadow_side, shadow_symbol in probe_specs:
         fwd = _filter(complete, filters)
         fwd_m = _metric(fwd, horizon, use_net=False)
+        data_source = "decision_evaluations"
+        shadow_rows = pd.DataFrame()
+        # v6.3.1 sync: if the decision/evaluation join has no COMPLETE rows for
+        # the probe, use the already-evaluated shadow ledger for matching gates.
+        if int(fwd_m.get("samples", 0) or 0) == 0 and shadow_gate:
+            shadow_rows = _shadow_filter(
+                shadow,
+                gate_name=shadow_gate,
+                regime_label="TRENDING_BULL",
+                side=shadow_side,
+                symbol=shadow_symbol,
+            )
+            shadow_m = _shadow_metric_summary(shadow_rows)
+            if int(shadow_m.get("samples", 0) or 0) > 0:
+                fwd_m = shadow_m
+                data_source = "shadow_ledger_sync"
         hist_m = _historical_metric_for(filters, horizon)
         verdict = "NO_FORWARD_SAMPLE"
         fwd_n = int(fwd_m.get("samples", 0) or 0)
@@ -313,6 +393,9 @@ def _forward_bull_probes(joined: pd.DataFrame, horizon: str, min_samples: int) -
             "probe": name,
             "filters": filters,
             "verdict": verdict,
+            "forward_data_source": data_source,
+            "shadow_gate_source": shadow_gate,
+            "shadow_rows_seen": int(len(shadow_rows)) if shadow_gate else 0,
             "forward_samples": fwd_n,
             "forward_avg_pct": fwd_m.get("avg_return_pct", 0.0),
             "forward_win_rate": fwd_m.get("win_rate", 0.0),
@@ -384,7 +467,7 @@ def run_forward_shadow_coverage(*, horizon: str = "24h", min_samples: int = 30) 
 
     regime_counts = _regime_counts(decisions)
     shadow_gate_coverage, shadow_regime_coverage = _shadow_metrics(shadow, horizon)
-    bull_probes = _forward_bull_probes(joined, horizon, min_samples)
+    bull_probes = _forward_bull_probes(joined, shadow, horizon, min_samples)
     zero_diag = _bear_zero_diagnostics(joined, shadow_gate_coverage)
 
     evaluated_shadow_rows = 0
@@ -418,14 +501,16 @@ def run_forward_shadow_coverage(*, horizon: str = "24h", min_samples: int = 30) 
     status = "FORWARD_SHADOW_COVERAGE_READY"
     if contradictions:
         status = "FORWARD_PROMISING_BACKTEST_CONFLICTS_FOUND"
-    if known_bear_count == 0:
+    if known_bear_count == 0 and contradictions:
+        status = "NO_BEAR_COVERAGE_WITH_BULL_PROBE_CONFLICTS"
+    elif known_bear_count == 0:
         status = "NO_BEAR_FORWARD_COVERAGE_YET"
     if decisions.empty:
         status = "NO_FORWARD_DECISIONS"
 
     warnings = [
         "این ماژول فقط coverage و probe تحقیقاتی می‌سازد؛ هیچ Paper/Live فعال نمی‌کند.",
-        "Bull probeها کاندید قطعی نیستند؛ تضاد Forward کم‌نمونه با Backtest باید جدی گرفته شود.",
+        "Bull probeها کاندید قطعی نیستند؛ v6.3.1 اگر لازم باشد از Shadow Ledger برای همگام‌سازی ارزیابی‌ها استفاده می‌کند.",
         "برچسب‌های legacy/proxy regime برای تحقیق‌اند؛ Forward جدید DIRECT_ENGINE ارزش بیشتری دارد.",
     ]
 
@@ -439,7 +524,7 @@ def run_forward_shadow_coverage(*, horizon: str = "24h", min_samples: int = 30) 
         decision_rows=int(len(decisions)),
         directional_decisions=int((_upper_series(decisions, "side").isin(DIRECTIONAL_SIDES)).sum()) if not decisions.empty else 0,
         evaluation_rows=int(len(evals)) if evals is not None and not evals.empty else 0,
-        complete_evaluations=int(len(complete)),
+        complete_evaluations=int(max(len(complete), evaluated_shadow_rows)),
         shadow_signal_rows=int(len(shadow)) if shadow is not None and not shadow.empty else 0,
         evaluated_shadow_rows=evaluated_shadow_rows,
         forward_regime_counts=regime_counts,
@@ -487,7 +572,7 @@ def format_forward_shadow_coverage_console(report: Dict[str, Any], *, compact: b
     if report.get("bull_forward_probes"):
         for row in report.get("bull_forward_probes", [])[:8]:
             lines.append(
-                f"- {row.get('probe')}: {row.get('verdict')} | fwd_n={row.get('forward_samples')} | fwd_avg={row.get('forward_avg_pct')}% | fwd_win={row.get('forward_win_rate')}% | bt_n={row.get('backtest_samples')} | bt_net={row.get('backtest_net_avg_pct')}%"
+                f"- {row.get('probe')}: {row.get('verdict')} | fwd_n={row.get('forward_samples')} | fwd_avg={row.get('forward_avg_pct')}% | fwd_win={row.get('forward_win_rate')}% | src={row.get('forward_data_source', 'decision_evaluations')} | bt_n={row.get('backtest_samples')} | bt_net={row.get('backtest_net_avg_pct')}%"
             )
     else:
         lines.append("- No Bull probes available.")

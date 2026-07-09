@@ -1,5 +1,5 @@
 """
-Freakto v6.3.0 - Research Robustness & Forward Regime Intelligence Suite
+Freakto v6.3.1 - Research Robustness & Forward Regime Intelligence Suite
 
 Implements the 11 requested improvement areas in research-only mode:
 1) Gate robustness / multiple-testing guard / walk-forward / embargo proxy
@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v6.3.0"
+VERSION = "v6.3.1"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 

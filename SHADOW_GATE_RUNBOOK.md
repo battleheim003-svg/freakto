@@ -128,3 +128,8 @@ python forward_shadow_coverage_dashboard.py --compact
 ```
 
 اگر Forward فعلی فقط `TRENDING_BULL` باشد، صفر بودن `REGIME_TRENDING_BEAR_*` طبیعی است.
+
+
+## v6.3.1 Bull Probe Evaluation Sync Patch
+
+`forward_shadow_coverage_dashboard.py` now syncs Bull probe evaluation counts from the Shadow Ledger when decision evaluation rows are not marked COMPLETE yet. This is reporting-only and research-only.

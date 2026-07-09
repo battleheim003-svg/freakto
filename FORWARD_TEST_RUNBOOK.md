@@ -140,3 +140,8 @@ Command: python -X utf8 forward_shadow_coverage_dashboard.py --compact
 ```
 
 این مرحله فقط گزارش coverage می‌سازد و هیچ Paper/Live فعال نمی‌کند.
+
+
+## v6.3.1 Bull Probe Evaluation Sync Patch
+
+`forward_shadow_coverage_dashboard.py` now syncs Bull probe evaluation counts from the Shadow Ledger when decision evaluation rows are not marked COMPLETE yet. This is reporting-only and research-only.

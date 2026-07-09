@@ -305,3 +305,14 @@ python forward_shadow_coverage_dashboard.py --compact
 ```
 
 این مرحله نشان می‌دهد چرا Regime Bear gates ممکن است signal نگیرند و آیا عملکرد خوب STRUCTURE_SCORE_GE_10 در Bull regime فقط Forward کم‌نمونه است یا با Backtest هم‌خوانی دارد.
+
+
+## v6.3.1 — Bull Probe Evaluation Sync Patch
+
+Run after v6.3 if Bull probes show `NO_FORWARD_SAMPLE` while Shadow Gate Coverage has evaluated samples:
+
+```cmd
+python forward_shadow_coverage_dashboard.py --compact
+```
+
+Expected improvement: Bull probes can use the evaluated Shadow Ledger as a fallback source and will display `src=shadow_ledger_sync` when that happens.

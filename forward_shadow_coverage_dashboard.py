@@ -1,4 +1,4 @@
-"""Freakto v6.3 - Forward Shadow Coverage & Bull Regime Probe dashboard."""
+"""Freakto v6.3.1 - Bull Probe Evaluation Sync Patch dashboard."""
 import argparse
 
 from engine.forward_shadow_coverage import (

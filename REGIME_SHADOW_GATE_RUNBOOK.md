@@ -76,3 +76,8 @@ Regime Shadow signals از صفر خارج شود
 ## v6.3 Bull Probe Warning
 
 Bull probeها فقط مشاهده‌ای هستند. اگر Forward کم‌نمونه مثبت باشد ولی Backtest net همان فیلتر منفی باشد، verdict به شکل conflict نمایش داده می‌شود و نباید به candidate تبدیل شود.
+
+
+## v6.3.1 Bull Probe Evaluation Sync Patch
+
+`forward_shadow_coverage_dashboard.py` now syncs Bull probe evaluation counts from the Shadow Ledger when decision evaluation rows are not marked COMPLETE yet. This is reporting-only and research-only.

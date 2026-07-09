@@ -114,3 +114,8 @@ forward_regime_labeling
 ## v6.3 Forward Shadow Coverage
 
 ماژول جدید `forward_shadow_coverage_dashboard.py` به Research Suite اضافه شد. این ماژول coverage تصمیم‌های Forward، Shadow Gateها و Bull regime probes را با Backtest مقایسه می‌کند.
+
+
+## v6.3.1 Bull Probe Evaluation Sync Patch
+
+`forward_shadow_coverage_dashboard.py` now syncs Bull probe evaluation counts from the Shadow Ledger when decision evaluation rows are not marked COMPLETE yet. This is reporting-only and research-only.
