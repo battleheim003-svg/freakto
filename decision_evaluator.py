@@ -115,6 +115,7 @@ def _load_decisions():
         "causal_source_count": "",
         "causal_trusted_source_count": "",
         "causal_manual_event_count": "",
+        "causal_auto_event_count": "",
         "causal_top_sources": "",
         "causal_notes": "",
     }
@@ -296,6 +297,7 @@ def evaluate_decisions():
             "causal_source_count": decision.get("causal_source_count", ""),
             "causal_trusted_source_count": decision.get("causal_trusted_source_count", ""),
             "causal_manual_event_count": decision.get("causal_manual_event_count", ""),
+            "causal_auto_event_count": decision.get("causal_auto_event_count", ""),
             "causal_top_sources": decision.get("causal_top_sources", ""),
             "causal_notes": decision.get("causal_notes", ""),
             "entry_price": entry_price,

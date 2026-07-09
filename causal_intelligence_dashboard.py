@@ -1,4 +1,4 @@
-"""Freakto v6.4.0 - Causal/Event Intelligence dashboard."""
+"""Freakto v6.5.0 - Causal/Event Intelligence dashboard."""
 import argparse
 
 from config import SYMBOL, TIMEFRAME

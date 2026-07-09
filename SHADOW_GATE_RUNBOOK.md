@@ -138,3 +138,14 @@ python forward_shadow_coverage_dashboard.py --compact
 ## v6.4 causal context
 
 Shadow Gateها هنوز مستقل از Causal Intelligence هستند. اما از این نسخه، decisions/evaluations می‌توانند causal fields داشته باشند تا بعداً هر gate به تفکیک علت بازار بررسی شود.
+
+
+## v6.5.0 — Automatic Event Collector
+
+این نسخه قبل از Causal Intelligence یک مرحله جدید اضافه می‌کند:
+
+```cmd
+python automatic_event_collector_dashboard.py --compact
+```
+
+خروجی اصلی آن `data/auto_events.csv` است. این فایل از منابع رسمی/معتبر ساخته می‌شود و Causal Intelligence آن را در کنار `manual_events.csv` می‌خواند. این لایه فقط Research است و Paper/Live فعال نمی‌کند.

@@ -23,7 +23,7 @@ except Exception:  # pragma: no cover
     pd = None
 
 
-VERSION = "v6.4.0"
+VERSION = "v6.5.0"
 LOG_DIR = Path("logs")
 FORWARD_DIR = LOG_DIR / "forward_testing"
 RUNS_CSV = LOG_DIR / "forward_test_runs.csv"
@@ -178,6 +178,14 @@ def build_forward_test_plan(
         )
 
     if include_evaluator:
+        tasks.append(
+            ForwardTask(
+                name="automatic_event_collector",
+                command=_python_cmd("automatic_event_collector_dashboard.py", "--compact"),
+                required=False,
+                description="جمع‌آوری خودکار رویدادها از منابع رسمی/معتبر و ساخت data/auto_events.csv بدون Paper/Live.",
+            )
+        )
         tasks.append(
             ForwardTask(
                 name="causal_intelligence_probe",

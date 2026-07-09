@@ -467,7 +467,7 @@ def check_market():
             collect_live=False,
         )
         print("\n" + "=" * 70)
-        print("🧠 Causal/Event Intelligence Context v6.4")
+        print("🧠 Causal/Event Intelligence Context v6.5")
         print("=" * 70)
         print(f"Primary Cause : {causal_context.primary_cause}")
         print(f"Catalyst      : {causal_context.catalyst_score}/100 | Risk: {causal_context.event_risk}")

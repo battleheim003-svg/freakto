@@ -124,3 +124,14 @@ forward_regime_labeling
 ## v6.4 Causal/Event Intelligence
 
 Causal Intelligence به Research Suite اضافه شد تا primary_cause، catalyst_score، event_risk، technical_event_conflict و causal_verdict را کنار تصمیم‌ها ذخیره کند. این داده‌ها بعداً برای Conflict Lab و cause/outcome evaluation استفاده می‌شوند.
+
+
+## v6.5.0 — Automatic Event Collector
+
+این نسخه قبل از Causal Intelligence یک مرحله جدید اضافه می‌کند:
+
+```cmd
+python automatic_event_collector_dashboard.py --compact
+```
+
+خروجی اصلی آن `data/auto_events.csv` است. این فایل از منابع رسمی/معتبر ساخته می‌شود و Causal Intelligence آن را در کنار `manual_events.csv` می‌خواند. این لایه فقط Research است و Paper/Live فعال نمی‌کند.

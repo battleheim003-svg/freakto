@@ -56,3 +56,14 @@ timestamp_utc,symbol,event_type,source_name,source_url,impact,direction,confiden
 ## ایمنی
 
 v6.4 هیچ Paper Trade جدید، هیچ سفارش واقعی و هیچ Live execution فعال نمی‌کند. این فقط Research/Tagging/Reporting است.
+
+
+## v6.5.0 — Automatic Event Collector
+
+این نسخه قبل از Causal Intelligence یک مرحله جدید اضافه می‌کند:
+
+```cmd
+python automatic_event_collector_dashboard.py --compact
+```
+
+خروجی اصلی آن `data/auto_events.csv` است. این فایل از منابع رسمی/معتبر ساخته می‌شود و Causal Intelligence آن را در کنار `manual_events.csv` می‌خواند. این لایه فقط Research است و Paper/Live فعال نمی‌کند.

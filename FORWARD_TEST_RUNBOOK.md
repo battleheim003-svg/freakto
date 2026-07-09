@@ -156,3 +156,14 @@ python causal_intelligence_dashboard.py --compact
 ```
 
 این task منابع بیرونی معتبر و manual_events را جمع‌آوری می‌کند و فقط report/log می‌سازد.
+
+
+## v6.5.0 — Automatic Event Collector
+
+این نسخه قبل از Causal Intelligence یک مرحله جدید اضافه می‌کند:
+
+```cmd
+python automatic_event_collector_dashboard.py --compact
+```
+
+خروجی اصلی آن `data/auto_events.csv` است. این فایل از منابع رسمی/معتبر ساخته می‌شود و Causal Intelligence آن را در کنار `manual_events.csv` می‌خواند. این لایه فقط Research است و Paper/Live فعال نمی‌کند.

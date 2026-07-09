@@ -177,6 +177,7 @@ def log_decision(opportunity, latest_timestamp, price, provider=None):
         "causal_source_count": raw.get("causal_source_count", ""),
         "causal_trusted_source_count": raw.get("causal_trusted_source_count", ""),
         "causal_manual_event_count": raw.get("causal_manual_event_count", ""),
+        "causal_auto_event_count": raw.get("causal_auto_event_count", ""),
         "causal_top_sources": raw.get("causal_top_sources", ""),
         "causal_notes": raw.get("causal_notes", ""),
         "long_score": raw.get("long_score", ""),

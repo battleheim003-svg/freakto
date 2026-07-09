@@ -1,6 +1,6 @@
 
 """
-Freakto v6.4.0 - Causal/Event Intelligence Core
+Freakto v6.5.0 - Causal/Event Intelligence Core
 
 Purpose
 -------
@@ -50,22 +50,28 @@ from engine.research_utils import (
     save_dataframe_csv,
 )
 
-VERSION = "v6.4.0"
+VERSION = "v6.5.0"
 CAUSAL_DIR = LOG_DIR / "causal"
 CAUSAL_SNAPSHOTS_DIR = CAUSAL_DIR / "source_snapshots"
 CAUSAL_EVENTS_FILE = Path("data") / "manual_events.csv"
 CAUSAL_EVENTS_EXAMPLE = Path("data") / "manual_events.example.csv"
+CAUSAL_AUTO_EVENTS_FILE = Path("data") / "auto_events.csv"
 CAUSAL_OBSERVATIONS_CSV = CAUSAL_DIR / "causal_observations.csv"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 SOURCE_TIMEOUT_SECONDS = float(os.getenv("FREAKTO_CAUSAL_TIMEOUT", "12"))
-USER_AGENT = os.getenv("FREAKTO_CAUSAL_USER_AGENT", "FreaktoResearchBot/6.4 (+research-only)")
+USER_AGENT = os.getenv("FREAKTO_CAUSAL_USER_AGENT", "FreaktoResearchBot/6.5 (+research-only)")
 
 TRUST_ORDER = {
     "TIER_1_OFFICIAL_EXCHANGE": 1,
+    "TIER_1_OFFICIAL_EXCHANGE_NEWS": 1,
+    "TIER_1_OFFICIAL_REGULATOR": 1,
+    "TIER_1_OFFICIAL_PROTOCOL": 1,
     "TIER_1_OFFICIAL_MACRO": 1,
     "TIER_1_PROTOCOL_AGGREGATOR": 1,
     "TIER_2_MARKET_AGGREGATOR": 2,
+    "TIER_2_OFFICIAL_COMPANY_BLOG": 2,
+    "TIER_2_REPUTABLE_MEDIA": 2,
     "TIER_3_SENTIMENT": 3,
     "TIER_0_MANUAL_CURATED": 0,
 }
@@ -101,6 +107,7 @@ class CausalContext:
     source_count: int
     trusted_source_count: int
     manual_event_count: int
+    auto_event_count: int = 0
     top_sources: List[str] = field(default_factory=list)
     internal_causes: List[Dict[str, Any]] = field(default_factory=list)
     external_sources: List[Dict[str, Any]] = field(default_factory=list)
@@ -123,6 +130,7 @@ class CausalReport:
     trusted_successful_sources: int
     manual_events_loaded: int
     context: Dict[str, Any]
+    auto_events_loaded: int = 0
     source_results: List[Dict[str, Any]] = field(default_factory=list)
     source_registry: List[Dict[str, Any]] = field(default_factory=list)
     source_health: List[Dict[str, Any]] = field(default_factory=list)
@@ -272,6 +280,16 @@ def build_source_registry() -> List[Dict[str, Any]]:
             "env_key": "none",
             "purpose": "Sentiment/crowding warning only; never used as a standalone bullish/bearish trigger.",
             "why_trusted": "Popular sentiment index but lower tier because methodology is not exchange/official data.",
+        },
+        {
+            "source_id": "auto_event_collector",
+            "name": "Automatic Official/Trusted Event Collector",
+            "category": "news_event",
+            "reliability_tier": "TIER_1_OFFICIAL_EVENT_PIPELINE",
+            "requires_key": False,
+            "env_key": "none",
+            "purpose": "Reads data/auto_events.csv built from official RSS/API feeds such as SEC, Federal Reserve, Ethereum Foundation, Binance/Coinbase announcements, plus optional reputable media.",
+            "why_trusted": "Collector prioritizes official feeds and stores source tier, source URL, timestamp, dedup id, direction, impact, and confidence for auditability.",
         },
         {
             "source_id": "manual_events",
@@ -529,9 +547,71 @@ def load_manual_events(symbol: str, window_hours: int = 72) -> List[CausalSource
     return results
 
 
+def load_auto_events(symbol: str, window_hours: int = 168) -> List[CausalSourceResult]:
+    """Load automatically collected official/trusted events from data/auto_events.csv.
+
+    The collector writes the same core columns as manual_events plus source_tier,
+    event_id and auto_score. Rows are still filtered by symbol and recency.
+    """
+    if not CAUSAL_AUTO_EVENTS_FILE.exists():
+        return []
+    results: List[CausalSourceResult] = []
+    now = datetime.now(timezone.utc)
+    try:
+        with CAUSAL_AUTO_EVENTS_FILE.open("r", encoding="utf-8-sig", newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if not row:
+                    continue
+                ts = _iso_parse(row.get("timestamp_utc") or row.get("timestamp") or row.get("time"))
+                if ts and abs((now - ts).total_seconds()) > window_hours * 3600:
+                    continue
+                event_symbol = _upper(row.get("symbol"), "ALL")
+                target = _upper(symbol)
+                if event_symbol not in {"ALL", "GLOBAL", target, target.replace("/", "")}:
+                    continue
+                impact = _upper(row.get("impact"), "LOW")
+                direction = _upper(row.get("direction"), "NEUTRAL")
+                if direction not in {"BULLISH", "BEARISH", "NEUTRAL"}:
+                    direction = "NEUTRAL"
+                score = safe_float(row.get("auto_score"), None)
+                if score is None:
+                    score = 0
+                    if direction == "BULLISH":
+                        score = 12 if impact == "HIGH" else 7 if impact == "MEDIUM" else 2
+                    elif direction == "BEARISH":
+                        score = -12 if impact == "HIGH" else -7 if impact == "MEDIUM" else -2
+                source_name = _norm(row.get("source_name") or row.get("source_id"), "auto_event")
+                desc = _norm(row.get("description") or row.get("title"), "auto-collected event")
+                tier = _norm(row.get("source_tier"), "TIER_2_REPUTABLE_MEDIA")
+                results.append(_source_result(
+                    "auto_events", "Automatic Official/Trusted Event Ledger", "news_event", tier, "OK",
+                    direction=direction,
+                    confidence=_upper(row.get("confidence"), "MEDIUM"),
+                    signal_score=score,
+                    event_risk=_upper(row.get("event_risk"), "HIGH" if impact == "HIGH" else "MEDIUM" if impact == "MEDIUM" else "LOW"),
+                    summary=f"{source_name}: {desc}",
+                    url=_norm(row.get("source_url")),
+                    fields={
+                        "event_id": row.get("event_id", ""),
+                        "source_id": row.get("source_id", ""),
+                        "event_type": row.get("event_type", ""),
+                        "impact": impact,
+                        "event_timestamp_utc": ts.isoformat() if ts else "",
+                        "event_symbol": event_symbol,
+                        "tags": row.get("tags", ""),
+                        "matched_keywords": row.get("matched_keywords", ""),
+                    },
+                ))
+    except Exception as error:
+        results.append(_source_result("auto_events", "Automatic Official/Trusted Event Ledger", "news_event", "TIER_2_REPUTABLE_MEDIA", "FAILED", error=f"{type(error).__name__}: {error}"))
+    return results
+
+
 def collect_external_sources(symbol: str = "BTC/USDT", *, collect_live: bool = True, include_sentiment: bool = True) -> List[CausalSourceResult]:
     results: List[CausalSourceResult] = []
     results.extend(load_manual_events(symbol))
+    results.extend(load_auto_events(symbol))
     if not collect_live:
         return results
     collectors = [
@@ -661,6 +741,7 @@ def build_causal_context(
     successful = [r for r in external if r.status == "OK"]
     trusted_success = [r for r in successful if TRUST_ORDER.get(r.reliability_tier, 9) <= 2]
     manual_events = [r for r in successful if r.source_id == "manual_events"]
+    auto_events = [r for r in successful if r.source_id == "auto_events"]
 
     internal_score = sum(safe_float(c.get("score"), 0.0) or 0.0 for c in internal)
     external_score = sum(safe_float(r.signal_score, 0.0) or 0.0 for r in successful)
@@ -729,7 +810,11 @@ def build_causal_context(
         recommendations.append("manual_events.csv فعال است؛ رویدادهای high-impact را با source_url معتبر ادامه بده.")
     else:
         recommendations.append("برای خبر/رویدادهای خیلی مهم، data/manual_events.csv را از example بساز و فقط منابع معتبر مثل Fed/SEC/Reuters/official project را وارد کن.")
-    recommendations.append("در v6.4 نتایج فقط به decision log و research reports اضافه می‌شود؛ هیچ Paper/Live فعال نمی‌شود.")
+    if CAUSAL_AUTO_EVENTS_FILE.exists():
+        recommendations.append("auto_events.csv فعال است؛ Automatic Event Collector قبل از Causal Intelligence باید اجرا شود.")
+    else:
+        recommendations.append("برای جمع‌آوری خودکار رویدادها، automatic_event_collector_dashboard.py --compact را اجرا کن.")
+    recommendations.append("در v6.5 نتایج فقط به decision log و research reports اضافه می‌شود؛ هیچ Paper/Live فعال نمی‌شود.")
 
     top_sources = []
     for r in sorted(successful, key=lambda x: (TRUST_ORDER.get(x.reliability_tier, 9), abs(safe_float(x.signal_score, 0.0) or 0.0)), reverse=False)[:6]:
@@ -746,6 +831,7 @@ def build_causal_context(
         source_count=len(external),
         trusted_source_count=len(trusted_success),
         manual_event_count=len(manual_events),
+        auto_event_count=len(auto_events),
         top_sources=top_sources,
         internal_causes=internal,
         external_sources=[asdict(r) for r in external],
@@ -779,6 +865,7 @@ def attach_causal_context(
         "causal_source_count": context.source_count,
         "causal_trusted_source_count": context.trusted_source_count,
         "causal_manual_event_count": context.manual_event_count,
+        "causal_auto_event_count": context.auto_event_count,
         "causal_top_sources": " | ".join(context.top_sources[:6]),
         "causal_notes": " | ".join([c.get("cause", "") for c in context.internal_causes[:4]]),
     })
@@ -820,6 +907,7 @@ def run_causal_intelligence(
     failed = [r for r in external if r.status.startswith("FAILED")]
     trusted_successful = [r for r in successful if TRUST_ORDER.get(r.reliability_tier, 9) <= 2]
     manual_count = sum(1 for r in successful if r.source_id == "manual_events")
+    auto_count = sum(1 for r in successful if r.source_id == "auto_events")
 
     blockers = []
     if collect_live and not trusted_successful:
@@ -858,6 +946,7 @@ def run_causal_intelligence(
         failed_sources=len(failed),
         trusted_successful_sources=len(trusted_successful),
         manual_events_loaded=manual_count,
+        auto_events_loaded=auto_count,
         context=asdict(context),
         source_results=[asdict(r) for r in external],
         source_registry=build_source_registry(),
@@ -882,6 +971,7 @@ def format_causal_console(report: CausalReport, compact: bool = True) -> str:
     lines.append(f"Sources OK/Failed      : {data.get('successful_sources')} / {data.get('failed_sources')}")
     lines.append(f"Trusted Sources OK     : {data.get('trusted_successful_sources')}")
     lines.append(f"Manual Events Loaded   : {data.get('manual_events_loaded')}")
+    lines.append(f"Auto Events Loaded     : {data.get('auto_events_loaded')}")
     lines.append("")
     lines.append("Causal Context:")
     lines.append(f"- Primary Cause        : {ctx.get('primary_cause')}")
@@ -940,6 +1030,7 @@ def _append_observation(report: CausalReport) -> Path:
         "successful_sources": report.successful_sources,
         "trusted_successful_sources": report.trusted_successful_sources,
         "manual_events_loaded": report.manual_events_loaded,
+        "auto_events_loaded": report.auto_events_loaded,
     }
     exists = CAUSAL_OBSERVATIONS_CSV.exists() and CAUSAL_OBSERVATIONS_CSV.stat().st_size > 0
     with CAUSAL_OBSERVATIONS_CSV.open("a", newline="", encoding="utf-8-sig") as f:

@@ -1,0 +1,82 @@
+[
+  {
+    "source_id": "sec_press_releases",
+    "name": "SEC Press Releases RSS",
+    "url": "https://www.sec.gov/news/pressreleases.rss",
+    "source_type": "rss",
+    "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+    "category": "regulatory",
+    "enabled_by_default": true,
+    "notes": "Official SEC news releases; high value for ETF/enforcement/regulatory catalysts."
+  },
+  {
+    "source_id": "sec_litigation_releases",
+    "name": "SEC Litigation Releases RSS",
+    "url": "https://www.sec.gov/litigation/litreleases.rss",
+    "source_type": "rss",
+    "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+    "category": "regulatory",
+    "enabled_by_default": true,
+    "notes": "Official SEC litigation releases; bearish/regulatory-risk context when crypto-related."
+  },
+  {
+    "source_id": "federal_reserve_press",
+    "name": "Federal Reserve Press Releases RSS",
+    "url": "https://www.federalreserve.gov/feeds/press_all.xml",
+    "source_type": "rss",
+    "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+    "category": "macro",
+    "enabled_by_default": true,
+    "notes": "Official Fed press feed; macro and rate-policy context."
+  },
+  {
+    "source_id": "federal_reserve_speeches",
+    "name": "Federal Reserve Speeches RSS",
+    "url": "https://www.federalreserve.gov/feeds/speeches.xml",
+    "source_type": "rss",
+    "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+    "category": "macro",
+    "enabled_by_default": true,
+    "notes": "Official Fed speeches/testimony feed; used as event-risk context, not standalone direction."
+  },
+  {
+    "source_id": "ethereum_foundation_blog",
+    "name": "Ethereum Foundation Blog",
+    "url": "https://blog.ethereum.org/feed.xml",
+    "source_type": "rss",
+    "reliability_tier": "TIER_1_OFFICIAL_PROTOCOL",
+    "category": "protocol",
+    "enabled_by_default": true,
+    "notes": "Official Ethereum Foundation blog feed for protocol/security/upgrade items."
+  },
+  {
+    "source_id": "coinbase_blog",
+    "name": "Coinbase Blog RSS",
+    "url": "https://blog.coinbase.com/feed",
+    "source_type": "rss",
+    "reliability_tier": "TIER_2_OFFICIAL_COMPANY_BLOG",
+    "category": "exchange_company",
+    "enabled_by_default": true,
+    "notes": "Coinbase official Medium/blog feed; useful for company/product/listing context."
+  },
+  {
+    "source_id": "binance_announcements",
+    "name": "Binance Announcements",
+    "url": "https://www.binance.com/bapi/composite/v1/public/cms/article/list/query?type=1&pageNo=1&pageSize=30",
+    "source_type": "binance_json",
+    "reliability_tier": "TIER_1_OFFICIAL_EXCHANGE_NEWS",
+    "category": "exchange",
+    "enabled_by_default": true,
+    "notes": "Binance official announcement page backend; used defensively and allowed to fail if format changes."
+  },
+  {
+    "source_id": "coindesk_rss",
+    "name": "CoinDesk RSS",
+    "url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+    "source_type": "rss",
+    "reliability_tier": "TIER_2_REPUTABLE_MEDIA",
+    "category": "media",
+    "enabled_by_default": true,
+    "notes": "Reputable crypto media context only; lower priority than official sources."
+  }
+]
