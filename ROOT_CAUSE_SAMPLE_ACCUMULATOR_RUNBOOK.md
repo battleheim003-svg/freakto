@@ -77,3 +77,8 @@ ROOT_CAUSE_VALIDATION_RESEARCH_CANDIDATES_FOUND
 ## نکته مهم
 
 این ماژول فقط maturity tracker است. حتی اگر sample کافی شد، Paper/Live فعال نمی‌شود. مرحله بعد از sample کافی، Root-Cause Gate Simulator است.
+
+
+## اتصال به v9 Evidence Graph
+
+پس از اینکه Root Cause sample tracker نمونه‌ها را شمرد، `evidence_graph_dashboard.py` می‌تواند همان نمونه‌ها را به مسیرهای evidence تبدیل کند و نشان دهد کدام مسیرها در Forward بهتر یا بدتر بوده‌اند.

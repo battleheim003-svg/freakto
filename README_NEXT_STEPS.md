@@ -459,3 +459,14 @@ python forward_test_dashboard.py --plan
 هدف v8.2 این است که Root Causeهای تولیدشده فقط در گزارش نمانند؛ بلکه به `decision_evaluations.csv` وصل شوند، forward outcome بگیرند و تعداد sampleها به‌صورت شفاف پایش شود.
 
 تا قبل از رسیدن به حداقل sample کافی، خروجی Root Cause فقط Research/Shadow است.
+
+
+## v9 Evidence Graph
+
+بعد از v8.2، مرحله Evidence Graph اضافه شده است. اجرای پیشنهادی:
+
+```cmd
+python evidence_graph_dashboard.py --compact
+```
+
+این مرحله مسیر `Evidence Source -> Narrative -> Root Cause -> Decision -> Outcome` را می‌سازد و فقط research-only است.

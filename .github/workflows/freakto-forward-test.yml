@@ -164,6 +164,11 @@ jobs:
         run: |
           python -X utf8 root_cause_sample_dashboard.py --compact || true
 
+      - name: Run v9 evidence graph engine
+        if: always()
+        run: |
+          python -X utf8 evidence_graph_dashboard.py --compact || true
+
       - name: Upload logs as workflow artifact
         if: always()
         uses: actions/upload-artifact@v4

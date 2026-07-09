@@ -780,6 +780,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
     from engine.root_cause_discovery import run_root_cause_discovery
     from engine.root_cause_forward_validation import run_root_cause_forward_validation
     from engine.root_cause_sample_tracker import run_root_cause_sample_tracker
+    from engine.evidence_graph import run_evidence_graph
 
     sections = {
         "gate_robustness": run_gate_robustness(),
@@ -799,6 +800,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "root_cause_discovery": asdict(run_root_cause_discovery()),
         "root_cause_forward_validation": asdict(run_root_cause_forward_validation()),
         "root_cause_sample_tracker": asdict(run_root_cause_sample_tracker()),
+        "evidence_graph": asdict(run_evidence_graph()),
         "cross_exchange_validation": run_cross_exchange_validation(),
         "research_db": run_research_db_export(),
         "pipeline_health": run_pipeline_health(),

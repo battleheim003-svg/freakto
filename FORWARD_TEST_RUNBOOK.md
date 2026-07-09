@@ -261,3 +261,14 @@ decision_evaluator
 root_cause_forward_validation_probe
 root_cause_sample_tracker
 ```
+
+
+## v9 Evidence Graph Probe
+
+Forward plan اکنون شامل `evidence_graph_probe` است:
+
+```cmd
+python evidence_graph_dashboard.py --compact
+```
+
+این مرحله باید بعد از root cause sample tracker اجرا شود و هیچ Paper/Live فعال نمی‌کند.
