@@ -1,0 +1,52 @@
+{
+  "created_utc": "2026-07-09T10:54:26.951633+00:00",
+  "symbols": [
+    {
+      "symbol": "BTC/USDT",
+      "scan_count": 0,
+      "decision_count": 48,
+      "complete_evaluations": 44,
+      "paper_trades": 0,
+      "closed_paper_trades": 0,
+      "latest_side": "UNKNOWN",
+      "latest_recommendation": "UNKNOWN",
+      "latest_mtf": "UNKNOWN",
+      "avg_score": 0.0,
+      "avg_confidence": 0.0,
+      "avg_opportunity": 0.0,
+      "max_opportunity": 0.0,
+      "avg_rr": 0.0,
+      "best_rr": 0.0,
+      "directional_win_rate": 75.0,
+      "target_1_hit_rate": 54.55,
+      "avg_24h_return_pct": 0.6105,
+      "paper_win_rate": 0.0,
+      "paper_expectancy_r": 0.0,
+      "paper_profit_factor": 0.0,
+      "actionable_rate": 0.0,
+      "monitor_rate": 0.0,
+      "ignore_rate": 0.0,
+      "dominant_side": "UNKNOWN",
+      "dominant_recommendation": "UNKNOWN",
+      "memory_status": "SYMBOL_EDGE_EARLY",
+      "confidence": "MEDIUM",
+      "notes": [
+        "Decision edge اولیه برای این نماد مثبت است."
+      ],
+      "blockers": [
+        "Closed paper trades کمتر از 30 است: 0"
+      ]
+    }
+  ],
+  "portfolio_status": "MEMORY_BUILDING",
+  "best_memory_symbol": "BTC/USDT",
+  "best_paper_symbol": "NONE",
+  "total_symbols": 1,
+  "total_scans": 0,
+  "total_complete_evaluations": 44,
+  "total_closed_paper_trades": 0,
+  "notes": [],
+  "warnings": [
+    "Closed paper trades کل پورتفو کمتر از 30 است: 0"
+  ]
+}

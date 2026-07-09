@@ -1,0 +1,2096 @@
+{
+  "run_id": "research_suite_20260709_105434",
+  "generated_utc": "2026-07-09T10:54:34.791531+00:00",
+  "version": "v6.2.1",
+  "status": "RESEARCH_SUITE_WITH_BLOCKERS",
+  "sections": {
+    "gate_robustness": {
+      "run_id": "gate_robustness_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.644403+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "results": [],
+      "blockers": [
+        "هیچ دیتای backtest کامل برای robust validation وجود ندارد."
+      ],
+      "warnings": []
+    },
+    "cost_adjusted_backtest": {
+      "run_id": "cost_backtest_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.644879+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "groups": [],
+      "blockers": [
+        "Backtest data موجود نیست."
+      ]
+    },
+    "meta_labeling": {
+      "run_id": "meta_label_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.645341+00:00",
+      "status": "LOW_SAMPLE_META_LABELING",
+      "samples": 0,
+      "blockers": [
+        "برای meta-labeling حداقل 120 نمونه لازم است."
+      ],
+      "warnings": [],
+      "top_features": []
+    },
+    "ensemble_explainability": {
+      "run_id": "ensemble_explain_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.662443+00:00",
+      "status": "EXPLAINABILITY_READY",
+      "rows": 48,
+      "recent_count": 25,
+      "avg_ensemble_agreement": 63.32,
+      "recent_explanations": [
+        {
+          "decision_id": "3ed3beb8a0142741",
+          "candle_timestamp": "2026-07-05 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 33.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 40.5
+            },
+            {
+              "feature": "momentum_score",
+              "value": 17.0,
+              "share_pct": 40.5
+            },
+            {
+              "feature": "structure_score",
+              "value": 8.0,
+              "share_pct": 19.0
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "d20cf69165d7b25f",
+          "candle_timestamp": "2026-07-05 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 16.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 44.0
+            },
+            {
+              "feature": "momentum_score",
+              "value": 8.0,
+              "share_pct": 32.0
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 24.0
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "b2ff192282909211",
+          "candle_timestamp": "2026-07-05 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 31.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 43.6
+            },
+            {
+              "feature": "momentum_score",
+              "value": 16.0,
+              "share_pct": 41.0
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 15.4
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "120e189be1e70388",
+          "candle_timestamp": "2026-07-05 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 36.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 42.5
+            },
+            {
+              "feature": "momentum_score",
+              "value": 17.0,
+              "share_pct": 42.5
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 15.0
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "6343d5fda70f7ead",
+          "candle_timestamp": "2026-07-05 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 31.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 43.6
+            },
+            {
+              "feature": "momentum_score",
+              "value": 16.0,
+              "share_pct": 41.0
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 15.4
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "e4b687ee00cfdd03",
+          "candle_timestamp": "2026-07-05 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 36.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 42.5
+            },
+            {
+              "feature": "momentum_score",
+              "value": 17.0,
+              "share_pct": 42.5
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 15.0
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "af0089d5a911079a",
+          "candle_timestamp": "2026-07-05 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 31.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 43.6
+            },
+            {
+              "feature": "momentum_score",
+              "value": 16.0,
+              "share_pct": 41.0
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 15.4
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "90ceec3959a268ff",
+          "candle_timestamp": "2026-07-05 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 18.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 40.7
+            },
+            {
+              "feature": "momentum_score",
+              "value": 8.0,
+              "share_pct": 29.6
+            },
+            {
+              "feature": "structure_score",
+              "value": 8.0,
+              "share_pct": 29.6
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "0678ab66434e5aeb",
+          "candle_timestamp": "2026-07-05 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 18.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 52.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 40.7
+            },
+            {
+              "feature": "momentum_score",
+              "value": 8.0,
+              "share_pct": 29.6
+            },
+            {
+              "feature": "structure_score",
+              "value": 8.0,
+              "share_pct": 29.6
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "740c9e42772549f9",
+          "candle_timestamp": "2026-07-06 04:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 35.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 62.2
+            },
+            {
+              "feature": "momentum_score",
+              "value": 11.0,
+              "share_pct": 24.4
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 13.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "e19f2e26336bad6a",
+          "candle_timestamp": "2026-07-06 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 38.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 81.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 30.0,
+              "share_pct": 48.4
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 27.4
+            },
+            {
+              "feature": "volume_score",
+              "value": 11.0,
+              "share_pct": 17.7
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "055d1880dfc7312a",
+          "candle_timestamp": "2026-07-06 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 38.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 81.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 30.0,
+              "share_pct": 48.4
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 27.4
+            },
+            {
+              "feature": "volume_score",
+              "value": 11.0,
+              "share_pct": 17.7
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "09ce1fb638454be2",
+          "candle_timestamp": "2026-07-06 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 38.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 73.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 28.0,
+              "share_pct": 46.7
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 28.3
+            },
+            {
+              "feature": "volume_score",
+              "value": 11.0,
+              "share_pct": 18.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "1102b59be0b7de01",
+          "candle_timestamp": "2026-07-06 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 49.0,
+          "actionability": "NOT_ACTIONABLE",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 52.8
+            },
+            {
+              "feature": "momentum_score",
+              "value": 19.0,
+              "share_pct": 35.8
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 11.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "86f05b0fe8adfbd6",
+          "candle_timestamp": "2026-07-06 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 63.0,
+          "actionability": "WATCHLIST",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 49.1
+            },
+            {
+              "feature": "momentum_score",
+              "value": 22.0,
+              "share_pct": 38.6
+            },
+            {
+              "feature": "structure_score",
+              "value": 7.0,
+              "share_pct": 12.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "2eaf3b9ad9adfdef",
+          "candle_timestamp": "2026-07-07 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 22.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 59.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 13.0,
+              "share_pct": 40.6
+            },
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 34.4
+            },
+            {
+              "feature": "volume_score",
+              "value": 5.0,
+              "share_pct": 15.6
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "c773f3c70658f65e",
+          "candle_timestamp": "2026-07-07 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 49.0,
+          "actionability": "NOT_ACTIONABLE",
+          "ensemble_agreement_score": 88.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 49.1
+            },
+            {
+              "feature": "momentum_score",
+              "value": 19.0,
+              "share_pct": 33.3
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 10.5
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "0a09219f00e35fac",
+          "candle_timestamp": "2026-07-07 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 66.0,
+          "actionability": "WATCHLIST",
+          "ensemble_agreement_score": 100.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 43.1
+            },
+            {
+              "feature": "momentum_score",
+              "value": 21.0,
+              "share_pct": 32.3
+            },
+            {
+              "feature": "historical_edge_score",
+              "value": 8.0,
+              "share_pct": 12.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "c1076bda549a5f61",
+          "candle_timestamp": "2026-07-07 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 30.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 68.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 62.2
+            },
+            {
+              "feature": "momentum_score",
+              "value": 11.0,
+              "share_pct": 24.4
+            },
+            {
+              "feature": "structure_score",
+              "value": 3.0,
+              "share_pct": 6.7
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "a2775e3a287b70db",
+          "candle_timestamp": "2026-07-07 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 35.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 88.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 60.9
+            },
+            {
+              "feature": "momentum_score",
+              "value": 11.0,
+              "share_pct": 23.9
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 13.0
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "6a43591943ce3847",
+          "candle_timestamp": "2026-07-08 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 41.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 88.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 30.0,
+              "share_pct": 47.6
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 27.0
+            },
+            {
+              "feature": "structure_score",
+              "value": 7.0,
+              "share_pct": 11.1
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "590b7028829eaf1b",
+          "candle_timestamp": "2026-07-08 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 35.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 42.4
+            },
+            {
+              "feature": "momentum_score",
+              "value": 20.0,
+              "share_pct": 30.3
+            },
+            {
+              "feature": "historical_edge_score",
+              "value": -11.0,
+              "share_pct": 16.7
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "6a47ef8e8f85e111",
+          "candle_timestamp": "2026-07-09 00:00:00",
+          "symbol": "BTC/USDT",
+          "side": "SHORT",
+          "score": 46.0,
+          "actionability": "NOT_ACTIONABLE",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 40.0
+            },
+            {
+              "feature": "momentum_score",
+              "value": 25.0,
+              "share_pct": 35.7
+            },
+            {
+              "feature": "historical_edge_score",
+              "value": -11.0,
+              "share_pct": 15.7
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "efde5793295b9eb9",
+          "candle_timestamp": "2026-07-09 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 24.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 66.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 13.0,
+              "share_pct": 43.3
+            },
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 36.7
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 20.0
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "7a396aa24ec56b57",
+          "candle_timestamp": "2026-07-09 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 29.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 71.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 16.0,
+              "share_pct": 48.5
+            },
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 33.3
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 18.2
+            }
+          ],
+          "note": "high_agreement"
+        }
+      ],
+      "warnings": [
+        "Explainability سهم featureها را برای دیباگ نشان می‌دهد؛ به تنهایی سیگنال معاملاتی نیست."
+      ],
+      "blockers": []
+    },
+    "data_enrichment": {
+      "run_id": "data_enrichment_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.670492+00:00",
+      "status": "ENRICHMENT_CONNECTORS_PRESENT",
+      "features": [
+        {
+          "feature": "funding_rate",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "open_interest",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "long_short_ratio",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "liquidations",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "order_book_imbalance",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "exchange_inflow_outflow",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        }
+      ],
+      "connectors": {
+        "coinalyze_fetcher.py": true,
+        "futures_data_fetcher.py": true,
+        "news_sentiment.py": true,
+        "airdrop_radar.py": true
+      },
+      "recommendations": [
+        "Funding/Open Interest/Long-Short را اول به Shadow features اضافه کن، نه به decision live.",
+        "Order book برای تایم‌فریم 4h اولویت پایین‌تر از derivatives aggregate دارد."
+      ],
+      "warnings": [
+        "عدم وجود ستون یعنی feature هنوز در لاگ تصمیم‌ها persist نشده است، نه اینکه collector حتماً وجود ندارد."
+      ]
+    },
+    "regime_research": {
+      "run_id": "regime_research_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.671033+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "regimes": [],
+      "blockers": [
+        "Backtest data موجود نیست."
+      ]
+    },
+    "forward_regime_labeling": {
+      "run_id": "forward_regime_label_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.671046+00:00",
+      "status": "FORWARD_REGIME_LABELING_READY",
+      "apply_changes": false,
+      "decisions_path": "logs/decisions.csv",
+      "evaluations_path": "logs/decision_evaluations.csv",
+      "decision_rows": 48,
+      "known_before": 48,
+      "unknown_before": 0,
+      "known_after": 48,
+      "unknown_after": 0,
+      "injected_decision_rows": 0,
+      "preserved_decision_rows": 48,
+      "direct_engine_rows": 15,
+      "text_inferred_rows": 33,
+      "proxy_inferred_rows": 0,
+      "evaluation_rows": 46,
+      "patched_evaluation_rows": 0,
+      "evaluation_known_after": 46,
+      "label_counts": {
+        "TRENDING_BULL": 43,
+        "TRENDING_BEAR": 5
+      },
+      "evaluation_label_counts": {
+        "TRENDING_BULL": 43,
+        "TRENDING_BEAR": 3
+      },
+      "backup_paths": [],
+      "blockers": [],
+      "recommendations": [
+        "بعد از اجرای cycle جدید، regime_shadow_gate_dashboard.py --compact را دوباره بررسی کن."
+      ],
+      "warnings": [
+        "Regime injection فقط از داده‌های لحظه تصمیم استفاده می‌کند؛ outcome/return/target/stop استفاده نمی‌شود.",
+        "برچسب‌های LOW_CONF_PROXY برای Research هستند و باید در Forward واقعی بیشتر validate شوند."
+      ]
+    },
+    "regime_gate_matrix": {
+      "run_id": "regime_gate_matrix_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.675124+00:00",
+      "version": "v6.1.0",
+      "status": "NO_BACKTEST_DATA",
+      "horizon": "24h",
+      "min_samples": 10,
+      "candidate_min_samples": 30,
+      "fee_bps": 10.0,
+      "slippage_bps": 5.0,
+      "baseline_net": {
+        "samples": 0,
+        "avg_return_pct": 0.0,
+        "win_rate": 0.0,
+        "target_1_hit_rate": 0.0,
+        "stop_hit_rate": 0.0
+      },
+      "regimes_seen": [],
+      "gates_tested": 0,
+      "candidate_count": 0,
+      "regime_candidates": [],
+      "regime_gate_side_candidates": [],
+      "top_regime_gate": [],
+      "top_regime_gate_side": [],
+      "top_regime_side": [],
+      "top_regime_symbol": [],
+      "avoid_regimes": [],
+      "shadow_proposals": [],
+      "blockers": [
+        "هیچ historical_backtest_evaluations کامل برای ساخت Regime-Gate Matrix پیدا نشد."
+      ],
+      "warnings": [],
+      "recommendations": []
+    },
+    "regime_shadow_gates": {
+      "run_id": "shadow_gate_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.723063+00:00",
+      "status": "REGIME_SHADOW_GATES_ACTIVE",
+      "horizon": "24h",
+      "min_samples": 30,
+      "decisions": 48,
+      "directional_decisions": 28,
+      "shadow_signals": 16,
+      "evaluated_shadow_samples": 16,
+      "pending_shadow_samples": 0,
+      "gates_tracked": 11,
+      "confirmed_candidates": 0,
+      "building_candidates": 11,
+      "rejected_candidates": 0,
+      "top_gates": [
+        {
+          "gate": "STRUCTURE_SCORE_GE_10",
+          "family": "review_backtest_candidate",
+          "priority": 4,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 14,
+          "evaluated_samples": 14,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.8834,
+          "median_return_pct": 0.8142,
+          "win_rate": 100.0,
+          "target_1_hit_rate": 100.0,
+          "stop_hit_rate": 85.71,
+          "mfe_mean_pct": 3.4715,
+          "mae_mean_pct": -1.9449,
+          "mfe_mae_ratio": 1.785,
+          "best_return_pct": 1.7343,
+          "worst_return_pct": 0.4897,
+          "latest_signal_utc": "2026-07-03T22:12:37.322247+00:00",
+          "latest_candle_timestamp": "2026-07-03 20:00:00",
+          "description": "مثبت ولی نیازمند review: structure_score >= 10.",
+          "warnings": [
+            "Forward evaluated samples کمتر از حداقل 30 است: 14"
+          ],
+          "filters": {
+            "structure_score_min": 10
+          }
+        },
+        {
+          "gate": "HISTORICAL_EDGE_SCORE_GE_1",
+          "family": "primary_backtest_candidate",
+          "priority": 3,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 2,
+          "evaluated_samples": 2,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": -3.0511,
+          "median_return_pct": -3.0511,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 100.0,
+          "mfe_mean_pct": 0.4753,
+          "mae_mean_pct": -3.7369,
+          "mfe_mae_ratio": 0.127,
+          "best_return_pct": -2.8398,
+          "worst_return_pct": -3.2625,
+          "latest_signal_utc": "2026-07-07T15:40:48.725757+00:00",
+          "latest_candle_timestamp": "2026-07-07 12:00:00",
+          "description": "Backtest candidate با stop کمتر: historical_edge_score >= 1.",
+          "warnings": [
+            "Forward evaluated samples کمتر از حداقل 30 است: 2"
+          ],
+          "filters": {
+            "historical_edge_score_min": 1
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "risk_normalized_in": [
+              "MEDIUM"
+            ]
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium + SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "risk_normalized_in": [
+              "MEDIUM"
+            ],
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "structure_score_min": 10
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10 + SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "structure_score_min": 10,
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        },
+        {
+          "gate": "VOLUME_SCORE_GE_10",
+          "family": "primary_backtest_candidate",
+          "priority": 1,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "Backtest candidate قوی: volume_score >= 10.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "volume_score_min": 10
+          }
+        },
+        {
+          "gate": "RISK_MEDIUM",
+          "family": "primary_backtest_candidate",
+          "priority": 2,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "Backtest candidate با sample بیشتر: risk_label = Medium.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "risk_normalized_in": [
+              "MEDIUM"
+            ]
+          }
+        },
+        {
+          "gate": "SCORE_GE_80",
+          "family": "small_sample_positive",
+          "priority": 5,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "مثبت کم‌نمونه: score >= 80؛ فقط watchlist تحقیقاتی.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "score_min": 80
+          }
+        },
+        {
+          "gate": "DOGE_SHORT_WATCH",
+          "family": "symbol_side_watch",
+          "priority": 6,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "مثبت کم‌نمونه: DOGE/USDT SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "symbol_in": [
+              "DOGE/USDT"
+            ],
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        }
+      ],
+      "gate_metrics": [
+        {
+          "gate": "STRUCTURE_SCORE_GE_10",
+          "family": "review_backtest_candidate",
+          "priority": 4,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 14,
+          "evaluated_samples": 14,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.8834,
+          "median_return_pct": 0.8142,
+          "win_rate": 100.0,
+          "target_1_hit_rate": 100.0,
+          "stop_hit_rate": 85.71,
+          "mfe_mean_pct": 3.4715,
+          "mae_mean_pct": -1.9449,
+          "mfe_mae_ratio": 1.785,
+          "best_return_pct": 1.7343,
+          "worst_return_pct": 0.4897,
+          "latest_signal_utc": "2026-07-03T22:12:37.322247+00:00",
+          "latest_candle_timestamp": "2026-07-03 20:00:00",
+          "description": "مثبت ولی نیازمند review: structure_score >= 10.",
+          "warnings": [
+            "Forward evaluated samples کمتر از حداقل 30 است: 14"
+          ],
+          "filters": {
+            "structure_score_min": 10
+          }
+        },
+        {
+          "gate": "HISTORICAL_EDGE_SCORE_GE_1",
+          "family": "primary_backtest_candidate",
+          "priority": 3,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 2,
+          "evaluated_samples": 2,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": -3.0511,
+          "median_return_pct": -3.0511,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 100.0,
+          "mfe_mean_pct": 0.4753,
+          "mae_mean_pct": -3.7369,
+          "mfe_mae_ratio": 0.127,
+          "best_return_pct": -2.8398,
+          "worst_return_pct": -3.2625,
+          "latest_signal_utc": "2026-07-07T15:40:48.725757+00:00",
+          "latest_candle_timestamp": "2026-07-07 12:00:00",
+          "description": "Backtest candidate با stop کمتر: historical_edge_score >= 1.",
+          "warnings": [
+            "Forward evaluated samples کمتر از حداقل 30 است: 2"
+          ],
+          "filters": {
+            "historical_edge_score_min": 1
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "risk_normalized_in": [
+              "MEDIUM"
+            ]
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium + SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "risk_normalized_in": [
+              "MEDIUM"
+            ],
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "structure_score_min": 10
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10 + SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "structure_score_min": 10,
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        },
+        {
+          "gate": "VOLUME_SCORE_GE_10",
+          "family": "primary_backtest_candidate",
+          "priority": 1,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "Backtest candidate قوی: volume_score >= 10.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "volume_score_min": 10
+          }
+        },
+        {
+          "gate": "RISK_MEDIUM",
+          "family": "primary_backtest_candidate",
+          "priority": 2,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "Backtest candidate با sample بیشتر: risk_label = Medium.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "risk_normalized_in": [
+              "MEDIUM"
+            ]
+          }
+        },
+        {
+          "gate": "SCORE_GE_80",
+          "family": "small_sample_positive",
+          "priority": 5,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "مثبت کم‌نمونه: score >= 80؛ فقط watchlist تحقیقاتی.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "score_min": 80
+          }
+        },
+        {
+          "gate": "DOGE_SHORT_WATCH",
+          "family": "symbol_side_watch",
+          "priority": 6,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "مثبت کم‌نمونه: DOGE/USDT SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "symbol_in": [
+              "DOGE/USDT"
+            ],
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        },
+        {
+          "gate": "BNB_LONG_SCORE_GE_60",
+          "family": "symbol_side_watch",
+          "priority": 7,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "مثبت کم‌نمونه: BNB/USDT LONG + score>=60.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "symbol_in": [
+              "BNB/USDT"
+            ],
+            "side_in": [
+              "LONG"
+            ],
+            "score_min": 60
+          }
+        }
+      ],
+      "recent_signals": [
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T18:39:13.917697+00:00",
+          "candle_timestamp": "2026-07-03 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 63,
+          "selected_return_pct": 1.7091,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T18:43:17.296314+00:00",
+          "candle_timestamp": "2026-07-03 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 63,
+          "selected_return_pct": 1.7343,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T20:55:25.355921+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 56,
+          "selected_return_pct": 0.5531,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:01:16.119821+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 65,
+          "selected_return_pct": 0.562,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:11:58.699575+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 70,
+          "selected_return_pct": 0.4897,
+          "actionability": "ACTIONABLE",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:18:24.126801+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 68,
+          "selected_return_pct": 0.7856,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:31:55.569860+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 68,
+          "selected_return_pct": 0.8566,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:38:31.601977+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 67,
+          "selected_return_pct": 0.9276,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:45:51.573056+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 70,
+          "selected_return_pct": 0.8199,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:58:23.468112+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 72,
+          "selected_return_pct": 0.6401,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T22:05:21.173468+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 70,
+          "selected_return_pct": 0.7874,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T22:05:39.693647+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 70,
+          "selected_return_pct": 0.8457,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T22:09:19.852309+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 70,
+          "selected_return_pct": 0.8086,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T22:12:37.322247+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 70,
+          "selected_return_pct": 0.8479,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+          "gate_family": "primary_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-07T12:50:45.844155+00:00",
+          "candle_timestamp": "2026-07-07 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 49,
+          "selected_return_pct": -2.8398,
+          "actionability": "NOT_ACTIONABLE",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+          "gate_family": "primary_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-07T15:40:48.725757+00:00",
+          "candle_timestamp": "2026-07-07 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 66,
+          "selected_return_pct": -3.2625,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        }
+      ],
+      "blockers": [
+        "کل نمونه‌های ارزیابی‌شده Shadow کمتر از 30 است: 16"
+      ],
+      "recommendations": [
+        "Shadow هنوز در حال ساخت داده است؛ فعال‌ترین gate: STRUCTURE_SCORE_GE_10 | signals=14, evaluated=14.",
+        "برای هر gate حداقل 30 نمونه Forward کامل لازم است.",
+        "Regime Shadow gateهای v6.1 فعال شده‌اند، اما هنوز هیچ تصمیم Forward آن‌ها را پاس نکرده است.",
+        "سه gate پایه که باید زیر نظر بمانند: VOLUME_SCORE_GE_10، RISK_MEDIUM، HISTORICAL_EDGE_SCORE_GE_1."
+      ],
+      "warnings": [
+        "Shadow Gate هیچ Paper Trade و هیچ سفارش واقعی ایجاد نمی‌کند؛ فقط برچسب تحقیقاتی می‌زند.",
+        "Gateهای پایه از Backtest و Gateهای Regime از v6.1 Regime-Gate Matrix آمده‌اند و باید در Forward مستقل تأیید شوند.",
+        "تا وقتی هر gate، مخصوصاً gateهای Regime، حداقل 30 نمونه Forward کامل ندارد، نتیجه آماری قابل اتکا نیست."
+      ],
+      "regime_gate_metrics": [
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "risk_normalized_in": [
+              "MEDIUM"
+            ]
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium + SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "risk_normalized_in": [
+              "MEDIUM"
+            ],
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "structure_score_min": 10
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10 + SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "structure_score_min": 10,
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        }
+      ],
+      "regime_gate_count": 4,
+      "regime_gate_signals": 0
+    },
+    "cross_exchange_validation": {
+      "run_id": "cross_exchange_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.726336+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "providers": [],
+      "blockers": [
+        "Backtest data موجود نیست."
+      ]
+    },
+    "research_db": {
+      "run_id": "research_db_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.763473+00:00",
+      "status": "RESEARCH_DB_READY",
+      "db_path": "logs/research/freakto_research.db",
+      "tables": [
+        {
+          "table": "decision_evaluations",
+          "rows": 46,
+          "source": "logs/decision_evaluations.csv"
+        },
+        {
+          "table": "decisions",
+          "rows": 48,
+          "source": "logs/decisions.csv"
+        },
+        {
+          "table": "forward_test_runs",
+          "rows": 19,
+          "source": "logs/forward_test_runs.csv"
+        },
+        {
+          "table": "shadow_gate_signals",
+          "rows": 16,
+          "source": "logs/shadow_gates/shadow_gate_signals.csv"
+        }
+      ]
+    },
+    "pipeline_health": {
+      "run_id": "pipeline_health_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.770544+00:00",
+      "status": "PIPELINE_HEALTHY",
+      "alerts": [],
+      "latest_forward_run": {
+        "run_id": "forward_20260709_105336",
+        "started_utc": "2026-07-09T10:53:36.328443+00:00",
+        "finished_utc": "2026-07-09T10:54:31.879303+00:00",
+        "duration_seconds": "55.55",
+        "mode": "EXECUTE",
+        "ok": "True",
+        "task_count": "8",
+        "failed_tasks": "nan",
+        "report_file": "logs/forward_testing/forward_20260709_105336_report.md",
+        "hours_since_last_run": 0.02
+      },
+      "forward_eval_rows": 46,
+      "forward_regime_known_rows": 46,
+      "forward_regime_unknown_rows": 0,
+      "shadow_signal_rows": 16
+    },
+    "strict_readiness": {
+      "run_id": "strict_readiness_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.788560+00:00",
+      "status": "STRICT_READINESS_RESEARCH_ONLY",
+      "backtest_net": {
+        "samples": 0,
+        "avg_return_pct": 0.0,
+        "median_return_pct": 0.0,
+        "win_rate": 0.0,
+        "target_1_hit_rate": 0.0,
+        "stop_hit_rate": 0.0,
+        "mfe_mean_pct": 0.0,
+        "mae_mean_pct": 0.0,
+        "mfe_mae_ratio": 0.0,
+        "best_return_pct": 0.0,
+        "worst_return_pct": 0.0,
+        "std_return_pct": 0.0,
+        "t_stat": 0.0,
+        "confidence_95_low_pct": 0.0,
+        "confidence_95_high_pct": 0.0
+      },
+      "forward_net": {
+        "samples": 27,
+        "avg_return_pct": 0.2624,
+        "median_return_pct": 0.4901,
+        "win_rate": 81.48,
+        "target_1_hit_rate": 88.89,
+        "stop_hit_rate": 81.48,
+        "mfe_mean_pct": 2.9907,
+        "mae_mean_pct": -2.2745,
+        "mfe_mae_ratio": 1.315,
+        "best_return_pct": 1.6846,
+        "worst_return_pct": -3.4125,
+        "std_return_pct": 1.2355,
+        "t_stat": 1.1036,
+        "confidence_95_low_pct": -0.2036,
+        "confidence_95_high_pct": 0.7284
+      },
+      "regime_labels": [],
+      "btc_beta_check": {
+        "samples": 0,
+        "correlation_to_btc": 0.0,
+        "note": "insufficient_data"
+      },
+      "blockers": [
+        "Backtest sample کمتر از 100 است.",
+        "Backtest net expectancy از نظر CI95 بالای صفر نیست.",
+        "Forward complete samples کمتر از 30 است.",
+        "پوشش regime کافی نیست؛ حداقل دو رژیم معتبر لازم است."
+      ],
+      "warnings": [
+        "این readiness سخت‌گیرانه‌تر از نسخه‌های قبلی است و به تنهایی مجوز Live نیست."
+      ]
+    },
+    "position_sizing_lab": {
+      "run_id": "position_sizing_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.789084+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "rows": []
+    },
+    "airdrop_shadow_research": {
+      "run_id": "airdrop_shadow_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.789187+00:00",
+      "status": "AIRDROP_SHADOW_READY",
+      "items": [
+        {
+          "name": "Example Placeholder - Replace Me",
+          "score": 0,
+          "shadow_gates": "",
+          "cost_usd": 50.0,
+          "minutes": 90.0,
+          "token_status": "unknown",
+          "verdict": "WATCH_OR_IGNORE"
+        }
+      ],
+      "warnings": [
+        "Airdrop shadow فقط امتیازدهی تحقیقاتی است؛ نباید wallet connect یا signature خودکار انجام شود."
+      ]
+    },
+    "static_dashboard": {
+      "run_id": "static_dashboard_20260709_105434",
+      "generated_utc": "2026-07-09T10:54:34.791498+00:00",
+      "status": "STATIC_DASHBOARD_READY",
+      "html_path": "logs/research_dashboard/index.html"
+    }
+  },
+  "blockers": [
+    "gate_robustness: هیچ دیتای backtest کامل برای robust validation وجود ندارد.",
+    "cost_adjusted_backtest: Backtest data موجود نیست.",
+    "meta_labeling: برای meta-labeling حداقل 120 نمونه لازم است.",
+    "regime_research: Backtest data موجود نیست.",
+    "regime_gate_matrix: هیچ historical_backtest_evaluations کامل برای ساخت Regime-Gate Matrix پیدا نشد.",
+    "regime_shadow_gates: کل نمونه‌های ارزیابی‌شده Shadow کمتر از 30 است: 16",
+    "cross_exchange_validation: Backtest data موجود نیست.",
+    "strict_readiness: Backtest sample کمتر از 100 است.",
+    "strict_readiness: Backtest net expectancy از نظر CI95 بالای صفر نیست.",
+    "strict_readiness: Forward complete samples کمتر از 30 است.",
+    "strict_readiness: پوشش regime کافی نیست؛ حداقل دو رژیم معتبر لازم است."
+  ]
+}
