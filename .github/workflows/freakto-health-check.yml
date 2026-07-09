@@ -82,6 +82,11 @@ jobs:
         run: |
           python -X utf8 regime_gate_matrix_dashboard.py --compact || true
 
+      - name: Run v6.2.1 forward regime label check
+        if: always()
+        run: |
+          python -X utf8 forward_regime_label_dashboard.py --compact --dry-run || true
+
       - name: Run v6.2 regime shadow gate activator
         if: always()
         run: |

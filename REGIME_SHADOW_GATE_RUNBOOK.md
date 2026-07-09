@@ -49,3 +49,26 @@ MFE/MAE >= 1
 ## ایمنی
 
 v6.2 هیچ سفارش واقعی ارسال نمی‌کند و هیچ Paper Trade جدید ایجاد نمی‌کند. این نسخه فقط label/research/report می‌سازد.
+
+---
+
+## v6.2.1 — حل مشکل صفر بودن Regime Shadow Signal
+
+اگر خروجی focused نشان داد:
+
+```text
+Shadow Signals = 0
+```
+
+ممکن است Forward logها هنوز `regime_label` کافی نداشته باشند. Patch v6.2.1 این مشکل را با مرحله زیر حل می‌کند:
+
+```cmd
+python forward_regime_label_dashboard.py --compact
+```
+
+بعد از اجرای چند چرخه Forward جدید، انتظار داریم:
+
+```text
+Known Forward regime rows رشد کند
+Regime Shadow signals از صفر خارج شود
+```

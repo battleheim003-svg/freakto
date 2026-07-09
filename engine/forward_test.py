@@ -23,7 +23,7 @@ except Exception:  # pragma: no cover
     pd = None
 
 
-VERSION = "v5.3.3"
+VERSION = "v6.2.1"
 LOG_DIR = Path("logs")
 FORWARD_DIR = LOG_DIR / "forward_testing"
 RUNS_CSV = LOG_DIR / "forward_test_runs.csv"
@@ -188,10 +188,18 @@ def build_forward_test_plan(
         )
         tasks.append(
             ForwardTask(
+                name="forward_regime_label_injection",
+                command=_python_cmd("forward_regime_label_dashboard.py", "--compact"),
+                required=False,
+                description="تزریق/ترمیم regime_label و metadata قبل از decision_evaluator و Shadow Gates.",
+            )
+        )
+        tasks.append(
+            ForwardTask(
                 name="decision_evaluator",
                 command=_python_cmd("decision_evaluator.py"),
                 required=True,
-                description="به‌روزرسانی ارزیابی تصمیم‌ها با کندل‌های جدید.",
+                description="به‌روزرسانی ارزیابی تصمیم‌ها با کندل‌های جدید و کپی regime metadata.",
             )
         )
         tasks.append(
@@ -372,7 +380,7 @@ def build_forward_progress() -> ForwardProgress:
 
     if known_regime < TARGET_REGIME_LABELED:
         blockers.append(f"Regime-labeled samples کمتر از {TARGET_REGIME_LABELED} است: {known_regime}")
-        next_actions.append("چند اجرای جدید monitor.py --once پس از v4.7 لازم است تا regime_label وارد لاگ‌ها شود.")
+        next_actions.append("forward_regime_label_dashboard.py و چند اجرای جدید monitor.py --once پس از v6.2.1 لازم است تا regime_label وارد لاگ‌ها و evaluationها شود.")
     else:
         notes.append("Regime-labeled samples برای تحلیل اولیه کافی است.")
 

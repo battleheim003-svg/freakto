@@ -1,4 +1,4 @@
-"""Freakto v6.2.0 - Focused Regime Shadow Gate dashboard.
+"""Freakto v6.2.1 - Focused Regime Shadow Gate dashboard.
 
 This is a convenience CLI for operators who want to review only the new v6.1
 Regime-Gate Shadow activators without scrolling through every older base gate.

@@ -104,3 +104,28 @@ python regime_shadow_gate_dashboard.py --compact
 ```
 
 این مرحله هیچ Paper/Live ایجاد نمی‌کند.
+
+---
+
+## v6.2.1 — Forward Regime Label Injection در Cycle
+
+از v6.2.1 چرخه Forward این مرحله را قبل از `decision_evaluator` اجرا می‌کند:
+
+```text
+forward_regime_label_injection
+Command: python -X utf8 forward_regime_label_dashboard.py --compact
+```
+
+این مرحله ستون‌های زیر را در لاگ‌های Forward تضمین می‌کند:
+
+```text
+regime_label, regime_confidence, regime_source, regime_label_quality,
+trend_state, volatility_state, market_phase
+```
+
+تست دستی:
+
+```cmd
+python forward_regime_label_dashboard.py --compact
+python forward_test_dashboard.py --plan
+```

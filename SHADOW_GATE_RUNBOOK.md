@@ -100,3 +100,21 @@ python regime_shadow_gate_dashboard.py --compact
 ```
 
 این gateها فقط Shadow هستند و هیچ اثری روی Paper/Live ندارند.
+
+---
+
+## v6.2.1 — پیش‌نیاز Regime Shadow Gate
+
+اگر Regime Shadow Gateها signal صفر دارند، اول این دستور را اجرا کن:
+
+```cmd
+python forward_regime_label_dashboard.py --compact
+```
+
+بعد دوباره چک کن:
+
+```cmd
+python regime_shadow_gate_dashboard.py --compact
+```
+
+بدون `regime_label` قابل‌اعتماد، gateهایی مثل `REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT` نمی‌توانند signal بگیرند.

@@ -1,7 +1,7 @@
 """Repair/migrate logs/decisions.csv to the current Freakto header.
 
 Useful after upgrading from older releases whose decision log had fewer columns.
-This script preserves common fields and rewrites the CSV with the v5.1.2-safe
+This script preserves common fields and rewrites the CSV with the v6.2.1-safe
 header so pandas-based tools can read it again.
 """
 
@@ -43,6 +43,11 @@ CURRENT_HEADER = [
     "regime_label",
     "regime_confidence",
     "regime_adjustment",
+    "regime_source",
+    "regime_label_quality",
+    "trend_state",
+    "volatility_state",
+    "market_phase",
     "long_score",
     "short_score",
     "reasons",
@@ -53,7 +58,7 @@ CURRENT_HEADER = [
 
 def main() -> None:
     print("=" * 110)
-    print("🛠️ Freakto Decision Log Repair v5.1.2")
+    print("🛠️ Freakto Decision Log Repair v6.2.1")
     print("=" * 110)
 
     if not LOG_FILE.exists():
@@ -76,7 +81,7 @@ def main() -> None:
 
     print(f"Backup     : {backup}")
     print(f"New columns: {len(merged_header)}")
-    print("OK: decisions.csv repaired/migrated for pandas-safe evaluation.")
+    print("OK: decisions.csv repaired/migrated with v6.2.1 regime metadata columns.")
     print("=" * 110)
 
 

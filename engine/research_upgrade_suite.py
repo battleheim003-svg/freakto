@@ -1,5 +1,5 @@
 """
-Freakto v6.2.0 - Research Robustness & Regime Shadow Intelligence Suite
+Freakto v6.2.1 - Research Robustness & Forward Regime Intelligence Suite
 
 Implements the 11 requested improvement areas in research-only mode:
 1) Gate robustness / multiple-testing guard / walk-forward / embargo proxy
@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v6.2.0"
+VERSION = "v6.2.1"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 
@@ -523,13 +523,23 @@ def run_pipeline_health(max_hours_without_run: float = 8.0) -> Dict[str, Any]:
         except Exception:
             alerts.append("زمان آخرین Forward Run قابل parse نیست.")
     evals = read_csv_df(FORWARD_EVALS)
+    regime_known = 0
+    regime_unknown = 0
     if evals.empty:
         alerts.append("decision_evaluations.csv خالی یا موجود نیست.")
+    elif "regime_label" in evals.columns:
+        labels = evals["regime_label"].fillna("UNKNOWN").astype(str).str.strip().str.upper().replace({"": "UNKNOWN", "NAN": "UNKNOWN", "NONE": "UNKNOWN"})
+        regime_known = int((labels != "UNKNOWN").sum())
+        regime_unknown = int((labels == "UNKNOWN").sum())
+        if regime_known == 0:
+            alerts.append("decision_evaluations.csv هنوز هیچ regime_label شناخته‌شده ندارد؛ v6.2.1 injection/evaluator را بررسی کن.")
+    else:
+        alerts.append("decision_evaluations.csv ستون regime_label ندارد؛ v6.2.1 injection لازم است.")
     shadow = read_csv_df(SHADOW_SIGNALS)
     if shadow.empty:
         alerts.append("shadow_gate_signals.csv هنوز ساخته نشده یا خالی است.")
     status = "PIPELINE_HEALTHY" if not alerts else "PIPELINE_ATTENTION_REQUIRED"
-    return {"run_id": run_id("pipeline_health"), "generated_utc": utc_now_iso(), "status": status, "alerts": alerts, "latest_forward_run": latest, "forward_eval_rows": len(evals), "shadow_signal_rows": len(shadow)}
+    return {"run_id": run_id("pipeline_health"), "generated_utc": utc_now_iso(), "status": status, "alerts": alerts, "latest_forward_run": latest, "forward_eval_rows": len(evals), "forward_regime_known_rows": regime_known, "forward_regime_unknown_rows": regime_unknown, "shadow_signal_rows": len(shadow)}
 
 
 def run_static_dashboard(summary: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -761,6 +771,7 @@ def _shadow_report_to_dict(report: Any) -> Dict[str, Any]:
 def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
     from engine.regime_gate_matrix import run_regime_gate_matrix
     from engine.shadow_gates import run_shadow_gate_validation
+    from engine.forward_regime_labeling import run_forward_regime_labeling
 
     sections = {
         "gate_robustness": run_gate_robustness(),
@@ -769,6 +780,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "ensemble_explainability": run_ensemble_explainability(),
         "data_enrichment": run_data_enrichment_readiness(),
         "regime_research": run_regime_research(),
+        "forward_regime_labeling": asdict(run_forward_regime_labeling(apply_changes=False)),
         "regime_gate_matrix": run_regime_gate_matrix(),
         "regime_shadow_gates": _shadow_report_to_dict(run_shadow_gate_validation()),
         "cross_exchange_validation": run_cross_exchange_validation(),
@@ -817,6 +829,10 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         for r in (rgm.get("regime_candidates", []) + rgm.get("regime_gate_side_candidates", []))[:5]:
             label = f"{r.get('regime')} × {r.get('gate')}" + (f" × {r.get('side')}" if r.get('side') else "")
             lines.append(f"- {label}: n={r.get('samples')} | net={r.get('net_avg_pct')}% | verdict={r.get('verdict')}")
+    frl = report.get("sections", {}).get("forward_regime_labeling", {})
+    if frl:
+        lines.append("\nForward Regime Labeling:")
+        lines.append(f"- {frl.get('status')} | known={frl.get('known_after')} | unknown={frl.get('unknown_after')} | injected={frl.get('injected_decision_rows')}")
     rsg = report.get("sections", {}).get("regime_shadow_gates", {})
     if rsg:
         lines.append("\nRegime Shadow Gate Highlights:")
@@ -837,7 +853,7 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nSuite Blockers:")
         for b in report.get("blockers", [])[:12]:
             lines.append(f"⛔ {b}")
-    lines.append("\nSafety: هیچ بخش v6/v6.1/v6.2 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
+    lines.append("\nSafety: هیچ بخش v6/v6.1/v6.2/v6.2.1 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
     lines.append(sep)
     return "\n".join(lines)
 

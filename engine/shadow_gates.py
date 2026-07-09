@@ -1,7 +1,7 @@
 """
 engine/shadow_gates.py
 
-Freakto v6.2.0 - Candidate + Regime Shadow Gate Activator
+Freakto v6.2.1 - Candidate + Regime Shadow Gate Activator
 
 Purpose:
 - Take the best research gates found by Backtest Gate Simulator.
@@ -29,7 +29,7 @@ import pandas as pd
 from engine.csv_utils import read_csv_dicts_lenient
 
 
-VERSION = "v6.2.0"
+VERSION = "v6.2.1"
 LOG_DIR = Path("logs")
 DECISIONS_FILE = LOG_DIR / "decisions.csv"
 EVALUATIONS_FILE = LOG_DIR / "decision_evaluations.csv"
@@ -199,6 +199,12 @@ def _prepare_decisions(df: pd.DataFrame) -> pd.DataFrame:
         "actionability": "",
         "is_actionable": "",
         "regime_label": "",
+        "regime_confidence": "",
+        "regime_source": "",
+        "regime_label_quality": "",
+        "trend_state": "",
+        "volatility_state": "",
+        "market_phase": "",
         "trend_score": 0,
         "momentum_score": 0,
         "volume_score": 0,

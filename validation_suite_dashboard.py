@@ -11,10 +11,11 @@ Runs validation + risk intelligence together:
 8) Historical Backtest Status
 9) Backtest Diagnostics
 10) Backtest Gate Simulator
-11) Regime Shadow Gate Activator
-12) Regime-Split Gate Matrix
-13) Research Robustness & Intelligence Suite
-14) Advanced Live Readiness Score
+11) Forward Regime Label Injection
+12) Regime Shadow Gate Activator
+13) Regime-Split Gate Matrix
+14) Research Robustness & Intelligence Suite
+15) Advanced Live Readiness Score
 """
 
 import argparse
@@ -39,6 +40,7 @@ from engine.backtest_gate_simulator import run_gate_simulation, format_gate_simu
 from engine.shadow_gates import run_shadow_gate_validation, format_shadow_gate_console, save_shadow_gate_validation
 from engine.research_upgrade_suite import run_full_research_suite, format_full_suite_console, save_full_suite
 from engine.regime_gate_matrix import run_regime_gate_matrix, format_regime_gate_matrix_console, save_regime_gate_matrix
+from engine.forward_regime_labeling import run_forward_regime_labeling, format_forward_regime_label_console, save_forward_regime_labeling
 from telegram_notifier import send_telegram_message
 
 SUITE_DIR = Path("logs") / "validation_suite"
@@ -67,6 +69,7 @@ def main():
     backtest_summary = load_all_backtest_summary()
     backtest_diag = run_backtest_diagnostics()
     gate_sim = run_gate_simulation()
+    forward_regime_labeling = run_forward_regime_labeling(apply_changes=False)
     shadow_gates = run_shadow_gate_validation()
     regime_gate_matrix = run_regime_gate_matrix()
     research_suite = run_full_research_suite(save=False)
@@ -82,12 +85,13 @@ def main():
     backtest_text = format_backtest_summary_console(backtest_summary)
     backtest_diag_text = format_backtest_diagnostics_console(backtest_diag, detail=False)
     gate_sim_text = format_gate_simulation_console(gate_sim, detail=False, top=8)
+    forward_regime_label_text = format_forward_regime_label_console(forward_regime_labeling, compact=True)
     shadow_gate_text = format_shadow_gate_console(shadow_gates, detail=False, top=8)
     regime_gate_matrix_text = format_regime_gate_matrix_console(regime_gate_matrix, compact=True)
     research_suite_text = format_full_suite_console(research_suite)
     readiness_text = format_advanced_readiness_console(readiness)
 
-    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, gate_sim_text, shadow_gate_text, regime_gate_matrix_text, research_suite_text, readiness_text])
+    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, gate_sim_text, forward_regime_label_text, shadow_gate_text, regime_gate_matrix_text, research_suite_text, readiness_text])
     print(combined)
 
     metric_report = save_metric_definitions_report()
@@ -99,6 +103,7 @@ def main():
     forward_json, forward_report = save_forward_progress(forward_progress)
     backtest_diag_json, backtest_diag_report = save_backtest_diagnostics(backtest_diag)
     gate_sim_json, gate_sim_report, gate_sim_csv = save_gate_simulation(gate_sim)
+    frl_json, frl_report = save_forward_regime_labeling(forward_regime_labeling)
     shadow_json, shadow_report, shadow_metrics_csv, shadow_signals_csv = save_shadow_gate_validation(shadow_gates)
     rgm_json, rgm_report, rgm_csv, rgm_side_csv, rgm_avoid_csv, rgm_proposals = save_regime_gate_matrix(regime_gate_matrix)
     research_suite_json, research_suite_report = save_full_suite(research_suite)
@@ -123,6 +128,8 @@ def main():
     print(f"🧪 Gate simulator JSON ذخیره شد: {gate_sim_json}")
     print(f"📝 Gate simulator report ذخیره شد: {gate_sim_report}")
     print(f"📊 Gate simulator CSV ذخیره شد: {gate_sim_csv}")
+    print(f"🧬 Forward regime labeling JSON ذخیره شد: {frl_json}")
+    print(f"📝 Forward regime labeling report ذخیره شد: {frl_report}")
     print(f"🧪 Shadow gate JSON ذخیره شد: {shadow_json}")
     print(f"📝 Shadow gate report ذخیره شد: {shadow_report}")
     print(f"📊 Shadow gate metrics ذخیره شد: {shadow_metrics_csv}")

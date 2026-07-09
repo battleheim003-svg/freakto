@@ -276,3 +276,22 @@ python freakto_research_suite_dashboard.py
 ```
 
 هنوز Live/Paper فعال نیست. هدف فقط جمع‌آوری Forward sample برای Regime Shadow Gates است.
+
+---
+
+## v6.2.1 — Forward Regime Label Injection Patch
+
+بعد از v6.2 اگر `regime_shadow_gate_dashboard.py` هیچ signal نشان نداد، ابتدا مطمئن شو Forward logs واقعاً regime metadata دارند:
+
+```cmd
+python forward_regime_label_dashboard.py --compact
+python regime_shadow_gate_dashboard.py --compact
+```
+
+در Forward Cycle جدید، مرحله زیر به‌صورت خودکار اضافه شده است:
+
+```text
+forward_regime_label_injection
+```
+
+هدف این است که `regime_label` و metadata آن وارد `decisions.csv` و `decision_evaluations.csv` شود تا gateهای Regime-specific بتوانند در Forward واقعی sample جمع کنند.

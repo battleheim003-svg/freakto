@@ -98,3 +98,15 @@ python shadow_gate_dashboard.py --compact
 python regime_shadow_gate_dashboard.py --compact
 python freakto_research_suite_dashboard.py
 ```
+
+---
+
+## v6.2.1 — Forward Regime Labeling در Research Suite
+
+Research Suite از v6.2.1 بخش جدیدی دارد:
+
+```text
+forward_regime_labeling
+```
+
+این بخش به‌صورت dry-run نشان می‌دهد چند decision/evaluation دارای regime قابل‌استفاده هستند و چند ردیف هنوز UNKNOWN مانده‌اند.
