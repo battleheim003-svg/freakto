@@ -1,0 +1,93 @@
+name: Freakto Market Replay v10
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbols:
+        description: "Comma-separated symbols"
+        required: true
+        default: "BTC/USDT,ETH/USDT,SOL/USDT"
+      timeframe:
+        description: "Replay timeframe"
+        required: true
+        default: "4h"
+      years:
+        description: "Historical years"
+        required: true
+        default: "3"
+      step:
+        description: "Replay every N candles"
+        required: true
+        default: "6"
+      force_refresh:
+        description: "Ignore existing cache"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
+concurrency:
+  group: freakto-market-replay
+  cancel-in-progress: false
+
+jobs:
+  market-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Compile v10 modules
+        run: |
+          python -m py_compile engine/historical_data_store.py engine/market_replay.py market_replay_dashboard.py
+
+      - name: Run tests
+        run: |
+          python -m unittest tests.test_market_replay
+
+      - name: Build data and replay
+        shell: bash
+        run: |
+          EXTRA=""
+          if [ "${{ inputs.force_refresh }}" = "true" ]; then EXTRA="--force-refresh"; fi
+          python -X utf8 market_replay_dashboard.py --full \
+            --symbols "${{ inputs.symbols }}" \
+            --timeframe "${{ inputs.timeframe }}" \
+            --years "${{ inputs.years }}" \
+            --step "${{ inputs.step }}" \
+            --compact $EXTRA
+
+      - name: Upload replay artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freakto-market-replay-${{ github.run_id }}
+          if-no-files-found: warn
+          retention-days: 30
+          path: |
+            data/market_replay/**/*.csv.gz
+            data/market_replay/**/*.json
+            logs/market_replay/**/*.csv
+            logs/market_replay/**/*.json
+            logs/market_replay/**/*.md

@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v8.2.0"
+VERSION = "v10.0.0"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 
@@ -781,6 +781,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
     from engine.root_cause_forward_validation import run_root_cause_forward_validation
     from engine.root_cause_sample_tracker import run_root_cause_sample_tracker
     from engine.evidence_graph import run_evidence_graph
+    from engine.market_replay import load_market_replay_status
 
     sections = {
         "gate_robustness": run_gate_robustness(),
@@ -801,6 +802,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "root_cause_forward_validation": asdict(run_root_cause_forward_validation()),
         "root_cause_sample_tracker": asdict(run_root_cause_sample_tracker()),
         "evidence_graph": asdict(run_evidence_graph()),
+        "market_replay": asdict(load_market_replay_status()),
         "cross_exchange_validation": run_cross_exchange_validation(),
         "research_db": run_research_db_export(),
         "pipeline_health": run_pipeline_health(),
@@ -879,6 +881,11 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nNarrative/Decision Conflict:")
         lines.append(f"- {ndc.get('status')} | side={ndc.get('decision_side')} | narrative={ndc.get('narrative_direction')} | alignment={ndc.get('narrative_alignment')}")
         lines.append(f"- conflict={ndc.get('narrative_conflict_score')}/100 | adj={ndc.get('narrative_adjustment')} | verdict={ndc.get('narrative_decision_verdict')}")
+    mr = report.get("sections", {}).get("market_replay", {})
+    if mr:
+        lines.append("\nMarket Replay v10:")
+        lines.append(f"- {mr.get('status')} | rows={mr.get('total_rows')} | complete={mr.get('complete_rows')} | directional={mr.get('directional_rows')}")
+        lines.append(f"- test/research audit={mr.get('leakage_audit_status')} | avg_net24={mr.get('avg_net_24h_pct')}% | PF={mr.get('profit_factor_24h')}")
     rcd = report.get("sections", {}).get("root_cause_discovery", {})
     if rcd:
         lines.append("\nRoot Cause Discovery:")
@@ -904,7 +911,7 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nSuite Blockers:")
         for b in report.get("blockers", [])[:12]:
             lines.append(f"⛔ {b}")
-    lines.append("\nSafety: هیچ بخش v6/v7/v8 سفارش واقعی ارسال نمی‌کند و Paper Trade جدید ایجاد نمی‌کند.")
+    lines.append("\nSafety: هیچ بخش v6 تا v10 سفارش واقعی ارسال نمی‌کند؛ Market Replay نیز فقط Research/Backtest است.")
     lines.append(sep)
     return "\n".join(lines)
 

@@ -420,3 +420,17 @@ UnicodeDecodeError: 'utf-8' codec can't decode byte 0xb6
 ```
 
 یعنی نسخه قدیمی `scripts/github_actions_restore_logs.py` هنوز روی GitHub است یا patch درست push نشده. نسخه v5.2.3 را نصب کن، commit بزن، push کن و دوباره Health Check را اجرا کن.
+
+---
+
+## v10 — اجرای دستی Market Replay در GitHub Actions
+
+Workflow زیر فقط با `workflow_dispatch` اجرا می‌شود و به‌صورت زمان‌بندی‌شده فعال نیست:
+
+```text
+.github/workflows/freakto-market-replay.yml
+```
+
+در تب Actions، `Freakto Market Replay v10` را انتخاب کن و Symbols، Timeframe، Years و Step را وارد کن. Dataset و گزارش‌ها به‌صورت Artifact ذخیره می‌شوند.
+
+برای Replay سه‌ساله‌ی کامل، اجرای لوکال معمولاً پایدارتر است؛ بعضی صرافی‌ها ممکن است IP دیتاسنتر GitHub را محدود کنند. شکست یک Provider به معنی خرابی موتور نیست و باید Source attempts و data-quality report بررسی شود.

@@ -490,7 +490,11 @@ def run_historical_backtest(config: HistoricalBacktestConfig) -> Tuple[Historica
     from features import add_features
     from engine.decision import DecisionEngine
 
-    engine = DecisionEngine(min_side_score=config.min_side_score)
+    engine = DecisionEngine(
+        min_side_score=config.min_side_score,
+        allow_learning_overrides=False,
+        allow_historical_edge=False,
+    )
 
     for symbol in config.symbols:
         try:

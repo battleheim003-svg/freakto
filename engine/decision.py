@@ -17,8 +17,20 @@ from .score import OpportunityV2, confidence_label, _zones
 
 
 class DecisionEngine:
-    def __init__(self, min_side_score: int = 50):
+    def __init__(
+        self,
+        min_side_score: int = 50,
+        *,
+        allow_learning_overrides: bool = True,
+        allow_historical_edge: bool = True,
+    ):
         self.min_side_score = min_side_score
+        # Market Replay disables both switches.  Their persisted files may
+        # contain information learned after the historical candle and would
+        # otherwise create silent look-ahead leakage.  Live/Forward behavior
+        # remains unchanged because both options default to True.
+        self.allow_learning_overrides = bool(allow_learning_overrides)
+        self.allow_historical_edge = bool(allow_historical_edge)
 
     def analyze(self, df: pd.DataFrame, symbol: str, timeframe: str) -> OpportunityV2:
         required = [
@@ -129,6 +141,9 @@ class DecisionEngine:
                 "onchain_signal_score": safe_float(row.get("onchain_signal_score"), 0.0),
                 "onchain_status": str(row.get("onchain_status", "") or ""),
                 "engine": "DecisionEngine",
+                "allow_learning_overrides": self.allow_learning_overrides,
+                "allow_historical_edge": self.allow_historical_edge,
+                "replay_safe": not self.allow_learning_overrides and not self.allow_historical_edge,
             },
         )
         rr = calculate_risk_reward(opportunity)
@@ -217,12 +232,13 @@ class DecisionEngine:
             score_external_context(row, side),
         ]
 
-        components, learning_state, learning_component = apply_learning_overrides(components)
+        if self.allow_learning_overrides:
+            components, learning_state, learning_component = apply_learning_overrides(components)
 
-        # Learning Override در v3.3 فقط وقتی فایل staging وجود داشته باشد در Breakdown دیده می‌شود.
-        # اگر فعال نباشد، امتیاز آن صفر است و فقط دلیل/هشدار ایمنی گزارش می‌شود.
-        if learning_state.exists:
-            components.append(learning_component)
+            # Learning Override در v3.3 فقط وقتی فایل staging وجود داشته باشد در Breakdown دیده می‌شود.
+            # اگر فعال نباشد، امتیاز آن صفر است و فقط دلیل/هشدار ایمنی گزارش می‌شود.
+            if learning_state.exists:
+                components.append(learning_component)
 
         adaptive_adjustment = score_adaptive_adjustment(
             components=components,
@@ -234,14 +250,23 @@ class DecisionEngine:
 
         base_score = max(0, min(100, int(sum(component.points for component in components))))
 
-        historical_edge = score_historical_edge(
-            symbol=symbol,
-            timeframe=timeframe,
-            side=side,
-            components=components,
-            base_score=base_score,
-            current_timestamp=str(latest_timestamp),
-        )
+        if self.allow_historical_edge:
+            historical_edge = score_historical_edge(
+                symbol=symbol,
+                timeframe=timeframe,
+                side=side,
+                components=components,
+                base_score=base_score,
+                current_timestamp=str(latest_timestamp),
+            )
+        else:
+            historical_edge = ScoreComponent(
+                name="Historical Edge",
+                points=0,
+                max_points=8,
+                reasons=[],
+                warnings=[],
+            )
 
         components.append(historical_edge)
 

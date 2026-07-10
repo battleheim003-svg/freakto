@@ -19,3 +19,6 @@ paper_trading_log.json
 .DS_Store
 .vscode/
 .idea/
+
+# v10 generated historical market cache
+/data/market_replay/

@@ -1,3 +1,27 @@
+# v10 Migration Note — Market Replay جایگزین مسیر اصلی Historical Research
+
+فایل `historical_backtest_dashboard.py` برای سازگاری با خروجی‌های قدیمی باقی مانده است، اما برای داده‌ی ۲ تا ۳ ساله و Replay دقیق باید از دستور زیر استفاده شود:
+
+```cmd
+python -X utf8 market_replay_dashboard.py --full --symbols BTC/USDT,ETH/USDT,SOL/USDT --timeframe 4h --years 3 --step 1
+```
+
+تفاوت‌های v10:
+
+- Pagination چندساله به‌جای limit تک‌درخواست؛
+- Cache محلی فشرده؛
+- Gap/Coverage validation؛
+- Checkpoint/Resume؛
+- Learning Override و Historical Edge خاموش در گذشته؛
+- No-lookahead audit؛
+- Train/Validation/Test زمانی؛
+- Fee و Slippage؛
+- برخورد محافظه‌کارانه با Stop/Target همزمان.
+
+راهنمای اصلی: `MARKET_REPLAY_RUNBOOK.md`
+
+---
+
 # Freakto v5.3 Historical Backfill & Backtest Runbook
 
 این بخش برای استفاده از دیتای گذشته ساخته شده است، اما خروجی آن عمداً از Forward Test جدا ذخیره می‌شود.

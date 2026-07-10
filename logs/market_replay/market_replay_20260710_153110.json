@@ -1,0 +1,341 @@
+{
+  "run": {
+    "run_id": "market_replay_20260710_153110",
+    "version": "v10.0.0",
+    "started_utc": "2026-07-10T15:31:10.222167+00:00",
+    "finished_utc": "2026-07-10T15:31:55.827120+00:00",
+    "ok": true,
+    "config": {
+      "symbols": [
+        "BTC/USDT"
+      ],
+      "timeframe": "4h",
+      "start_utc": "",
+      "end_utc": "",
+      "data_dir": "data\\market_replay",
+      "min_window": 120,
+      "step": 1,
+      "min_side_score": 50,
+      "horizons": [
+        1,
+        3,
+        6
+      ],
+      "include_neutral": true,
+      "max_decisions_per_symbol": 0,
+      "fee_bps_per_side": 10.0,
+      "slippage_bps_per_side": 5.0,
+      "context_file": "data/market_replay_context.csv",
+      "context_max_age_hours": 24.0,
+      "checkpoint_every": 250,
+      "strict_leakage_audit": true,
+      "source": "MARKET_REPLAY"
+    },
+    "symbol_results": [
+      {
+        "symbol": "BTC/USDT",
+        "timeframe": "4h",
+        "ok": true,
+        "provider": "kucoin",
+        "candles_loaded": 6577,
+        "candles_in_range": 6577,
+        "decisions_written": 6451,
+        "first_decision_utc": "2023-07-30T12:00:00+00:00",
+        "last_decision_utc": "2026-07-09T12:00:00+00:00",
+        "leakage_audit": {
+          "status": "PASSED_NO_LOOKAHEAD",
+          "points_checked": 3,
+          "feature_values_checked": 21,
+          "mismatches": 0,
+          "max_abs_difference": 0.0,
+          "details": []
+        },
+        "error": ""
+      }
+    ],
+    "output_csv": "logs\\market_replay\\market_replay_20260710_153110.csv",
+    "output_json": "logs\\market_replay\\market_replay_20260710_153110.json",
+    "output_report": "logs\\market_replay\\market_replay_20260710_153110_report.md",
+    "checkpoint_path": "logs\\market_replay\\checkpoints\\market_replay_20260710_153110.json",
+    "error_count": 0
+  },
+  "summary": {
+    "run_id": "market_replay_20260710_153110",
+    "version": "v10.0.0",
+    "status": "REPLAY_RESEARCH_NOT_VALIDATED",
+    "mode": "REPLAY_SAFE_TECHNICAL_CORE",
+    "symbols_requested": 1,
+    "symbols_completed": 1,
+    "total_candles": 6577,
+    "total_rows": 6451,
+    "complete_rows": 6451,
+    "directional_rows": 2527,
+    "actionable_rows": 371,
+    "neutral_rows": 3924,
+    "win_rate_24h_pct": 40.92,
+    "avg_gross_24h_pct": 0.037458,
+    "avg_net_24h_pct": -0.262542,
+    "profit_factor_24h": 0.746,
+    "leakage_audit_status": "PASSED_NO_LOOKAHEAD",
+    "historical_context_mode": "TIMESTAMPED_CONTEXT_FILE",
+    "evaluation_horizon_candles": 6,
+    "evaluation_horizon_label": "1d",
+    "by_split": [
+      {
+        "rows": 3870,
+        "directional_rows": 1526,
+        "complete_rows": 3870,
+        "win_rate_24h_pct": 39.84,
+        "avg_gross_24h_pct": 0.025684,
+        "avg_net_24h_pct": -0.274316,
+        "median_net_24h_pct": -0.430688,
+        "target_1_hit_rate_pct": 50.66,
+        "stop_hit_rate_pct": 42.6,
+        "profit_factor_24h": 0.7462,
+        "max_drawdown_proxy_pct": -470.250106,
+        "replay_split": "TRAIN_60"
+      },
+      {
+        "rows": 1291,
+        "directional_rows": 523,
+        "complete_rows": 1291,
+        "win_rate_24h_pct": 40.92,
+        "avg_gross_24h_pct": -0.110723,
+        "avg_net_24h_pct": -0.410723,
+        "median_net_24h_pct": -0.468611,
+        "target_1_hit_rate_pct": 53.92,
+        "stop_hit_rate_pct": 39.58,
+        "profit_factor_24h": 0.6276,
+        "max_drawdown_proxy_pct": -224.847112,
+        "replay_split": "TEST_20"
+      },
+      {
+        "rows": 1290,
+        "directional_rows": 478,
+        "complete_rows": 1290,
+        "win_rate_24h_pct": 44.35,
+        "avg_gross_24h_pct": 0.237177,
+        "avg_net_24h_pct": -0.062823,
+        "median_net_24h_pct": -0.25168,
+        "target_1_hit_rate_pct": 55.65,
+        "stop_hit_rate_pct": 37.24,
+        "profit_factor_24h": 0.9221,
+        "max_drawdown_proxy_pct": -109.896059,
+        "replay_split": "VALIDATION_20"
+      }
+    ],
+    "by_symbol": [
+      {
+        "rows": 6451,
+        "directional_rows": 2527,
+        "complete_rows": 6451,
+        "win_rate_24h_pct": 40.92,
+        "avg_gross_24h_pct": 0.037458,
+        "avg_net_24h_pct": -0.262542,
+        "median_net_24h_pct": -0.418269,
+        "target_1_hit_rate_pct": 52.28,
+        "stop_hit_rate_pct": 40.96,
+        "profit_factor_24h": 0.746,
+        "max_drawdown_proxy_pct": -707.906612,
+        "symbol": "BTC/USDT"
+      }
+    ],
+    "by_side": [
+      {
+        "rows": 3924,
+        "directional_rows": 0,
+        "complete_rows": 3924,
+        "win_rate_24h_pct": 0.0,
+        "avg_gross_24h_pct": 0.0,
+        "avg_net_24h_pct": 0.0,
+        "median_net_24h_pct": 0.0,
+        "target_1_hit_rate_pct": 0.0,
+        "stop_hit_rate_pct": 0.0,
+        "profit_factor_24h": 0.0,
+        "max_drawdown_proxy_pct": 0.0,
+        "side": "NEUTRAL"
+      },
+      {
+        "rows": 1356,
+        "directional_rows": 1356,
+        "complete_rows": 1356,
+        "win_rate_24h_pct": 43.22,
+        "avg_gross_24h_pct": 0.193166,
+        "avg_net_24h_pct": -0.106834,
+        "median_net_24h_pct": -0.28605,
+        "target_1_hit_rate_pct": 51.7,
+        "stop_hit_rate_pct": 39.09,
+        "profit_factor_24h": 0.8781,
+        "max_drawdown_proxy_pct": -246.541855,
+        "side": "LONG"
+      },
+      {
+        "rows": 1171,
+        "directional_rows": 1171,
+        "complete_rows": 1171,
+        "win_rate_24h_pct": 38.26,
+        "avg_gross_24h_pct": -0.14285,
+        "avg_net_24h_pct": -0.44285,
+        "median_net_24h_pct": -0.566049,
+        "target_1_hit_rate_pct": 52.95,
+        "stop_hit_rate_pct": 43.13,
+        "profit_factor_24h": 0.6357,
+        "max_drawdown_proxy_pct": -585.715244,
+        "side": "SHORT"
+      }
+    ],
+    "by_regime": [
+      {
+        "rows": 2480,
+        "directional_rows": 1252,
+        "complete_rows": 2480,
+        "win_rate_24h_pct": 43.21,
+        "avg_gross_24h_pct": 0.19611,
+        "avg_net_24h_pct": -0.10389,
+        "median_net_24h_pct": -0.279445,
+        "target_1_hit_rate_pct": 51.84,
+        "stop_hit_rate_pct": 38.1,
+        "profit_factor_24h": 0.8805,
+        "max_drawdown_proxy_pct": -210.299355,
+        "regime_label": "TRENDING_BULL"
+      },
+      {
+        "rows": 2049,
+        "directional_rows": 1028,
+        "complete_rows": 2049,
+        "win_rate_24h_pct": 38.23,
+        "avg_gross_24h_pct": -0.123892,
+        "avg_net_24h_pct": -0.423892,
+        "median_net_24h_pct": -0.568958,
+        "target_1_hit_rate_pct": 53.02,
+        "stop_hit_rate_pct": 42.51,
+        "profit_factor_24h": 0.6507,
+        "max_drawdown_proxy_pct": -515.647806,
+        "regime_label": "TRENDING_BEAR"
+      },
+      {
+        "rows": 1144,
+        "directional_rows": 134,
+        "complete_rows": 1144,
+        "win_rate_24h_pct": 44.03,
+        "avg_gross_24h_pct": 0.194475,
+        "avg_net_24h_pct": -0.105525,
+        "median_net_24h_pct": -0.308735,
+        "target_1_hit_rate_pct": 55.97,
+        "stop_hit_rate_pct": 47.01,
+        "profit_factor_24h": 0.8834,
+        "max_drawdown_proxy_pct": -35.86297,
+        "regime_label": "SIDEWAYS"
+      },
+      {
+        "rows": 336,
+        "directional_rows": 67,
+        "complete_rows": 336,
+        "win_rate_24h_pct": 40.3,
+        "avg_gross_24h_pct": -0.409825,
+        "avg_net_24h_pct": -0.709825,
+        "median_net_24h_pct": -0.736443,
+        "target_1_hit_rate_pct": 41.79,
+        "stop_hit_rate_pct": 52.24,
+        "profit_factor_24h": 0.4599,
+        "max_drawdown_proxy_pct": -48.363949,
+        "regime_label": "UNKNOWN"
+      },
+      {
+        "rows": 231,
+        "directional_rows": 34,
+        "complete_rows": 231,
+        "win_rate_24h_pct": 32.35,
+        "avg_gross_24h_pct": -0.432656,
+        "avg_net_24h_pct": -0.732656,
+        "median_net_24h_pct": -0.558325,
+        "target_1_hit_rate_pct": 61.76,
+        "stop_hit_rate_pct": 55.88,
+        "profit_factor_24h": 0.4849,
+        "max_drawdown_proxy_pct": -24.26922,
+        "regime_label": "QUIET"
+      },
+      {
+        "rows": 211,
+        "directional_rows": 12,
+        "complete_rows": 211,
+        "win_rate_24h_pct": 25.0,
+        "avg_gross_24h_pct": -0.616974,
+        "avg_net_24h_pct": -0.916974,
+        "median_net_24h_pct": -0.940951,
+        "target_1_hit_rate_pct": 25.0,
+        "stop_hit_rate_pct": 33.33,
+        "profit_factor_24h": 0.3804,
+        "max_drawdown_proxy_pct": -13.981632,
+        "regime_label": "VOLATILE"
+      }
+    ],
+    "by_year": [
+      {
+        "rows": 2196,
+        "directional_rows": 900,
+        "complete_rows": 2196,
+        "win_rate_24h_pct": 40.56,
+        "avg_gross_24h_pct": 0.092241,
+        "avg_net_24h_pct": -0.207759,
+        "median_net_24h_pct": -0.456558,
+        "target_1_hit_rate_pct": 50.44,
+        "stop_hit_rate_pct": 41.44,
+        "profit_factor_24h": 0.8065,
+        "max_drawdown_proxy_pct": -230.794474,
+        "year": "2024"
+      },
+      {
+        "rows": 2190,
+        "directional_rows": 819,
+        "complete_rows": 2190,
+        "win_rate_24h_pct": 41.15,
+        "avg_gross_24h_pct": -0.026766,
+        "avg_net_24h_pct": -0.326766,
+        "median_net_24h_pct": -0.393657,
+        "target_1_hit_rate_pct": 51.65,
+        "stop_hit_rate_pct": 42.86,
+        "profit_factor_24h": 0.6828,
+        "max_drawdown_proxy_pct": -279.314235,
+        "year": "2025"
+      },
+      {
+        "rows": 1138,
+        "directional_rows": 468,
+        "complete_rows": 1138,
+        "win_rate_24h_pct": 43.8,
+        "avg_gross_24h_pct": -0.019911,
+        "avg_net_24h_pct": -0.319911,
+        "median_net_24h_pct": -0.321728,
+        "target_1_hit_rate_pct": 55.56,
+        "stop_hit_rate_pct": 37.39,
+        "profit_factor_24h": 0.6996,
+        "max_drawdown_proxy_pct": -222.210697,
+        "year": "2026"
+      },
+      {
+        "rows": 927,
+        "directional_rows": 340,
+        "complete_rows": 927,
+        "win_rate_24h_pct": 37.35,
+        "avg_gross_24h_pct": 0.126114,
+        "avg_net_24h_pct": -0.173886,
+        "median_net_24h_pct": -0.421211,
+        "target_1_hit_rate_pct": 54.12,
+        "stop_hit_rate_pct": 40.0,
+        "profit_factor_24h": 0.8049,
+        "max_drawdown_proxy_pct": -92.817393,
+        "year": "2023"
+      }
+    ],
+    "blockers": [
+      "میانگین Net Return در Test split مثبت نیست."
+    ],
+    "warnings": [
+      "Market Replay نتیجه Backtest است و جای Forward/Paper را نمی‌گیرد.",
+      "نسخه v10 به‌صورت پیش‌فرض Technical/Regime core را Replay می‌کند؛ خبر تاریخی فقط با context_file زمان‌دار وارد می‌شود.",
+      "در کندلی که Stop و Target همزمان لمس شوند، ترتیب محافظه‌کارانه Stop-first ثبت می‌شود.",
+      "هرگونه تنظیم وزن باید فقط با Validation/Test split و سپس Forward انجام شود."
+    ]
+  }
+}

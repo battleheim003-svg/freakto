@@ -1,91 +1,114 @@
-# ربات سیگنال‌دهی ترید کریپتو با هوش مصنوعی
+# Freakto — Crypto Research & Decision Intelligence Platform
 
-این پروژه یک نمونه‌ی کامل و قابل اجراست که:
-1. داده‌ی قیمت کریپتو را از صرافی می‌گیرد
-2. با اندیکاتورهای تکنیکال فیچر می‌سازد
-3. یک مدل یادگیری ماشین (Random Forest) آموزش می‌دهد
-4. عملکرد مدل را با بک‌تست می‌سنجد
-5. سیگنال‌های زنده را به تلگرام می‌فرستد
+Freakto یک سیستم پژوهشی برای تحلیل بازار کریپتو، ساخت تصمیم، ارزیابی تاریخی، Forward Test، Paper Trading و تحلیل علت‌های حرکت بازار است.
 
-## ⚠️ هشدار مهم قبل از شروع
-- این کد یک **ابزار آموزشی و اسکلت اولیه** است، نه یک استراتژی سودده‌ی تضمینی.
-- هیچ مدلی نمی‌تواند آینده‌ی بازار را با قطعیت پیش‌بینی کند.
-- قبل از استفاده‌ی واقعی، حتما هفته‌ها/ماه‌ها بک‌تست و سپس **پیپر تریدینگ (معامله‌ی فرضی بدون پول واقعی)** انجام بده.
-- هیچ‌وقت بیشتر از چیزی که حاضری از دست بدهی، سرمایه‌گذاری نکن.
+هدف پروژه تولید سیگنال کور نیست. هر تصمیم باید از چند لایه عبور کند:
 
-## مراحل نصب
+```text
+Market Data
+→ Technical Features
+→ Decision Engine
+→ Regime / Risk / Actionability
+→ Event & Narrative Intelligence
+→ Root Cause & Evidence Graph
+→ Historical Replay / Forward Validation
+→ Shadow / Paper Review
+```
 
-### ۱. نصب پایتون
-اگر نصب نیست، پایتون ۳.10 یا بالاتر را از python.org نصب کن.
+## وضعیت ایمنی
 
-### ۲. نصب کتابخونه‌ها
-در پوشه‌ی پروژه این دستور را بزن:
-```bash
+- اجرای خودکار Live order در پروژه فعال نیست.
+- Backtest و Market Replay جای Forward Test و Paper Trading را نمی‌گیرند.
+- هیچ نتیجه‌ای سود را تضمین نمی‌کند.
+- ورود به پول واقعی فقط بعد از داده‌ی کافی تاریخی، Forward و Paper قابل بررسی است.
+
+## قابلیت‌های اصلی
+
+- دریافت OHLCV از چند صرافی با fallback؛
+- Decision Engine برای LONG، SHORT و NEUTRAL؛
+- Trend، Momentum، Volume، Structure، Risk و Regime scoring؛
+- Portfolio Scanner و Multi-Timeframe analysis؛
+- Historical Backtest، Walk-Forward و Gate Simulator؛
+- Market Replay چندساله و کندل‌به‌کندل با کنترل Lookahead؛
+- Forward Test و Decision Evaluation؛
+- Shadow Gates و Regime-specific validation؛
+- Paper Trading جدا از Live؛
+- Automatic Event Collector، Market Narrative و Causal Intelligence؛
+- Root Cause Discovery، Root Cause Forward Validation و Sample Tracking؛
+- Evidence Graph برای اتصال منبع شواهد به علت و Outcome؛
+- Research Suite، Validation Suite و Live Readiness checks؛
+- GitHub Actions برای جمع‌آوری Forward data و اجرای Workflowهای تحقیقاتی.
+
+## نصب
+
+پایتون 3.10 یا بالاتر:
+
+```cmd
+python -m venv .venv
+.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### ۳. ساخت بات تلگرام
-1. در تلگرام به `@BotFather` پیام بده → `/newbot`
-2. اسم بات را انتخاب کن، یک **توکن** به تو می‌دهد
-3. توکن را در `config.py` در متغیر `TELEGRAM_BOT_TOKEN` بگذار
-4. به بات خودت یک پیام بده (مثلا `/start`)
-5. این آدرس را در مرورگر باز کن (TOKEN خودت را جایگزین کن):
-   `https://api.telegram.org/bot<TOKEN>/getUpdates`
-6. عدد جلوی `"chat":{"id":` همان Chat ID توست → در `config.py` بگذار
+فایل `.env` حاوی Token و API Key است و نباید روی GitHub قرار بگیرد.
 
-### ۴. تنظیم بازار مورد نظر
-در فایل `config.py`:
-```python
-SYMBOL = "BTC/USDT"   # یا هر جفت ارز دیگر
-TIMEFRAME = "1h"      # تایم‌فریم
+## اجرای روزمره‌ی پایه
+
+یک تصمیم جدید:
+
+```cmd
+python -X utf8 monitor.py --once
 ```
 
-## ترتیب اجرا (مهم - رعایت کن)
+اسکن پورتفو در حالت Paper Gate:
 
-### مرحله ۱: آموزش مدل
-```bash
-python model_train.py
+```cmd
+python -X utf8 portfolio_scanner.py --paper
 ```
-خروجی شامل گزارش دقت مدل روی داده‌های تست است. اگر دقت خیلی پایین بود (نزدیک به حدس تصادفی)، باید فیچرها یا پارامترها را تغییر بدهی.
 
-### مرحله ۲: بک‌تست (هرگز رد نکن!)
-```bash
-python backtest.py
+چرخه Forward:
+
+```cmd
+python -X utf8 forward_test_dashboard.py --cycle --validate --continue-on-error
 ```
-این به تو می‌گوید اگر طبق سیگنال‌های مدل معامله می‌کردی، نتیجه چه می‌شد (Win rate، بازده میانگین و...). اگر نتیجه ضعیف بود، به مرحله‌ی ۱ برگرد و تنظیمات (`LOOKAHEAD_CANDLES`, `TARGET_RETURN_THRESHOLD`, `MIN_CONFIDENCE`) را تغییر بده.
 
-### مرحله ۳: تست اتصال تلگرام
-```bash
-python telegram_notifier.py
+Research Suite:
+
+```cmd
+python -X utf8 freakto_research_suite_dashboard.py
 ```
-باید یک پیام تست در تلگرامت دریافت کنی.
 
-### مرحله ۴: اجرای زنده
-```bash
-python main.py
+## Market Replay v10
+
+وضعیت داده‌های محلی:
+
+```cmd
+python -X utf8 market_replay_dashboard.py --status --compact
 ```
-این اسکریپت به‌صورت دوره‌ای (هر `CHECK_INTERVAL_MINUTES` دقیقه) بازار را چک می‌کند و سیگنال‌های قوی را به تلگرام می‌فرستد.
 
-برای اجرای ۲۴ ساعته روی سرور، پیشنهاد می‌شود با یکی از این روش‌ها اجرا شود تا با بسته شدن ترمینال متوقف نشود:
-- `tmux` یا `screen` (ساده‌ترین برای شروع)
-- `systemd service` (برای سرور لینوکس، حرفه‌ای‌تر)
-- `pm2` (اگر با Node.js آشنا هستی)
+ساخت سه سال داده و Replay:
 
-## نقشه‌ی بهبود (وقتی نسخه‌ی اول کار کرد)
-1. **مدیریت ریسک واقعی**: اضافه کردن Stop Loss / Take Profit به سیگنال‌ها
-2. **چند جفت ارز هم‌زمان**: لیست SYMBOL را به آرایه تبدیل کن و حلقه بزن
-3. **مدل‌های بهتر**: امتحان XGBoost یا LightGBM به‌جای Random Forest
-4. **فیچرهای بیشتر**: حجم معاملات صرافی‌های دیگر، sentiment اخبار، on-chain data
-5. **Walk-forward backtesting**: بک‌تست دقیق‌تر با آموزش مجدد دوره‌ای مدل
-6. **دیتابیس**: ذخیره‌ی تاریخچه‌ی سیگنال‌ها در SQLite برای تحلیل بعدی
-
-## ساختار فایل‌ها
+```cmd
+python -X utf8 market_replay_dashboard.py --full --symbols BTC/USDT,ETH/USDT,SOL/USDT --timeframe 4h --years 3 --step 1
 ```
-config.py            تنظیمات (API، تلگرام، بازار)
-data_fetcher.py       دریافت داده از صرافی
-features.py           ساخت اندیکاتورها و لیبل‌ها
-model_train.py         آموزش مدل
-backtest.py            ارزیابی استراتژی روی داده‌ی گذشته
-telegram_notifier.py    ارسال پیام به تلگرام
-main.py                 اجرای زنده و حلقه‌ی نظارت
+
+راهنمای کامل:
+
+```text
+MARKET_REPLAY_RUNBOOK.md
 ```
+
+## مسیرهای مهم
+
+```text
+engine/                         موتورهای تحلیل و اعتبارسنجی
+logs/                           خروجی‌های Research/Forward/Paper
+history/                        پایگاه‌های داده محلی
+scripts/                        ابزارهای GitHub Actions و عملیات
+.github/workflows/              Workflowهای خودکار
+data/market_replay/             Cache تاریخی تولیدشده در v10
+data/manual_events.csv          رویدادهای curated اختیاری
+```
+
+## وضعیت فعلی پروژه
+
+Freakto در فاز **Research, Historical Replay, Forward Validation و Paper Evaluation** است. وجود ماژول‌های پیشرفته به معنی آماده‌بودن Live نیست؛ کیفیت نهایی به تعداد نمونه، ثبات در دوره‌های مختلف بازار، هزینه‌ی معامله و نتیجه‌ی Forward/Paper بستگی دارد.

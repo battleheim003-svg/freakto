@@ -1,3 +1,36 @@
+# Freakto Next Steps — v10.0
+
+## اولویت فعلی: Historical Data & Market Replay
+
+نسخه v10 مشکل محدود بودن Backtest به چندصد کندل آخر را حل می‌کند. ابتدا سه سال OHLCV محلی ساخته می‌شود و سپس Decision Engine به‌صورت candle-by-candle و replay-safe اجرا می‌شود.
+
+اجرای پیشنهادی اولیه:
+
+```cmd
+python -X utf8 market_replay_dashboard.py --full --symbols BTC/USDT,ETH/USDT,SOL/USDT --timeframe 4h --years 3 --step 6 --compact
+```
+
+بعد از تأیید `PASSED_NO_LOOKAHEAD` و کیفیت داده، Replay دقیق:
+
+```cmd
+python -X utf8 market_replay_dashboard.py --replay --symbols BTC/USDT,ETH/USDT,SOL/USDT --timeframe 4h --years 3 --step 1
+```
+
+معیارهای اولیه:
+
+```text
+Historical coverage >= 90%
+Leakage Audit = PASSED_NO_LOOKAHEAD
+Complete Replay Rows >= 500
+Test Directional Rows >= 50
+Test Avg Net Return > 0
+Forward/Paper confirmation required
+```
+
+راهنمای کامل: `MARKET_REPLAY_RUNBOOK.md`
+
+---
+
 # Freakto Next Steps — v5.2
 
 ## وضعیت فعلی

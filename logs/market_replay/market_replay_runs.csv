@@ -1,0 +1,4 @@
+﻿run_id,version,started_utc,finished_utc,ok,symbols_completed,rows,status,leakage_audit_status,output_csv,output_report
+market_replay_20260710_152233,v10.0.0,2026-07-10T15:22:33.765238+00:00,2026-07-10T15:22:42.375690+00:00,True,1,1076,REPLAY_RESEARCH_NOT_VALIDATED,PASSED_NO_LOOKAHEAD,logs\market_replay\market_replay_20260710_152233.csv,logs\market_replay\market_replay_20260710_152233_report.md
+market_replay_20260710_152411,v10.0.0,2026-07-10T15:24:11.500739+00:00,2026-07-10T15:30:34.837929+00:00,True,6,38706,REPLAY_RESEARCH_NOT_VALIDATED,PASSED_NO_LOOKAHEAD,logs\market_replay\market_replay_20260710_152411.csv,logs\market_replay\market_replay_20260710_152411_report.md
+market_replay_20260710_153110,v10.0.0,2026-07-10T15:31:10.222167+00:00,2026-07-10T15:31:55.827120+00:00,True,1,6451,REPLAY_RESEARCH_NOT_VALIDATED,PASSED_NO_LOOKAHEAD,logs\market_replay\market_replay_20260710_153110.csv,logs\market_replay\market_replay_20260710_153110_report.md

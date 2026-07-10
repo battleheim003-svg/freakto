@@ -18,6 +18,7 @@ from typing import Dict, List
 from .edge_validation import EdgeValidationResult, run_edge_validation
 from .regime_matrix import RegimeMatrixResult, run_regime_matrix
 from .trade_readiness import GlobalReadinessStats, load_global_readiness_stats
+from .market_replay import load_market_replay_status
 
 LOGS_DIR = Path("logs")
 READINESS_DIR = LOGS_DIR / "readiness"
@@ -210,6 +211,7 @@ def assess_advanced_live_readiness() -> AdvancedReadinessResult:
     stats = load_global_readiness_stats()
     edge = run_edge_validation()
     regime = run_regime_matrix()
+    market_replay = load_market_replay_status()
 
     components = [
         _data_sufficiency(stats),
@@ -222,6 +224,11 @@ def assess_advanced_live_readiness() -> AdvancedReadinessResult:
     total = sum(c.score for c in components)
     blockers = [b for c in components for b in c.blockers]
     warnings: List[str] = []
+    if market_replay.status != "REPLAY_RESEARCH_VALIDATED":
+        blockers.append(
+            f"Market Replay هنوز برای Live معتبر نیست: {market_replay.status} "
+            f"(rows={market_replay.total_rows}, audit={market_replay.leakage_audit_status})"
+        )
 
     if edge.decision_edge.sample_count < 30:
         warnings.append("Decision edge هنوز بسیار کم‌نمونه است.")
@@ -229,6 +236,8 @@ def assess_advanced_live_readiness() -> AdvancedReadinessResult:
         warnings.append("Paper Trading هنوز نتیجه بسته‌شده ندارد.")
     if regime.unknown_regime_samples > regime.known_regime_samples:
         warnings.append("Regime Matrix برای لاگ‌های قدیمی هنوز UNKNOWN زیادی دارد؛ چند روز داده جدید لازم است.")
+    if market_replay.status != "REPLAY_RESEARCH_VALIDATED":
+        warnings.append("Market Replay v10 باید روی Test split و بعد در Forward تأیید شود؛ این مانع Paper آزمایشی نیست اما Live را مسدود می‌کند.")
 
     hard_live_gates = (
         stats.complete_evaluations >= 100
@@ -238,6 +247,7 @@ def assess_advanced_live_readiness() -> AdvancedReadinessResult:
         and edge.decision_edge.profit_factor >= 1.0
         and regime.known_regime_samples >= 30
         and total >= 80
+        and market_replay.status == "REPLAY_RESEARCH_VALIDATED"
         and not blockers
     )
 

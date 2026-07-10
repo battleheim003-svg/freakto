@@ -48,6 +48,7 @@ from engine.root_cause_discovery import run_root_cause_discovery, format_root_ca
 from engine.root_cause_forward_validation import run_root_cause_forward_validation, format_root_cause_forward_console, save_root_cause_forward_report
 from engine.root_cause_sample_tracker import run_root_cause_sample_tracker, format_root_cause_sample_console, save_root_cause_sample_report
 from engine.evidence_graph import run_evidence_graph, format_evidence_graph_console, save_evidence_graph_report
+from engine.market_replay import load_market_replay_status, format_market_replay_console
 from telegram_notifier import send_telegram_message
 
 SUITE_DIR = Path("logs") / "validation_suite"
@@ -84,6 +85,7 @@ def main():
     root_cause_forward = run_root_cause_forward_validation()
     root_cause_samples = run_root_cause_sample_tracker()
     evidence_graph = run_evidence_graph()
+    market_replay = load_market_replay_status()
     research_suite = run_full_research_suite(save=False)
     readiness = assess_advanced_live_readiness()
 
@@ -105,10 +107,11 @@ def main():
     root_cause_forward_text = format_root_cause_forward_console(root_cause_forward, compact=True)
     root_cause_samples_text = format_root_cause_sample_console(root_cause_samples, compact=True)
     evidence_graph_text = format_evidence_graph_console(evidence_graph, compact=True)
+    market_replay_text = format_market_replay_console(market_replay, compact=True)
     research_suite_text = format_full_suite_console(research_suite)
     readiness_text = format_advanced_readiness_console(readiness)
 
-    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, gate_sim_text, forward_regime_label_text, shadow_gate_text, regime_gate_matrix_text, forward_shadow_coverage_text, root_cause_text, root_cause_forward_text, root_cause_samples_text, evidence_graph_text, research_suite_text, readiness_text])
+    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, gate_sim_text, forward_regime_label_text, shadow_gate_text, regime_gate_matrix_text, forward_shadow_coverage_text, root_cause_text, root_cause_forward_text, root_cause_samples_text, evidence_graph_text, market_replay_text, research_suite_text, readiness_text])
     print(combined)
 
     metric_report = save_metric_definitions_report()

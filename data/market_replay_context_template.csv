@@ -1,0 +1,2 @@
+timestamp_utc,symbol,news_sentiment_score,news_sentiment_summary,onchain_signal_score,onchain_status,cross_exchange_volume_ratio,cross_exchange_provider_count
+2024-01-01T00:00:00Z,BTC/USDT,0.0,Example timestamped context row,0.0,UNKNOWN,1.0,0
