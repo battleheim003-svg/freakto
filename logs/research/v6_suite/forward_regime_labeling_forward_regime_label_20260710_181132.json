@@ -1,0 +1,38 @@
+{
+  "run_id": "forward_regime_label_20260710_181132",
+  "generated_utc": "2026-07-10T18:11:32.504596+00:00",
+  "status": "FORWARD_REGIME_LABELING_READY",
+  "apply_changes": false,
+  "decisions_path": "logs/decisions.csv",
+  "evaluations_path": "logs/decision_evaluations.csv",
+  "decision_rows": 53,
+  "known_before": 53,
+  "unknown_before": 0,
+  "known_after": 53,
+  "unknown_after": 0,
+  "injected_decision_rows": 0,
+  "preserved_decision_rows": 53,
+  "direct_engine_rows": 20,
+  "text_inferred_rows": 33,
+  "proxy_inferred_rows": 0,
+  "evaluation_rows": 52,
+  "patched_evaluation_rows": 0,
+  "evaluation_known_after": 52,
+  "label_counts": {
+    "TRENDING_BULL": 45,
+    "TRENDING_BEAR": 8
+  },
+  "evaluation_label_counts": {
+    "TRENDING_BULL": 44,
+    "TRENDING_BEAR": 8
+  },
+  "backup_paths": [],
+  "blockers": [],
+  "recommendations": [
+    "بعد از اجرای cycle جدید، regime_shadow_gate_dashboard.py --compact را دوباره بررسی کن."
+  ],
+  "warnings": [
+    "Regime injection فقط از داده‌های لحظه تصمیم استفاده می‌کند؛ outcome/return/target/stop استفاده نمی‌شود.",
+    "برچسب‌های LOW_CONF_PROXY برای Research هستند و باید در Forward واقعی بیشتر validate شوند."
+  ]
+}

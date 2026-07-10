@@ -1,0 +1,34 @@
+{
+  "run_id": "evidence_graph_20260710_181158",
+  "generated_utc": "2026-07-10T18:11:58.672217+00:00",
+  "version": "v9.0.0",
+  "status": "NO_EVIDENCE_GRAPH_ROWS",
+  "evaluations_file": "logs/decision_evaluations.csv",
+  "evaluation_rows": 52,
+  "complete_rows": 50,
+  "graph_rows": 0,
+  "root_cause_rows": 0,
+  "nodes_total": 0,
+  "edges_total": 0,
+  "paths_total": 0,
+  "min_samples": 10,
+  "research_samples": 30,
+  "candidate_samples": 90,
+  "graph_maturity": "NO_GRAPH_DATA",
+  "top_nodes": [],
+  "top_edges": [],
+  "top_paths": [],
+  "root_cause_learning_signals": [],
+  "blockers": [
+    "هیچ decision_evaluations row با root_cause قابل ساخت گراف پیدا نشد؛ root_cause_dashboard و decision_evaluator را اجرا کن."
+  ],
+  "warnings": [
+    "Evidence Graph فقط رابطه‌های پژوهشی بین شواهد، روایت، علت و outcome را می‌سازد؛ سیگنال خرید/فروش نیست.",
+    "تا وقتی sample کافی وجود نداشته باشد، هیچ وزن evidence نباید برای Paper/Live تغییر کند."
+  ],
+  "recommendations": [
+    "چرخه Forward را منظم اجرا کن تا مسیرهای evidence به outcomeهای بیشتری وصل شوند.",
+    "مسیرهایی که چند هفته متوالی hit-rate و signed-return مثبت دارند بعداً می‌توانند وارد Evidence Weight Review شوند.",
+    "اگر یک منبع یا روایت در Forward چندبار fail شد، وزن آن باید فقط بعد از sample کافی بازبینی شود."
+  ]
+}
