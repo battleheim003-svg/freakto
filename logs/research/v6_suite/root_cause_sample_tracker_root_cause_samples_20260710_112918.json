@@ -1,0 +1,34 @@
+{
+  "run_id": "root_cause_samples_20260710_112918",
+  "generated_utc": "2026-07-10T11:29:18.686721+00:00",
+  "version": "v8.2.0",
+  "status": "NO_ROOT_CAUSE_SAMPLES_YET",
+  "evaluations_file": "logs/decision_evaluations.csv",
+  "evaluation_rows": 51,
+  "complete_rows": 49,
+  "root_cause_rows": 0,
+  "evaluated_cells": 0,
+  "unique_root_causes": 0,
+  "min_cells": 10,
+  "research_cells": 30,
+  "candidate_cells": 90,
+  "estimated_more_root_cause_decisions_for_min": 4,
+  "estimated_more_root_cause_decisions_for_research": 10,
+  "estimated_more_root_cause_decisions_for_candidate": 30,
+  "validation_status": "NO_ROOT_CAUSE_ROWS_EVALUATED",
+  "validation_candidates": 0,
+  "validation_promising_low_sample": 0,
+  "buckets": [],
+  "blockers": [
+    "هنوز هیچ Root Cause row قابل ارزیابی وجود ندارد."
+  ],
+  "warnings": [
+    "Root Cause Sample Tracker فقط بلوغ نمونه‌ها را می‌سنجد؛ Paper/Live فعال نمی‌کند.",
+    "Promotion واقعی فقط بعد از Forward validation پایدار و sample کافی مجاز است."
+  ],
+  "recommendations": [
+    "چرخه Forward را هر 4 ساعت یا با GitHub Actions اجرا کن تا Root Cause rows بیشتر شود.",
+    "پس از هر root_cause_dashboard.py، decision_evaluator.py و سپس root_cause_forward_validation_dashboard.py را اجرا کن.",
+    "تا وقتی حداقل 30-50 تصمیم دارای Root Cause جمع نشده، نتیجه فقط Research/Shadow بماند."
+  ]
+}

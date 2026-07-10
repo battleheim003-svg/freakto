@@ -1,0 +1,31 @@
+{
+  "run_id": "root_cause_forward_20260710_112914",
+  "generated_utc": "2026-07-10T11:29:14.180669+00:00",
+  "version": "v8.1.0",
+  "status": "NO_ROOT_CAUSE_ROWS_EVALUATED",
+  "horizon": "24h",
+  "min_samples": 10,
+  "min_abs_return_pct": 0.0,
+  "evaluations_file": "logs/decision_evaluations.csv",
+  "evaluation_rows": 51,
+  "root_cause_rows": 0,
+  "evaluated_cells": 0,
+  "complete_rows": 49,
+  "eligible_causes": 0,
+  "research_candidates": 0,
+  "promising_low_sample": 0,
+  "top_validated_causes": [],
+  "validation_rows": [],
+  "blockers": [
+    "هیچ ردیف decision_evaluations با root_cause_primary/root_cause_direction قابل ارزیابی پیدا نشد."
+  ],
+  "warnings": [
+    "Root Cause Forward Validation فقط رابطه علت‌های پژوهشی با outcome بعدی را می‌سنجد؛ سیگنال خرید/فروش نیست.",
+    "این validation باید چند هفته/ماه sample جمع کند تا قابل اتکا شود."
+  ],
+  "recommendations": [
+    "ابتدا decision_evaluator.py را اجرا کن تا market_return_after_* برای تصمیم‌ها ساخته شود.",
+    "Root Causeهایی که hit-rate پایدار و sample کافی دارند بعداً می‌توانند وارد Root-Cause Gate Simulator شوند.",
+    "تا قبل از sample کافی، نتیجه فقط Research/Shadow بماند و Paper/Live فعال نشود."
+  ]
+}

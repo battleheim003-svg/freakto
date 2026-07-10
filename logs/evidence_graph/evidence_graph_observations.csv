@@ -1,0 +1,5 @@
+﻿run_id,generated_utc,version,status,graph_rows,nodes_total,edges_total,paths_total,graph_maturity,top_path,top_path_samples,top_path_hit_rate_24h,top_path_avg_signed_return_24h_pct,top_learning_root_cause,top_learning_verdict
+evidence_graph_20260710_112914,2026-07-10T11:29:14.950500+00:00,v9.0.0,NO_EVIDENCE_GRAPH_ROWS,0,0,0,0,NO_GRAPH_DATA,,,,,,
+evidence_graph_20260710_112918,2026-07-10T11:29:18.692217+00:00,v9.0.0,NO_EVIDENCE_GRAPH_ROWS,0,0,0,0,NO_GRAPH_DATA,,,,,,
+evidence_graph_20260710_112931,2026-07-10T11:29:31.771379+00:00,v9.0.0,NO_EVIDENCE_GRAPH_ROWS,0,0,0,0,NO_GRAPH_DATA,,,,,,
+evidence_graph_20260710_112944,2026-07-10T11:29:44.861661+00:00,v9.0.0,NO_EVIDENCE_GRAPH_ROWS,0,0,0,0,NO_GRAPH_DATA,,,,,,

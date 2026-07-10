@@ -1,0 +1,5 @@
+﻿run_id,generated_utc,version,status,evaluation_rows,complete_rows,root_cause_rows,evaluated_cells,unique_root_causes,validation_status,top_cause,top_direction,top_cells,top_hit_rate_24h,top_avg_signed_return_24h_pct,top_maturity,more_decisions_for_research
+root_cause_samples_20260710_112914,2026-07-10T11:29:14.568793+00:00,v8.2.0,NO_ROOT_CAUSE_SAMPLES_YET,51,49,0,0,0,NO_ROOT_CAUSE_ROWS_EVALUATED,,,,,,,10
+root_cause_samples_20260710_112918,2026-07-10T11:29:18.686721+00:00,v8.2.0,NO_ROOT_CAUSE_SAMPLES_YET,51,49,0,0,0,NO_ROOT_CAUSE_ROWS_EVALUATED,,,,,,,10
+root_cause_samples_20260710_112931,2026-07-10T11:29:31.766361+00:00,v8.2.0,NO_ROOT_CAUSE_SAMPLES_YET,51,49,0,0,0,NO_ROOT_CAUSE_ROWS_EVALUATED,,,,,,,10
+root_cause_samples_20260710_112944,2026-07-10T11:29:44.451064+00:00,v8.2.0,NO_ROOT_CAUSE_SAMPLES_YET,51,49,0,0,0,NO_ROOT_CAUSE_ROWS_EVALUATED,,,,,,,10
