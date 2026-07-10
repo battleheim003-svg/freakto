@@ -11,6 +11,8 @@ from .regime import detect_market_regime
 from .adaptive import score_adaptive_adjustment
 from .historical_edge import score_historical_edge
 from .learning_overrides import apply_learning_overrides
+from .external_features import score_external_context
+from .risk_reward import calculate_risk_reward
 from .score import OpportunityV2, confidence_label, _zones
 
 
@@ -95,7 +97,7 @@ class DecisionEngine:
             ScoreComponent("Risk Penalty", 0, 25),
         )
 
-        return OpportunityV2(
+        opportunity = OpportunityV2(
             symbol=symbol,
             timeframe=timeframe,
             side=side,
@@ -118,9 +120,31 @@ class DecisionEngine:
                 "regime_adjustment": regime.adjustment,
                 "regime_reasons": regime.reasons,
                 "regime_warnings": regime.warnings,
+                "cross_exchange_volume": safe_float(row.get("cross_exchange_volume"), 0.0),
+                "cross_exchange_volume_ratio": safe_float(row.get("cross_exchange_volume_ratio"), 1.0),
+                "cross_exchange_provider_count": safe_float(row.get("cross_exchange_provider_count"), 0.0),
+                "news_sentiment_score": safe_float(row.get("news_sentiment_score"), 0.0),
+                "news_sentiment_summary": str(row.get("news_sentiment_summary", "") or ""),
+                "onchain_active_addresses": safe_float(row.get("onchain_active_addresses"), 0.0),
+                "onchain_signal_score": safe_float(row.get("onchain_signal_score"), 0.0),
+                "onchain_status": str(row.get("onchain_status", "") or ""),
                 "engine": "DecisionEngine",
             },
         )
+        rr = calculate_risk_reward(opportunity)
+        opportunity.raw.update({
+            "risk_plan_valid": rr.is_valid,
+            "risk_plan_entry": rr.entry,
+            "risk_plan_stop_loss": rr.stop,
+            "risk_plan_stop_distance_pct": rr.stop_distance_pct,
+            "risk_plan_take_profit_1": rr.targets[0].price if len(rr.targets) > 0 else None,
+            "risk_plan_take_profit_2": rr.targets[1].price if len(rr.targets) > 1 else None,
+            "risk_plan_take_profit_3": rr.targets[2].price if len(rr.targets) > 2 else None,
+            "risk_plan_rr_1": rr.targets[0].rr if len(rr.targets) > 0 else None,
+            "risk_plan_rr_2": rr.targets[1].rr if len(rr.targets) > 1 else None,
+            "risk_plan_rr_3": rr.targets[2].rr if len(rr.targets) > 2 else None,
+        })
+        return opportunity
 
     def _get_latest_timestamp(self, df: pd.DataFrame):
         if "timestamp" in df.columns:
@@ -190,6 +214,7 @@ class DecisionEngine:
             score_structure(row, recent_df, side),
             self._regime_component(side, regime),
             score_risk(row, side),
+            score_external_context(row, side),
         ]
 
         components, learning_state, learning_component = apply_learning_overrides(components)

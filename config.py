@@ -52,7 +52,11 @@ WUNDERTRADING_BASE_URL = os.getenv("WUNDERTRADING_BASE_URL", "https://api.wunder
 
 # ========== تنظیمات بازار ==========
 EXCHANGE_ID = os.getenv("EXCHANGE_ID", "okx")
-SYMBOL = os.getenv("SYMBOL", "BTC/USDT")
+SYMBOLS = _get_list(
+    "SYMBOLS",
+    os.getenv("PORTFOLIO_SYMBOLS", os.getenv("SYMBOL", "BTC/USDT")),
+)
+SYMBOL = os.getenv("SYMBOL", SYMBOLS[0] if SYMBOLS else "BTC/USDT")
 TIMEFRAME = os.getenv("TIMEFRAME", "4h")
 CANDLES_LIMIT = int(os.getenv("CANDLES_LIMIT", "1000"))
 TRAINING_CANDLES = int(os.getenv("TRAINING_CANDLES", "12000"))
@@ -102,6 +106,18 @@ PORTFOLIO_ELITE_SCORE = float(os.getenv("PORTFOLIO_ELITE_SCORE", "85"))
 PORTFOLIO_ACTIONABLE_SCORE = float(os.getenv("PORTFOLIO_ACTIONABLE_SCORE", "72"))
 PORTFOLIO_WATCHLIST_SCORE = float(os.getenv("PORTFOLIO_WATCHLIST_SCORE", "55"))
 PORTFOLIO_SHOW_MONITOR_CANDIDATES = _get_bool("PORTFOLIO_SHOW_MONITOR_CANDIDATES", True)
+
+# ========== External feature enrichment ==========
+ENABLE_CROSS_EXCHANGE_VOLUME = _get_bool("ENABLE_CROSS_EXCHANGE_VOLUME", False)
+ENABLE_NEWS_SENTIMENT = _get_bool("ENABLE_NEWS_SENTIMENT", False)
+ENABLE_ONCHAIN_FEATURES = _get_bool("ENABLE_ONCHAIN_FEATURES", False)
+CROSS_EXCHANGE_VOLUME_LIMIT = int(os.getenv("CROSS_EXCHANGE_VOLUME_LIMIT", "80"))
+GLASSNODE_API_KEY = os.getenv("GLASSNODE_API_KEY", "")
+COINGECKO_API_KEY = os.getenv("COINGECKO_API_KEY", "")
+
+# ========== Model Lab ==========
+MODEL_TYPE = os.getenv("MODEL_TYPE", "auto")
+MODEL_LAB_OUTPUT_DIR = os.getenv("MODEL_LAB_OUTPUT_DIR", str(BASE_DIR / "logs" / "model_lab"))
 
 # ========== Trade Intelligence v2.7 ==========
 TRADE_ACCOUNT_SIZE = float(os.getenv("TRADE_ACCOUNT_SIZE", "10000"))

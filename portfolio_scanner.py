@@ -16,6 +16,7 @@ Multi-Timeframe Consensus می‌سازد، سپس نمادها را رتبه‌
 import argparse
 import csv
 from pathlib import Path
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 
 from config import (
@@ -49,10 +50,12 @@ from engine.daily_report import (
     format_daily_report_telegram,
     save_daily_report,
 )
+from engine.market_enrichment import add_live_enrichment_features
 from engine.paper_trading import (
     record_paper_trades_from_portfolio,
     format_paper_record_result,
 )
+from engine.signal_store import init_signal_db, save_portfolio_item_signal
 
 
 PRIMARY_TIMEFRAME = TIMEFRAME
@@ -125,6 +128,7 @@ def _prepare_market_dataframe(symbol: str, timeframe: str, limit: Optional[int] 
 
     provider = _extract_provider(raw)
     df = add_features(raw)
+    df = add_live_enrichment_features(df, symbol=symbol, timeframe=timeframe)
 
     if provider:
         df.attrs["provider"] = provider
@@ -315,6 +319,10 @@ def _write_portfolio_log(result: PortfolioScanResult):
         "expected_drawdown_pct",
         "provider",
         "price",
+        "decision_timestamp",
+        "entry_zone",
+        "stop_zone",
+        "targets",
         "breadth_mode",
         "breadth_strength",
         "breadth_market_agreement",
@@ -364,6 +372,10 @@ def _write_portfolio_log(result: PortfolioScanResult):
                 "expected_drawdown_pct": item.expected_drawdown_pct,
                 "provider": item.provider,
                 "price": item.price,
+                "decision_timestamp": item.decision_timestamp,
+                "entry_zone": item.entry_zone,
+                "stop_zone": item.stop_zone,
+                "targets": " | ".join(str(target) for target in item.targets),
                 "breadth_mode": result.market_breadth.market_mode if result.market_breadth else "",
                 "breadth_strength": result.market_breadth.market_agreement if result.market_breadth else "",
                 "breadth_market_agreement": result.market_breadth.market_agreement if result.market_breadth else "",
@@ -384,6 +396,8 @@ def run_portfolio_scan(symbols: List[str] = None, send: bool = False, top_n: int
     symbols = symbols or list(PORTFOLIO_SYMBOLS)
     result = PortfolioScanResult()
     result.daily_report_file = ""
+    run_id = "portfolio_" + datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    init_signal_db()
 
     print("=" * 90)
     print("🏆 Freakto Portfolio Scanner v4.6.1")
@@ -411,6 +425,8 @@ def run_portfolio_scan(symbols: List[str] = None, send: bool = False, top_n: int
     print(f"🧠 Daily report ذخیره شد: {report_path}")
 
     _write_portfolio_log(result)
+    for item in result.ranked_items:
+        save_portfolio_item_signal(item, source="portfolio_scanner", run_id=run_id)
 
     if paper:
         paper_result = record_paper_trades_from_portfolio(result)

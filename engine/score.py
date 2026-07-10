@@ -14,6 +14,7 @@ from .confidence import calculate_confidence
 from .similarity import find_similar_snapshots, format_similarity_for_telegram
 from .trade_quality import build_trade_intelligence_card, format_trade_card_lines
 from .intelligence import build_intelligence_report, format_intelligence_telegram
+from .risk_reward import calculate_risk_reward
 
 
 @dataclass
@@ -256,6 +257,27 @@ def _format_trade_intelligence(opportunity: OpportunityV2) -> List[str]:
     return format_trade_card_lines(card)
 
 
+def _format_risk_plan(opportunity: OpportunityV2) -> List[str]:
+    rr = calculate_risk_reward(opportunity)
+    lines = ["*Stop Loss / Take Profit Plan:*"]
+    if not rr.is_valid:
+        lines.append(f"- {rr.reason}")
+        return lines
+
+    if not opportunity.is_actionable:
+        lines.append("- Research-only plan: Quality Gate is not fully passed yet.")
+    lines.append(f"- Entry: `{fmt_price(rr.entry)}`")
+    lines.append(f"- Stop Loss: `{fmt_price(rr.stop)}`")
+    lines.append(f"- Stop Distance: `{rr.stop_distance_pct:.2f}%`")
+    if rr.targets:
+        for target in rr.targets[:3]:
+            if target.price is None:
+                continue
+            rr_text = f"{target.rr:.2f}" if target.rr is not None else "n/a"
+            lines.append(f"- {target.label} Take Profit: `{fmt_price(target.price)}` | R:R `{rr_text}`")
+    return lines
+
+
 
 
 def _format_intelligence_layer(opportunity: OpportunityV2) -> List[str]:
@@ -432,6 +454,9 @@ def format_opportunity_v2_message(opportunity: OpportunityV2) -> str:
 
     lines.append("")
     lines.extend(_format_trade_intelligence(opportunity))
+
+    lines.append("")
+    lines.extend(_format_risk_plan(opportunity))
 
     lines.append("")
     lines.extend(_format_intelligence_layer(opportunity))

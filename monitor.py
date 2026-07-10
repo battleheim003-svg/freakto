@@ -17,6 +17,7 @@ import schedule
 
 from config import (
     SYMBOL,
+    SYMBOLS,
     TIMEFRAME,
     CHECK_INTERVAL_MINUTES,
     OPPORTUNITY_ENGINE_ENABLED,
@@ -39,6 +40,8 @@ from engine.intelligence import build_intelligence_report, format_intelligence_c
 from engine.causal_intelligence import attach_causal_context
 from engine.market_narrative import attach_market_narrative_to_opportunity
 from engine.root_cause_discovery import attach_root_cause_to_opportunity
+from engine.market_enrichment import add_live_enrichment_features
+from engine.signal_store import init_signal_db, save_opportunity_signal
 from engine.multi_timeframe import (
     TimeframeSignal,
     calculate_consensus,
@@ -56,7 +59,7 @@ FETCH_LIMITS = {
     "1d": 220,
 }
 
-_last_checked_timestamp = None
+_last_checked_timestamp = {}
 
 
 def _unique_timeframes(timeframes: List[str]) -> List[str]:
@@ -65,6 +68,14 @@ def _unique_timeframes(timeframes: List[str]) -> List[str]:
         if timeframe not in result:
             result.append(timeframe)
     return result
+
+
+def _parse_symbols(value: str = "") -> List[str]:
+    if value:
+        symbols = [item.strip().upper() for item in value.split(",") if item.strip()]
+        if symbols:
+            return symbols
+    return list(SYMBOLS or [SYMBOL])
 
 
 def _dedupe_text(items: List[str]) -> List[str]:
@@ -81,10 +92,10 @@ def _dedupe_text(items: List[str]) -> List[str]:
     return result
 
 
-def _send_alert_report(latest_timestamp, price, alerts):
+def _send_alert_report(symbol, latest_timestamp, price, alerts):
     lines = [
         "📡 *Freakto Market Monitor*",
-        f"Symbol: {SYMBOL} | TF: {PRIMARY_TIMEFRAME}",
+        f"Symbol: {symbol} | TF: {PRIMARY_TIMEFRAME}",
         f"Price: `{price:.2f}`",
         f"Candle: `{latest_timestamp}`",
         "",
@@ -232,6 +243,7 @@ def _prepare_market_dataframe(symbol=SYMBOL, timeframe=PRIMARY_TIMEFRAME, limit=
 
     provider = _extract_provider(raw)
     df = add_features(raw)
+    df = add_live_enrichment_features(df, symbol=symbol, timeframe=timeframe)
 
     if provider:
         df.attrs["provider"] = provider
@@ -357,7 +369,7 @@ def _format_telegram_message(opportunity, consensus_result=None):
     return message
 
 
-def _analyze_multi_timeframe():
+def _analyze_multi_timeframe(symbol=SYMBOL):
     timeframes = _unique_timeframes(MULTI_TIMEFRAMES)
     results: Dict[str, Tuple] = {}
     signals = []
@@ -368,7 +380,7 @@ def _analyze_multi_timeframe():
 
     for timeframe in timeframes:
         print(f"\n--- تحلیل تایم‌فریم {timeframe} ---")
-        result = _analyze_timeframe(SYMBOL, timeframe)
+        result = _analyze_timeframe(symbol, timeframe)
         df, opportunity, latest_timestamp, price, provider = result
 
         if opportunity is None:
@@ -404,11 +416,11 @@ def _analyze_multi_timeframe():
     ), results
 
 
-def check_market():
+def check_market(symbol=SYMBOL):
     global _last_checked_timestamp
 
     if not OPPORTUNITY_ENGINE_ENABLED:
-        df = _prepare_market_dataframe()
+        df = _prepare_market_dataframe(symbol=symbol)
         if df is None:
             return
 
@@ -427,19 +439,20 @@ def check_market():
         print(f"[{latest_timestamp}] قیمت: {price:.2f} | هشدارها: {len(alerts)}")
 
         if alerts:
-            _send_alert_report(latest_timestamp, price, alerts)
+            _send_alert_report(symbol, latest_timestamp, price, alerts)
 
-        _last_checked_timestamp = latest_timestamp
+        _last_checked_timestamp[f"{symbol}|{PRIMARY_TIMEFRAME}"] = latest_timestamp
         return
 
-    analysis_result, all_results = _analyze_multi_timeframe()
+    analysis_result, all_results = _analyze_multi_timeframe(symbol=symbol)
 
     if analysis_result is None:
         return
 
     df, opportunity, latest_timestamp, price, provider, consensus_result = analysis_result
 
-    if str(latest_timestamp) == str(_last_checked_timestamp):
+    key = f"{symbol}|{PRIMARY_TIMEFRAME}"
+    if str(latest_timestamp) == str(_last_checked_timestamp.get(key)):
         print(f"[{latest_timestamp}] کندل تکراری، رد شد.")
         return
 
@@ -456,7 +469,7 @@ def check_market():
     print(f"[{latest_timestamp}] قیمت: {price:.2f} | هشدارها: {len(alerts)}")
 
     if alerts:
-        _send_alert_report(latest_timestamp, price, alerts)
+        _send_alert_report(symbol, latest_timestamp, price, alerts)
 
     _print_decision_report(opportunity)
 
@@ -464,7 +477,7 @@ def check_market():
         causal_context = attach_causal_context(
             opportunity,
             df,
-            symbol=SYMBOL,
+            symbol=symbol,
             timeframe=PRIMARY_TIMEFRAME,
             collect_live=False,
         )
@@ -481,7 +494,7 @@ def check_market():
     try:
         narrative = attach_market_narrative_to_opportunity(
             opportunity,
-            symbol=SYMBOL,
+            symbol=symbol,
             timeframe=PRIMARY_TIMEFRAME,
         )
         print("\n" + "=" * 70)
@@ -501,7 +514,7 @@ def check_market():
     try:
         root_cause = attach_root_cause_to_opportunity(
             opportunity,
-            symbol=SYMBOL,
+            symbol=symbol,
             timeframe=PRIMARY_TIMEFRAME,
         )
         print("\n" + "=" * 70)
@@ -530,6 +543,13 @@ def check_market():
         price=price,
         provider=provider,
     )
+    save_opportunity_signal(
+        opportunity,
+        price=price,
+        candle_timestamp=latest_timestamp,
+        provider=provider,
+        source="monitor",
+    )
 
     if _should_send_opportunity(opportunity):
         sent = send_telegram_message(_format_telegram_message(opportunity, consensus_result))
@@ -540,7 +560,7 @@ def check_market():
     else:
         print("ℹ️ پیام ارسال نشد؛ وضعیت هنوز قابل اقدام یا قابل گزارش نیست.")
 
-    _last_checked_timestamp = latest_timestamp
+    _last_checked_timestamp[key] = latest_timestamp
 
 
 def main():
@@ -550,9 +570,17 @@ def main():
         action="store_true",
         help="Run one market check and exit.",
     )
+    parser.add_argument(
+        "--symbols",
+        type=str,
+        default="",
+        help="Comma-separated symbols. Defaults to SYMBOLS from config/.env.",
+    )
     args = parser.parse_args()
 
     init_history_db()
+    init_signal_db()
+    symbols = _parse_symbols(args.symbols)
 
     print("Freakto شروع شد: Market Monitor + Decision Engine v4 + Intelligence Layer")
     print(ALL_RULES_DESCRIPTION)
@@ -561,14 +589,20 @@ def main():
     print(f"Send Neutral Reports: {SEND_NEUTRAL_REPORTS}")
     print(f"Primary Timeframe: {PRIMARY_TIMEFRAME}")
     print(f"Multi-Timeframes: {', '.join(_unique_timeframes(MULTI_TIMEFRAMES))}")
+    print(f"Symbols: {', '.join(symbols)}")
 
-    check_market()
+    for symbol in symbols:
+        check_market(symbol=symbol)
 
     if args.once:
         print("✅ اجرای یک‌باره انجام شد.")
         return
 
-    schedule.every(CHECK_INTERVAL_MINUTES).minutes.do(check_market)
+    def run_all_symbols():
+        for symbol in symbols:
+            check_market(symbol=symbol)
+
+    schedule.every(CHECK_INTERVAL_MINUTES).minutes.do(run_all_symbols)
 
     while True:
         schedule.run_pending()
