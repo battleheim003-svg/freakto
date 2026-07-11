@@ -1,0 +1,20 @@
+Replace raw confidence usage with calibration_mapper output.
+
+New flow:
+
+score
+ |
+ v
+calibration_mapper
+ |
+ v
+historical_probability
+ |
+ v
+edge_gate
+ |
+ v
+ACTIONABLE / BLOCKED
+
+Do not use:
+confidence = score
