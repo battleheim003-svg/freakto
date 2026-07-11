@@ -1,43 +1,44 @@
-"""Build a clean calibration dataset from Freakto evaluation logs."""
+"""Build a stable calibration dataset from replay evaluations."""
 from pathlib import Path
 import pandas as pd
 
-DEFAULT_SOURCE = Path('logs/decision_evaluations.csv')
-DEFAULT_OUTPUT = Path('logs/calibration_dataset/calibration_training.csv')
+SRC = Path("logs/market_replay/market_replay_evaluations.csv")
+OUT = Path("logs/calibration_dataset/calibration_training.csv")
+MAX_ROWS = 3200
 
 
-def build_calibration_dataset(source=DEFAULT_SOURCE, output=DEFAULT_OUTPUT):
-    source = Path(source)
-    output = Path(output)
-    if not source.exists():
-        raise FileNotFoundError(source)
+def build_calibration_dataset(limit=MAX_ROWS):
+    if not SRC.exists():
+        raise FileNotFoundError(SRC)
+    df = pd.read_csv(SRC, encoding="utf-8-sig", low_memory=False)
+    if "evaluation_status" in df.columns:
+        df = df[df["evaluation_status"].astype(str).str.upper() == "COMPLETE"]
+    if "net_signed_return_after_6c_pct" in df.columns:
+        ret = "net_signed_return_after_6c_pct"
+    elif "return_after_24h_pct" in df.columns:
+        ret = "return_after_24h_pct"
+    else:
+        raise ValueError("No evaluation return column found")
+    df["evaluated_return"] = pd.to_numeric(df[ret], errors="coerce")
+    df = df.dropna(subset=["evaluated_return"])
+    if "side" in df.columns:
+        df = df[df["side"].astype(str).str.upper().isin(["LONG", "SHORT"])]
+    cols = [c for c in [
+        "decision_id","candle_timestamp","symbol","timeframe","side","score",
+        "confidence_label","risk_label","actionability","regime_label",
+        "evaluated_return","target_1_hit","target_2_hit","stop_hit",
+        "net_return_after_24h_pct","net_signed_return_after_6c_pct"
+    ] if c in df.columns]
+    out = df[cols].copy()
+    out["win"] = out["evaluated_return"] > 0
+    out = out.sort_values("candle_timestamp") if "candle_timestamp" in out else out
+    out = out.tail(limit)
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    out.to_csv(OUT, index=False, encoding="utf-8-sig")
+    return OUT, len(out)
 
-    df = pd.read_csv(source, low_memory=False)
-    if 'evaluation_status' in df.columns:
-        df = df[df['evaluation_status'].astype(str).str.upper() == 'COMPLETE'].copy()
 
-    keep = [
-        'decision_id','timestamp','symbol','side','score','confidence_label',
-        'actionability','evaluated_return','return_after_24h_pct',
-        'target_1_hit','market_regime','risk_level'
-    ]
-    cols = [c for c in keep if c in df.columns]
-    result = df[cols].copy()
-
-    if 'evaluated_return' not in result.columns:
-        for c in ['return_after_24h_pct','return_after_12h_pct','return_after_4h_pct']:
-            if c in result.columns:
-                result['evaluated_return'] = pd.to_numeric(result[c], errors='coerce')
-                break
-
-    if 'evaluated_return' in result.columns:
-        result['win'] = pd.to_numeric(result['evaluated_return'], errors='coerce') > 0
-
-    output.parent.mkdir(parents=True, exist_ok=True)
-    result.to_csv(output, index=False, encoding='utf-8-sig')
-    return output, len(result)
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     path, rows = build_calibration_dataset()
-    print(f'Calibration dataset created: {path} rows={rows}')
+    print(f"Calibration dataset created: {path}")
+    print(f"Rows: {rows}")

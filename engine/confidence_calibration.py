@@ -116,9 +116,20 @@ def _score_bucket_midpoint(bucket: str) -> float:
 
 
 def _prepare_frame() -> pd.DataFrame:
-    evals = _load_csv(CALIBRATION_DATASET_FILE)
-    if evals.empty:
-        evals = _load_csv(DECISION_EVALS_FILE)
+    dataset = _load_csv(CALIBRATION_DATASET_FILE)
+    if not dataset.empty:
+        frame = dataset.copy()
+        if "evaluated_return" in frame.columns:
+            frame["directional_win"] = pd.to_numeric(frame["evaluated_return"], errors="coerce") > 0
+            frame["target_1_hit_bool"] = _bool_series(frame, "target_1_hit")
+            if "confidence_label" not in frame.columns:
+                frame["confidence_label"] = "UNKNOWN"
+            if "score" not in frame.columns:
+                frame["score"] = 50
+            frame["confidence_midpoint"] = frame["confidence_label"].map(_label_midpoint)
+            frame["score_bucket"] = frame["score"].map(_score_bucket)
+            return frame
+    evals = _load_csv(DECISION_EVALS_FILE)
     decisions = _load_csv(DECISIONS_FILE)
     if evals.empty:
         return pd.DataFrame()
@@ -189,7 +200,7 @@ def run_confidence_calibration() -> ConfidenceCalibrationResult:
     if frame.empty:
         return ConfidenceCalibrationResult(
             created_utc=datetime.now(timezone.utc).isoformat(),
-            source="decision_evaluations",
+            source="calibration_training_dataset" if not _load_csv(CALIBRATION_DATASET_FILE).empty else "decision_evaluations",
             sample_count=0,
             overall_directional_win_rate=0.0,
             overall_target_1_hit_rate=0.0,
@@ -245,7 +256,7 @@ def run_confidence_calibration() -> ConfidenceCalibrationResult:
 
     return ConfidenceCalibrationResult(
         created_utc=datetime.now(timezone.utc).isoformat(),
-        source="decision_evaluations",
+        source="calibration_training_dataset" if not _load_csv(CALIBRATION_DATASET_FILE).empty else "decision_evaluations",
         sample_count=int(n),
         overall_directional_win_rate=overall_dir,
         overall_target_1_hit_rate=overall_t1,
