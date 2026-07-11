@@ -58,6 +58,12 @@ class PaperTradeCandidate:
     market_mode: str = "UNKNOWN"
     risk_tone: str = "UNKNOWN"
     provider: str = ""
+    historical_win_probability: float = 0.0
+    expected_r: float = 0.0
+    calibration_samples: int = 0
+    calibration_status: str = "MISSING"
+    allocation_pct: float = 0.0
+    shadow_allocation_pct: float = 0.0
     source: str = "portfolio_scanner"
     notes: List[str] = field(default_factory=list)
 
@@ -196,6 +202,12 @@ def candidate_from_portfolio_item(item, market_breadth=None) -> PaperTradeCandid
         market_mode=str(getattr(market_breadth, "market_mode", "UNKNOWN") or "UNKNOWN") if market_breadth else "UNKNOWN",
         risk_tone=str(getattr(market_breadth, "risk_tone", "UNKNOWN") or "UNKNOWN") if market_breadth else "UNKNOWN",
         provider=str(getattr(item, "provider", "") or ""),
+        historical_win_probability=float(getattr(item, "historical_win_probability", 0.0) or 0.0),
+        expected_r=float(getattr(item, "expected_r", 0.0) or 0.0),
+        calibration_samples=int(getattr(item, "calibration_samples", 0) or 0),
+        calibration_status=str(getattr(item, "calibration_status", "MISSING") or "MISSING"),
+        allocation_pct=float(getattr(item, "allocation_pct", 0.0) or 0.0),
+        shadow_allocation_pct=float(getattr(item, "shadow_allocation_pct", 0.0) or 0.0),
         notes=list(getattr(item, "notes", []) or []),
     )
 
@@ -290,6 +302,12 @@ def record_paper_trades_from_portfolio(
             "market_mode": candidate.market_mode,
             "risk_tone": candidate.risk_tone,
             "provider": candidate.provider,
+            "historical_win_probability": candidate.historical_win_probability,
+            "expected_r": candidate.expected_r,
+            "calibration_samples": candidate.calibration_samples,
+            "calibration_status": candidate.calibration_status,
+            "allocation_pct": candidate.allocation_pct,
+            "shadow_allocation_pct": candidate.shadow_allocation_pct,
             **CURRENT_MODEL_CONTRACT.as_dict(),
             "fee_bps_per_side": float(fee_bps_per_side),
             "base_slippage_bps_per_side": float(slippage_bps_per_side),

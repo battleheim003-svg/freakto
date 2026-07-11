@@ -15,6 +15,10 @@ Multi-Timeframe Consensus می‌سازد، سپس نمادها را رتبه‌
 
 import argparse
 import csv
+import sys
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
@@ -43,6 +47,7 @@ from engine.portfolio import (
     format_portfolio_console,
     format_portfolio_telegram,
 )
+from engine.portfolio_optimizer import build_portfolio_decision, format_portfolio_decision
 from engine.market_breadth import calculate_market_breadth
 from engine.daily_report import (
     build_daily_report,
@@ -56,6 +61,7 @@ from engine.paper_trading import (
     format_paper_record_result,
 )
 from engine.signal_store import init_signal_db, save_portfolio_item_signal
+from engine.csv_utils import migrate_csv_header, read_csv_dicts_lenient
 
 
 PRIMARY_TIMEFRAME = TIMEFRAME
@@ -170,7 +176,7 @@ def _analyze_timeframe(symbol: str, timeframe: str):
     )
 
     if df is None:
-        return None, None, None, None
+        return None, None, None, None, None
 
     opportunity = analyze_opportunity(
         df,
@@ -284,6 +290,7 @@ def analyze_symbol(symbol: str):
         consensus_result=consensus_result,
         provider=provider,
         price=price,
+        market_df=df,
     )
 
     return item
@@ -317,6 +324,15 @@ def _write_portfolio_log(result: PortfolioScanResult):
         "recommended_risk_pct",
         "position_notional",
         "expected_drawdown_pct",
+        "historical_win_probability",
+        "probability_ci_low",
+        "probability_ci_high",
+        "expected_r",
+        "calibration_samples",
+        "calibration_status",
+        "calibration_usable",
+        "allocation_pct",
+        "shadow_allocation_pct",
         "provider",
         "price",
         "decision_timestamp",
@@ -335,6 +351,12 @@ def _write_portfolio_log(result: PortfolioScanResult):
         "daily_report_file",
         "notes",
     ]
+
+    if PORTFOLIO_LOG_FILE.exists() and PORTFOLIO_LOG_FILE.stat().st_size:
+        existing_fields, _ = read_csv_dicts_lenient(PORTFOLIO_LOG_FILE, encoding="utf-8")
+        union = existing_fields + [column for column in fieldnames if column not in existing_fields]
+        migrate_csv_header(PORTFOLIO_LOG_FILE, union)
+        fieldnames = union
 
     file_exists = PORTFOLIO_LOG_FILE.exists()
 
@@ -370,6 +392,15 @@ def _write_portfolio_log(result: PortfolioScanResult):
                 "recommended_risk_pct": item.recommended_risk_pct,
                 "position_notional": item.position_notional,
                 "expected_drawdown_pct": item.expected_drawdown_pct,
+                "historical_win_probability": item.historical_win_probability,
+                "probability_ci_low": item.probability_ci_low,
+                "probability_ci_high": item.probability_ci_high,
+                "expected_r": item.expected_r,
+                "calibration_samples": item.calibration_samples,
+                "calibration_status": item.calibration_status,
+                "calibration_usable": item.calibration_usable,
+                "allocation_pct": item.allocation_pct,
+                "shadow_allocation_pct": item.shadow_allocation_pct,
                 "provider": item.provider,
                 "price": item.price,
                 "decision_timestamp": item.decision_timestamp,
@@ -415,12 +446,20 @@ def run_portfolio_scan(symbols: List[str] = None, send: bool = False, top_n: int
             result.failed_symbols.append(symbol)
 
     result.market_breadth = calculate_market_breadth(result.items)
+    result.portfolio_decision = build_portfolio_decision(result.items)
+    allocation_by_symbol = {item.symbol: item for item in result.portfolio_decision.allocations}
+    for item in result.items:
+        allocation = allocation_by_symbol.get(item.symbol)
+        if allocation:
+            item.allocation_pct = allocation.allocation_pct
+            item.shadow_allocation_pct = allocation.shadow_allocation_pct
 
     daily_report = build_daily_report(result, symbols=symbols)
     report_path = save_daily_report(daily_report)
     result.daily_report_file = str(report_path)
 
     format_portfolio_console(result, top_n=top_n)
+    print(format_portfolio_decision(result.portfolio_decision))
     print(format_daily_report_console(daily_report))
     print(f"🧠 Daily report ذخیره شد: {report_path}")
 

@@ -19,7 +19,7 @@ Portfolio Scanner models and ranking helpers - v4.6.1
 """
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import Any, List
 
 from .trade_quality import build_trade_intelligence_card
 from .market_breadth import MarketBreadthResult, format_breadth_console, format_breadth_telegram
@@ -80,6 +80,16 @@ class PortfolioItem:
     recommended_risk_pct: float = 0.0
     position_notional: float = 0.0
     expected_drawdown_pct: float = 0.0
+    historical_win_probability: float = 0.0
+    probability_ci_low: float = 0.0
+    probability_ci_high: float = 1.0
+    expected_r: float = 0.0
+    calibration_samples: int = 0
+    calibration_status: str = "MISSING"
+    calibration_usable: bool = False
+    allocation_pct: float = 0.0
+    shadow_allocation_pct: float = 0.0
+    return_history: List[float] = field(default_factory=list, repr=False)
     notes: List[str] = field(default_factory=list)
 
     @property
@@ -104,6 +114,7 @@ class PortfolioScanResult:
     items: List[PortfolioItem] = field(default_factory=list)
     failed_symbols: List[str] = field(default_factory=list)
     market_breadth: MarketBreadthResult | None = None
+    portfolio_decision: Any = None
 
     @property
     def ranked_items(self) -> List[PortfolioItem]:
@@ -391,7 +402,7 @@ def calculate_rank_score(opportunity, consensus_result=None) -> float:
     return round(max(0.0, rank), 2)
 
 
-def build_portfolio_item(symbol: str, opportunity, consensus_result=None, provider: str = "", price: float = 0.0) -> PortfolioItem:
+def build_portfolio_item(symbol: str, opportunity, consensus_result=None, provider: str = "", price: float = 0.0, market_df=None) -> PortfolioItem:
     notes = []
 
     regime = opportunity.raw.get("regime_label", "") if hasattr(opportunity, "raw") else ""
@@ -448,6 +459,16 @@ def build_portfolio_item(symbol: str, opportunity, consensus_result=None, provid
     if intelligence.conflicts:
         notes.append(f"Conflicts: {len(intelligence.conflicts)}")
 
+    from .economic_calibration import estimate_score_economics
+    economics = estimate_score_economics(opportunity.score)
+    notes.append(
+        f"Historical economics: p={economics.historical_win_probability:.1%}, "
+        f"E[R]={economics.expected_r:+.3f}, n={economics.samples}, status={economics.calibration_status}"
+    )
+    return_history: List[float] = []
+    if market_df is not None and "close" in market_df.columns:
+        return_history = [float(value) for value in market_df["close"].astype(float).pct_change().dropna().tail(180)]
+
     return PortfolioItem(
         symbol=symbol,
         timeframe=opportunity.timeframe,
@@ -479,6 +500,14 @@ def build_portfolio_item(symbol: str, opportunity, consensus_result=None, provid
         recommended_risk_pct=float(trade_card.kelly.recommended_risk_pct or 0.0),
         position_notional=position_notional,
         expected_drawdown_pct=expected_drawdown,
+        historical_win_probability=economics.historical_win_probability,
+        probability_ci_low=economics.probability_ci_low,
+        probability_ci_high=economics.probability_ci_high,
+        expected_r=economics.expected_r,
+        calibration_samples=economics.samples,
+        calibration_status=economics.calibration_status,
+        calibration_usable=economics.usable_for_allocation,
+        return_history=return_history,
         notes=notes,
     )
 

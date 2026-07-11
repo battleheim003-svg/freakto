@@ -1,5 +1,9 @@
 """Freakto v6.5.0 - Causal/Event Intelligence dashboard."""
 import argparse
+import sys
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 from config import SYMBOL, TIMEFRAME
 from engine.causal_intelligence import (

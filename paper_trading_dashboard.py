@@ -73,6 +73,8 @@ def main():
             f"Ready: {preflight.ready}",
             f"Replay rows: {preflight.replay_rows}",
             f"TEST directional rows: {preflight.test_directional_rows}",
+            f"Economic calibration: {preflight.economic_calibration_status}",
+            f"Capital allocation ready: {preflight.capital_allocation_ready}",
         ]
         lines.extend(f"[BLOCKER] {item}" for item in preflight.blockers)
         lines.extend(f"[WARNING] {item}" for item in preflight.warnings)

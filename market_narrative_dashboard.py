@@ -1,5 +1,9 @@
 """Freakto v7.0.0 - Market Narrative dashboard."""
 import argparse
+import sys
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 from config import SYMBOL, TIMEFRAME
 from engine.market_narrative import (

@@ -49,8 +49,10 @@ from engine.research_utils import (
     write_text,
     save_dataframe_csv,
 )
+from engine.evidence_quality import assess_evidence
+from engine.csv_utils import migrate_csv_header, read_csv_dicts_lenient
 
-VERSION = "v7.0.0"
+VERSION = "v7.2.0"
 CAUSAL_DIR = LOG_DIR / "causal"
 CAUSAL_SNAPSHOTS_DIR = CAUSAL_DIR / "source_snapshots"
 CAUSAL_EVENTS_FILE = Path("data") / "manual_events.csv"
@@ -108,6 +110,13 @@ class CausalContext:
     trusted_source_count: int
     manual_event_count: int
     auto_event_count: int = 0
+    evidence_strength: float = 0.0
+    evidence_grade: str = "INSUFFICIENT"
+    causal_claim_status: str = "INSUFFICIENT_EVIDENCE"
+    independent_source_count: int = 0
+    directional_agreement: float = 0.0
+    alternative_explanations: List[str] = field(default_factory=list)
+    evidence_limitations: List[str] = field(default_factory=list)
     top_sources: List[str] = field(default_factory=list)
     internal_causes: List[Dict[str, Any]] = field(default_factory=list)
     external_sources: List[Dict[str, Any]] = field(default_factory=list)
@@ -535,6 +544,8 @@ def load_manual_events(symbol: str, window_hours: int = 72) -> List[CausalSource
                     score = -12 if impact == "HIGH" else -7 if impact == "MEDIUM" else -3
                 source_name = _norm(row.get("source_name"), "manual")
                 desc = _norm(row.get("description"), "manual event")
+                if desc.lower().startswith("example:"):
+                    continue
                 results.append(_source_result(
                     "manual_events", "Curated Manual Event Ledger", "news_event", "TIER_0_MANUAL_CURATED", "OK",
                     direction=direction, confidence=_upper(row.get("confidence"), "MEDIUM"), signal_score=score,
@@ -810,6 +821,28 @@ def build_causal_context(
     else:
         verdict = "CAUSAL_CONTEXT_NEUTRAL"
 
+    primary_direction = "NEUTRAL"
+    if primary_cause.startswith("EXTERNAL_"):
+        source_key = primary_cause.replace("EXTERNAL_", "").lower()
+        primary_direction = next((item.direction for item in successful if item.source_id.lower() == source_key), "NEUTRAL")
+    elif primary_cause in {"MULTI_SOURCE_EVENT_CONSENSUS", "AUTO_EVENTS_CONTEXT"}:
+        primary_direction = "BULLISH" if external_direction_sum > 0 else "BEARISH" if external_direction_sum < 0 else "NEUTRAL"
+    else:
+        primary_direction = str(top_internal.get("direction", "NEUTRAL"))
+    alternatives = [
+        f"Internal alternative: {item.get('cause')} ({item.get('detail', '')})"
+        for item in sorted(internal, key=lambda row: abs(safe_float(row.get("score"), 0.0) or 0.0), reverse=True)
+        if item.get("cause") != primary_cause
+    ][:3]
+    evidence = assess_evidence(
+        [asdict(item) for item in successful],
+        claimed_direction=primary_direction,
+        proposed_alternatives=alternatives,
+    )
+    if evidence.claim_status in {"WEAK_HYPOTHESIS", "INSUFFICIENT_EVIDENCE"}:
+        verdict = "CAUSAL_HYPOTHESIS_WEAK_EVIDENCE"
+        cause_confidence = "LOW"
+
     warnings = [
         "Causal Intelligence یک لایه پژوهشی است و به‌تنهایی سیگنال خرید/فروش نمی‌سازد.",
         "جمع‌آوری APIهای عمومی ممکن است با rate limit یا محدودیت منطقه‌ای روبه‌رو شود؛ شکست source نباید چرخه Forward را fail کند.",
@@ -846,6 +879,13 @@ def build_causal_context(
         trusted_source_count=len(trusted_success),
         manual_event_count=len(manual_events),
         auto_event_count=len(auto_events),
+        evidence_strength=evidence.strength,
+        evidence_grade=evidence.grade,
+        causal_claim_status=evidence.claim_status,
+        independent_source_count=evidence.independent_source_count,
+        directional_agreement=evidence.directional_agreement,
+        alternative_explanations=evidence.alternative_explanations,
+        evidence_limitations=evidence.limitations,
         top_sources=top_sources,
         internal_causes=internal,
         external_sources=[asdict(r) for r in external],
@@ -880,6 +920,13 @@ def attach_causal_context(
         "causal_trusted_source_count": context.trusted_source_count,
         "causal_manual_event_count": context.manual_event_count,
         "causal_auto_event_count": context.auto_event_count,
+        "causal_evidence_strength": context.evidence_strength,
+        "causal_evidence_grade": context.evidence_grade,
+        "causal_claim_status": context.causal_claim_status,
+        "causal_independent_source_count": context.independent_source_count,
+        "causal_directional_agreement": context.directional_agreement,
+        "causal_alternative_explanations": " | ".join(context.alternative_explanations[:6]),
+        "causal_evidence_limitations": " | ".join(context.evidence_limitations[:6]),
         "causal_top_sources": " | ".join(context.top_sources[:6]),
         "causal_notes": " | ".join([c.get("cause", "") for c in context.internal_causes[:4]]),
     })
@@ -932,6 +979,8 @@ def run_causal_intelligence(
     status = "CAUSAL_CONTEXT_READY"
     if blockers:
         status = "CAUSAL_CONTEXT_WITH_BLOCKERS"
+    elif not collect_live and (manual_count or auto_count):
+        status = "CAUSAL_CONTEXT_LEDGER_ONLY"
     elif not collect_live:
         status = "CAUSAL_CONTEXT_INTERNAL_ONLY"
     elif failed and successful:
@@ -995,6 +1044,13 @@ def format_causal_console(report: CausalReport, compact: bool = True) -> str:
     lines.append(f"- Technical Conflict   : {ctx.get('technical_event_conflict')}")
     lines.append(f"- Alignment            : {ctx.get('causal_alignment')}")
     lines.append(f"- Verdict              : {ctx.get('causal_verdict')}")
+    lines.append(f"- Evidence Strength    : {ctx.get('evidence_strength')} ({ctx.get('evidence_grade')})")
+    lines.append(f"- Claim Status         : {ctx.get('causal_claim_status')}")
+    lines.append(f"- Independent Sources  : {ctx.get('independent_source_count')}")
+    lines.append(f"- Direction Agreement  : {ctx.get('directional_agreement')}")
+    if ctx.get("alternative_explanations"):
+        lines.append("\nAlternative Explanations:")
+        lines.extend(f"- {item}" for item in ctx.get("alternative_explanations", []))
     if ctx.get("internal_causes"):
         lines.append("\nInternal Causes:")
         for c in ctx.get("internal_causes", [])[:8]:
@@ -1040,6 +1096,11 @@ def _append_observation(report: CausalReport) -> Path:
         "technical_event_conflict": ctx.get("technical_event_conflict", ""),
         "causal_alignment": ctx.get("causal_alignment", ""),
         "causal_verdict": ctx.get("causal_verdict", ""),
+        "evidence_strength": ctx.get("evidence_strength", ""),
+        "evidence_grade": ctx.get("evidence_grade", ""),
+        "causal_claim_status": ctx.get("causal_claim_status", ""),
+        "independent_source_count": ctx.get("independent_source_count", ""),
+        "directional_agreement": ctx.get("directional_agreement", ""),
         "source_count": report.source_count,
         "successful_sources": report.successful_sources,
         "trusted_successful_sources": report.trusted_successful_sources,
@@ -1047,6 +1108,11 @@ def _append_observation(report: CausalReport) -> Path:
         "auto_events_loaded": report.auto_events_loaded,
     }
     exists = CAUSAL_OBSERVATIONS_CSV.exists() and CAUSAL_OBSERVATIONS_CSV.stat().st_size > 0
+    if exists:
+        existing_fields, _ = read_csv_dicts_lenient(CAUSAL_OBSERVATIONS_CSV)
+        union = existing_fields + [column for column in row if column not in existing_fields]
+        migrate_csv_header(CAUSAL_OBSERVATIONS_CSV, union)
+        row = {column: row.get(column, "") for column in union}
     with CAUSAL_OBSERVATIONS_CSV.open("a", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=list(row.keys()))
         if not exists:

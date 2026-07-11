@@ -21,6 +21,8 @@ class PaperTradePreflight:
     status: str
     replay_rows: int = 0
     test_directional_rows: int = 0
+    economic_calibration_status: str = "MISSING"
+    capital_allocation_ready: bool = False
     blockers: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
 
@@ -64,12 +66,24 @@ def run_paper_trade_preflight(path: str | Path = DEFAULT_REPLAY_FILE) -> PaperTr
         calibration = ExperimentRegistry().latest_run("CALIBRATION", parent_run_id=latest_run)
         if calibration is None or calibration.status != "COMPLETED":
             blockers.append("No completed one-shot calibration is registered for the latest replay run.")
+    from engine.economic_calibration import load_economic_calibration
+    economic = load_economic_calibration()
+    economic_status = economic.status if economic else "MISSING"
+    capital_ready = bool(economic and economic.usable_for_allocation)
+    if economic is None:
+        blockers.append("Economic calibration artifact is missing; run economic_calibration_dashboard.py --build.")
+    elif economic.source_replay_run_id != latest_run:
+        blockers.append("Economic calibration artifact does not match the latest replay run.")
+    elif not economic.usable_for_allocation:
+        warnings.append("Economic calibration has no validated positive edge; paper trades are observation-only and allocation stays at zero.")
     warnings.append("Paper readiness means safe forward observation, not proven positive edge or live-trading approval.")
     return PaperTradePreflight(
         ready=not blockers,
         status="READY_FOR_PAPER_OBSERVATION" if not blockers else "BLOCKED_RESEARCH_PREFLIGHT",
         replay_rows=int(len(complete)),
         test_directional_rows=int(len(test)),
+        economic_calibration_status=economic_status,
+        capital_allocation_ready=capital_ready,
         blockers=blockers,
         warnings=warnings,
     )

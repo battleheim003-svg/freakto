@@ -22,8 +22,10 @@ except Exception:  # pragma: no cover
     pd = None
 
 from engine.research_utils import LOG_DIR, RESEARCH_DIR, run_id, safe_float, utc_now_iso, write_json, write_text, save_dataframe_csv
+from engine.evidence_quality import assess_evidence, evidence_relevance
+from engine.csv_utils import migrate_csv_header, read_csv_dicts_lenient
 
-VERSION = "v7.1.0"
+VERSION = "v7.2.0"
 NARRATIVE_DIR = LOG_DIR / "narrative"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 AUTO_EVENTS_FILE = Path("data") / "auto_events.csv"
@@ -66,6 +68,7 @@ class NarrativeDriver:
     direction: str
     impact: str
     confidence: str
+    evidence_relevance: float
     weight: float
     timestamp_utc: str
     source_url: str = ""
@@ -93,10 +96,17 @@ class MarketNarrativeReport:
     event_risk: str
     technical_event_conflict: str
     narrative_summary: str
+    evidence_strength: float
+    evidence_grade: str
+    causal_claim_status: str
+    independent_source_count: int
+    directional_agreement: float
     driver_count: int
     top_drivers: List[Dict[str, Any]] = field(default_factory=list)
     theme_scores: List[Dict[str, Any]] = field(default_factory=list)
     contradictions: List[str] = field(default_factory=list)
+    alternative_explanations: List[str] = field(default_factory=list)
+    evidence_limitations: List[str] = field(default_factory=list)
     latest_causal_context: Dict[str, Any] = field(default_factory=dict)
     blockers: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
@@ -169,6 +179,8 @@ def _row_is_noise(row: Dict[str, Any]) -> Tuple[bool, str]:
     quality = _upper(row.get("event_quality"))
     if quality.startswith("REJECTED"):
         return True, quality
+    if title.startswith("example:"):
+        return True, "example_placeholder_not_real_evidence"
     if source_id == "coinbase_blog" and "/blog" not in url:
         return True, "coinbase_non_blog_product_or_nav_link"
     bad = ["developer platform", "payments", "verified pools", "asset listings", "list your asset", "trusted by institutions", "privacy policy", "terms of use"]
@@ -187,7 +199,7 @@ def _event_weight(row: Dict[str, Any], now: datetime) -> float:
     ts = _parse_dt(row.get("timestamp_utc")) or now
     age_hours = max(0.0, (now - ts).total_seconds() / 3600.0)
     recency_w = max(0.35, math.exp(-age_hours / 168.0))
-    return round(sign * 10.0 * tier_w * conf_w * impact_w * recency_w, 4)
+    return round(sign * 10.0 * tier_w * conf_w * impact_w * recency_w * evidence_relevance(row), 4)
 
 
 def _load_latest_causal() -> Dict[str, Any]:
@@ -224,6 +236,7 @@ def _drivers_from_rows(rows: List[Dict[str, Any]], *, symbol: str, lookback_hour
             direction=_upper(row.get("direction"), "NEUTRAL"),
             impact=_upper(row.get("impact"), "LOW"),
             confidence=_upper(row.get("confidence"), "LOW"),
+            evidence_relevance=evidence_relevance(row),
             weight=w,
             timestamp_utc=(ts.isoformat() if ts else _norm(row.get("timestamp_utc"))),
             source_url=_norm(row.get("source_url")),
@@ -327,10 +340,22 @@ def run_market_narrative(*, symbol: str = "BTC/USDT", timeframe: str = "4h", loo
         status = "MARKET_NARRATIVE_WITH_CONFLICTS"
 
     summary = _build_summary(label, dominant_direction, dominant_theme, net, event_risk, all_drivers)
+    evidence = assess_evidence(
+        [asdict(driver) for driver in all_drivers],
+        claimed_direction=dominant_direction,
+        proposed_alternatives=[f"Competing theme: {item['theme']} score={item['score']}" for item in theme_scores[1:4]],
+    )
+    if evidence.claim_status in {"WEAK_HYPOTHESIS", "INSUFFICIENT_EVIDENCE"}:
+        status = "MARKET_NARRATIVE_WEAK_EVIDENCE"
+        conf = "LOW"
+        warnings_extra = "Narrative wording is hypothesis-only because evidence strength is insufficient."
+    else:
+        warnings_extra = "Narrative remains a supported hypothesis, not a proven cause."
     warnings = [
         "Market Narrative فقط روایت پژوهشی می‌سازد؛ سیگنال خرید/فروش مستقل نیست.",
         "اگر event sourceها نویز HTML/marketing بدهند، v7 آن‌ها را فیلتر می‌کند اما همچنان باید source health بررسی شود.",
     ]
+    warnings.append(warnings_extra)
     recommendations = [
         "automatic_event_collector_dashboard.py --compact باید قبل از market_narrative_dashboard.py اجرا شود.",
         "اگر Narrative و Technical conflict بالا باشد، تصمیم فقط Research/Watchlist بماند.",
@@ -356,10 +381,17 @@ def run_market_narrative(*, symbol: str = "BTC/USDT", timeframe: str = "4h", loo
         event_risk=event_risk,
         technical_event_conflict=causal_conflict,
         narrative_summary=summary,
+        evidence_strength=evidence.strength,
+        evidence_grade=evidence.grade,
+        causal_claim_status=evidence.claim_status,
+        independent_source_count=evidence.independent_source_count,
+        directional_agreement=evidence.directional_agreement,
         driver_count=len(all_drivers),
         top_drivers=[asdict(d) for d in all_drivers[:12]],
         theme_scores=theme_scores[:12],
         contradictions=contradictions,
+        alternative_explanations=evidence.alternative_explanations,
+        evidence_limitations=evidence.limitations,
         latest_causal_context=causal,
         blockers=blockers,
         warnings=warnings,
@@ -397,6 +429,13 @@ def format_market_narrative_console(report: MarketNarrativeReport, compact: bool
     lines.append(f"- Event Risk           : {data.get('event_risk')}")
     lines.append(f"- Tech/Event Conflict  : {data.get('technical_event_conflict')}")
     lines.append(f"- Summary              : {data.get('narrative_summary')}")
+    lines.append(f"- Evidence Strength    : {data.get('evidence_strength')} ({data.get('evidence_grade')})")
+    lines.append(f"- Claim Status         : {data.get('causal_claim_status')}")
+    lines.append(f"- Independent Sources  : {data.get('independent_source_count')}")
+    lines.append(f"- Direction Agreement  : {data.get('directional_agreement')}")
+    if data.get("alternative_explanations"):
+        lines.append("\nAlternative Explanations:")
+        lines.extend(f"- {item}" for item in data.get("alternative_explanations", []))
     if data.get("theme_scores"):
         lines.append("\nTheme Scores:")
         for r in data.get("theme_scores", [])[:8]:
@@ -439,8 +478,18 @@ def _append_observation(report: MarketNarrativeReport) -> Path:
         "technical_event_conflict": report.technical_event_conflict,
         "accepted_events": report.accepted_events,
         "noise_filtered_events": report.noise_filtered_events,
+        "evidence_strength": report.evidence_strength,
+        "evidence_grade": report.evidence_grade,
+        "causal_claim_status": report.causal_claim_status,
+        "independent_source_count": report.independent_source_count,
+        "directional_agreement": report.directional_agreement,
     }
     exists = NARRATIVE_OBSERVATIONS_CSV.exists() and NARRATIVE_OBSERVATIONS_CSV.stat().st_size > 0
+    if exists:
+        existing_fields, _ = read_csv_dicts_lenient(NARRATIVE_OBSERVATIONS_CSV)
+        union = existing_fields + [column for column in row if column not in existing_fields]
+        migrate_csv_header(NARRATIVE_OBSERVATIONS_CSV, union)
+        row = {column: row.get(column, "") for column in union}
     with NARRATIVE_OBSERVATIONS_CSV.open("a", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=list(row.keys()))
         if not exists:
@@ -485,6 +534,11 @@ def attach_market_narrative_to_opportunity(opportunity: Any, *, symbol: str = "B
         "market_narrative_event_risk": report.event_risk,
         "market_narrative_conflict": report.technical_event_conflict,
         "market_narrative_summary": report.narrative_summary,
+        "market_narrative_evidence_strength": report.evidence_strength,
+        "market_narrative_evidence_grade": report.evidence_grade,
+        "market_narrative_claim_status": report.causal_claim_status,
+        "market_narrative_independent_sources": report.independent_source_count,
+        "market_narrative_alternatives": " | ".join(report.alternative_explanations[:6]),
     })
     # v7.1: immediately score the narrative against the Decision Engine bias.
     # This is research-only metadata and does not modify Paper/Live execution.
