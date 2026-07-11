@@ -1,0 +1,58 @@
+{
+  "run_id": "root_cause_samples_20260711_113548",
+  "generated_utc": "2026-07-11T11:35:48.155628+00:00",
+  "version": "v8.2.0",
+  "status": "ROOT_CAUSE_SAMPLE_COLLECTION_ACTIVE_LOW_SAMPLE",
+  "evaluations_file": "logs/decision_evaluations.csv",
+  "evaluation_rows": 55,
+  "complete_rows": 52,
+  "root_cause_rows": 4,
+  "evaluated_cells": 8,
+  "unique_root_causes": 1,
+  "min_cells": 10,
+  "research_cells": 30,
+  "candidate_cells": 90,
+  "estimated_more_root_cause_decisions_for_min": 1,
+  "estimated_more_root_cause_decisions_for_research": 8,
+  "estimated_more_root_cause_decisions_for_candidate": 28,
+  "validation_status": "ROOT_CAUSE_FORWARD_PROMISING_LOW_SAMPLE",
+  "validation_candidates": 0,
+  "validation_promising_low_sample": 1,
+  "buckets": [
+    {
+      "root_cause_primary": "MACRO_POLICY_PRESSURE",
+      "root_cause_direction": "BEARISH",
+      "decision_rows": 4,
+      "evaluated_cells": 8,
+      "samples_4h": 4,
+      "hit_rate_4h": 75.0,
+      "avg_signed_return_4h_pct": 0.0886,
+      "samples_12h": 3,
+      "hit_rate_12h": 33.33,
+      "avg_signed_return_12h_pct": 0.0167,
+      "samples_24h": 1,
+      "hit_rate_24h": 100.0,
+      "avg_signed_return_24h_pct": 0.3409,
+      "avg_probability_pct": 46.395,
+      "evidence_quality_mode": "HIGH",
+      "confidence_mode": "MEDIUM",
+      "maturity_level": "LOW_SAMPLE_ACCUMULATING",
+      "sample_gap_to_min": 2,
+      "sample_gap_to_research": 22,
+      "sample_gap_to_candidate": 82,
+      "provisional_verdict": "LOW_SAMPLE_KEEP_COLLECTING"
+    }
+  ],
+  "blockers": [
+    "Root Cause evaluated cells کمتر از حداقل است: 8/10"
+  ],
+  "warnings": [
+    "Root Cause Sample Tracker فقط بلوغ نمونه‌ها را می‌سنجد؛ Paper/Live فعال نمی‌کند.",
+    "Promotion واقعی فقط بعد از Forward validation پایدار و sample کافی مجاز است."
+  ],
+  "recommendations": [
+    "چرخه Forward را هر 4 ساعت یا با GitHub Actions اجرا کن تا Root Cause rows بیشتر شود.",
+    "پس از هر root_cause_dashboard.py، decision_evaluator.py و سپس root_cause_forward_validation_dashboard.py را اجرا کن.",
+    "تا وقتی حداقل 30-50 تصمیم دارای Root Cause جمع نشده، نتیجه فقط Research/Shadow بماند."
+  ]
+}
