@@ -1,0 +1,4715 @@
+{
+  "run_id": "research_suite_20260711_072653",
+  "generated_utc": "2026-07-11T07:26:53.524824+00:00",
+  "version": "v10.0.0",
+  "status": "RESEARCH_SUITE_WITH_BLOCKERS",
+  "sections": {
+    "gate_robustness": {
+      "run_id": "gate_robustness_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.165588+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "results": [],
+      "blockers": [
+        "هیچ دیتای backtest کامل برای robust validation وجود ندارد."
+      ],
+      "warnings": []
+    },
+    "cost_adjusted_backtest": {
+      "run_id": "cost_backtest_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.166166+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "groups": [],
+      "blockers": [
+        "Backtest data موجود نیست."
+      ]
+    },
+    "meta_labeling": {
+      "run_id": "meta_label_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.166676+00:00",
+      "status": "LOW_SAMPLE_META_LABELING",
+      "samples": 0,
+      "blockers": [
+        "برای meta-labeling حداقل 120 نمونه لازم است."
+      ],
+      "warnings": [],
+      "top_features": []
+    },
+    "ensemble_explainability": {
+      "run_id": "ensemble_explain_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.186376+00:00",
+      "status": "EXPLAINABILITY_READY",
+      "rows": 55,
+      "recent_count": 25,
+      "avg_ensemble_agreement": 75.96,
+      "recent_explanations": [
+        {
+          "decision_id": "90ceec3959a268ff",
+          "candle_timestamp": "2026-07-05 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 18.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 36.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 40.7
+            },
+            {
+              "feature": "momentum_score",
+              "value": 8.0,
+              "share_pct": 29.6
+            },
+            {
+              "feature": "structure_score",
+              "value": 8.0,
+              "share_pct": 29.6
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "0678ab66434e5aeb",
+          "candle_timestamp": "2026-07-05 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 18.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 52.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 40.7
+            },
+            {
+              "feature": "momentum_score",
+              "value": 8.0,
+              "share_pct": 29.6
+            },
+            {
+              "feature": "structure_score",
+              "value": 8.0,
+              "share_pct": 29.6
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "740c9e42772549f9",
+          "candle_timestamp": "2026-07-06 04:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 35.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 62.2
+            },
+            {
+              "feature": "momentum_score",
+              "value": 11.0,
+              "share_pct": 24.4
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 13.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "e19f2e26336bad6a",
+          "candle_timestamp": "2026-07-06 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 38.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 81.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 30.0,
+              "share_pct": 48.4
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 27.4
+            },
+            {
+              "feature": "volume_score",
+              "value": 11.0,
+              "share_pct": 17.7
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "055d1880dfc7312a",
+          "candle_timestamp": "2026-07-06 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 38.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 81.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 30.0,
+              "share_pct": 48.4
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 27.4
+            },
+            {
+              "feature": "volume_score",
+              "value": 11.0,
+              "share_pct": 17.7
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "09ce1fb638454be2",
+          "candle_timestamp": "2026-07-06 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 38.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 73.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 28.0,
+              "share_pct": 46.7
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 28.3
+            },
+            {
+              "feature": "volume_score",
+              "value": 11.0,
+              "share_pct": 18.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "1102b59be0b7de01",
+          "candle_timestamp": "2026-07-06 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 49.0,
+          "actionability": "NOT_ACTIONABLE",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 52.8
+            },
+            {
+              "feature": "momentum_score",
+              "value": 19.0,
+              "share_pct": 35.8
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 11.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "86f05b0fe8adfbd6",
+          "candle_timestamp": "2026-07-06 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 63.0,
+          "actionability": "WATCHLIST",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 49.1
+            },
+            {
+              "feature": "momentum_score",
+              "value": 22.0,
+              "share_pct": 38.6
+            },
+            {
+              "feature": "structure_score",
+              "value": 7.0,
+              "share_pct": 12.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "2eaf3b9ad9adfdef",
+          "candle_timestamp": "2026-07-07 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 22.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 59.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 13.0,
+              "share_pct": 40.6
+            },
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 34.4
+            },
+            {
+              "feature": "volume_score",
+              "value": 5.0,
+              "share_pct": 15.6
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "c773f3c70658f65e",
+          "candle_timestamp": "2026-07-07 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 49.0,
+          "actionability": "NOT_ACTIONABLE",
+          "ensemble_agreement_score": 88.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 49.1
+            },
+            {
+              "feature": "momentum_score",
+              "value": 19.0,
+              "share_pct": 33.3
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 10.5
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "0a09219f00e35fac",
+          "candle_timestamp": "2026-07-07 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 66.0,
+          "actionability": "WATCHLIST",
+          "ensemble_agreement_score": 100.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 43.1
+            },
+            {
+              "feature": "momentum_score",
+              "value": 21.0,
+              "share_pct": 32.3
+            },
+            {
+              "feature": "historical_edge_score",
+              "value": 8.0,
+              "share_pct": 12.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "c1076bda549a5f61",
+          "candle_timestamp": "2026-07-07 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 30.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 68.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 62.2
+            },
+            {
+              "feature": "momentum_score",
+              "value": 11.0,
+              "share_pct": 24.4
+            },
+            {
+              "feature": "structure_score",
+              "value": 3.0,
+              "share_pct": 6.7
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "a2775e3a287b70db",
+          "candle_timestamp": "2026-07-07 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 35.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 88.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 60.9
+            },
+            {
+              "feature": "momentum_score",
+              "value": 11.0,
+              "share_pct": 23.9
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 13.0
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "6a43591943ce3847",
+          "candle_timestamp": "2026-07-08 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 41.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 88.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 30.0,
+              "share_pct": 47.6
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 27.0
+            },
+            {
+              "feature": "structure_score",
+              "value": 7.0,
+              "share_pct": 11.1
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "590b7028829eaf1b",
+          "candle_timestamp": "2026-07-08 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 35.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 42.4
+            },
+            {
+              "feature": "momentum_score",
+              "value": 20.0,
+              "share_pct": 30.3
+            },
+            {
+              "feature": "historical_edge_score",
+              "value": -11.0,
+              "share_pct": 16.7
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "6a47ef8e8f85e111",
+          "candle_timestamp": "2026-07-09 00:00:00",
+          "symbol": "BTC/USDT",
+          "side": "SHORT",
+          "score": 46.0,
+          "actionability": "NOT_ACTIONABLE",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 40.0
+            },
+            {
+              "feature": "momentum_score",
+              "value": 25.0,
+              "share_pct": 35.7
+            },
+            {
+              "feature": "historical_edge_score",
+              "value": -11.0,
+              "share_pct": 15.7
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "efde5793295b9eb9",
+          "candle_timestamp": "2026-07-09 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 24.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 66.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 13.0,
+              "share_pct": 43.3
+            },
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 36.7
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 20.0
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "7a396aa24ec56b57",
+          "candle_timestamp": "2026-07-09 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 29.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 71.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 16.0,
+              "share_pct": 48.5
+            },
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 33.3
+            },
+            {
+              "feature": "structure_score",
+              "value": 6.0,
+              "share_pct": 18.2
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "32434246e29d7d99",
+          "candle_timestamp": "2026-07-09 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 39.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 88.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 16.0,
+              "share_pct": 40.0
+            },
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 27.5
+            },
+            {
+              "feature": "volume_score",
+              "value": 7.0,
+              "share_pct": 17.5
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "407db4bd4257b687",
+          "candle_timestamp": "2026-07-09 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 24.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 66.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 11.0,
+              "share_pct": 32.4
+            },
+            {
+              "feature": "momentum_score",
+              "value": 8.0,
+              "share_pct": 23.5
+            },
+            {
+              "feature": "structure_score",
+              "value": 8.0,
+              "share_pct": 23.5
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "bc3658cbb2d9e852",
+          "candle_timestamp": "2026-07-09 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 25.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 62.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 26.0,
+              "share_pct": 55.3
+            },
+            {
+              "feature": "trend_score",
+              "value": 17.0,
+              "share_pct": 36.2
+            },
+            {
+              "feature": "structure_score",
+              "value": 4.0,
+              "share_pct": 8.5
+            }
+          ],
+          "note": "mixed_or_building"
+        },
+        {
+          "decision_id": "8782f6983beb22b1",
+          "candle_timestamp": "2026-07-10 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 75.0,
+          "actionability": "WATCHLIST",
+          "ensemble_agreement_score": 100.0,
+          "top_contributors": [
+            {
+              "feature": "momentum_score",
+              "value": 30.0,
+              "share_pct": 40.0
+            },
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 37.3
+            },
+            {
+              "feature": "historical_edge_score",
+              "value": 11.0,
+              "share_pct": 14.7
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "503dadce97c9976f",
+          "candle_timestamp": "2026-07-10 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 47.0,
+          "actionability": "NOT_ACTIONABLE",
+          "ensemble_agreement_score": 88.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 46.7
+            },
+            {
+              "feature": "momentum_score",
+              "value": 17.0,
+              "share_pct": 28.3
+            },
+            {
+              "feature": "historical_edge_score",
+              "value": 11.0,
+              "share_pct": 18.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "b02ae7fe2b105ae9",
+          "candle_timestamp": "2026-07-10 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "NEUTRAL",
+          "score": 35.0,
+          "actionability": "MONITOR_ONLY",
+          "ensemble_agreement_score": 76.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 49.1
+            },
+            {
+              "feature": "momentum_score",
+              "value": 23.0,
+              "share_pct": 40.4
+            },
+            {
+              "feature": "structure_score",
+              "value": 3.0,
+              "share_pct": 5.3
+            }
+          ],
+          "note": "high_agreement"
+        },
+        {
+          "decision_id": "3a81916cf067dc15",
+          "candle_timestamp": "2026-07-11 04:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 62.0,
+          "actionability": "WATCHLIST",
+          "ensemble_agreement_score": 88.0,
+          "top_contributors": [
+            {
+              "feature": "trend_score",
+              "value": 28.0,
+              "share_pct": 42.4
+            },
+            {
+              "feature": "momentum_score",
+              "value": 22.0,
+              "share_pct": 33.3
+            },
+            {
+              "feature": "historical_edge_score",
+              "value": 10.0,
+              "share_pct": 15.2
+            }
+          ],
+          "note": "high_agreement"
+        }
+      ],
+      "warnings": [
+        "Explainability سهم featureها را برای دیباگ نشان می‌دهد؛ به تنهایی سیگنال معاملاتی نیست."
+      ],
+      "blockers": []
+    },
+    "data_enrichment": {
+      "run_id": "data_enrichment_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.196087+00:00",
+      "status": "ENRICHMENT_CONNECTORS_PRESENT",
+      "features": [
+        {
+          "feature": "funding_rate",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "open_interest",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "long_short_ratio",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "liquidations",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "order_book_imbalance",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        },
+        {
+          "feature": "exchange_inflow_outflow",
+          "present": false,
+          "column": "",
+          "coverage_pct": 0.0
+        }
+      ],
+      "connectors": {
+        "coinalyze_fetcher.py": true,
+        "futures_data_fetcher.py": true,
+        "news_sentiment.py": true,
+        "airdrop_radar.py": true
+      },
+      "recommendations": [
+        "Funding/Open Interest/Long-Short را اول به Shadow features اضافه کن، نه به decision live.",
+        "Order book برای تایم‌فریم 4h اولویت پایین‌تر از derivatives aggregate دارد."
+      ],
+      "warnings": [
+        "عدم وجود ستون یعنی feature هنوز در لاگ تصمیم‌ها persist نشده است، نه اینکه collector حتماً وجود ندارد."
+      ]
+    },
+    "regime_research": {
+      "run_id": "regime_research_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.196664+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "regimes": [],
+      "blockers": [
+        "Backtest data موجود نیست."
+      ]
+    },
+    "forward_regime_labeling": {
+      "run_id": "forward_regime_label_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.196679+00:00",
+      "status": "FORWARD_REGIME_LABELING_READY",
+      "apply_changes": false,
+      "decisions_path": "logs/decisions.csv",
+      "evaluations_path": "logs/decision_evaluations.csv",
+      "decision_rows": 55,
+      "known_before": 55,
+      "unknown_before": 0,
+      "known_after": 55,
+      "unknown_after": 0,
+      "injected_decision_rows": 0,
+      "preserved_decision_rows": 55,
+      "direct_engine_rows": 22,
+      "text_inferred_rows": 33,
+      "proxy_inferred_rows": 0,
+      "evaluation_rows": 54,
+      "patched_evaluation_rows": 0,
+      "evaluation_known_after": 54,
+      "label_counts": {
+        "TRENDING_BULL": 46,
+        "TRENDING_BEAR": 8,
+        "SIDEWAYS": 1
+      },
+      "evaluation_label_counts": {
+        "TRENDING_BULL": 45,
+        "TRENDING_BEAR": 8,
+        "SIDEWAYS": 1
+      },
+      "backup_paths": [],
+      "blockers": [],
+      "recommendations": [
+        "بعد از اجرای cycle جدید، regime_shadow_gate_dashboard.py --compact را دوباره بررسی کن."
+      ],
+      "warnings": [
+        "Regime injection فقط از داده‌های لحظه تصمیم استفاده می‌کند؛ outcome/return/target/stop استفاده نمی‌شود.",
+        "برچسب‌های LOW_CONF_PROXY برای Research هستند و باید در Forward واقعی بیشتر validate شوند."
+      ]
+    },
+    "regime_gate_matrix": {
+      "run_id": "regime_gate_matrix_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.202714+00:00",
+      "version": "v6.1.0",
+      "status": "NO_BACKTEST_DATA",
+      "horizon": "24h",
+      "min_samples": 10,
+      "candidate_min_samples": 30,
+      "fee_bps": 10.0,
+      "slippage_bps": 5.0,
+      "baseline_net": {
+        "samples": 0,
+        "avg_return_pct": 0.0,
+        "win_rate": 0.0,
+        "target_1_hit_rate": 0.0,
+        "stop_hit_rate": 0.0
+      },
+      "regimes_seen": [],
+      "gates_tested": 0,
+      "candidate_count": 0,
+      "regime_candidates": [],
+      "regime_gate_side_candidates": [],
+      "top_regime_gate": [],
+      "top_regime_gate_side": [],
+      "top_regime_side": [],
+      "top_regime_symbol": [],
+      "avoid_regimes": [],
+      "shadow_proposals": [],
+      "blockers": [
+        "هیچ historical_backtest_evaluations کامل برای ساخت Regime-Gate Matrix پیدا نشد."
+      ],
+      "warnings": [],
+      "recommendations": []
+    },
+    "regime_shadow_gates": {
+      "run_id": "shadow_gate_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.258182+00:00",
+      "status": "REGIME_SHADOW_GATES_ACTIVE",
+      "horizon": "24h",
+      "min_samples": 30,
+      "decisions": 55,
+      "directional_decisions": 31,
+      "shadow_signals": 20,
+      "evaluated_shadow_samples": 16,
+      "pending_shadow_samples": 1,
+      "gates_tracked": 11,
+      "confirmed_candidates": 0,
+      "building_candidates": 11,
+      "rejected_candidates": 0,
+      "top_gates": [
+        {
+          "gate": "STRUCTURE_SCORE_GE_10",
+          "family": "review_backtest_candidate",
+          "priority": 4,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 14,
+          "evaluated_samples": 14,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.8834,
+          "median_return_pct": 0.8142,
+          "win_rate": 100.0,
+          "target_1_hit_rate": 100.0,
+          "stop_hit_rate": 85.71,
+          "mfe_mean_pct": 3.4715,
+          "mae_mean_pct": -1.9449,
+          "mfe_mae_ratio": 1.785,
+          "best_return_pct": 1.7343,
+          "worst_return_pct": 0.4897,
+          "latest_signal_utc": "2026-07-03T22:12:37.322247+00:00",
+          "latest_candle_timestamp": "2026-07-03 20:00:00",
+          "description": "مثبت ولی نیازمند review: structure_score >= 10.",
+          "warnings": [
+            "Forward evaluated samples کمتر از حداقل 30 است: 14"
+          ],
+          "filters": {
+            "structure_score_min": 10
+          }
+        },
+        {
+          "gate": "HISTORICAL_EDGE_SCORE_GE_1",
+          "family": "primary_backtest_candidate",
+          "priority": 3,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 5,
+          "evaluated_samples": 2,
+          "pending_samples": 1,
+          "partial_samples": 2,
+          "avg_return_pct": -3.0511,
+          "median_return_pct": -3.0511,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 100.0,
+          "stop_hit_rate": 100.0,
+          "mfe_mean_pct": 1.1851,
+          "mae_mean_pct": -3.7369,
+          "mfe_mae_ratio": 0.317,
+          "best_return_pct": -2.8398,
+          "worst_return_pct": -3.2625,
+          "latest_signal_utc": "2026-07-11T07:25:53.492975+00:00",
+          "latest_candle_timestamp": "2026-07-11 04:00:00",
+          "description": "Backtest candidate با stop کمتر: historical_edge_score >= 1.",
+          "warnings": [
+            "Forward evaluated samples کمتر از حداقل 30 است: 2"
+          ],
+          "filters": {
+            "historical_edge_score_min": 1
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "risk_normalized_in": [
+              "MEDIUM"
+            ]
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium + SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "risk_normalized_in": [
+              "MEDIUM"
+            ],
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "structure_score_min": 10
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10 + SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "structure_score_min": 10,
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        },
+        {
+          "gate": "VOLUME_SCORE_GE_10",
+          "family": "primary_backtest_candidate",
+          "priority": 1,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "Backtest candidate قوی: volume_score >= 10.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "volume_score_min": 10
+          }
+        },
+        {
+          "gate": "RISK_MEDIUM",
+          "family": "primary_backtest_candidate",
+          "priority": 2,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 1,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 1,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "2026-07-10T18:10:47.369248+00:00",
+          "latest_candle_timestamp": "2026-07-10 16:00:00",
+          "description": "Backtest candidate با sample بیشتر: risk_label = Medium.",
+          "warnings": [
+            "Forward evaluated samples کمتر از حداقل 30 است: 0"
+          ],
+          "filters": {
+            "risk_normalized_in": [
+              "MEDIUM"
+            ]
+          }
+        },
+        {
+          "gate": "SCORE_GE_80",
+          "family": "small_sample_positive",
+          "priority": 5,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "مثبت کم‌نمونه: score >= 80؛ فقط watchlist تحقیقاتی.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "score_min": 80
+          }
+        },
+        {
+          "gate": "DOGE_SHORT_WATCH",
+          "family": "symbol_side_watch",
+          "priority": 6,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "مثبت کم‌نمونه: DOGE/USDT SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "symbol_in": [
+              "DOGE/USDT"
+            ],
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        }
+      ],
+      "gate_metrics": [
+        {
+          "gate": "STRUCTURE_SCORE_GE_10",
+          "family": "review_backtest_candidate",
+          "priority": 4,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 14,
+          "evaluated_samples": 14,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.8834,
+          "median_return_pct": 0.8142,
+          "win_rate": 100.0,
+          "target_1_hit_rate": 100.0,
+          "stop_hit_rate": 85.71,
+          "mfe_mean_pct": 3.4715,
+          "mae_mean_pct": -1.9449,
+          "mfe_mae_ratio": 1.785,
+          "best_return_pct": 1.7343,
+          "worst_return_pct": 0.4897,
+          "latest_signal_utc": "2026-07-03T22:12:37.322247+00:00",
+          "latest_candle_timestamp": "2026-07-03 20:00:00",
+          "description": "مثبت ولی نیازمند review: structure_score >= 10.",
+          "warnings": [
+            "Forward evaluated samples کمتر از حداقل 30 است: 14"
+          ],
+          "filters": {
+            "structure_score_min": 10
+          }
+        },
+        {
+          "gate": "HISTORICAL_EDGE_SCORE_GE_1",
+          "family": "primary_backtest_candidate",
+          "priority": 3,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 5,
+          "evaluated_samples": 2,
+          "pending_samples": 1,
+          "partial_samples": 2,
+          "avg_return_pct": -3.0511,
+          "median_return_pct": -3.0511,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 100.0,
+          "stop_hit_rate": 100.0,
+          "mfe_mean_pct": 1.1851,
+          "mae_mean_pct": -3.7369,
+          "mfe_mae_ratio": 0.317,
+          "best_return_pct": -2.8398,
+          "worst_return_pct": -3.2625,
+          "latest_signal_utc": "2026-07-11T07:25:53.492975+00:00",
+          "latest_candle_timestamp": "2026-07-11 04:00:00",
+          "description": "Backtest candidate با stop کمتر: historical_edge_score >= 1.",
+          "warnings": [
+            "Forward evaluated samples کمتر از حداقل 30 است: 2"
+          ],
+          "filters": {
+            "historical_edge_score_min": 1
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "risk_normalized_in": [
+              "MEDIUM"
+            ]
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium + SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "risk_normalized_in": [
+              "MEDIUM"
+            ],
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "structure_score_min": 10
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10 + SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "structure_score_min": 10,
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        },
+        {
+          "gate": "VOLUME_SCORE_GE_10",
+          "family": "primary_backtest_candidate",
+          "priority": 1,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "Backtest candidate قوی: volume_score >= 10.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "volume_score_min": 10
+          }
+        },
+        {
+          "gate": "RISK_MEDIUM",
+          "family": "primary_backtest_candidate",
+          "priority": 2,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 1,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 1,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "2026-07-10T18:10:47.369248+00:00",
+          "latest_candle_timestamp": "2026-07-10 16:00:00",
+          "description": "Backtest candidate با sample بیشتر: risk_label = Medium.",
+          "warnings": [
+            "Forward evaluated samples کمتر از حداقل 30 است: 0"
+          ],
+          "filters": {
+            "risk_normalized_in": [
+              "MEDIUM"
+            ]
+          }
+        },
+        {
+          "gate": "SCORE_GE_80",
+          "family": "small_sample_positive",
+          "priority": 5,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "مثبت کم‌نمونه: score >= 80؛ فقط watchlist تحقیقاتی.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "score_min": 80
+          }
+        },
+        {
+          "gate": "DOGE_SHORT_WATCH",
+          "family": "symbol_side_watch",
+          "priority": 6,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "مثبت کم‌نمونه: DOGE/USDT SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "symbol_in": [
+              "DOGE/USDT"
+            ],
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        },
+        {
+          "gate": "BNB_LONG_SCORE_GE_60",
+          "family": "symbol_side_watch",
+          "priority": 7,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "مثبت کم‌نمونه: BNB/USDT LONG + score>=60.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "symbol_in": [
+              "BNB/USDT"
+            ],
+            "side_in": [
+              "LONG"
+            ],
+            "score_min": 60
+          }
+        }
+      ],
+      "recent_signals": [
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T18:39:13.917697+00:00",
+          "candle_timestamp": "2026-07-03 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 63,
+          "selected_return_pct": 1.7091,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T18:43:17.296314+00:00",
+          "candle_timestamp": "2026-07-03 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 63,
+          "selected_return_pct": 1.7343,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T20:55:25.355921+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 56,
+          "selected_return_pct": 0.5531,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:01:16.119821+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 65,
+          "selected_return_pct": 0.562,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:11:58.699575+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 70,
+          "selected_return_pct": 0.4897,
+          "actionability": "ACTIONABLE",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:18:24.126801+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 68,
+          "selected_return_pct": 0.7856,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:31:55.569860+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 68,
+          "selected_return_pct": 0.8566,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:38:31.601977+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 67,
+          "selected_return_pct": 0.9276,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:45:51.573056+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 70,
+          "selected_return_pct": 0.8199,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T21:58:23.468112+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 72,
+          "selected_return_pct": 0.6401,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T22:05:21.173468+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 70,
+          "selected_return_pct": 0.7874,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T22:05:39.693647+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 70,
+          "selected_return_pct": 0.8457,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T22:09:19.852309+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 70,
+          "selected_return_pct": 0.8086,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "STRUCTURE_SCORE_GE_10",
+          "gate_family": "review_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-03T22:12:37.322247+00:00",
+          "candle_timestamp": "2026-07-03 20:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 70,
+          "selected_return_pct": 0.8479,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+          "gate_family": "primary_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-07T12:50:45.844155+00:00",
+          "candle_timestamp": "2026-07-07 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 49,
+          "selected_return_pct": -2.8398,
+          "actionability": "NOT_ACTIONABLE",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+          "gate_family": "primary_backtest_candidate",
+          "shadow_status": "EVALUATED",
+          "decision_logged_at_utc": "2026-07-07T15:40:48.725757+00:00",
+          "candle_timestamp": "2026-07-07 12:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 66,
+          "selected_return_pct": -3.2625,
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+          "gate_family": "primary_backtest_candidate",
+          "shadow_status": "PARTIAL",
+          "decision_logged_at_utc": "2026-07-10T11:28:34.883694+00:00",
+          "candle_timestamp": "2026-07-10 08:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 75,
+          "selected_return_pct": "",
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "RISK_MEDIUM",
+          "gate_family": "primary_backtest_candidate",
+          "shadow_status": "PARTIAL",
+          "decision_logged_at_utc": "2026-07-10T18:10:47.369248+00:00",
+          "candle_timestamp": "2026-07-10 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 47,
+          "selected_return_pct": "",
+          "actionability": "NOT_ACTIONABLE",
+          "risk_label": "Medium",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+          "gate_family": "primary_backtest_candidate",
+          "shadow_status": "PARTIAL",
+          "decision_logged_at_utc": "2026-07-10T18:10:47.369248+00:00",
+          "candle_timestamp": "2026-07-10 16:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 47,
+          "selected_return_pct": "",
+          "actionability": "NOT_ACTIONABLE",
+          "risk_label": "Medium",
+          "regime_label": "TRENDING_BULL"
+        },
+        {
+          "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+          "gate_family": "primary_backtest_candidate",
+          "shadow_status": "PENDING",
+          "decision_logged_at_utc": "2026-07-11T07:25:53.492975+00:00",
+          "candle_timestamp": "2026-07-11 04:00:00",
+          "symbol": "BTC/USDT",
+          "side": "LONG",
+          "score": 62,
+          "selected_return_pct": "",
+          "actionability": "WATCHLIST",
+          "risk_label": "Low",
+          "regime_label": "TRENDING_BULL"
+        }
+      ],
+      "blockers": [
+        "کل نمونه‌های ارزیابی‌شده Shadow کمتر از 30 است: 16"
+      ],
+      "recommendations": [
+        "Shadow هنوز در حال ساخت داده است؛ فعال‌ترین gate: STRUCTURE_SCORE_GE_10 | signals=14, evaluated=14.",
+        "برای هر gate حداقل 30 نمونه Forward کامل لازم است.",
+        "Regime Shadow gateهای v6.1 فعال شده‌اند، اما هنوز هیچ تصمیم Forward آن‌ها را پاس نکرده است.",
+        "سه gate پایه که باید زیر نظر بمانند: VOLUME_SCORE_GE_10، RISK_MEDIUM، HISTORICAL_EDGE_SCORE_GE_1."
+      ],
+      "warnings": [
+        "Shadow Gate هیچ Paper Trade و هیچ سفارش واقعی ایجاد نمی‌کند؛ فقط برچسب تحقیقاتی می‌زند.",
+        "Gateهای پایه از Backtest و Gateهای Regime از v6.1 Regime-Gate Matrix آمده‌اند و باید در Forward مستقل تأیید شوند.",
+        "تا وقتی هر gate، مخصوصاً gateهای Regime، حداقل 30 نمونه Forward کامل ندارد، نتیجه آماری قابل اتکا نیست."
+      ],
+      "regime_gate_metrics": [
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "risk_normalized_in": [
+              "MEDIUM"
+            ]
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium + SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "risk_normalized_in": [
+              "MEDIUM"
+            ],
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "structure_score_min": 10
+          }
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT",
+          "family": "regime_gate_matrix_candidate",
+          "priority": 0,
+          "verdict": "SHADOW_BUILDING",
+          "total_signals": 0,
+          "evaluated_samples": 0,
+          "pending_samples": 0,
+          "partial_samples": 0,
+          "avg_return_pct": 0.0,
+          "median_return_pct": 0.0,
+          "win_rate": 0.0,
+          "target_1_hit_rate": 0.0,
+          "stop_hit_rate": 0.0,
+          "mfe_mean_pct": 0.0,
+          "mae_mean_pct": 0.0,
+          "mfe_mae_ratio": 0.0,
+          "best_return_pct": 0.0,
+          "worst_return_pct": 0.0,
+          "latest_signal_utc": "",
+          "latest_candle_timestamp": "",
+          "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10 + SHORT.",
+          "warnings": [
+            "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+          ],
+          "filters": {
+            "regime_label_in": [
+              "TRENDING_BEAR"
+            ],
+            "structure_score_min": 10,
+            "side_in": [
+              "SHORT"
+            ]
+          }
+        }
+      ],
+      "regime_gate_count": 4,
+      "regime_gate_signals": 0
+    },
+    "forward_shadow_coverage": {
+      "run_id": "forward_shadow_coverage_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.369057+00:00",
+      "status": "FORWARD_PROMISING_BACKTEST_CONFLICTS_FOUND",
+      "version": "v6.3.1",
+      "horizon": "24h",
+      "min_samples": 30,
+      "decision_rows": 55,
+      "directional_decisions": 31,
+      "evaluation_rows": 54,
+      "complete_evaluations": 16,
+      "shadow_signal_rows": 20,
+      "evaluated_shadow_rows": 16,
+      "forward_regime_counts": [
+        {
+          "regime": "TRENDING_BULL",
+          "rows": 46,
+          "share_pct": 83.64,
+          "directional_rows": 30,
+          "direct_engine_rows": 0,
+          "proxy_or_text_rows": 0
+        },
+        {
+          "regime": "TRENDING_BEAR",
+          "rows": 8,
+          "share_pct": 14.55,
+          "directional_rows": 1,
+          "direct_engine_rows": 0,
+          "proxy_or_text_rows": 0
+        },
+        {
+          "regime": "SIDEWAYS",
+          "rows": 1,
+          "share_pct": 1.82,
+          "directional_rows": 0,
+          "direct_engine_rows": 0,
+          "proxy_or_text_rows": 0
+        }
+      ],
+      "shadow_gate_coverage": [
+        {
+          "gate": "STRUCTURE_SCORE_GE_10",
+          "family": "review_backtest_candidate",
+          "signals": 14,
+          "evaluated": 14,
+          "avg_return_pct": 0.8834,
+          "win_rate": 100.0,
+          "dominant_regime": "TRENDING_BULL",
+          "regime_count": 14
+        },
+        {
+          "gate": "HISTORICAL_EDGE_SCORE_GE_1",
+          "family": "primary_backtest_candidate",
+          "signals": 5,
+          "evaluated": 2,
+          "avg_return_pct": -3.0511,
+          "win_rate": 0.0,
+          "dominant_regime": "TRENDING_BULL",
+          "regime_count": 5
+        },
+        {
+          "gate": "RISK_MEDIUM",
+          "family": "primary_backtest_candidate",
+          "signals": 1,
+          "evaluated": 0,
+          "avg_return_pct": 0.0,
+          "win_rate": 0.0,
+          "dominant_regime": "TRENDING_BULL",
+          "regime_count": 1
+        }
+      ],
+      "shadow_regime_coverage": [
+        {
+          "regime": "TRENDING_BULL",
+          "shadow_signals": 20,
+          "evaluated": 16,
+          "avg_return_pct": 0.3916,
+          "win_rate": 87.5,
+          "distinct_gates": 3
+        }
+      ],
+      "bull_forward_probes": [
+        {
+          "probe": "BULL_STRUCTURE_SCORE_GE_10",
+          "filters": {
+            "regime_label": "TRENDING_BULL",
+            "structure_score_min": 10
+          },
+          "verdict": "FORWARD_PROMISING_LOW_SAMPLE_BACKTEST_CONFLICT",
+          "forward_data_source": "shadow_ledger_sync",
+          "shadow_gate_source": "STRUCTURE_SCORE_GE_10",
+          "shadow_rows_seen": 14,
+          "forward_samples": 14,
+          "forward_avg_pct": 0.8834,
+          "forward_win_rate": 100.0,
+          "forward_t1_rate": 100.0,
+          "forward_stop_rate": 85.71,
+          "forward_mfe_mae": 1.785,
+          "backtest_samples": 0,
+          "backtest_net_avg_pct": 0.0,
+          "backtest_win_rate": 0.0,
+          "backtest_t1_rate": 0.0,
+          "backtest_stop_rate": 0.0,
+          "backtest_mfe_mae": 0.0
+        },
+        {
+          "probe": "BULL_STRUCTURE_SCORE_GE_10_LONG",
+          "filters": {
+            "regime_label": "TRENDING_BULL",
+            "structure_score_min": 10,
+            "side": "LONG"
+          },
+          "verdict": "FORWARD_PROMISING_LOW_SAMPLE_BACKTEST_CONFLICT",
+          "forward_data_source": "shadow_ledger_sync",
+          "shadow_gate_source": "STRUCTURE_SCORE_GE_10",
+          "shadow_rows_seen": 14,
+          "forward_samples": 14,
+          "forward_avg_pct": 0.8834,
+          "forward_win_rate": 100.0,
+          "forward_t1_rate": 100.0,
+          "forward_stop_rate": 85.71,
+          "forward_mfe_mae": 1.785,
+          "backtest_samples": 0,
+          "backtest_net_avg_pct": 0.0,
+          "backtest_win_rate": 0.0,
+          "backtest_t1_rate": 0.0,
+          "backtest_stop_rate": 0.0,
+          "backtest_mfe_mae": 0.0
+        },
+        {
+          "probe": "BULL_VOLUME_SCORE_GE_10",
+          "filters": {
+            "regime_label": "TRENDING_BULL",
+            "volume_score_min": 10
+          },
+          "verdict": "NO_FORWARD_SAMPLE",
+          "forward_data_source": "decision_evaluations",
+          "shadow_gate_source": "VOLUME_SCORE_GE_10",
+          "shadow_rows_seen": 0,
+          "forward_samples": 0,
+          "forward_avg_pct": 0.0,
+          "forward_win_rate": 0.0,
+          "forward_t1_rate": 0.0,
+          "forward_stop_rate": 0.0,
+          "forward_mfe_mae": 0.0,
+          "backtest_samples": 0,
+          "backtest_net_avg_pct": 0.0,
+          "backtest_win_rate": 0.0,
+          "backtest_t1_rate": 0.0,
+          "backtest_stop_rate": 0.0,
+          "backtest_mfe_mae": 0.0
+        },
+        {
+          "probe": "BULL_RISK_MEDIUM",
+          "filters": {
+            "regime_label": "TRENDING_BULL",
+            "risk_medium": true
+          },
+          "verdict": "NO_FORWARD_SAMPLE",
+          "forward_data_source": "decision_evaluations",
+          "shadow_gate_source": "RISK_MEDIUM",
+          "shadow_rows_seen": 1,
+          "forward_samples": 0,
+          "forward_avg_pct": 0.0,
+          "forward_win_rate": 0.0,
+          "forward_t1_rate": 0.0,
+          "forward_stop_rate": 0.0,
+          "forward_mfe_mae": 0.0,
+          "backtest_samples": 0,
+          "backtest_net_avg_pct": 0.0,
+          "backtest_win_rate": 0.0,
+          "backtest_t1_rate": 0.0,
+          "backtest_stop_rate": 0.0,
+          "backtest_mfe_mae": 0.0
+        },
+        {
+          "probe": "BULL_SCORE_GE_80",
+          "filters": {
+            "regime_label": "TRENDING_BULL",
+            "score_min": 80
+          },
+          "verdict": "NO_FORWARD_SAMPLE",
+          "forward_data_source": "decision_evaluations",
+          "shadow_gate_source": "SCORE_GE_80",
+          "shadow_rows_seen": 0,
+          "forward_samples": 0,
+          "forward_avg_pct": 0.0,
+          "forward_win_rate": 0.0,
+          "forward_t1_rate": 0.0,
+          "forward_stop_rate": 0.0,
+          "forward_mfe_mae": 0.0,
+          "backtest_samples": 0,
+          "backtest_net_avg_pct": 0.0,
+          "backtest_win_rate": 0.0,
+          "backtest_t1_rate": 0.0,
+          "backtest_stop_rate": 0.0,
+          "backtest_mfe_mae": 0.0
+        },
+        {
+          "probe": "BULL_BNB_LONG_SCORE_GE_60",
+          "filters": {
+            "regime_label": "TRENDING_BULL",
+            "symbol": "BNB/USDT",
+            "side": "LONG",
+            "score_min": 60
+          },
+          "verdict": "NO_FORWARD_SAMPLE",
+          "forward_data_source": "decision_evaluations",
+          "shadow_gate_source": "BNB_LONG_SCORE_GE_60",
+          "shadow_rows_seen": 0,
+          "forward_samples": 0,
+          "forward_avg_pct": 0.0,
+          "forward_win_rate": 0.0,
+          "forward_t1_rate": 0.0,
+          "forward_stop_rate": 0.0,
+          "forward_mfe_mae": 0.0,
+          "backtest_samples": 0,
+          "backtest_net_avg_pct": 0.0,
+          "backtest_win_rate": 0.0,
+          "backtest_t1_rate": 0.0,
+          "backtest_stop_rate": 0.0,
+          "backtest_mfe_mae": 0.0
+        }
+      ],
+      "bear_zero_signal_diagnostics": [
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM",
+          "cause": "TRENDING_BEAR_EXISTS_BUT_NO_RISK_MEDIUM",
+          "matching_decisions": 0,
+          "trend_bear_decisions": 1,
+          "existing_shadow_signals": 0
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT",
+          "cause": "TRENDING_BEAR_EXISTS_BUT_NO_RISK_MEDIUM",
+          "matching_decisions": 0,
+          "trend_bear_decisions": 1,
+          "existing_shadow_signals": 0
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10",
+          "cause": "TRENDING_BEAR_EXISTS_BUT_STRUCTURE_LT_10",
+          "matching_decisions": 0,
+          "trend_bear_decisions": 1,
+          "existing_shadow_signals": 0
+        },
+        {
+          "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT",
+          "cause": "TRENDING_BEAR_EXISTS_BUT_STRUCTURE_LT_10",
+          "matching_decisions": 0,
+          "trend_bear_decisions": 1,
+          "existing_shadow_signals": 0
+        }
+      ],
+      "contradictions": [
+        "BULL_STRUCTURE_SCORE_GE_10: Forward avg=0.8834% با n=14 اما Backtest net=0.0% است.",
+        "BULL_STRUCTURE_SCORE_GE_10_LONG: Forward avg=0.8834% با n=14 اما Backtest net=0.0% است."
+      ],
+      "blockers": [
+        "Shadow evaluated samples کمتر از 30 است: 16"
+      ],
+      "recommendations": [
+        "فعال‌ترین Bull probe فعلی: BULL_STRUCTURE_SCORE_GE_10 | forward n=14 | avg=0.8834% | verdict=FORWARD_PROMISING_LOW_SAMPLE_BACKTEST_CONFLICT.",
+        "Bull probe فقط مشاهده‌ای است؛ تا وقتی Backtest/Forward هر دو robust نشوند، به Shadow Candidate ارتقا نده.",
+        "برای تصمیم‌گیری بعدی، STRUCTURE_SCORE_GE_10 را جداگانه به تفکیک regime در Forward دنبال کن."
+      ],
+      "warnings": [
+        "این ماژول فقط coverage و probe تحقیقاتی می‌سازد؛ هیچ Paper/Live فعال نمی‌کند.",
+        "Bull probeها کاندید قطعی نیستند؛ v6.3.1 اگر لازم باشد از Shadow Ledger برای همگام‌سازی ارزیابی‌ها استفاده می‌کند.",
+        "برچسب‌های legacy/proxy regime برای تحقیق‌اند؛ Forward جدید DIRECT_ENGINE ارزش بیشتری دارد."
+      ]
+    },
+    "automatic_event_collector": {
+      "run_id": "auto_events_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.370710+00:00",
+      "version": "v7.0.0",
+      "status": "AUTO_EVENT_COLLECTOR_LEDGER_ONLY",
+      "fetch_live": false,
+      "apply_changes": false,
+      "lookback_hours": 168,
+      "sources_total": 7,
+      "sources_ok": 0,
+      "sources_failed": 0,
+      "events_fetched": 0,
+      "significant_events": 0,
+      "new_events_written": 0,
+      "total_auto_events": 13,
+      "high_impact_events": 0,
+      "official_tier_events": 0,
+      "source_health": [
+        {
+          "source_id": "sec_press_releases",
+          "source_name": "SEC Press Releases RSS",
+          "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+          "source_type": "rss",
+          "status": "SKIPPED_NO_FETCH",
+          "fetched_items": 0,
+          "significant_events": 0,
+          "error": "",
+          "url": "https://www.sec.gov/news/pressreleases.rss"
+        },
+        {
+          "source_id": "sec_litigation_releases",
+          "source_name": "SEC Litigation Releases",
+          "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+          "source_type": "rss",
+          "status": "SKIPPED_NO_FETCH",
+          "fetched_items": 0,
+          "significant_events": 0,
+          "error": "",
+          "url": "https://www.sec.gov/litigation/litreleases.rss"
+        },
+        {
+          "source_id": "federal_reserve_press",
+          "source_name": "Federal Reserve Press Releases RSS",
+          "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+          "source_type": "rss",
+          "status": "SKIPPED_NO_FETCH",
+          "fetched_items": 0,
+          "significant_events": 0,
+          "error": "",
+          "url": "https://www.federalreserve.gov/feeds/press_all.xml"
+        },
+        {
+          "source_id": "federal_reserve_speeches",
+          "source_name": "Federal Reserve Speeches RSS",
+          "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+          "source_type": "rss",
+          "status": "SKIPPED_NO_FETCH",
+          "fetched_items": 0,
+          "significant_events": 0,
+          "error": "",
+          "url": "https://www.federalreserve.gov/feeds/speeches.xml"
+        },
+        {
+          "source_id": "ethereum_foundation_blog",
+          "source_name": "Ethereum Foundation Blog",
+          "reliability_tier": "TIER_1_OFFICIAL_PROTOCOL",
+          "source_type": "rss",
+          "status": "SKIPPED_NO_FETCH",
+          "fetched_items": 0,
+          "significant_events": 0,
+          "error": "",
+          "url": "https://blog.ethereum.org/feed.xml"
+        },
+        {
+          "source_id": "coinbase_blog",
+          "source_name": "Coinbase Blog",
+          "reliability_tier": "TIER_2_OFFICIAL_COMPANY_BLOG",
+          "source_type": "rss",
+          "status": "SKIPPED_NO_FETCH",
+          "fetched_items": 0,
+          "significant_events": 0,
+          "error": "",
+          "url": "https://www.coinbase.com/blog/rss.xml"
+        },
+        {
+          "source_id": "binance_announcements",
+          "source_name": "Binance Announcements",
+          "reliability_tier": "TIER_1_OFFICIAL_EXCHANGE_NEWS",
+          "source_type": "binance_json",
+          "status": "SKIPPED_NO_FETCH",
+          "fetched_items": 0,
+          "significant_events": 0,
+          "error": "",
+          "url": "https://www.binance.com/bapi/composite/v1/public/cms/article/list/query?type=1&pageNo=1&pageSize=30"
+        }
+      ],
+      "top_events": [],
+      "blockers": [],
+      "warnings": [
+        "Automatic Event Collector فقط داده و tag تحقیقاتی تولید می‌کند؛ Paper/Live فعال نمی‌کند.",
+        "Event direction با keyword/rule ساده ساخته می‌شود و باید به عنوان catalyst context دیده شود، نه سیگنال مستقل."
+      ],
+      "recommendations": [
+        "فعلاً event high-impact جدید دیده نشد؛ collector را در GitHub Actions فعال نگه دار تا ledger بسازد.",
+        "manual_events.csv را فقط برای رویدادهای بسیار مهمی استفاده کن که collector از دست داده یا نیاز به curated override دارند."
+      ]
+    },
+    "causal_intelligence": {
+      "run_id": "causal_intel_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.387598+00:00",
+      "version": "v7.0.0",
+      "status": "CAUSAL_CONTEXT_WITH_BLOCKERS",
+      "symbol": "BTC/USDT",
+      "timeframe": "4h",
+      "collect_live": false,
+      "source_count": 13,
+      "successful_sources": 13,
+      "failed_sources": 0,
+      "trusted_successful_sources": 13,
+      "manual_events_loaded": 2,
+      "context": {
+        "primary_cause": "MULTI_SOURCE_EVENT_CONSENSUS",
+        "cause_confidence": "HIGH",
+        "catalyst_score": 44,
+        "event_risk": "HIGH",
+        "technical_event_conflict": "HIGH",
+        "causal_alignment": "CONFLICT_WITH_EXTERNAL_CONTEXT",
+        "causal_verdict": "CAUSAL_CONFLICT_RESEARCH_ONLY",
+        "source_count": 13,
+        "trusted_source_count": 13,
+        "manual_event_count": 2,
+        "auto_event_count": 11,
+        "top_sources": [
+          "manual_events:OK:BULLISH:MEDIUM",
+          "manual_events:OK:BEARISH:MEDIUM",
+          "auto_events:OK:NEUTRAL:HIGH",
+          "auto_events:OK:NEUTRAL:HIGH",
+          "auto_events:OK:NEUTRAL:HIGH",
+          "auto_events:OK:NEUTRAL:HIGH"
+        ],
+        "internal_causes": [
+          {
+            "cause": "TREND_MOMENTUM_ALIGNMENT",
+            "direction": "LONG",
+            "confidence": "MEDIUM",
+            "score": 18,
+            "detail": "trend and momentum components are aligned"
+          },
+          {
+            "cause": "REGIME_ALIGNED_BULL_LONG",
+            "direction": "BULLISH",
+            "confidence": "MEDIUM",
+            "score": 12,
+            "detail": "TRENDING_BULL regime supports LONG bias"
+          }
+        ],
+        "external_sources": [
+          {
+            "source_id": "manual_events",
+            "name": "Curated Manual Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_0_MANUAL_CURATED",
+            "status": "OK",
+            "direction": "BULLISH",
+            "confidence": "MEDIUM",
+            "signal_score": 12,
+            "event_risk": "HIGH",
+            "summary": "Reuters: Example: dovish macro interpretation supporting risk assets",
+            "url": "",
+            "fields": {
+              "event_type": "macro",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-09T12:00:00+00:00",
+              "event_symbol": "BTC/USDT"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386389+00:00"
+          },
+          {
+            "source_id": "manual_events",
+            "name": "Curated Manual Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_0_MANUAL_CURATED",
+            "status": "OK",
+            "direction": "BEARISH",
+            "confidence": "MEDIUM",
+            "signal_score": -12,
+            "event_risk": "HIGH",
+            "summary": "SEC: Example: enforcement headline increasing crypto regulatory risk",
+            "url": "",
+            "fields": {
+              "event_type": "regulatory",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-09T15:00:00+00:00",
+              "event_symbol": "ALL"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386419+00:00"
+          },
+          {
+            "source_id": "auto_events",
+            "name": "Automatic Official/Trusted Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+            "status": "OK",
+            "direction": "NEUTRAL",
+            "confidence": "HIGH",
+            "signal_score": 0.0,
+            "event_risk": "HIGH",
+            "summary": "SEC Press Releases RSS: The Securities and Exchange Commission’s Office of Municipal Securities today announced it has updated its Registration of Municipal Advisors FAQs webpage to offer more clarity on municipal advisor registration and recordkeeping requirements. The…",
+            "url": "https://www.sec.gov/newsroom/press-releases/2026-66-sec-office-municipal-securities-updates-faqs-registration-municipal-advisors",
+            "fields": {
+              "event_id": "41ff746d91035fb0744119d9",
+              "source_id": "sec_press_releases",
+              "event_type": "regulatory",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-10T16:00:32+00:00",
+              "event_symbol": "ALL",
+              "tags": "regulatory;regulatory;high;neutral",
+              "matched_keywords": "sec"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386534+00:00"
+          },
+          {
+            "source_id": "auto_events",
+            "name": "Automatic Official/Trusted Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+            "status": "OK",
+            "direction": "NEUTRAL",
+            "confidence": "HIGH",
+            "signal_score": 0.0,
+            "event_risk": "HIGH",
+            "summary": "Federal Reserve Press Releases RSS: Federal Reserve announces the leadership and objectives of its task forces to advance the conduct of monetary policy",
+            "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260709a.htm",
+            "fields": {
+              "event_id": "0bf916edc5938e5d690ceca4",
+              "source_id": "federal_reserve_press",
+              "event_type": "macro",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-09T19:00:00+00:00",
+              "event_symbol": "ALL",
+              "tags": "macro;macro;high;neutral",
+              "matched_keywords": "federal reserve"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386566+00:00"
+          },
+          {
+            "source_id": "auto_events",
+            "name": "Automatic Official/Trusted Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+            "status": "OK",
+            "direction": "BEARISH",
+            "confidence": "HIGH",
+            "signal_score": -12.0,
+            "event_risk": "HIGH",
+            "summary": "Federal Reserve Press Releases RSS: Federal Reserve Board issues enforcement action with TS Banking Group, Inc. and TS Contrarian Bancshares, Inc.",
+            "url": "https://www.federalreserve.gov/newsevents/pressreleases/enforcement20260709a.htm",
+            "fields": {
+              "event_id": "3c766c9aa6298301c89060b5",
+              "source_id": "federal_reserve_press",
+              "event_type": "macro",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-09T15:00:00+00:00",
+              "event_symbol": "ALL",
+              "tags": "macro;macro;high;bearish",
+              "matched_keywords": "enforcement;ban;federal reserve"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386595+00:00"
+          },
+          {
+            "source_id": "auto_events",
+            "name": "Automatic Official/Trusted Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+            "status": "OK",
+            "direction": "NEUTRAL",
+            "confidence": "HIGH",
+            "signal_score": 0.0,
+            "event_risk": "HIGH",
+            "summary": "Federal Reserve Press Releases RSS: Minutes of the Federal Open Market Committee, June 16-17, 2026",
+            "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260708a.htm",
+            "fields": {
+              "event_id": "93f412831e297cd04e10f0ad",
+              "source_id": "federal_reserve_press",
+              "event_type": "macro",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-08T18:00:00+00:00",
+              "event_symbol": "ALL",
+              "tags": "macro;macro;high;neutral",
+              "matched_keywords": "federal reserve"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386666+00:00"
+          },
+          {
+            "source_id": "auto_events",
+            "name": "Automatic Official/Trusted Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+            "status": "OK",
+            "direction": "BULLISH",
+            "confidence": "HIGH",
+            "signal_score": 12.0,
+            "event_risk": "HIGH",
+            "summary": "SEC Press Releases RSS: The Securities and Exchange Commission’s Office of the Advocate for Small Business Capital Formation and the Division of Corporation Finance will co-host a livestreamed discussion on Monday, July 13, 2026, at 2 p.m. to re-examine…",
+            "url": "https://www.sec.gov/newsroom/press-releases/2026-65-sec-host-virtual-roundtable-modernizing-ipos-expanding-access-public-markets",
+            "fields": {
+              "event_id": "2698be06085e1e3236b68d2b",
+              "source_id": "sec_press_releases",
+              "event_type": "regulatory",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-08T17:54:26+00:00",
+              "event_symbol": "ALL",
+              "tags": "regulatory;regulatory;high;bullish",
+              "matched_keywords": "expand;sec"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386725+00:00"
+          },
+          {
+            "source_id": "auto_events",
+            "name": "Automatic Official/Trusted Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+            "status": "OK",
+            "direction": "NEUTRAL",
+            "confidence": "HIGH",
+            "signal_score": 0.0,
+            "event_risk": "HIGH",
+            "summary": "SEC Press Releases RSS: The Securities and Exchange Commission’s Small Business Capital Formation Advisory Committee announced that it will hold a meeting on Tuesday, July 21, 2026 at 10 a.m. to explore ways to modernize public market access and encourage IPOs…",
+            "url": "https://www.sec.gov/newsroom/press-releases/2026-64-sec-small-business-advisory-committee-explore-modernizing-market-access",
+            "fields": {
+              "event_id": "3c0803e99e232a1d97c61524",
+              "source_id": "sec_press_releases",
+              "event_type": "regulatory",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-08T13:01:01+00:00",
+              "event_symbol": "ALL",
+              "tags": "regulatory;regulatory;high;neutral",
+              "matched_keywords": "sec"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386760+00:00"
+          },
+          {
+            "source_id": "auto_events",
+            "name": "Automatic Official/Trusted Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+            "status": "OK",
+            "direction": "BEARISH",
+            "confidence": "HIGH",
+            "signal_score": -12.0,
+            "event_risk": "HIGH",
+            "summary": "Federal Reserve Press Releases RSS: Federal Reserve Board requests comment on a proposal to amend its requirements for banks to maintain anti-money laundering programs",
+            "url": "https://www.federalreserve.gov/newsevents/pressreleases/bcreg20260707a.htm",
+            "fields": {
+              "event_id": "55b80c56297e60f49d56fc67",
+              "source_id": "federal_reserve_press",
+              "event_type": "macro",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-07T19:00:00+00:00",
+              "event_symbol": "ALL",
+              "tags": "macro;macro;high;bearish",
+              "matched_keywords": "ban;federal reserve"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386787+00:00"
+          },
+          {
+            "source_id": "auto_events",
+            "name": "Automatic Official/Trusted Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+            "status": "OK",
+            "direction": "BEARISH",
+            "confidence": "HIGH",
+            "signal_score": -12.0,
+            "event_risk": "HIGH",
+            "summary": "SEC Press Releases RSS: The Securities and Exchange Commission today announced the creation of the Retail Fraud Working Group designed to strengthen the Division of Enforcement’s efforts to identify and combat fraud targeting everyday investors.The Retail Fraud Working Group…",
+            "url": "https://www.sec.gov/newsroom/press-releases/2026-63-sec-forms-new-retail-fraud-working-group",
+            "fields": {
+              "event_id": "f351e405258dc4e3db9e7abe",
+              "source_id": "sec_press_releases",
+              "event_type": "regulatory",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-07T14:39:57+00:00",
+              "event_symbol": "ALL",
+              "tags": "regulatory;regulatory;high;bearish",
+              "matched_keywords": "enforcement;sec"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386815+00:00"
+          },
+          {
+            "source_id": "auto_events",
+            "name": "Automatic Official/Trusted Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+            "status": "OK",
+            "direction": "NEUTRAL",
+            "confidence": "HIGH",
+            "signal_score": 0.0,
+            "event_risk": "HIGH",
+            "summary": "Federal Reserve Speeches RSS: Speech At the Financial Stability Board Virtual Outreach Event",
+            "url": "https://www.federalreserve.gov/newsevents/speech/bowman20260707a.htm",
+            "fields": {
+              "event_id": "ba96a35b77d5c4202c31319d",
+              "source_id": "federal_reserve_speeches",
+              "event_type": "macro",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-07T11:00:00+00:00",
+              "event_symbol": "ALL",
+              "tags": "macro;macro;high;neutral",
+              "matched_keywords": "federal reserve"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386840+00:00"
+          },
+          {
+            "source_id": "auto_events",
+            "name": "Automatic Official/Trusted Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+            "status": "OK",
+            "direction": "NEUTRAL",
+            "confidence": "HIGH",
+            "signal_score": 0.0,
+            "event_risk": "HIGH",
+            "summary": "SEC Press Releases RSS: The Securities and Exchange Commission today announced that Paul Knight has been named as the agency’s Chief Operating Officer (COO).As COO, Mr. Knight will oversee the SEC's operational and administrative functions, including the agency's Office of…",
+            "url": "https://www.sec.gov/newsroom/press-releases/2026-62-sec-names-paul-knight-chief-operating-officer",
+            "fields": {
+              "event_id": "7e12e2ece38170df9f458759",
+              "source_id": "sec_press_releases",
+              "event_type": "regulatory",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-06T19:10:00+00:00",
+              "event_symbol": "ALL",
+              "tags": "regulatory;regulatory;high;neutral",
+              "matched_keywords": "sec"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386869+00:00"
+          },
+          {
+            "source_id": "auto_events",
+            "name": "Automatic Official/Trusted Event Ledger",
+            "category": "news_event",
+            "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+            "status": "OK",
+            "direction": "BEARISH",
+            "confidence": "HIGH",
+            "signal_score": -12.0,
+            "event_risk": "HIGH",
+            "summary": "Federal Reserve Speeches RSS: Speech At \"Challenges for Monetary Policy Transmission in a Changing World,\" a conference sponsored by the Bank of Italy for the research network initiated by the European System of Central Banks, Rome, Italy",
+            "url": "https://www.federalreserve.gov/newsevents/speech/waller20260706a.htm",
+            "fields": {
+              "event_id": "ffbcd33c1265fdfdab933b1e",
+              "source_id": "federal_reserve_speeches",
+              "event_type": "macro",
+              "impact": "HIGH",
+              "event_timestamp_utc": "2026-07-06T15:00:00+00:00",
+              "event_symbol": "ALL",
+              "tags": "macro;macro;high;bearish",
+              "matched_keywords": "ban;federal reserve"
+            },
+            "error": "",
+            "collected_utc": "2026-07-11T07:26:53.386894+00:00"
+          }
+        ],
+        "warnings": [
+          "Causal Intelligence یک لایه پژوهشی است و به‌تنهایی سیگنال خرید/فروش نمی‌سازد.",
+          "جمع‌آوری APIهای عمومی ممکن است با rate limit یا محدودیت منطقه‌ای روبه‌رو شود؛ شکست source نباید چرخه Forward را fail کند.",
+          "بین جهت تکنیکال و context بیرونی/علتی تضاد دیده شده؛ confidence تصمیم باید پایین‌تر در نظر گرفته شود."
+        ],
+        "recommendations": [
+          "manual_events.csv فعال است؛ رویدادهای high-impact را با source_url معتبر ادامه بده.",
+          "auto_events.csv فعال است؛ Automatic Event Collector قبل از Causal Intelligence باید اجرا شود.",
+          "در v7 نتایج causal/narrative فقط به decision log و research reports اضافه می‌شود؛ هیچ Paper/Live فعال نمی‌شود."
+        ]
+      },
+      "auto_events_loaded": 11,
+      "source_results": [
+        {
+          "source_id": "manual_events",
+          "name": "Curated Manual Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_0_MANUAL_CURATED",
+          "status": "OK",
+          "direction": "BULLISH",
+          "confidence": "MEDIUM",
+          "signal_score": 12,
+          "event_risk": "HIGH",
+          "summary": "Reuters: Example: dovish macro interpretation supporting risk assets",
+          "url": "",
+          "fields": {
+            "event_type": "macro",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-09T12:00:00+00:00",
+            "event_symbol": "BTC/USDT"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386389+00:00"
+        },
+        {
+          "source_id": "manual_events",
+          "name": "Curated Manual Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_0_MANUAL_CURATED",
+          "status": "OK",
+          "direction": "BEARISH",
+          "confidence": "MEDIUM",
+          "signal_score": -12,
+          "event_risk": "HIGH",
+          "summary": "SEC: Example: enforcement headline increasing crypto regulatory risk",
+          "url": "",
+          "fields": {
+            "event_type": "regulatory",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-09T15:00:00+00:00",
+            "event_symbol": "ALL"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386419+00:00"
+        },
+        {
+          "source_id": "auto_events",
+          "name": "Automatic Official/Trusted Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+          "status": "OK",
+          "direction": "NEUTRAL",
+          "confidence": "HIGH",
+          "signal_score": 0.0,
+          "event_risk": "HIGH",
+          "summary": "SEC Press Releases RSS: The Securities and Exchange Commission’s Office of Municipal Securities today announced it has updated its Registration of Municipal Advisors FAQs webpage to offer more clarity on municipal advisor registration and recordkeeping requirements. The…",
+          "url": "https://www.sec.gov/newsroom/press-releases/2026-66-sec-office-municipal-securities-updates-faqs-registration-municipal-advisors",
+          "fields": {
+            "event_id": "41ff746d91035fb0744119d9",
+            "source_id": "sec_press_releases",
+            "event_type": "regulatory",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-10T16:00:32+00:00",
+            "event_symbol": "ALL",
+            "tags": "regulatory;regulatory;high;neutral",
+            "matched_keywords": "sec"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386534+00:00"
+        },
+        {
+          "source_id": "auto_events",
+          "name": "Automatic Official/Trusted Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+          "status": "OK",
+          "direction": "NEUTRAL",
+          "confidence": "HIGH",
+          "signal_score": 0.0,
+          "event_risk": "HIGH",
+          "summary": "Federal Reserve Press Releases RSS: Federal Reserve announces the leadership and objectives of its task forces to advance the conduct of monetary policy",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260709a.htm",
+          "fields": {
+            "event_id": "0bf916edc5938e5d690ceca4",
+            "source_id": "federal_reserve_press",
+            "event_type": "macro",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-09T19:00:00+00:00",
+            "event_symbol": "ALL",
+            "tags": "macro;macro;high;neutral",
+            "matched_keywords": "federal reserve"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386566+00:00"
+        },
+        {
+          "source_id": "auto_events",
+          "name": "Automatic Official/Trusted Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+          "status": "OK",
+          "direction": "BEARISH",
+          "confidence": "HIGH",
+          "signal_score": -12.0,
+          "event_risk": "HIGH",
+          "summary": "Federal Reserve Press Releases RSS: Federal Reserve Board issues enforcement action with TS Banking Group, Inc. and TS Contrarian Bancshares, Inc.",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/enforcement20260709a.htm",
+          "fields": {
+            "event_id": "3c766c9aa6298301c89060b5",
+            "source_id": "federal_reserve_press",
+            "event_type": "macro",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-09T15:00:00+00:00",
+            "event_symbol": "ALL",
+            "tags": "macro;macro;high;bearish",
+            "matched_keywords": "enforcement;ban;federal reserve"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386595+00:00"
+        },
+        {
+          "source_id": "auto_events",
+          "name": "Automatic Official/Trusted Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+          "status": "OK",
+          "direction": "NEUTRAL",
+          "confidence": "HIGH",
+          "signal_score": 0.0,
+          "event_risk": "HIGH",
+          "summary": "Federal Reserve Press Releases RSS: Minutes of the Federal Open Market Committee, June 16-17, 2026",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260708a.htm",
+          "fields": {
+            "event_id": "93f412831e297cd04e10f0ad",
+            "source_id": "federal_reserve_press",
+            "event_type": "macro",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-08T18:00:00+00:00",
+            "event_symbol": "ALL",
+            "tags": "macro;macro;high;neutral",
+            "matched_keywords": "federal reserve"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386666+00:00"
+        },
+        {
+          "source_id": "auto_events",
+          "name": "Automatic Official/Trusted Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+          "status": "OK",
+          "direction": "BULLISH",
+          "confidence": "HIGH",
+          "signal_score": 12.0,
+          "event_risk": "HIGH",
+          "summary": "SEC Press Releases RSS: The Securities and Exchange Commission’s Office of the Advocate for Small Business Capital Formation and the Division of Corporation Finance will co-host a livestreamed discussion on Monday, July 13, 2026, at 2 p.m. to re-examine…",
+          "url": "https://www.sec.gov/newsroom/press-releases/2026-65-sec-host-virtual-roundtable-modernizing-ipos-expanding-access-public-markets",
+          "fields": {
+            "event_id": "2698be06085e1e3236b68d2b",
+            "source_id": "sec_press_releases",
+            "event_type": "regulatory",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-08T17:54:26+00:00",
+            "event_symbol": "ALL",
+            "tags": "regulatory;regulatory;high;bullish",
+            "matched_keywords": "expand;sec"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386725+00:00"
+        },
+        {
+          "source_id": "auto_events",
+          "name": "Automatic Official/Trusted Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+          "status": "OK",
+          "direction": "NEUTRAL",
+          "confidence": "HIGH",
+          "signal_score": 0.0,
+          "event_risk": "HIGH",
+          "summary": "SEC Press Releases RSS: The Securities and Exchange Commission’s Small Business Capital Formation Advisory Committee announced that it will hold a meeting on Tuesday, July 21, 2026 at 10 a.m. to explore ways to modernize public market access and encourage IPOs…",
+          "url": "https://www.sec.gov/newsroom/press-releases/2026-64-sec-small-business-advisory-committee-explore-modernizing-market-access",
+          "fields": {
+            "event_id": "3c0803e99e232a1d97c61524",
+            "source_id": "sec_press_releases",
+            "event_type": "regulatory",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-08T13:01:01+00:00",
+            "event_symbol": "ALL",
+            "tags": "regulatory;regulatory;high;neutral",
+            "matched_keywords": "sec"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386760+00:00"
+        },
+        {
+          "source_id": "auto_events",
+          "name": "Automatic Official/Trusted Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+          "status": "OK",
+          "direction": "BEARISH",
+          "confidence": "HIGH",
+          "signal_score": -12.0,
+          "event_risk": "HIGH",
+          "summary": "Federal Reserve Press Releases RSS: Federal Reserve Board requests comment on a proposal to amend its requirements for banks to maintain anti-money laundering programs",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/bcreg20260707a.htm",
+          "fields": {
+            "event_id": "55b80c56297e60f49d56fc67",
+            "source_id": "federal_reserve_press",
+            "event_type": "macro",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-07T19:00:00+00:00",
+            "event_symbol": "ALL",
+            "tags": "macro;macro;high;bearish",
+            "matched_keywords": "ban;federal reserve"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386787+00:00"
+        },
+        {
+          "source_id": "auto_events",
+          "name": "Automatic Official/Trusted Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+          "status": "OK",
+          "direction": "BEARISH",
+          "confidence": "HIGH",
+          "signal_score": -12.0,
+          "event_risk": "HIGH",
+          "summary": "SEC Press Releases RSS: The Securities and Exchange Commission today announced the creation of the Retail Fraud Working Group designed to strengthen the Division of Enforcement’s efforts to identify and combat fraud targeting everyday investors.The Retail Fraud Working Group…",
+          "url": "https://www.sec.gov/newsroom/press-releases/2026-63-sec-forms-new-retail-fraud-working-group",
+          "fields": {
+            "event_id": "f351e405258dc4e3db9e7abe",
+            "source_id": "sec_press_releases",
+            "event_type": "regulatory",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-07T14:39:57+00:00",
+            "event_symbol": "ALL",
+            "tags": "regulatory;regulatory;high;bearish",
+            "matched_keywords": "enforcement;sec"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386815+00:00"
+        },
+        {
+          "source_id": "auto_events",
+          "name": "Automatic Official/Trusted Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+          "status": "OK",
+          "direction": "NEUTRAL",
+          "confidence": "HIGH",
+          "signal_score": 0.0,
+          "event_risk": "HIGH",
+          "summary": "Federal Reserve Speeches RSS: Speech At the Financial Stability Board Virtual Outreach Event",
+          "url": "https://www.federalreserve.gov/newsevents/speech/bowman20260707a.htm",
+          "fields": {
+            "event_id": "ba96a35b77d5c4202c31319d",
+            "source_id": "federal_reserve_speeches",
+            "event_type": "macro",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-07T11:00:00+00:00",
+            "event_symbol": "ALL",
+            "tags": "macro;macro;high;neutral",
+            "matched_keywords": "federal reserve"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386840+00:00"
+        },
+        {
+          "source_id": "auto_events",
+          "name": "Automatic Official/Trusted Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_1_OFFICIAL_REGULATOR",
+          "status": "OK",
+          "direction": "NEUTRAL",
+          "confidence": "HIGH",
+          "signal_score": 0.0,
+          "event_risk": "HIGH",
+          "summary": "SEC Press Releases RSS: The Securities and Exchange Commission today announced that Paul Knight has been named as the agency’s Chief Operating Officer (COO).As COO, Mr. Knight will oversee the SEC's operational and administrative functions, including the agency's Office of…",
+          "url": "https://www.sec.gov/newsroom/press-releases/2026-62-sec-names-paul-knight-chief-operating-officer",
+          "fields": {
+            "event_id": "7e12e2ece38170df9f458759",
+            "source_id": "sec_press_releases",
+            "event_type": "regulatory",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-06T19:10:00+00:00",
+            "event_symbol": "ALL",
+            "tags": "regulatory;regulatory;high;neutral",
+            "matched_keywords": "sec"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386869+00:00"
+        },
+        {
+          "source_id": "auto_events",
+          "name": "Automatic Official/Trusted Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+          "status": "OK",
+          "direction": "BEARISH",
+          "confidence": "HIGH",
+          "signal_score": -12.0,
+          "event_risk": "HIGH",
+          "summary": "Federal Reserve Speeches RSS: Speech At \"Challenges for Monetary Policy Transmission in a Changing World,\" a conference sponsored by the Bank of Italy for the research network initiated by the European System of Central Banks, Rome, Italy",
+          "url": "https://www.federalreserve.gov/newsevents/speech/waller20260706a.htm",
+          "fields": {
+            "event_id": "ffbcd33c1265fdfdab933b1e",
+            "source_id": "federal_reserve_speeches",
+            "event_type": "macro",
+            "impact": "HIGH",
+            "event_timestamp_utc": "2026-07-06T15:00:00+00:00",
+            "event_symbol": "ALL",
+            "tags": "macro;macro;high;bearish",
+            "matched_keywords": "ban;federal reserve"
+          },
+          "error": "",
+          "collected_utc": "2026-07-11T07:26:53.386894+00:00"
+        }
+      ],
+      "source_registry": [
+        {
+          "source_id": "coingecko_global",
+          "name": "CoinGecko Global Market Data",
+          "category": "market_aggregate",
+          "reliability_tier": "TIER_2_MARKET_AGGREGATOR",
+          "requires_key": false,
+          "env_key": "COINGECKO_API_KEY optional",
+          "purpose": "Global crypto market cap, 24h volume, BTC/ETH dominance and 24h aggregate change.",
+          "why_trusted": "Large independent crypto market data aggregator with documented REST endpoints."
+        },
+        {
+          "source_id": "defillama_tvl",
+          "name": "DefiLlama Total TVL Chart",
+          "category": "defi_liquidity",
+          "reliability_tier": "TIER_1_PROTOCOL_AGGREGATOR",
+          "requires_key": false,
+          "env_key": "none",
+          "purpose": "DeFi TVL trend as liquidity/risk-appetite context.",
+          "why_trusted": "Open-source DeFi analytics API with transparent methodology notes."
+        },
+        {
+          "source_id": "defillama_stablecoins",
+          "name": "DefiLlama Stablecoins",
+          "category": "stablecoin_liquidity",
+          "reliability_tier": "TIER_1_PROTOCOL_AGGREGATOR",
+          "requires_key": false,
+          "env_key": "none",
+          "purpose": "Stablecoin supply and liquidity context.",
+          "why_trusted": "Public stablecoin and DeFi analytics used as a neutral aggregator, not a trading venue."
+        },
+        {
+          "source_id": "binance_futures_open_interest",
+          "name": "Binance USD-M Futures Open Interest",
+          "category": "derivatives",
+          "reliability_tier": "TIER_1_OFFICIAL_EXCHANGE",
+          "requires_key": false,
+          "env_key": "none",
+          "purpose": "Present open interest for the mapped futures symbol.",
+          "why_trusted": "Official Binance Futures market-data endpoint for Binance-listed contracts."
+        },
+        {
+          "source_id": "binance_futures_premium_funding",
+          "name": "Binance USD-M Futures Premium/Funding",
+          "category": "derivatives",
+          "reliability_tier": "TIER_1_OFFICIAL_EXCHANGE",
+          "requires_key": false,
+          "env_key": "none",
+          "purpose": "Funding-rate and mark/index price context for crowding risk.",
+          "why_trusted": "Official Binance Futures premium index endpoint."
+        },
+        {
+          "source_id": "fred_macro",
+          "name": "FRED Macro Snapshot",
+          "category": "macro",
+          "reliability_tier": "TIER_1_OFFICIAL_MACRO",
+          "requires_key": true,
+          "env_key": "FRED_API_KEY",
+          "purpose": "US rates/dollar-liquidity macro context when API key is configured.",
+          "why_trusted": "Federal Reserve Economic Data web service from the St. Louis Fed."
+        },
+        {
+          "source_id": "alternative_fng",
+          "name": "Alternative.me Fear & Greed",
+          "category": "sentiment",
+          "reliability_tier": "TIER_3_SENTIMENT",
+          "requires_key": false,
+          "env_key": "none",
+          "purpose": "Sentiment/crowding warning only; never used as a standalone bullish/bearish trigger.",
+          "why_trusted": "Popular sentiment index but lower tier because methodology is not exchange/official data."
+        },
+        {
+          "source_id": "auto_event_collector",
+          "name": "Automatic Official/Trusted Event Collector",
+          "category": "news_event",
+          "reliability_tier": "TIER_1_OFFICIAL_EVENT_PIPELINE",
+          "requires_key": false,
+          "env_key": "none",
+          "purpose": "Reads data/auto_events.csv built from official RSS/API feeds such as SEC, Federal Reserve, Ethereum Foundation, Binance/Coinbase announcements, plus optional reputable media.",
+          "why_trusted": "Collector prioritizes official feeds and stores source tier, source URL, timestamp, dedup id, direction, impact, and confidence for auditability."
+        },
+        {
+          "source_id": "manual_events",
+          "name": "Curated Manual Event Ledger",
+          "category": "news_event",
+          "reliability_tier": "TIER_0_MANUAL_CURATED",
+          "requires_key": false,
+          "env_key": "none",
+          "purpose": "High-trust manually entered events from sources such as Reuters, Fed, SEC, ETF issuers, project official posts.",
+          "why_trusted": "Human-curated provenance lets you reject low-quality rumor sources."
+        }
+      ],
+      "source_health": [
+        {
+          "source_id": "manual_events",
+          "status": "OK",
+          "tier": "TIER_0_MANUAL_CURATED",
+          "category": "news_event",
+          "direction": "BULLISH",
+          "event_risk": "HIGH",
+          "error": ""
+        },
+        {
+          "source_id": "manual_events",
+          "status": "OK",
+          "tier": "TIER_0_MANUAL_CURATED",
+          "category": "news_event",
+          "direction": "BEARISH",
+          "event_risk": "HIGH",
+          "error": ""
+        },
+        {
+          "source_id": "auto_events",
+          "status": "OK",
+          "tier": "TIER_1_OFFICIAL_REGULATOR",
+          "category": "news_event",
+          "direction": "NEUTRAL",
+          "event_risk": "HIGH",
+          "error": ""
+        },
+        {
+          "source_id": "auto_events",
+          "status": "OK",
+          "tier": "TIER_1_OFFICIAL_MACRO",
+          "category": "news_event",
+          "direction": "NEUTRAL",
+          "event_risk": "HIGH",
+          "error": ""
+        },
+        {
+          "source_id": "auto_events",
+          "status": "OK",
+          "tier": "TIER_1_OFFICIAL_MACRO",
+          "category": "news_event",
+          "direction": "BEARISH",
+          "event_risk": "HIGH",
+          "error": ""
+        },
+        {
+          "source_id": "auto_events",
+          "status": "OK",
+          "tier": "TIER_1_OFFICIAL_MACRO",
+          "category": "news_event",
+          "direction": "NEUTRAL",
+          "event_risk": "HIGH",
+          "error": ""
+        },
+        {
+          "source_id": "auto_events",
+          "status": "OK",
+          "tier": "TIER_1_OFFICIAL_REGULATOR",
+          "category": "news_event",
+          "direction": "BULLISH",
+          "event_risk": "HIGH",
+          "error": ""
+        },
+        {
+          "source_id": "auto_events",
+          "status": "OK",
+          "tier": "TIER_1_OFFICIAL_REGULATOR",
+          "category": "news_event",
+          "direction": "NEUTRAL",
+          "event_risk": "HIGH",
+          "error": ""
+        },
+        {
+          "source_id": "auto_events",
+          "status": "OK",
+          "tier": "TIER_1_OFFICIAL_MACRO",
+          "category": "news_event",
+          "direction": "BEARISH",
+          "event_risk": "HIGH",
+          "error": ""
+        },
+        {
+          "source_id": "auto_events",
+          "status": "OK",
+          "tier": "TIER_1_OFFICIAL_REGULATOR",
+          "category": "news_event",
+          "direction": "BEARISH",
+          "event_risk": "HIGH",
+          "error": ""
+        },
+        {
+          "source_id": "auto_events",
+          "status": "OK",
+          "tier": "TIER_1_OFFICIAL_MACRO",
+          "category": "news_event",
+          "direction": "NEUTRAL",
+          "event_risk": "HIGH",
+          "error": ""
+        },
+        {
+          "source_id": "auto_events",
+          "status": "OK",
+          "tier": "TIER_1_OFFICIAL_REGULATOR",
+          "category": "news_event",
+          "direction": "NEUTRAL",
+          "event_risk": "HIGH",
+          "error": ""
+        },
+        {
+          "source_id": "auto_events",
+          "status": "OK",
+          "tier": "TIER_1_OFFICIAL_MACRO",
+          "category": "news_event",
+          "direction": "BEARISH",
+          "event_risk": "HIGH",
+          "error": ""
+        }
+      ],
+      "latest_decision": {
+        "decision_id": "3a81916cf067dc15",
+        "logged_at_utc": "2026-07-11T07:25:53.492975+00:00",
+        "candle_timestamp": "2026-07-11 04:00:00",
+        "symbol": "BTC/USDT",
+        "timeframe": "4h",
+        "price": 64219.2,
+        "side": "LONG",
+        "score": 62,
+        "confidence_label": "Medium",
+        "risk_label": "Low",
+        "actionability": "WATCHLIST",
+        "is_actionable": false,
+        "entry_zone": "64,049 - 64,321",
+        "stop_zone": "63,405",
+        "targets": "[\"64,898\", \"65,441\", \"65,984\"]",
+        "trend_score": 28,
+        "trend_max": 28,
+        "momentum_score": 22,
+        "momentum_max": 30,
+        "volume_score": 0,
+        "volume_max": 20,
+        "structure_score": 6,
+        "structure_max": 12,
+        "risk_penalty": -2,
+        "risk_max": 25,
+        "regime_label": "TRENDING_BULL",
+        "regime_confidence": 100,
+        "regime_adjustment": 5,
+        "regime_source": "decision_engine_raw",
+        "regime_label_quality": "DIRECT_ENGINE",
+        "trend_state": "BULLISH",
+        "volatility_state": "NORMAL_OR_LOW_VOL",
+        "market_phase": "BULLISH__NORMAL_OR_LOW_VOL",
+        "primary_cause": "MULTI_SOURCE_EVENT_CONSENSUS",
+        "cause_confidence": "HIGH",
+        "catalyst_score": 44.0,
+        "event_risk": "HIGH",
+        "technical_event_conflict": "HIGH",
+        "causal_alignment": "CONFLICT_WITH_EXTERNAL_CONTEXT",
+        "causal_verdict": "CAUSAL_CONFLICT_RESEARCH_ONLY",
+        "causal_source_count": 12.0,
+        "causal_trusted_source_count": 12.0,
+        "causal_manual_event_count": 2.0,
+        "causal_auto_event_count": 10.0,
+        "causal_top_sources": "manual_events:OK:BULLISH:MEDIUM | manual_events:OK:BEARISH:MEDIUM | auto_events:OK:NEUTRAL:HIGH | auto_events:OK:NEUTRAL:HIGH | auto_events:OK:NEUTRAL:HIGH | auto_events:OK:NEUTRAL:HIGH",
+        "causal_notes": "TREND_MOMENTUM_ALIGNMENT | REGIME_ALIGNED_BULL_LONG",
+        "market_narrative_label": "MIXED_NARRATIVE_CONFLICT",
+        "market_narrative_confidence": "MEDIUM",
+        "market_narrative_direction": "BEARISH",
+        "market_narrative_theme": "MACRO_POLICY",
+        "market_narrative_score": -20.8099,
+        "market_narrative_event_risk": "HIGH",
+        "market_narrative_conflict": "LOW",
+        "market_narrative_summary": "Narrative=MIXED_NARRATIVE_CONFLICT; direction=BEARISH; theme=MACRO_POLICY; net_score=-20.8099; risk=HIGH. محرک اصلی فعلی از federal_reserve_press است: Federal Reserve Board issues enforcement action with TS Banking Group, Inc. and TS Contrarian Bancshares, Inc.",
+        "narrative_alignment": "CONFLICTING",
+        "narrative_conflict_score": 72.0,
+        "narrative_adjustment": -26.0,
+        "narrative_adjusted_score": 36.0,
+        "narrative_action_override": "DOWNGRADE_OR_WAIT",
+        "narrative_decision_verdict": "DOWNGRADE_CONFIDENCE_RESEARCH_ONLY",
+        "narrative_decision_notes": "Narrative با جهت تصمیم در تضاد است؛ confidence باید کاهش یابد. | خود narrative برچسب conflict/mixed دارد. | Event risk بالاست؛ حتی narrative هم‌جهت هم باید با احتیاط دیده شود.",
+        "root_cause_primary": "MACRO_POLICY_PRESSURE",
+        "root_cause_direction": "BEARISH",
+        "root_cause_confidence": "MEDIUM",
+        "root_cause_probability_pct": 45.59,
+        "root_cause_evidence_quality": "HIGH",
+        "root_cause_verdict": "PROBABLE_CAUSE_BUT_CONFLICTED",
+        "root_cause_evidence_total": 15.0,
+        "root_cause_official_evidence_total": 11.0,
+        "root_cause_top_causes": "MACRO_POLICY_PRESSURE:45.59%;REGULATORY_ACCESS_OR_MODERNIZATION:14.4%;MIXED_EVENT_CONFLICT:14.18%;TECHNICAL_STRUCTURE_MOMENTUM:11.1%;REGULATORY_RISK:9.74%",
+        "root_cause_summary": "Probable root cause=MACRO_POLICY_PRESSURE; direction=BEARISH; confidence=MEDIUM; share=45.59%. قوی‌ترین evidence از federal_reserve_press است: Market narrative theme: MACRO_POLICY | هشدار: شواهد متضاد همزمان وجود دارد.",
+        "long_score": 68.0,
+        "short_score": 0.0,
+        "reasons": "روند کوتاه‌مدت صعودی و هم‌راستاست؛ قیمت بالای میانگین‌های مهم قرار دارد. | قیمت بالای EMA10 است؛ مومنتوم کوتاه‌مدت هنوز حفظ شده است. | RSI در محدوده سالم مومنتوم صعودی است: 60.9 | RSI نسبت به کندل قبل کمی افزایش یافته است: +0.6 | MACD در ناحیه مثبت است. | کندل فعلی مثبت بسته شده است. | قیمت بالای EMA10 است؛ مومنتوم کوتاه‌مدت هنوز حفظ شده است. | ساختار Higher High دیده می‌شود؛ سقف جدید بالاتر از سقف قبلی است. | ساختار Higher Low دیده می‌شود؛ کف جدید بالاتر از کف قبلی است. | Market Regime صعودی است و Bias لانگ را تأیید می‌کند. | Learning overrides موجود است اما enabled=false است؛ هیچ تغییری اعمال نمی‌شود. | Adaptive: مومنتوم در جهت رژیم صعودی تأیید شده است. | 14 نمونه مشابه نتیجه‌دار پیدا شد؛ میانگین شباهت 92%. | Win Rate تاریخی قوی است: 85.7% | میانگین بازده 24h کمی مثبت است: 0.39% | Target 1 در نمونه‌های مشابه زیاد خورده است: 85.7% | Historical Edge Summary: Win 85.7% | Stop 50.0% | Avg 24h 0.39%",
+        "warnings": "MACD نسبت به کندل قبل ضعیف‌تر شده است. | کندل مثبت است اما بدنه آن ضعیف است. | حجم فعلی ضعیف‌تر از میانگین اخیر است؛ احتمال شکست فیک بیشتر می‌شود. | هم حجم پایین است و هم بدنه کندل ضعیف؛ بازار هنوز مشارکت جدی ندارد. | بدنه کندل متوسط/ضعیف است؛ قدرت حرکت هنوز کامل نیست. | Learning Override اعمال نشد. Status=DISABLED | Adaptive: با وجود رژیم صعودی، حجم هنوز تأیید کافی نداده است. | Stop Rate تاریخی متوسط/بالاست: 50.0% | Multi-Timeframe خنثی/ناهم‌راستا است؛ تایم‌فریم‌های بالاتر هنوز Bias LONG را تأیید نمی‌کنند: 65%",
+        "provider": "kucoin",
+        "historical_edge_score": 10.0,
+        "historical_edge_max": 12.0,
+        "source": "UNKNOWN",
+        "evaluation_status": ""
+      },
+      "blockers": [
+        "Causal conflict بالا است؛ هر استفاده عملی باید downgrade شود و فقط Research بماند."
+      ],
+      "warnings": [
+        "Causal Intelligence یک لایه پژوهشی است و به‌تنهایی سیگنال خرید/فروش نمی‌سازد.",
+        "جمع‌آوری APIهای عمومی ممکن است با rate limit یا محدودیت منطقه‌ای روبه‌رو شود؛ شکست source نباید چرخه Forward را fail کند.",
+        "بین جهت تکنیکال و context بیرونی/علتی تضاد دیده شده؛ confidence تصمیم باید پایین‌تر در نظر گرفته شود."
+      ],
+      "recommendations": [
+        "manual_events.csv فعال است؛ رویدادهای high-impact را با source_url معتبر ادامه بده.",
+        "auto_events.csv فعال است؛ Automatic Event Collector قبل از Causal Intelligence باید اجرا شود.",
+        "در v7 نتایج causal/narrative فقط به decision log و research reports اضافه می‌شود؛ هیچ Paper/Live فعال نمی‌شود."
+      ]
+    },
+    "market_narrative": {
+      "run_id": "market_narrative_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.390809+00:00",
+      "version": "v7.1.0",
+      "status": "MARKET_NARRATIVE_WITH_CONFLICTS",
+      "symbol": "BTC/USDT",
+      "timeframe": "4h",
+      "lookback_hours": 168,
+      "auto_events_loaded": 13,
+      "manual_events_loaded": 2,
+      "accepted_events": 7,
+      "noise_filtered_events": 0,
+      "narrative_label": "MIXED_NARRATIVE_CONFLICT",
+      "narrative_confidence": "MEDIUM",
+      "net_direction_score": -20.8077,
+      "dominant_direction": "BEARISH",
+      "dominant_theme": "MACRO_POLICY",
+      "event_risk": "HIGH",
+      "technical_event_conflict": "HIGH",
+      "narrative_summary": "Narrative=MIXED_NARRATIVE_CONFLICT; direction=BEARISH; theme=MACRO_POLICY; net_score=-20.8077; risk=HIGH. محرک اصلی فعلی از federal_reserve_press است: Federal Reserve Board issues enforcement action with TS Banking Group, Inc. and TS Contrarian Bancshares, Inc.",
+      "driver_count": 7,
+      "top_drivers": [
+        {
+          "theme": "MACRO_POLICY",
+          "title": "Federal Reserve Board issues enforcement action with TS Banking Group, Inc. and TS Contrarian Bancshares, Inc.",
+          "source_id": "federal_reserve_press",
+          "source_tier": "TIER_1_OFFICIAL_MACRO",
+          "direction": "BEARISH",
+          "impact": "HIGH",
+          "confidence": "HIGH",
+          "weight": -9.0393,
+          "timestamp_utc": "2026-07-09T15:00:00+00:00",
+          "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/enforcement20260709a.htm",
+          "event_type": "macro",
+          "event_quality": "ACTIONABLE_EVENT_CONTEXT"
+        },
+        {
+          "theme": "REGULATORY_RISK",
+          "title": "SEC to Host Virtual Roundtable on Modernizing IPOs and Expanding Access to Public Markets",
+          "source_id": "sec_press_releases",
+          "source_tier": "TIER_1_OFFICIAL_REGULATOR",
+          "direction": "BULLISH",
+          "impact": "HIGH",
+          "confidence": "HIGH",
+          "weight": 7.9728,
+          "timestamp_utc": "2026-07-08T17:54:26+00:00",
+          "source_url": "https://www.sec.gov/newsroom/press-releases/2026-65-sec-host-virtual-roundtable-modernizing-ipos-expanding-access-public-markets",
+          "event_type": "regulatory",
+          "event_quality": "SIGNIFICANT_EVENT"
+        },
+        {
+          "theme": "MACRO_POLICY",
+          "title": "Federal Reserve Board requests comment on a proposal to amend its requirements for banks to maintain anti-money laundering programs",
+          "source_id": "federal_reserve_press",
+          "source_tier": "TIER_1_OFFICIAL_MACRO",
+          "direction": "BEARISH",
+          "impact": "HIGH",
+          "confidence": "HIGH",
+          "weight": -6.9565,
+          "timestamp_utc": "2026-07-07T19:00:00+00:00",
+          "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/bcreg20260707a.htm",
+          "event_type": "macro",
+          "event_quality": "ACTIONABLE_EVENT_CONTEXT"
+        },
+        {
+          "theme": "REGULATORY_RISK",
+          "title": "SEC Forms New Retail Fraud Working Group",
+          "source_id": "sec_press_releases",
+          "source_tier": "TIER_1_OFFICIAL_REGULATOR",
+          "direction": "BEARISH",
+          "impact": "HIGH",
+          "confidence": "HIGH",
+          "weight": -6.7793,
+          "timestamp_utc": "2026-07-07T14:39:57+00:00",
+          "source_url": "https://www.sec.gov/newsroom/press-releases/2026-63-sec-forms-new-retail-fraud-working-group",
+          "event_type": "regulatory",
+          "event_quality": "ACTIONABLE_EVENT_CONTEXT"
+        },
+        {
+          "theme": "REGULATORY_RISK",
+          "title": "Example: enforcement headline increasing crypto regulatory risk",
+          "source_id": "manual_events",
+          "source_tier": "TIER_0_MANUAL_CURATED",
+          "direction": "BEARISH",
+          "impact": "HIGH",
+          "confidence": "MEDIUM",
+          "weight": -6.6026,
+          "timestamp_utc": "2026-07-09T15:00:00+00:00",
+          "source_url": "",
+          "event_type": "regulatory",
+          "event_quality": "CURATED_MANUAL_EVENT"
+        },
+        {
+          "theme": "MACRO_POLICY",
+          "title": "Example: dovish macro interpretation supporting risk assets",
+          "source_id": "manual_events",
+          "source_tier": "TIER_0_MANUAL_CURATED",
+          "direction": "BULLISH",
+          "impact": "HIGH",
+          "confidence": "MEDIUM",
+          "weight": 6.4858,
+          "timestamp_utc": "2026-07-09T12:00:00+00:00",
+          "source_url": "",
+          "event_type": "macro",
+          "event_quality": "CURATED_MANUAL_EVENT"
+        },
+        {
+          "theme": "MACRO_POLICY",
+          "title": "Waller, Two Thoughts on the Transmission of Monetary Policy",
+          "source_id": "federal_reserve_speeches",
+          "source_tier": "TIER_1_OFFICIAL_MACRO",
+          "direction": "BEARISH",
+          "impact": "HIGH",
+          "confidence": "HIGH",
+          "weight": -5.8886,
+          "timestamp_utc": "2026-07-06T15:00:00+00:00",
+          "source_url": "https://www.federalreserve.gov/newsevents/speech/waller20260706a.htm",
+          "event_type": "macro",
+          "event_quality": "SIGNIFICANT_EVENT"
+        }
+      ],
+      "theme_scores": [
+        {
+          "theme": "MACRO_POLICY",
+          "score": -15.3986,
+          "drivers": 4,
+          "bullish": 1,
+          "bearish": 3,
+          "abs_score": 15.3986
+        },
+        {
+          "theme": "REGULATORY_RISK",
+          "score": -5.4091,
+          "drivers": 3,
+          "bullish": 1,
+          "bearish": 2,
+          "abs_score": 5.4091
+        }
+      ],
+      "contradictions": [
+        "همزمان eventهای bullish و bearish قوی دیده شد: bull=14.46, bear=35.27",
+        "Causal Intelligence تضاد HIGH با context تکنیکال گزارش کرده است."
+      ],
+      "latest_causal_context": {
+        "run_id": "causal_intel_20260711_072630",
+        "generated_utc": "2026-07-11T07:26:33.141542+00:00",
+        "version": "v7.0.0",
+        "status": "CAUSAL_CONTEXT_WITH_BLOCKERS",
+        "symbol": "BTC/USDT",
+        "timeframe": "4h",
+        "collect_live": "True",
+        "primary_cause": "MULTI_SOURCE_EVENT_CONSENSUS",
+        "cause_confidence": "HIGH",
+        "catalyst_score": "44",
+        "event_risk": "HIGH",
+        "technical_event_conflict": "HIGH",
+        "causal_alignment": "CONFLICT_WITH_EXTERNAL_CONTEXT",
+        "causal_verdict": "CAUSAL_CONFLICT_RESEARCH_ONLY",
+        "source_count": "20",
+        "successful_sources": "17",
+        "trusted_successful_sources": "16",
+        "manual_events_loaded": "2",
+        "auto_events_loaded": "11"
+      },
+      "blockers": [],
+      "warnings": [
+        "Market Narrative فقط روایت پژوهشی می‌سازد؛ سیگنال خرید/فروش مستقل نیست.",
+        "اگر event sourceها نویز HTML/marketing بدهند، v7 آن‌ها را فیلتر می‌کند اما همچنان باید source health بررسی شود."
+      ],
+      "recommendations": [
+        "automatic_event_collector_dashboard.py --compact باید قبل از market_narrative_dashboard.py اجرا شود.",
+        "اگر Narrative و Technical conflict بالا باشد، تصمیم فقط Research/Watchlist بماند.",
+        "برای ارتقا به Gate، narrative باید در Forward با outcomeهای بعدی validate شود."
+      ]
+    },
+    "narrative_decision_conflict": {
+      "run_id": "narrative_decision_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.393590+00:00",
+      "version": "v7.1.0",
+      "status": "NARRATIVE_DECISION_HIGH_CONFLICT",
+      "symbol": "BTC/USDT",
+      "timeframe": "4h",
+      "decision_id": "3a81916cf067dc15",
+      "decision_side": "LONG",
+      "decision_score": 62,
+      "decision_actionability": "WATCHLIST",
+      "narrative_label": "MIXED_NARRATIVE_CONFLICT",
+      "narrative_direction": "BEARISH",
+      "narrative_confidence": "MEDIUM",
+      "narrative_theme": "MACRO_POLICY",
+      "narrative_score": -20.8086,
+      "narrative_event_risk": "HIGH",
+      "narrative_technical_conflict": "HIGH",
+      "narrative_alignment": "CONFLICTING",
+      "narrative_conflict_score": 86,
+      "narrative_adjustment": -35,
+      "narrative_adjusted_score": 27,
+      "narrative_action_override": "WATCHLIST_ONLY_RESEARCH",
+      "narrative_decision_verdict": "HIGH_CONFLICT_WATCHLIST_ONLY",
+      "narrative_notes": "Narrative با جهت تصمیم در تضاد است؛ confidence باید کاهش یابد. | خود narrative برچسب conflict/mixed دارد. | Event risk بالاست؛ حتی narrative هم‌جهت هم باید با احتیاط دیده شود. | Causal/technical conflict بالاست.",
+      "blockers": [],
+      "warnings": [
+        "Narrative/Decision Conflict Scoring فقط research-level است و هیچ Paper/Live فعال نمی‌کند.",
+        "این امتیاز نباید به‌تنهایی باعث ورود شود؛ فقط برای کاهش/افزایش احتیاط در Forward Research است."
+      ],
+      "recommendations": [
+        "اگر conflict بالا باشد، تصمیم فقط Watchlist/Research بماند تا Forward outcome تأیید شود.",
+        "برای ارتقا به Gate، narrative_adjustment باید با outcomeهای بعدی در decision_evaluations.csv validate شود."
+      ],
+      "latest_narrative": {
+        "run_id": "market_narrative_20260711_072633",
+        "generated_utc": "2026-07-11T07:26:33.601738+00:00",
+        "version": "v7.1.0",
+        "status": "MARKET_NARRATIVE_WITH_CONFLICTS",
+        "symbol": "BTC/USDT",
+        "timeframe": "4h",
+        "narrative_label": "MIXED_NARRATIVE_CONFLICT",
+        "narrative_confidence": "MEDIUM",
+        "dominant_direction": "BEARISH",
+        "dominant_theme": "MACRO_POLICY",
+        "net_direction_score": "-20.8086",
+        "event_risk": "HIGH",
+        "technical_event_conflict": "HIGH",
+        "accepted_events": "7",
+        "noise_filtered_events": "0"
+      },
+      "latest_decision": {
+        "decision_id": "3a81916cf067dc15",
+        "logged_at_utc": "2026-07-11T07:25:53.492975+00:00",
+        "candle_timestamp": "2026-07-11 04:00:00",
+        "symbol": "BTC/USDT",
+        "timeframe": "4h",
+        "price": "64219.2",
+        "side": "LONG",
+        "score": "62",
+        "confidence_label": "Medium",
+        "risk_label": "Low",
+        "actionability": "WATCHLIST",
+        "is_actionable": "False",
+        "entry_zone": "64,049 - 64,321",
+        "stop_zone": "63,405",
+        "targets": "[\"64,898\", \"65,441\", \"65,984\"]",
+        "trend_score": "28",
+        "trend_max": "28",
+        "momentum_score": "22",
+        "momentum_max": "30",
+        "volume_score": "0",
+        "volume_max": "20",
+        "structure_score": "6",
+        "structure_max": "12",
+        "risk_penalty": "-2",
+        "risk_max": "25",
+        "regime_label": "TRENDING_BULL",
+        "regime_confidence": "100",
+        "regime_adjustment": "5",
+        "regime_source": "decision_engine_raw",
+        "regime_label_quality": "DIRECT_ENGINE",
+        "trend_state": "BULLISH",
+        "volatility_state": "NORMAL_OR_LOW_VOL",
+        "market_phase": "BULLISH__NORMAL_OR_LOW_VOL",
+        "primary_cause": "MULTI_SOURCE_EVENT_CONSENSUS",
+        "cause_confidence": "HIGH",
+        "catalyst_score": "44",
+        "event_risk": "HIGH",
+        "technical_event_conflict": "HIGH",
+        "causal_alignment": "CONFLICT_WITH_EXTERNAL_CONTEXT",
+        "causal_verdict": "CAUSAL_CONFLICT_RESEARCH_ONLY",
+        "causal_source_count": "12",
+        "causal_trusted_source_count": "12",
+        "causal_manual_event_count": "2",
+        "causal_auto_event_count": "10",
+        "causal_top_sources": "manual_events:OK:BULLISH:MEDIUM | manual_events:OK:BEARISH:MEDIUM | auto_events:OK:NEUTRAL:HIGH | auto_events:OK:NEUTRAL:HIGH | auto_events:OK:NEUTRAL:HIGH | auto_events:OK:NEUTRAL:HIGH",
+        "causal_notes": "TREND_MOMENTUM_ALIGNMENT | REGIME_ALIGNED_BULL_LONG",
+        "market_narrative_label": "MIXED_NARRATIVE_CONFLICT",
+        "market_narrative_confidence": "MEDIUM",
+        "market_narrative_direction": "BEARISH",
+        "market_narrative_theme": "MACRO_POLICY",
+        "market_narrative_score": "-20.8099",
+        "market_narrative_event_risk": "HIGH",
+        "market_narrative_conflict": "LOW",
+        "market_narrative_summary": "Narrative=MIXED_NARRATIVE_CONFLICT; direction=BEARISH; theme=MACRO_POLICY; net_score=-20.8099; risk=HIGH. محرک اصلی فعلی از federal_reserve_press است: Federal Reserve Board issues enforcement action with TS Banking Group, Inc. and TS Contrarian Bancshares, Inc.",
+        "narrative_alignment": "CONFLICTING",
+        "narrative_conflict_score": "72",
+        "narrative_adjustment": "-26",
+        "narrative_adjusted_score": "36",
+        "narrative_action_override": "DOWNGRADE_OR_WAIT",
+        "narrative_decision_verdict": "DOWNGRADE_CONFIDENCE_RESEARCH_ONLY",
+        "narrative_decision_notes": "Narrative با جهت تصمیم در تضاد است؛ confidence باید کاهش یابد. | خود narrative برچسب conflict/mixed دارد. | Event risk بالاست؛ حتی narrative هم‌جهت هم باید با احتیاط دیده شود.",
+        "root_cause_primary": "MACRO_POLICY_PRESSURE",
+        "root_cause_direction": "BEARISH",
+        "root_cause_confidence": "MEDIUM",
+        "root_cause_probability_pct": "45.59",
+        "root_cause_evidence_quality": "HIGH",
+        "root_cause_verdict": "PROBABLE_CAUSE_BUT_CONFLICTED",
+        "root_cause_evidence_total": "15",
+        "root_cause_official_evidence_total": "11",
+        "root_cause_top_causes": "MACRO_POLICY_PRESSURE:45.59%;REGULATORY_ACCESS_OR_MODERNIZATION:14.4%;MIXED_EVENT_CONFLICT:14.18%;TECHNICAL_STRUCTURE_MOMENTUM:11.1%;REGULATORY_RISK:9.74%",
+        "root_cause_summary": "Probable root cause=MACRO_POLICY_PRESSURE; direction=BEARISH; confidence=MEDIUM; share=45.59%. قوی‌ترین evidence از federal_reserve_press است: Market narrative theme: MACRO_POLICY | هشدار: شواهد متضاد همزمان وجود دارد.",
+        "long_score": "68",
+        "short_score": "0",
+        "reasons": "روند کوتاه‌مدت صعودی و هم‌راستاست؛ قیمت بالای میانگین‌های مهم قرار دارد. | قیمت بالای EMA10 است؛ مومنتوم کوتاه‌مدت هنوز حفظ شده است. | RSI در محدوده سالم مومنتوم صعودی است: 60.9 | RSI نسبت به کندل قبل کمی افزایش یافته است: +0.6 | MACD در ناحیه مثبت است. | کندل فعلی مثبت بسته شده است. | قیمت بالای EMA10 است؛ مومنتوم کوتاه‌مدت هنوز حفظ شده است. | ساختار Higher High دیده می‌شود؛ سقف جدید بالاتر از سقف قبلی است. | ساختار Higher Low دیده می‌شود؛ کف جدید بالاتر از کف قبلی است. | Market Regime صعودی است و Bias لانگ را تأیید می‌کند. | Learning overrides موجود است اما enabled=false است؛ هیچ تغییری اعمال نمی‌شود. | Adaptive: مومنتوم در جهت رژیم صعودی تأیید شده است. | 14 نمونه مشابه نتیجه‌دار پیدا شد؛ میانگین شباهت 92%. | Win Rate تاریخی قوی است: 85.7% | میانگین بازده 24h کمی مثبت است: 0.39% | Target 1 در نمونه‌های مشابه زیاد خورده است: 85.7% | Historical Edge Summary: Win 85.7% | Stop 50.0% | Avg 24h 0.39%",
+        "warnings": "MACD نسبت به کندل قبل ضعیف‌تر شده است. | کندل مثبت است اما بدنه آن ضعیف است. | حجم فعلی ضعیف‌تر از میانگین اخیر است؛ احتمال شکست فیک بیشتر می‌شود. | هم حجم پایین است و هم بدنه کندل ضعیف؛ بازار هنوز مشارکت جدی ندارد. | بدنه کندل متوسط/ضعیف است؛ قدرت حرکت هنوز کامل نیست. | Learning Override اعمال نشد. Status=DISABLED | Adaptive: با وجود رژیم صعودی، حجم هنوز تأیید کافی نداده است. | Stop Rate تاریخی متوسط/بالاست: 50.0% | Multi-Timeframe خنثی/ناهم‌راستا است؛ تایم‌فریم‌های بالاتر هنوز Bias LONG را تأیید نمی‌کنند: 65%",
+        "provider": "kucoin",
+        "historical_edge_score": "10",
+        "historical_edge_max": "12"
+      }
+    },
+    "root_cause_discovery": {
+      "run_id": "root_cause_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.393926+00:00",
+      "version": "v8.1.0",
+      "status": "ROOT_CAUSE_MIXED_WITH_CONTRADICTIONS",
+      "symbol": "BTC/USDT",
+      "timeframe": "4h",
+      "lookback_hours": 168,
+      "latest_decision_id": "3a81916cf067dc15",
+      "decision_side": "LONG",
+      "decision_score": 62,
+      "narrative_label": "MIXED_NARRATIVE_CONFLICT",
+      "narrative_direction": "BEARISH",
+      "narrative_theme": "MACRO_POLICY",
+      "narrative_confidence": "MEDIUM",
+      "narrative_score": -20.8086,
+      "causal_primary_cause": "MULTI_SOURCE_EVENT_CONSENSUS",
+      "causal_verdict": "CAUSAL_CONFLICT_RESEARCH_ONLY",
+      "catalyst_score": 44,
+      "primary_root_cause": "MACRO_POLICY_PRESSURE",
+      "root_cause_direction": "BEARISH",
+      "root_cause_confidence": "MEDIUM",
+      "root_cause_probability_pct": 41.81,
+      "root_cause_evidence_quality": "HIGH",
+      "root_cause_verdict": "PROBABLE_CAUSE_BUT_CONFLICTED",
+      "root_cause_summary": "Probable root cause=MACRO_POLICY_PRESSURE; direction=BEARISH; confidence=MEDIUM; share=41.81%. قوی‌ترین evidence از federal_reserve_press است: Market narrative theme: MACRO_POLICY | هشدار: شواهد متضاد همزمان وجود دارد.",
+      "evidence_total": 16,
+      "official_evidence_total": 12,
+      "accepted_event_rows": 12,
+      "top_causes": [
+        {
+          "cause": "MACRO_POLICY_PRESSURE",
+          "description": "سیاست پولی/کلان، سخنرانی‌ها، FOMC، CPI، ریسک بانکی یا liquidity macro.",
+          "direction": "BEARISH",
+          "evidence_score": 68.033,
+          "probability_pct": 41.81,
+          "evidence_count": 7,
+          "official_evidence_count": 6,
+          "strongest_source": "federal_reserve_press",
+          "verdict": "SUPPORTING_CAUSE",
+          "evidence": [
+            {
+              "cause": "MACRO_POLICY_PRESSURE",
+              "source": "market_narrative",
+              "direction": "BEARISH",
+              "weight": 16.283,
+              "quality": "MEDIUM",
+              "title": "Market narrative theme: MACRO_POLICY",
+              "note": "label=MIXED_NARRATIVE_CONFLICT; score=20.8086; confidence=MEDIUM; risk=HIGH",
+              "timestamp_utc": "",
+              "source_url": ""
+            },
+            {
+              "cause": "MACRO_POLICY_PRESSURE",
+              "source": "federal_reserve_press",
+              "direction": "NEUTRAL",
+              "weight": 9.775,
+              "quality": "HIGH",
+              "title": "Federal Reserve announces the leadership and objectives of its task forces to advance the conduct of monetary policy",
+              "note": "event_type=macro; tier=TIER_1_OFFICIAL_MACRO; impact=HIGH",
+              "timestamp_utc": "2026-07-09T19:00:00+00:00",
+              "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260709a.htm"
+            },
+            {
+              "cause": "MACRO_POLICY_PRESSURE",
+              "source": "federal_reserve_press",
+              "direction": "BEARISH",
+              "weight": 9.775,
+              "quality": "HIGH",
+              "title": "Federal Reserve Board issues enforcement action with TS Banking Group, Inc. and TS Contrarian Bancshares, Inc.",
+              "note": "event_type=macro; tier=TIER_1_OFFICIAL_MACRO; impact=HIGH",
+              "timestamp_utc": "2026-07-09T15:00:00+00:00",
+              "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/enforcement20260709a.htm"
+            },
+            {
+              "cause": "MACRO_POLICY_PRESSURE",
+              "source": "federal_reserve_press",
+              "direction": "NEUTRAL",
+              "weight": 9.775,
+              "quality": "HIGH",
+              "title": "Minutes of the Federal Open Market Committee, June 16-17, 2026",
+              "note": "event_type=macro; tier=TIER_1_OFFICIAL_MACRO; impact=HIGH",
+              "timestamp_utc": "2026-07-08T18:00:00+00:00",
+              "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260708a.htm"
+            },
+            {
+              "cause": "MACRO_POLICY_PRESSURE",
+              "source": "federal_reserve_press",
+              "direction": "BEARISH",
+              "weight": 7.475,
+              "quality": "HIGH",
+              "title": "Federal Reserve Board requests comment on a proposal to amend its requirements for banks to maintain anti-money laundering programs",
+              "note": "event_type=macro; tier=TIER_1_OFFICIAL_MACRO; impact=HIGH",
+              "timestamp_utc": "2026-07-07T19:00:00+00:00",
+              "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/bcreg20260707a.htm"
+            },
+            {
+              "cause": "MACRO_POLICY_PRESSURE",
+              "source": "federal_reserve_speeches",
+              "direction": "NEUTRAL",
+              "weight": 7.475,
+              "quality": "HIGH",
+              "title": "Bowman, Opening Remarks on Sound Practices for Artificial Intelligence",
+              "note": "event_type=macro; tier=TIER_1_OFFICIAL_MACRO; impact=HIGH",
+              "timestamp_utc": "2026-07-07T11:00:00+00:00",
+              "source_url": "https://www.federalreserve.gov/newsevents/speech/bowman20260707a.htm"
+            },
+            {
+              "cause": "MACRO_POLICY_PRESSURE",
+              "source": "federal_reserve_speeches",
+              "direction": "BEARISH",
+              "weight": 7.475,
+              "quality": "HIGH",
+              "title": "Waller, Two Thoughts on the Transmission of Monetary Policy",
+              "note": "event_type=macro; tier=TIER_1_OFFICIAL_MACRO; impact=HIGH",
+              "timestamp_utc": "2026-07-06T15:00:00+00:00",
+              "source_url": "https://www.federalreserve.gov/newsevents/speech/waller20260706a.htm"
+            }
+          ]
+        },
+        {
+          "cause": "REGULATORY_ACCESS_OR_MODERNIZATION",
+          "description": "رویدادهای مثبت/خنثی درباره market access، ETF، IPO modernization یا دسترسی عمومی.",
+          "direction": "BULLISH",
+          "evidence_score": 21.59,
+          "probability_pct": 13.27,
+          "evidence_count": 2,
+          "official_evidence_count": 2,
+          "strongest_source": "sec_press_releases",
+          "verdict": "WEAK_SUPPORTING_CAUSE",
+          "evidence": [
+            {
+              "cause": "REGULATORY_ACCESS_OR_MODERNIZATION",
+              "source": "sec_press_releases",
+              "direction": "BULLISH",
+              "weight": 11.815,
+              "quality": "HIGH",
+              "title": "SEC to Host Virtual Roundtable on Modernizing IPOs and Expanding Access to Public Markets",
+              "note": "event_type=regulatory; tier=TIER_1_OFFICIAL_REGULATOR; impact=HIGH",
+              "timestamp_utc": "2026-07-08T17:54:26+00:00",
+              "source_url": "https://www.sec.gov/newsroom/press-releases/2026-65-sec-host-virtual-roundtable-modernizing-ipos-expanding-access-public-markets"
+            },
+            {
+              "cause": "REGULATORY_ACCESS_OR_MODERNIZATION",
+              "source": "sec_press_releases",
+              "direction": "BULLISH",
+              "weight": 9.775,
+              "quality": "HIGH",
+              "title": "SEC Small Business Advisory Committee to Explore Modernizing Market Access",
+              "note": "event_type=regulatory; tier=TIER_1_OFFICIAL_REGULATOR; impact=HIGH",
+              "timestamp_utc": "2026-07-08T13:01:01+00:00",
+              "source_url": "https://www.sec.gov/newsroom/press-releases/2026-64-sec-small-business-advisory-committee-explore-modernizing-market-access"
+            }
+          ]
+        },
+        {
+          "cause": "MIXED_EVENT_CONFLICT",
+          "description": "چند علت متضاد همزمان دیده شده و علت غالب هنوز قطعی نیست.",
+          "direction": "MIXED_OR_NEUTRAL",
+          "evidence_score": 21.4923,
+          "probability_pct": 13.21,
+          "evidence_count": 2,
+          "official_evidence_count": 0,
+          "strongest_source": "market_narrative",
+          "verdict": "WEAK_SUPPORTING_CAUSE",
+          "evidence": [
+            {
+              "cause": "MIXED_EVENT_CONFLICT",
+              "source": "market_narrative",
+              "direction": "NEUTRAL",
+              "weight": 12.2123,
+              "quality": "MEDIUM",
+              "title": "Narrative has mixed/conflicting drivers",
+              "note": "label=MIXED_NARRATIVE_CONFLICT; theme=MACRO_POLICY",
+              "timestamp_utc": "",
+              "source_url": ""
+            },
+            {
+              "cause": "MIXED_EVENT_CONFLICT",
+              "source": "causal_intelligence",
+              "direction": "NEUTRAL",
+              "weight": 9.28,
+              "quality": "MEDIUM",
+              "title": "Causal context: MULTI_SOURCE_EVENT_CONSENSUS",
+              "note": "verdict=CAUSAL_CONFLICT_RESEARCH_ONLY; catalyst=44.0",
+              "timestamp_utc": "",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "cause": "EXCHANGE_MARKET_ACCESS",
+          "description": "رویدادهای exchange، listing، derivatives، product launch یا market access مربوط به صرافی‌ها.",
+          "direction": "MIXED_OR_NEUTRAL",
+          "evidence_score": 18.975,
+          "probability_pct": 11.66,
+          "evidence_count": 2,
+          "official_evidence_count": 2,
+          "strongest_source": "sec_press_releases",
+          "verdict": "WEAK_SUPPORTING_CAUSE",
+          "evidence": [
+            {
+              "cause": "EXCHANGE_MARKET_ACCESS",
+              "source": "sec_press_releases",
+              "direction": "NEUTRAL",
+              "weight": 11.5,
+              "quality": "HIGH",
+              "title": "SEC Office of Municipal Securities Updates FAQs for Registration of Municipal Advisors",
+              "note": "event_type=regulatory; tier=TIER_1_OFFICIAL_REGULATOR; impact=HIGH",
+              "timestamp_utc": "2026-07-10T16:00:32+00:00",
+              "source_url": "https://www.sec.gov/newsroom/press-releases/2026-66-sec-office-municipal-securities-updates-faqs-registration-municipal-advisors"
+            },
+            {
+              "cause": "EXCHANGE_MARKET_ACCESS",
+              "source": "sec_press_releases",
+              "direction": "NEUTRAL",
+              "weight": 7.475,
+              "quality": "HIGH",
+              "title": "SEC Names Paul Knight as Chief Operating Officer",
+              "note": "event_type=regulatory; tier=TIER_1_OFFICIAL_REGULATOR; impact=HIGH",
+              "timestamp_utc": "2026-07-06T19:10:00+00:00",
+              "source_url": "https://www.sec.gov/newsroom/press-releases/2026-62-sec-names-paul-knight-chief-operating-officer"
+            }
+          ]
+        },
+        {
+          "cause": "TECHNICAL_STRUCTURE_MOMENTUM",
+          "description": "علت درون‌بازاری از ساختار، trend، momentum یا شکست تکنیکال.",
+          "direction": "BULLISH",
+          "evidence_score": 18.0,
+          "probability_pct": 11.06,
+          "evidence_count": 1,
+          "official_evidence_count": 0,
+          "strongest_source": "decision_engine_features",
+          "verdict": "WEAK_SUPPORTING_CAUSE",
+          "evidence": [
+            {
+              "cause": "TECHNICAL_STRUCTURE_MOMENTUM",
+              "source": "decision_engine_features",
+              "direction": "BULLISH",
+              "weight": 18.0,
+              "quality": "MEDIUM",
+              "title": "Decision Engine structure/trend/momentum evidence",
+              "note": "trend=28.0; momentum=22.0; structure=6.0; score=62.0; regime=TRENDING_BULL",
+              "timestamp_utc": "",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "cause": "REGULATORY_RISK",
+          "description": "فشار نظارتی، enforcement، fraud، litigation یا headlineهای ریسک‌زای قانون‌گذاری.",
+          "direction": "BEARISH",
+          "evidence_score": 14.615,
+          "probability_pct": 8.98,
+          "evidence_count": 2,
+          "official_evidence_count": 2,
+          "strongest_source": "sec_press_releases",
+          "verdict": "WEAK_SUPPORTING_CAUSE",
+          "evidence": [
+            {
+              "cause": "REGULATORY_RISK",
+              "source": "sec_press_releases",
+              "direction": "BEARISH",
+              "weight": 7.475,
+              "quality": "HIGH",
+              "title": "SEC Forms New Retail Fraud Working Group",
+              "note": "event_type=regulatory; tier=TIER_1_OFFICIAL_REGULATOR; impact=HIGH",
+              "timestamp_utc": "2026-07-07T14:39:57+00:00",
+              "source_url": "https://www.sec.gov/newsroom/press-releases/2026-63-sec-forms-new-retail-fraud-working-group"
+            },
+            {
+              "cause": "REGULATORY_RISK",
+              "source": "manual_events",
+              "direction": "BEARISH",
+              "weight": 7.14,
+              "quality": "HIGH",
+              "title": "Example: enforcement headline increasing crypto regulatory risk",
+              "note": "event_type=regulatory; tier=TIER_0_MANUAL_CURATED; impact=high",
+              "timestamp_utc": "2026-07-09T15:00:00+00:00",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "root_cause_evidence": [
+        {
+          "cause": "TECHNICAL_STRUCTURE_MOMENTUM",
+          "source": "decision_engine_features",
+          "direction": "BULLISH",
+          "weight": 18.0,
+          "quality": "MEDIUM",
+          "title": "Decision Engine structure/trend/momentum evidence",
+          "note": "trend=28.0; momentum=22.0; structure=6.0; score=62.0; regime=TRENDING_BULL",
+          "timestamp_utc": "",
+          "source_url": ""
+        },
+        {
+          "cause": "MACRO_POLICY_PRESSURE",
+          "source": "market_narrative",
+          "direction": "BEARISH",
+          "weight": 16.283,
+          "quality": "MEDIUM",
+          "title": "Market narrative theme: MACRO_POLICY",
+          "note": "label=MIXED_NARRATIVE_CONFLICT; score=20.8086; confidence=MEDIUM; risk=HIGH",
+          "timestamp_utc": "",
+          "source_url": ""
+        },
+        {
+          "cause": "MIXED_EVENT_CONFLICT",
+          "source": "market_narrative",
+          "direction": "NEUTRAL",
+          "weight": 12.2123,
+          "quality": "MEDIUM",
+          "title": "Narrative has mixed/conflicting drivers",
+          "note": "label=MIXED_NARRATIVE_CONFLICT; theme=MACRO_POLICY",
+          "timestamp_utc": "",
+          "source_url": ""
+        },
+        {
+          "cause": "REGULATORY_ACCESS_OR_MODERNIZATION",
+          "source": "sec_press_releases",
+          "direction": "BULLISH",
+          "weight": 11.815,
+          "quality": "HIGH",
+          "title": "SEC to Host Virtual Roundtable on Modernizing IPOs and Expanding Access to Public Markets",
+          "note": "event_type=regulatory; tier=TIER_1_OFFICIAL_REGULATOR; impact=HIGH",
+          "timestamp_utc": "2026-07-08T17:54:26+00:00",
+          "source_url": "https://www.sec.gov/newsroom/press-releases/2026-65-sec-host-virtual-roundtable-modernizing-ipos-expanding-access-public-markets"
+        },
+        {
+          "cause": "EXCHANGE_MARKET_ACCESS",
+          "source": "sec_press_releases",
+          "direction": "NEUTRAL",
+          "weight": 11.5,
+          "quality": "HIGH",
+          "title": "SEC Office of Municipal Securities Updates FAQs for Registration of Municipal Advisors",
+          "note": "event_type=regulatory; tier=TIER_1_OFFICIAL_REGULATOR; impact=HIGH",
+          "timestamp_utc": "2026-07-10T16:00:32+00:00",
+          "source_url": "https://www.sec.gov/newsroom/press-releases/2026-66-sec-office-municipal-securities-updates-faqs-registration-municipal-advisors"
+        },
+        {
+          "cause": "MACRO_POLICY_PRESSURE",
+          "source": "federal_reserve_press",
+          "direction": "NEUTRAL",
+          "weight": 9.775,
+          "quality": "HIGH",
+          "title": "Federal Reserve announces the leadership and objectives of its task forces to advance the conduct of monetary policy",
+          "note": "event_type=macro; tier=TIER_1_OFFICIAL_MACRO; impact=HIGH",
+          "timestamp_utc": "2026-07-09T19:00:00+00:00",
+          "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260709a.htm"
+        },
+        {
+          "cause": "MACRO_POLICY_PRESSURE",
+          "source": "federal_reserve_press",
+          "direction": "BEARISH",
+          "weight": 9.775,
+          "quality": "HIGH",
+          "title": "Federal Reserve Board issues enforcement action with TS Banking Group, Inc. and TS Contrarian Bancshares, Inc.",
+          "note": "event_type=macro; tier=TIER_1_OFFICIAL_MACRO; impact=HIGH",
+          "timestamp_utc": "2026-07-09T15:00:00+00:00",
+          "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/enforcement20260709a.htm"
+        },
+        {
+          "cause": "MACRO_POLICY_PRESSURE",
+          "source": "federal_reserve_press",
+          "direction": "NEUTRAL",
+          "weight": 9.775,
+          "quality": "HIGH",
+          "title": "Minutes of the Federal Open Market Committee, June 16-17, 2026",
+          "note": "event_type=macro; tier=TIER_1_OFFICIAL_MACRO; impact=HIGH",
+          "timestamp_utc": "2026-07-08T18:00:00+00:00",
+          "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260708a.htm"
+        },
+        {
+          "cause": "REGULATORY_ACCESS_OR_MODERNIZATION",
+          "source": "sec_press_releases",
+          "direction": "BULLISH",
+          "weight": 9.775,
+          "quality": "HIGH",
+          "title": "SEC Small Business Advisory Committee to Explore Modernizing Market Access",
+          "note": "event_type=regulatory; tier=TIER_1_OFFICIAL_REGULATOR; impact=HIGH",
+          "timestamp_utc": "2026-07-08T13:01:01+00:00",
+          "source_url": "https://www.sec.gov/newsroom/press-releases/2026-64-sec-small-business-advisory-committee-explore-modernizing-market-access"
+        },
+        {
+          "cause": "MIXED_EVENT_CONFLICT",
+          "source": "causal_intelligence",
+          "direction": "NEUTRAL",
+          "weight": 9.28,
+          "quality": "MEDIUM",
+          "title": "Causal context: MULTI_SOURCE_EVENT_CONSENSUS",
+          "note": "verdict=CAUSAL_CONFLICT_RESEARCH_ONLY; catalyst=44.0",
+          "timestamp_utc": "",
+          "source_url": ""
+        },
+        {
+          "cause": "MACRO_POLICY_PRESSURE",
+          "source": "federal_reserve_press",
+          "direction": "BEARISH",
+          "weight": 7.475,
+          "quality": "HIGH",
+          "title": "Federal Reserve Board requests comment on a proposal to amend its requirements for banks to maintain anti-money laundering programs",
+          "note": "event_type=macro; tier=TIER_1_OFFICIAL_MACRO; impact=HIGH",
+          "timestamp_utc": "2026-07-07T19:00:00+00:00",
+          "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/bcreg20260707a.htm"
+        },
+        {
+          "cause": "REGULATORY_RISK",
+          "source": "sec_press_releases",
+          "direction": "BEARISH",
+          "weight": 7.475,
+          "quality": "HIGH",
+          "title": "SEC Forms New Retail Fraud Working Group",
+          "note": "event_type=regulatory; tier=TIER_1_OFFICIAL_REGULATOR; impact=HIGH",
+          "timestamp_utc": "2026-07-07T14:39:57+00:00",
+          "source_url": "https://www.sec.gov/newsroom/press-releases/2026-63-sec-forms-new-retail-fraud-working-group"
+        },
+        {
+          "cause": "MACRO_POLICY_PRESSURE",
+          "source": "federal_reserve_speeches",
+          "direction": "NEUTRAL",
+          "weight": 7.475,
+          "quality": "HIGH",
+          "title": "Bowman, Opening Remarks on Sound Practices for Artificial Intelligence",
+          "note": "event_type=macro; tier=TIER_1_OFFICIAL_MACRO; impact=HIGH",
+          "timestamp_utc": "2026-07-07T11:00:00+00:00",
+          "source_url": "https://www.federalreserve.gov/newsevents/speech/bowman20260707a.htm"
+        },
+        {
+          "cause": "EXCHANGE_MARKET_ACCESS",
+          "source": "sec_press_releases",
+          "direction": "NEUTRAL",
+          "weight": 7.475,
+          "quality": "HIGH",
+          "title": "SEC Names Paul Knight as Chief Operating Officer",
+          "note": "event_type=regulatory; tier=TIER_1_OFFICIAL_REGULATOR; impact=HIGH",
+          "timestamp_utc": "2026-07-06T19:10:00+00:00",
+          "source_url": "https://www.sec.gov/newsroom/press-releases/2026-62-sec-names-paul-knight-chief-operating-officer"
+        },
+        {
+          "cause": "MACRO_POLICY_PRESSURE",
+          "source": "federal_reserve_speeches",
+          "direction": "BEARISH",
+          "weight": 7.475,
+          "quality": "HIGH",
+          "title": "Waller, Two Thoughts on the Transmission of Monetary Policy",
+          "note": "event_type=macro; tier=TIER_1_OFFICIAL_MACRO; impact=HIGH",
+          "timestamp_utc": "2026-07-06T15:00:00+00:00",
+          "source_url": "https://www.federalreserve.gov/newsevents/speech/waller20260706a.htm"
+        },
+        {
+          "cause": "REGULATORY_RISK",
+          "source": "manual_events",
+          "direction": "BEARISH",
+          "weight": 7.14,
+          "quality": "HIGH",
+          "title": "Example: enforcement headline increasing crypto regulatory risk",
+          "note": "event_type=regulatory; tier=TIER_0_MANUAL_CURATED; impact=high",
+          "timestamp_utc": "2026-07-09T15:00:00+00:00",
+          "source_url": ""
+        }
+      ],
+      "blockers": [],
+      "contradictions": [
+        "شواهد bullish و bearish همزمان قوی‌اند: bull=39.59, bear=82.65"
+      ],
+      "warnings": [
+        "Root Cause Discovery احتمالات علّی پژوهشی می‌سازد؛ علت قطعی یا سیگنال خرید/فروش نیست.",
+        "این ماژول از outcome/return آینده برای تشخیص علت استفاده نمی‌کند تا leakage ایجاد نشود.",
+        "تا وقتی علت‌ها با forward outcomes اعتبارسنجی نشوند، Paper/Live نباید از آن‌ها استفاده کند."
+      ],
+      "recommendations": [
+        "automatic_event_collector، causal_intelligence، market_narrative و narrative_decision را قبل از root_cause اجرا کن.",
+        "اگر primary_root_cause چند هفته متوالی با outcome مثبت/منفی همبستگی داشت، بعداً می‌تواند وارد Root-Cause Gate Simulator شود.",
+        "برای افزایش دقت، داده‌های derivatives/on-chain/ETF flow را به evidence registry اضافه کن."
+      ],
+      "latest_decision": {
+        "decision_id": "3a81916cf067dc15",
+        "logged_at_utc": "2026-07-11T07:25:53.492975+00:00",
+        "candle_timestamp": "2026-07-11 04:00:00",
+        "symbol": "BTC/USDT",
+        "timeframe": "4h",
+        "price": "64219.2",
+        "side": "LONG",
+        "score": "62",
+        "confidence_label": "Medium",
+        "risk_label": "Low",
+        "actionability": "WATCHLIST",
+        "is_actionable": "False",
+        "entry_zone": "64,049 - 64,321",
+        "stop_zone": "63,405",
+        "targets": "[\"64,898\", \"65,441\", \"65,984\"]",
+        "trend_score": "28",
+        "trend_max": "28",
+        "momentum_score": "22",
+        "momentum_max": "30",
+        "volume_score": "0",
+        "volume_max": "20",
+        "structure_score": "6",
+        "structure_max": "12",
+        "risk_penalty": "-2",
+        "risk_max": "25",
+        "regime_label": "TRENDING_BULL",
+        "regime_confidence": "100",
+        "regime_adjustment": "5",
+        "regime_source": "decision_engine_raw",
+        "regime_label_quality": "DIRECT_ENGINE",
+        "trend_state": "BULLISH",
+        "volatility_state": "NORMAL_OR_LOW_VOL",
+        "market_phase": "BULLISH__NORMAL_OR_LOW_VOL",
+        "primary_cause": "MULTI_SOURCE_EVENT_CONSENSUS",
+        "cause_confidence": "HIGH",
+        "catalyst_score": "44",
+        "event_risk": "HIGH",
+        "technical_event_conflict": "HIGH",
+        "causal_alignment": "CONFLICT_WITH_EXTERNAL_CONTEXT",
+        "causal_verdict": "CAUSAL_CONFLICT_RESEARCH_ONLY",
+        "causal_source_count": "12",
+        "causal_trusted_source_count": "12",
+        "causal_manual_event_count": "2",
+        "causal_auto_event_count": "10",
+        "causal_top_sources": "manual_events:OK:BULLISH:MEDIUM | manual_events:OK:BEARISH:MEDIUM | auto_events:OK:NEUTRAL:HIGH | auto_events:OK:NEUTRAL:HIGH | auto_events:OK:NEUTRAL:HIGH | auto_events:OK:NEUTRAL:HIGH",
+        "causal_notes": "TREND_MOMENTUM_ALIGNMENT | REGIME_ALIGNED_BULL_LONG",
+        "market_narrative_label": "MIXED_NARRATIVE_CONFLICT",
+        "market_narrative_confidence": "MEDIUM",
+        "market_narrative_direction": "BEARISH",
+        "market_narrative_theme": "MACRO_POLICY",
+        "market_narrative_score": "-20.8099",
+        "market_narrative_event_risk": "HIGH",
+        "market_narrative_conflict": "LOW",
+        "market_narrative_summary": "Narrative=MIXED_NARRATIVE_CONFLICT; direction=BEARISH; theme=MACRO_POLICY; net_score=-20.8099; risk=HIGH. محرک اصلی فعلی از federal_reserve_press است: Federal Reserve Board issues enforcement action with TS Banking Group, Inc. and TS Contrarian Bancshares, Inc.",
+        "narrative_alignment": "CONFLICTING",
+        "narrative_conflict_score": "72",
+        "narrative_adjustment": "-26",
+        "narrative_adjusted_score": "36",
+        "narrative_action_override": "DOWNGRADE_OR_WAIT",
+        "narrative_decision_verdict": "DOWNGRADE_CONFIDENCE_RESEARCH_ONLY",
+        "narrative_decision_notes": "Narrative با جهت تصمیم در تضاد است؛ confidence باید کاهش یابد. | خود narrative برچسب conflict/mixed دارد. | Event risk بالاست؛ حتی narrative هم‌جهت هم باید با احتیاط دیده شود.",
+        "root_cause_primary": "MACRO_POLICY_PRESSURE",
+        "root_cause_direction": "BEARISH",
+        "root_cause_confidence": "MEDIUM",
+        "root_cause_probability_pct": "45.59",
+        "root_cause_evidence_quality": "HIGH",
+        "root_cause_verdict": "PROBABLE_CAUSE_BUT_CONFLICTED",
+        "root_cause_evidence_total": "15",
+        "root_cause_official_evidence_total": "11",
+        "root_cause_top_causes": "MACRO_POLICY_PRESSURE:45.59%;REGULATORY_ACCESS_OR_MODERNIZATION:14.4%;MIXED_EVENT_CONFLICT:14.18%;TECHNICAL_STRUCTURE_MOMENTUM:11.1%;REGULATORY_RISK:9.74%",
+        "root_cause_summary": "Probable root cause=MACRO_POLICY_PRESSURE; direction=BEARISH; confidence=MEDIUM; share=45.59%. قوی‌ترین evidence از federal_reserve_press است: Market narrative theme: MACRO_POLICY | هشدار: شواهد متضاد همزمان وجود دارد.",
+        "long_score": "68",
+        "short_score": "0",
+        "reasons": "روند کوتاه‌مدت صعودی و هم‌راستاست؛ قیمت بالای میانگین‌های مهم قرار دارد. | قیمت بالای EMA10 است؛ مومنتوم کوتاه‌مدت هنوز حفظ شده است. | RSI در محدوده سالم مومنتوم صعودی است: 60.9 | RSI نسبت به کندل قبل کمی افزایش یافته است: +0.6 | MACD در ناحیه مثبت است. | کندل فعلی مثبت بسته شده است. | قیمت بالای EMA10 است؛ مومنتوم کوتاه‌مدت هنوز حفظ شده است. | ساختار Higher High دیده می‌شود؛ سقف جدید بالاتر از سقف قبلی است. | ساختار Higher Low دیده می‌شود؛ کف جدید بالاتر از کف قبلی است. | Market Regime صعودی است و Bias لانگ را تأیید می‌کند. | Learning overrides موجود است اما enabled=false است؛ هیچ تغییری اعمال نمی‌شود. | Adaptive: مومنتوم در جهت رژیم صعودی تأیید شده است. | 14 نمونه مشابه نتیجه‌دار پیدا شد؛ میانگین شباهت 92%. | Win Rate تاریخی قوی است: 85.7% | میانگین بازده 24h کمی مثبت است: 0.39% | Target 1 در نمونه‌های مشابه زیاد خورده است: 85.7% | Historical Edge Summary: Win 85.7% | Stop 50.0% | Avg 24h 0.39%",
+        "warnings": "MACD نسبت به کندل قبل ضعیف‌تر شده است. | کندل مثبت است اما بدنه آن ضعیف است. | حجم فعلی ضعیف‌تر از میانگین اخیر است؛ احتمال شکست فیک بیشتر می‌شود. | هم حجم پایین است و هم بدنه کندل ضعیف؛ بازار هنوز مشارکت جدی ندارد. | بدنه کندل متوسط/ضعیف است؛ قدرت حرکت هنوز کامل نیست. | Learning Override اعمال نشد. Status=DISABLED | Adaptive: با وجود رژیم صعودی، حجم هنوز تأیید کافی نداده است. | Stop Rate تاریخی متوسط/بالاست: 50.0% | Multi-Timeframe خنثی/ناهم‌راستا است؛ تایم‌فریم‌های بالاتر هنوز Bias LONG را تأیید نمی‌کنند: 65%",
+        "provider": "kucoin",
+        "historical_edge_score": "10",
+        "historical_edge_max": "12"
+      },
+      "latest_narrative": {
+        "run_id": "market_narrative_20260711_072633",
+        "generated_utc": "2026-07-11T07:26:33.601738+00:00",
+        "version": "v7.1.0",
+        "status": "MARKET_NARRATIVE_WITH_CONFLICTS",
+        "symbol": "BTC/USDT",
+        "timeframe": "4h",
+        "narrative_label": "MIXED_NARRATIVE_CONFLICT",
+        "narrative_confidence": "MEDIUM",
+        "dominant_direction": "BEARISH",
+        "dominant_theme": "MACRO_POLICY",
+        "net_direction_score": "-20.8086",
+        "event_risk": "HIGH",
+        "technical_event_conflict": "HIGH",
+        "accepted_events": "7",
+        "noise_filtered_events": "0"
+      },
+      "latest_causal": {
+        "run_id": "causal_intel_20260711_072630",
+        "generated_utc": "2026-07-11T07:26:33.141542+00:00",
+        "version": "v7.0.0",
+        "status": "CAUSAL_CONTEXT_WITH_BLOCKERS",
+        "symbol": "BTC/USDT",
+        "timeframe": "4h",
+        "collect_live": "True",
+        "primary_cause": "MULTI_SOURCE_EVENT_CONSENSUS",
+        "cause_confidence": "HIGH",
+        "catalyst_score": "44",
+        "event_risk": "HIGH",
+        "technical_event_conflict": "HIGH",
+        "causal_alignment": "CONFLICT_WITH_EXTERNAL_CONTEXT",
+        "causal_verdict": "CAUSAL_CONFLICT_RESEARCH_ONLY",
+        "source_count": "20",
+        "successful_sources": "17",
+        "trusted_successful_sources": "16",
+        "manual_events_loaded": "2",
+        "auto_events_loaded": "11"
+      },
+      "latest_narrative_decision": {
+        "run_id": "narrative_decision_20260711_072633",
+        "generated_utc": "2026-07-11T07:26:33.969058+00:00",
+        "version": "v7.1.0",
+        "status": "NARRATIVE_DECISION_HIGH_CONFLICT",
+        "symbol": "BTC/USDT",
+        "timeframe": "4h",
+        "decision_id": "3a81916cf067dc15",
+        "decision_side": "LONG",
+        "decision_score": "62",
+        "narrative_label": "MIXED_NARRATIVE_CONFLICT",
+        "narrative_direction": "BEARISH",
+        "narrative_confidence": "MEDIUM",
+        "narrative_theme": "MACRO_POLICY",
+        "narrative_score": "-20.8086",
+        "narrative_event_risk": "HIGH",
+        "narrative_alignment": "CONFLICTING",
+        "narrative_conflict_score": "86",
+        "narrative_adjustment": "-35",
+        "narrative_adjusted_score": "27",
+        "narrative_action_override": "WATCHLIST_ONLY_RESEARCH",
+        "narrative_decision_verdict": "HIGH_CONFLICT_WATCHLIST_ONLY"
+      }
+    },
+    "root_cause_forward_validation": {
+      "run_id": "root_cause_forward_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.407353+00:00",
+      "version": "v8.1.0",
+      "status": "ROOT_CAUSE_FORWARD_PROMISING_LOW_SAMPLE",
+      "horizon": "24h",
+      "min_samples": 10,
+      "min_abs_return_pct": 0.0,
+      "evaluations_file": "logs/decision_evaluations.csv",
+      "evaluation_rows": 54,
+      "root_cause_rows": 3,
+      "evaluated_cells": 5,
+      "complete_rows": 51,
+      "eligible_causes": 1,
+      "research_candidates": 0,
+      "promising_low_sample": 1,
+      "top_validated_causes": [
+        {
+          "root_cause_primary": "MACRO_POLICY_PRESSURE",
+          "root_cause_direction": "BEARISH",
+          "samples_total": 3,
+          "evidence_quality_mode": "HIGH",
+          "confidence_mode": "MEDIUM",
+          "avg_probability_pct": 46.6633,
+          "samples_4h": 3,
+          "hit_rate_4h": 66.67,
+          "avg_signed_return_4h_pct": 0.1102,
+          "median_signed_return_4h_pct": 0.0567,
+          "samples_12h": 2,
+          "hit_rate_12h": 50.0,
+          "avg_signed_return_12h_pct": -0.0242,
+          "median_signed_return_12h_pct": -0.0242,
+          "samples_24h": 0,
+          "hit_rate_24h": 0.0,
+          "avg_signed_return_24h_pct": 0.0,
+          "median_signed_return_24h_pct": 0.0,
+          "validation_score": 5.7613,
+          "verdict": "FORWARD_PROMISING_LOW_SAMPLE"
+        }
+      ],
+      "validation_rows": [
+        {
+          "decision_id": "8782f6983beb22b1",
+          "candle_timestamp": "2026-07-10 08:00:00",
+          "symbol": "BTC/USDT",
+          "timeframe": "4h",
+          "side": "LONG",
+          "root_cause_primary": "MACRO_POLICY_PRESSURE",
+          "root_cause_direction": "BEARISH",
+          "root_cause_probability_pct": 47.74,
+          "root_cause_confidence": "MEDIUM",
+          "root_cause_evidence_quality": "HIGH",
+          "root_cause_verdict": "PROBABLE_CAUSE_BUT_CONFLICTED",
+          "evaluation_status": "PARTIAL",
+          "return_after_4h_pct": -0.6103,
+          "return_after_12h_pct": -0.409,
+          "return_after_24h_pct": null,
+          "signed_return_after_4h_pct": 0.6103,
+          "signed_return_after_12h_pct": 0.409,
+          "signed_return_after_24h_pct": null,
+          "direction_correct_4h": true,
+          "direction_correct_12h": true,
+          "direction_correct_24h": null
+        },
+        {
+          "decision_id": "503dadce97c9976f",
+          "candle_timestamp": "2026-07-10 16:00:00",
+          "symbol": "BTC/USDT",
+          "timeframe": "4h",
+          "side": "LONG",
+          "root_cause_primary": "MACRO_POLICY_PRESSURE",
+          "root_cause_direction": "BEARISH",
+          "root_cause_probability_pct": 46.18,
+          "root_cause_confidence": "MEDIUM",
+          "root_cause_evidence_quality": "HIGH",
+          "root_cause_verdict": "PROBABLE_CAUSE_BUT_CONFLICTED",
+          "evaluation_status": "PARTIAL",
+          "return_after_4h_pct": 0.3364,
+          "return_after_12h_pct": 0.4573,
+          "return_after_24h_pct": null,
+          "signed_return_after_4h_pct": -0.3364,
+          "signed_return_after_12h_pct": -0.4573,
+          "signed_return_after_24h_pct": null,
+          "direction_correct_4h": false,
+          "direction_correct_12h": false,
+          "direction_correct_24h": null
+        },
+        {
+          "decision_id": "b02ae7fe2b105ae9",
+          "candle_timestamp": "2026-07-10 20:00:00",
+          "symbol": "BTC/USDT",
+          "timeframe": "4h",
+          "side": "NEUTRAL",
+          "root_cause_primary": "MACRO_POLICY_PRESSURE",
+          "root_cause_direction": "BEARISH",
+          "root_cause_probability_pct": 46.07,
+          "root_cause_confidence": "MEDIUM",
+          "root_cause_evidence_quality": "HIGH",
+          "root_cause_verdict": "PROBABLE_CAUSE_BUT_CONFLICTED",
+          "evaluation_status": "PARTIAL",
+          "return_after_4h_pct": -0.0567,
+          "return_after_12h_pct": null,
+          "return_after_24h_pct": null,
+          "signed_return_after_4h_pct": 0.0567,
+          "signed_return_after_12h_pct": null,
+          "signed_return_after_24h_pct": null,
+          "direction_correct_4h": true,
+          "direction_correct_12h": null,
+          "direction_correct_24h": null
+        }
+      ],
+      "blockers": [],
+      "warnings": [
+        "Root Cause Forward Validation فقط رابطه علت‌های پژوهشی با outcome بعدی را می‌سنجد؛ سیگنال خرید/فروش نیست.",
+        "این validation باید چند هفته/ماه sample جمع کند تا قابل اتکا شود."
+      ],
+      "recommendations": [
+        "ابتدا decision_evaluator.py را اجرا کن تا market_return_after_* برای تصمیم‌ها ساخته شود.",
+        "Root Causeهایی که hit-rate پایدار و sample کافی دارند بعداً می‌توانند وارد Root-Cause Gate Simulator شوند.",
+        "تا قبل از sample کافی، نتیجه فقط Research/Shadow بماند و Paper/Live فعال نشود."
+      ]
+    },
+    "root_cause_sample_tracker": {
+      "run_id": "root_cause_samples_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.423258+00:00",
+      "version": "v8.2.0",
+      "status": "ROOT_CAUSE_SAMPLE_COLLECTION_ACTIVE_LOW_SAMPLE",
+      "evaluations_file": "logs/decision_evaluations.csv",
+      "evaluation_rows": 54,
+      "complete_rows": 51,
+      "root_cause_rows": 3,
+      "evaluated_cells": 5,
+      "unique_root_causes": 1,
+      "min_cells": 10,
+      "research_cells": 30,
+      "candidate_cells": 90,
+      "estimated_more_root_cause_decisions_for_min": 2,
+      "estimated_more_root_cause_decisions_for_research": 9,
+      "estimated_more_root_cause_decisions_for_candidate": 29,
+      "validation_status": "ROOT_CAUSE_FORWARD_PROMISING_LOW_SAMPLE",
+      "validation_candidates": 0,
+      "validation_promising_low_sample": 1,
+      "buckets": [
+        {
+          "root_cause_primary": "MACRO_POLICY_PRESSURE",
+          "root_cause_direction": "BEARISH",
+          "decision_rows": 3,
+          "evaluated_cells": 5,
+          "samples_4h": 3,
+          "hit_rate_4h": 66.67,
+          "avg_signed_return_4h_pct": 0.1102,
+          "samples_12h": 2,
+          "hit_rate_12h": 50.0,
+          "avg_signed_return_12h_pct": -0.0242,
+          "samples_24h": 0,
+          "hit_rate_24h": 0.0,
+          "avg_signed_return_24h_pct": 0.0,
+          "avg_probability_pct": 46.6633,
+          "evidence_quality_mode": "HIGH",
+          "confidence_mode": "MEDIUM",
+          "maturity_level": "LOW_SAMPLE_ACCUMULATING",
+          "sample_gap_to_min": 5,
+          "sample_gap_to_research": 25,
+          "sample_gap_to_candidate": 85,
+          "provisional_verdict": "LOW_SAMPLE_KEEP_COLLECTING"
+        }
+      ],
+      "blockers": [
+        "Root Cause evaluated cells کمتر از حداقل است: 5/10"
+      ],
+      "warnings": [
+        "Root Cause Sample Tracker فقط بلوغ نمونه‌ها را می‌سنجد؛ Paper/Live فعال نمی‌کند.",
+        "Promotion واقعی فقط بعد از Forward validation پایدار و sample کافی مجاز است."
+      ],
+      "recommendations": [
+        "چرخه Forward را هر 4 ساعت یا با GitHub Actions اجرا کن تا Root Cause rows بیشتر شود.",
+        "پس از هر root_cause_dashboard.py، decision_evaluator.py و سپس root_cause_forward_validation_dashboard.py را اجرا کن.",
+        "تا وقتی حداقل 30-50 تصمیم دارای Root Cause جمع نشده، نتیجه فقط Research/Shadow بماند."
+      ]
+    },
+    "evidence_graph": {
+      "run_id": "evidence_graph_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.428509+00:00",
+      "version": "v9.0.0",
+      "status": "NO_EVIDENCE_GRAPH_ROWS",
+      "evaluations_file": "logs/decision_evaluations.csv",
+      "evaluation_rows": 54,
+      "complete_rows": 51,
+      "graph_rows": 0,
+      "root_cause_rows": 0,
+      "nodes_total": 0,
+      "edges_total": 0,
+      "paths_total": 0,
+      "min_samples": 10,
+      "research_samples": 30,
+      "candidate_samples": 90,
+      "graph_maturity": "NO_GRAPH_DATA",
+      "top_nodes": [],
+      "top_edges": [],
+      "top_paths": [],
+      "root_cause_learning_signals": [],
+      "blockers": [
+        "هیچ decision_evaluations row با root_cause قابل ساخت گراف پیدا نشد؛ root_cause_dashboard و decision_evaluator را اجرا کن."
+      ],
+      "warnings": [
+        "Evidence Graph فقط رابطه‌های پژوهشی بین شواهد، روایت، علت و outcome را می‌سازد؛ سیگنال خرید/فروش نیست.",
+        "تا وقتی sample کافی وجود نداشته باشد، هیچ وزن evidence نباید برای Paper/Live تغییر کند."
+      ],
+      "recommendations": [
+        "چرخه Forward را منظم اجرا کن تا مسیرهای evidence به outcomeهای بیشتری وصل شوند.",
+        "مسیرهایی که چند هفته متوالی hit-rate و signed-return مثبت دارند بعداً می‌توانند وارد Evidence Weight Review شوند.",
+        "اگر یک منبع یا روایت در Forward چندبار fail شد، وزن آن باید فقط بعد از sample کافی بازبینی شود."
+      ]
+    },
+    "market_replay": {
+      "run_id": "market_replay_status",
+      "version": "v10.0.0",
+      "status": "NO_REPLAY_ROWS",
+      "mode": "REPLAY_SAFE_TECHNICAL_CORE",
+      "symbols_requested": 0,
+      "symbols_completed": 0,
+      "total_candles": 0,
+      "total_rows": 0,
+      "complete_rows": 0,
+      "directional_rows": 0,
+      "actionable_rows": 0,
+      "neutral_rows": 0,
+      "win_rate_24h_pct": 0.0,
+      "avg_gross_24h_pct": 0.0,
+      "avg_net_24h_pct": 0.0,
+      "profit_factor_24h": 0.0,
+      "leakage_audit_status": "FAILED_NO_REPLAY_ROWS",
+      "historical_context_mode": "UNKNOWN",
+      "evaluation_horizon_candles": 6,
+      "evaluation_horizon_label": "1d",
+      "by_split": [],
+      "by_symbol": [],
+      "by_side": [],
+      "by_regime": [],
+      "by_year": [],
+      "blockers": [
+        "هیچ ردیف Market Replay ساخته نشد."
+      ],
+      "warnings": []
+    },
+    "cross_exchange_validation": {
+      "run_id": "cross_exchange_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.429383+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "providers": [],
+      "blockers": [
+        "Backtest data موجود نیست."
+      ]
+    },
+    "research_db": {
+      "run_id": "research_db_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.490857+00:00",
+      "status": "RESEARCH_DB_READY",
+      "db_path": "logs/research/freakto_research.db",
+      "tables": [
+        {
+          "table": "decision_evaluations",
+          "rows": 54,
+          "source": "logs/decision_evaluations.csv"
+        },
+        {
+          "table": "decisions",
+          "rows": 55,
+          "source": "logs/decisions.csv"
+        },
+        {
+          "table": "forward_test_runs",
+          "rows": 26,
+          "source": "logs/forward_test_runs.csv"
+        },
+        {
+          "table": "shadow_gate_signals",
+          "rows": 20,
+          "source": "logs/shadow_gates/shadow_gate_signals.csv"
+        }
+      ]
+    },
+    "pipeline_health": {
+      "run_id": "pipeline_health_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.499395+00:00",
+      "status": "PIPELINE_HEALTHY",
+      "alerts": [],
+      "latest_forward_run": {
+        "run_id": "forward_20260711_072547",
+        "started_utc": "2026-07-11T07:25:47.173544+00:00",
+        "finished_utc": "2026-07-11T07:26:49.435241+00:00",
+        "duration_seconds": "62.26",
+        "mode": "EXECUTE",
+        "ok": "True",
+        "task_count": "17",
+        "failed_tasks": "nan",
+        "report_file": "logs/forward_testing/forward_20260711_072547_report.md",
+        "hours_since_last_run": 0.02
+      },
+      "forward_eval_rows": 54,
+      "forward_regime_known_rows": 54,
+      "forward_regime_unknown_rows": 0,
+      "shadow_signal_rows": 20
+    },
+    "strict_readiness": {
+      "run_id": "strict_readiness_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.519313+00:00",
+      "status": "STRICT_READINESS_RESEARCH_ONLY",
+      "backtest_net": {
+        "samples": 0,
+        "avg_return_pct": 0.0,
+        "median_return_pct": 0.0,
+        "win_rate": 0.0,
+        "target_1_hit_rate": 0.0,
+        "stop_hit_rate": 0.0,
+        "mfe_mean_pct": 0.0,
+        "mae_mean_pct": 0.0,
+        "mfe_mae_ratio": 0.0,
+        "best_return_pct": 0.0,
+        "worst_return_pct": 0.0,
+        "std_return_pct": 0.0,
+        "t_stat": 0.0,
+        "confidence_95_low_pct": 0.0,
+        "confidence_95_high_pct": 0.0
+      },
+      "forward_net": {
+        "samples": 28,
+        "avg_return_pct": 0.1459,
+        "median_return_pct": 0.4511,
+        "win_rate": 78.57,
+        "target_1_hit_rate": 92.86,
+        "stop_hit_rate": 82.14,
+        "mfe_mean_pct": 2.9566,
+        "mae_mean_pct": -2.3501,
+        "mfe_mae_ratio": 1.258,
+        "best_return_pct": 1.6846,
+        "worst_return_pct": -3.4125,
+        "std_return_pct": 1.36,
+        "t_stat": 0.5679,
+        "confidence_95_low_pct": -0.3578,
+        "confidence_95_high_pct": 0.6497
+      },
+      "regime_labels": [],
+      "btc_beta_check": {
+        "samples": 0,
+        "correlation_to_btc": 0.0,
+        "note": "insufficient_data"
+      },
+      "blockers": [
+        "Backtest sample کمتر از 100 است.",
+        "Backtest net expectancy از نظر CI95 بالای صفر نیست.",
+        "Forward complete samples کمتر از 30 است.",
+        "پوشش regime کافی نیست؛ حداقل دو رژیم معتبر لازم است."
+      ],
+      "warnings": [
+        "این readiness سخت‌گیرانه‌تر از نسخه‌های قبلی است و به تنهایی مجوز Live نیست."
+      ]
+    },
+    "position_sizing_lab": {
+      "run_id": "position_sizing_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.519880+00:00",
+      "status": "NO_BACKTEST_DATA",
+      "rows": []
+    },
+    "airdrop_shadow_research": {
+      "run_id": "airdrop_shadow_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.519986+00:00",
+      "status": "AIRDROP_SHADOW_READY",
+      "items": [
+        {
+          "name": "Example Placeholder - Replace Me",
+          "score": 0,
+          "shadow_gates": "",
+          "cost_usd": 50.0,
+          "minutes": 90.0,
+          "token_status": "unknown",
+          "verdict": "WATCH_OR_IGNORE"
+        }
+      ],
+      "warnings": [
+        "Airdrop shadow فقط امتیازدهی تحقیقاتی است؛ نباید wallet connect یا signature خودکار انجام شود."
+      ]
+    },
+    "static_dashboard": {
+      "run_id": "static_dashboard_20260711_072653",
+      "generated_utc": "2026-07-11T07:26:53.524789+00:00",
+      "status": "STATIC_DASHBOARD_READY",
+      "html_path": "logs/research_dashboard/index.html"
+    }
+  },
+  "blockers": [
+    "gate_robustness: هیچ دیتای backtest کامل برای robust validation وجود ندارد.",
+    "cost_adjusted_backtest: Backtest data موجود نیست.",
+    "meta_labeling: برای meta-labeling حداقل 120 نمونه لازم است.",
+    "regime_research: Backtest data موجود نیست.",
+    "regime_gate_matrix: هیچ historical_backtest_evaluations کامل برای ساخت Regime-Gate Matrix پیدا نشد.",
+    "regime_shadow_gates: کل نمونه‌های ارزیابی‌شده Shadow کمتر از 30 است: 16",
+    "forward_shadow_coverage: Shadow evaluated samples کمتر از 30 است: 16",
+    "causal_intelligence: Causal conflict بالا است؛ هر استفاده عملی باید downgrade شود و فقط Research بماند.",
+    "root_cause_sample_tracker: Root Cause evaluated cells کمتر از حداقل است: 5/10",
+    "evidence_graph: هیچ decision_evaluations row با root_cause قابل ساخت گراف پیدا نشد؛ root_cause_dashboard و decision_evaluator را اجرا کن.",
+    "market_replay: هیچ ردیف Market Replay ساخته نشد.",
+    "cross_exchange_validation: Backtest data موجود نیست.",
+    "strict_readiness: Backtest sample کمتر از 100 است.",
+    "strict_readiness: Backtest net expectancy از نظر CI95 بالای صفر نیست.",
+    "strict_readiness: Forward complete samples کمتر از 30 است.",
+    "strict_readiness: پوشش regime کافی نیست؛ حداقل دو رژیم معتبر لازم است."
+  ]
+}
