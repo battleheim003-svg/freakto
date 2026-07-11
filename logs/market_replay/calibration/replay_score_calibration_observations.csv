@@ -1,0 +1,3 @@
+﻿generated_utc,run_id,status,rows_analyzed,score_verdict,test_monotonicity,test_high_minus_low_net_pct,shadow_candidates
+2026-07-11T20:11:04.862624+00:00,replay_score_calibration_missing,SCORE_CALIBRATION_BLOCKED,0,,,,0
+2026-07-11T20:11:19.318103+00:00,replay_score_calibration_missing,SCORE_CALIBRATION_BLOCKED,0,,,,0

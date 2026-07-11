@@ -1,0 +1,56 @@
+{
+  "run_id": "root_cause_samples_20260711_201119",
+  "generated_utc": "2026-07-11T20:11:19.309199+00:00",
+  "version": "v8.2.0",
+  "status": "ROOT_CAUSE_MIN_SAMPLE_READY",
+  "evaluations_file": "logs/decision_evaluations.csv",
+  "evaluation_rows": 57,
+  "complete_rows": 54,
+  "root_cause_rows": 6,
+  "evaluated_cells": 14,
+  "unique_root_causes": 1,
+  "min_cells": 10,
+  "research_cells": 30,
+  "candidate_cells": 90,
+  "estimated_more_root_cause_decisions_for_min": 0,
+  "estimated_more_root_cause_decisions_for_research": 6,
+  "estimated_more_root_cause_decisions_for_candidate": 26,
+  "validation_status": "ROOT_CAUSE_FORWARD_MIXED_OR_WEAK",
+  "validation_candidates": 0,
+  "validation_promising_low_sample": 0,
+  "buckets": [
+    {
+      "root_cause_primary": "MACRO_POLICY_PRESSURE",
+      "root_cause_direction": "BEARISH",
+      "decision_rows": 6,
+      "evaluated_cells": 14,
+      "samples_4h": 6,
+      "hit_rate_4h": 83.33,
+      "avg_signed_return_4h_pct": 0.0922,
+      "samples_12h": 5,
+      "hit_rate_12h": 20.0,
+      "avg_signed_return_12h_pct": -0.052,
+      "samples_24h": 3,
+      "hit_rate_24h": 33.33,
+      "avg_signed_return_24h_pct": -0.1283,
+      "avg_probability_pct": 46.1283,
+      "evidence_quality_mode": "HIGH",
+      "confidence_mode": "MEDIUM",
+      "maturity_level": "MIN_SAMPLE_READY",
+      "sample_gap_to_min": 0,
+      "sample_gap_to_research": 16,
+      "sample_gap_to_candidate": 76,
+      "provisional_verdict": "MIXED_PROVISIONAL"
+    }
+  ],
+  "blockers": [],
+  "warnings": [
+    "Root Cause Sample Tracker فقط بلوغ نمونه‌ها را می‌سنجد؛ Paper/Live فعال نمی‌کند.",
+    "Promotion واقعی فقط بعد از Forward validation پایدار و sample کافی مجاز است."
+  ],
+  "recommendations": [
+    "چرخه Forward را هر 4 ساعت یا با GitHub Actions اجرا کن تا Root Cause rows بیشتر شود.",
+    "پس از هر root_cause_dashboard.py، decision_evaluator.py و سپس root_cause_forward_validation_dashboard.py را اجرا کن.",
+    "تا وقتی حداقل 30-50 تصمیم دارای Root Cause جمع نشده، نتیجه فقط Research/Shadow بماند."
+  ]
+}
