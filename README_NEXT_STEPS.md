@@ -503,3 +503,15 @@ python evidence_graph_dashboard.py --compact
 ```
 
 این مرحله مسیر `Evidence Source -> Narrative -> Root Cause -> Decision -> Outcome` را می‌سازد و فقط research-only است.
+
+## v10.1.5 — Replay Evaluation Recorder
+
+Market Replay v10 outcomeهای واقعی را در ستون‌های horizon-specific ثبت می‌کند. v10.1.5 این ستون‌ها را به schema ثابت Optimization تبدیل می‌کند.
+
+```cmd
+python -X utf8 replay_evaluation_recorder_dashboard.py
+python -X utf8 replay_evaluation_recorder_dashboard.py --apply
+python -X utf8 replay_real_metrics_dashboard.py --compact
+```
+
+تا وقتی Validation و Test با sample کافی مثبت نباشند، هیچ Threshold نباید وارد Paper/Live شود.

@@ -36,7 +36,7 @@ from engine.historical_data_store import (
 )
 
 
-VERSION = "v10.0.0"
+VERSION = "v10.1.5"
 REPLAY_DIR = Path("logs") / "market_replay"
 CHECKPOINT_DIR = REPLAY_DIR / "checkpoints"
 CUMULATIVE_REPLAY_FILE = REPLAY_DIR / "market_replay_evaluations.csv"
@@ -630,6 +630,48 @@ def _row_from_opportunity(
         "cross_exchange_volume_ratio": raw.get("cross_exchange_volume_ratio", 1.0),
     }
     row.update(path)
+
+    # v10.1.5 canonical evaluation recorder.  The replay engine already
+    # calculates horizon metrics above; these aliases make the primary
+    # research outcome explicit and stable for downstream optimization.
+    primary_horizon = max([int(value) for value in config.horizons if int(value) > 0] or [6])
+    primary_label = _horizon_label(config.timeframe, primary_horizon)
+    market_col = f"market_return_after_{primary_horizon}c_pct"
+    gross_col = f"gross_signed_return_after_{primary_horizon}c_pct"
+    net_col = f"net_signed_return_after_{primary_horizon}c_pct"
+    correct_col = f"direction_correct_after_{primary_horizon}c"
+    market_return = row.get(market_col)
+    gross_return = row.get(gross_col)
+    net_return = row.get(net_col)
+    exit_price = None
+    if market_return is not None:
+        try:
+            exit_price = round(entry_price * (1.0 + float(market_return) / 100.0), 10)
+        except (TypeError, ValueError):
+            exit_price = None
+    directional = side in {"LONG", "SHORT"}
+    row.update({
+        "evaluation_recorder_version": VERSION,
+        "primary_evaluation_horizon_candles": primary_horizon,
+        "primary_evaluation_horizon_label": primary_label,
+        "exit_price": exit_price,
+        "market_return_pct": market_return,
+        "gross_return_pct": gross_return if directional else None,
+        "net_return_pct": net_return if directional else None,
+        "win": bool(float(net_return) > 0) if directional and net_return is not None else None,
+        "direction_correct": row.get(correct_col) if directional else None,
+        "target_hit": bool(row.get("target_1_hit", False)) if directional else None,
+        "outcome_label": (
+            "WIN" if directional and net_return is not None and float(net_return) > 0
+            else "LOSS" if directional and net_return is not None
+            else "NEUTRAL" if not directional
+            else "PENDING"
+        ),
+        "evaluation_metric_source": f"{gross_col}|{net_col}",
+    })
+    # Compatibility aliases used by older optimization prototypes.
+    row["return"] = row.get("gross_return_pct")
+    row["net_return"] = row.get("net_return_pct")
     return row
 
 

@@ -211,3 +211,25 @@ Forward Test مستقل نیز نتیجه را تأیید کند
 ```
 
 عبور از این موارد اجازه‌ی Live نمی‌دهد؛ فقط یک Strategy/Gate را به Research Candidate تبدیل می‌کند.
+
+## v10.1.5 Canonical Evaluation Metrics
+
+برای Replayهای قدیمی ابتدا Dry Run بگیر:
+
+```cmd
+python -X utf8 replay_evaluation_recorder_dashboard.py
+```
+
+سپس Backfill امن را اعمال کن:
+
+```cmd
+python -X utf8 replay_evaluation_recorder_dashboard.py --apply
+```
+
+بعد Thresholdها را با Split زمانی واقعی ارزیابی کن:
+
+```cmd
+python -X utf8 replay_real_metrics_dashboard.py --compact
+```
+
+Backfill قبل از بازنویسی CSV، Backup زمان‌دار می‌سازد.

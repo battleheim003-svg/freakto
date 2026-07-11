@@ -1,4 +1,4 @@
-"""CLI dashboard for Freakto v10 Historical Data Store + Market Replay."""
+"""CLI dashboard for Freakto v10.1.5 Historical Data Store + Market Replay."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ def _horizons(value: str) -> List[int]:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Freakto v10 Historical Data Store and Market Replay",
+        description="Freakto v10.1.5 Historical Data Store and Market Replay",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     mode = parser.add_mutually_exclusive_group()
