@@ -275,7 +275,7 @@ def backfill_replay_file(
     target = Path(path)
     if not target.exists():
         raise FileNotFoundError(f"Replay evaluations file not found: {target}")
-    source = pd.read_csv(target, encoding="utf-8-sig")
+    source = pd.read_csv(target, encoding="utf-8-sig", low_memory=False)
     repaired, report = record_canonical_metrics(
         source,
         primary_horizon_candles=primary_horizon_candles,

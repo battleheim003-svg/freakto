@@ -21,6 +21,7 @@ LOGS_DIR = Path("logs")
 CAL_DIR = LOGS_DIR / "confidence_calibration"
 DECISIONS_FILE = LOGS_DIR / "decisions.csv"
 DECISION_EVALS_FILE = LOGS_DIR / "decision_evaluations.csv"
+CALIBRATION_DATASET_FILE = LOGS_DIR / "calibration_dataset" / "calibration_training.csv"
 
 CONFIDENCE_MIDPOINTS = {
     "VERY LOW": 10.0,
@@ -115,7 +116,9 @@ def _score_bucket_midpoint(bucket: str) -> float:
 
 
 def _prepare_frame() -> pd.DataFrame:
-    evals = _load_csv(DECISION_EVALS_FILE)
+    evals = _load_csv(CALIBRATION_DATASET_FILE)
+    if evals.empty:
+        evals = _load_csv(DECISION_EVALS_FILE)
     decisions = _load_csv(DECISIONS_FILE)
     if evals.empty:
         return pd.DataFrame()
