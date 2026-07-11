@@ -12,6 +12,7 @@ Commands:
 """
 
 import argparse
+import sys
 from pathlib import Path
 
 from telegram_notifier import send_telegram_message
@@ -24,6 +25,12 @@ from engine.paper_trading import (
     record_paper_trades_from_portfolio,
     summarize_paper_evaluations,
 )
+from engine.paper_trade_readiness import run_paper_trade_preflight
+
+
+def _safe_print(text: str) -> None:
+    encoding = sys.stdout.encoding or "utf-8"
+    print(str(text).encode(encoding, errors="replace").decode(encoding))
 
 
 def _existing_status_text() -> str:
@@ -53,29 +60,44 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--scan", action="store_true", help="Run portfolio scan and record eligible paper trades.")
     parser.add_argument("--evaluate", action="store_true", help="Evaluate existing paper trades.")
+    parser.add_argument("--preflight", action="store_true", help="Check whether new paper observations may be recorded.")
     parser.add_argument("--send", action="store_true", help="Send summary to Telegram.")
     args = parser.parse_args()
 
     outputs = []
+
+    if args.preflight:
+        preflight = run_paper_trade_preflight()
+        lines = [
+            f"Paper preflight: {preflight.status}",
+            f"Ready: {preflight.ready}",
+            f"Replay rows: {preflight.replay_rows}",
+            f"TEST directional rows: {preflight.test_directional_rows}",
+        ]
+        lines.extend(f"[BLOCKER] {item}" for item in preflight.blockers)
+        lines.extend(f"[WARNING] {item}" for item in preflight.warnings)
+        text = "\n".join(lines)
+        _safe_print(text)
+        outputs.append(text)
 
     if args.scan:
         from portfolio_scanner import run_portfolio_scan
         result = run_portfolio_scan(send=False)
         record_result = record_paper_trades_from_portfolio(result)
         text = format_paper_record_result(record_result)
-        print(text)
+        _safe_print(text)
         outputs.append(text)
 
     if args.evaluate:
         from data_fetcher import fetch_ohlcv
         summary = evaluate_paper_trades(fetcher=fetch_ohlcv)
         text = format_paper_evaluation_summary(summary)
-        print(text)
+        _safe_print(text)
         outputs.append(text)
 
-    if not args.scan and not args.evaluate:
+    if not args.scan and not args.evaluate and not args.preflight:
         text = _existing_status_text()
-        print(text)
+        _safe_print(text)
         outputs.append(text)
 
     if args.send:

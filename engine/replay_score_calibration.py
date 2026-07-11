@@ -22,8 +22,11 @@ import pandas as pd
 
 from engine.replay_evaluation_recorder import record_canonical_metrics
 from engine.replay_schema_adapter import normalize_metrics
+from engine.experiment_registry import DEFAULT_REGISTRY_PATH, ExperimentRegistry
+from engine.model_contract import CURRENT_MODEL_CONTRACT, SCORE_CALIBRATION_VERSION
+from engine.research_validation import add_fdr_to_feature_rows, dataset_fingerprint
 
-VERSION = "v10.2.0"
+VERSION = "v10.3.0"
 DEFAULT_FILE = Path("logs") / "market_replay" / "market_replay_evaluations.csv"
 OUTPUT_DIR = Path("logs") / "market_replay" / "calibration"
 SPLITS = ("TRAIN_60", "VALIDATION_20", "TEST_20")
@@ -284,6 +287,7 @@ def _feature_analysis(frame: pd.DataFrame) -> List[Dict[str, Any]]:
             spread = high_metric.avg_net_return_pct - low_metric.avg_net_return_pct
             corr = _spearman(values, part["normalized_net_return"])
             item[f"{split.lower()}_correlation"] = corr
+            item[f"{split.lower()}_correlation_samples"] = int(len(part))
             item[f"{split.lower()}_low_samples"] = low_metric.samples
             item[f"{split.lower()}_high_samples"] = high_metric.samples
             item[f"{split.lower()}_low_avg_net_pct"] = low_metric.avg_net_return_pct
@@ -343,6 +347,7 @@ def _interaction_analysis(frame: pd.DataFrame, feature_rows: List[Dict[str, Any]
         if row.get("train_q75") is not None
         and row.get("verdict") != "LOW_VARIANCE_OR_INSUFFICIENT_DATA"
         and row.get("feature") in frame.columns
+        and row.get("multiple_testing_significant", False)
     ]
     eligible = eligible[:8]
     rows: List[Dict[str, Any]] = []
@@ -405,10 +410,16 @@ def _interaction_analysis(frame: pd.DataFrame, feature_rows: List[Dict[str, Any]
 
 def _segment_analysis(frame: pd.DataFrame) -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
+    frame = frame.copy()
+    composite_columns = [column for column in ["symbol", "timeframe", "regime_label"] if column in frame.columns]
+    if composite_columns:
+        frame["segment_key"] = frame[composite_columns].astype(str).agg("|".join, axis=1)
     dimensions = [
         ("symbol", "SYMBOL"),
+        ("timeframe", "TIMEFRAME"),
         ("regime_label", "REGIME"),
         ("normalized_side", "SIDE"),
+        ("segment_key", "SYMBOL_TIMEFRAME_REGIME"),
     ]
     for column, dimension in dimensions:
         if column not in frame.columns:
@@ -462,12 +473,16 @@ def _recommendations(score_calibration: Dict[str, Any], features: List[Dict[str,
 
 def run_replay_score_calibration(
     path: str | Path = DEFAULT_FILE,
+    *,
+    enforce_one_shot_holdout: Optional[bool] = None,
+    registry_path: str | Path = DEFAULT_REGISTRY_PATH,
 ) -> Dict[str, Any]:
     input_path = Path(path)
+    run_id = "replay_score_calibration_" + datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
     if not input_path.exists():
         return {
             "version": VERSION,
-            "run_id": "replay_score_calibration_missing",
+            "run_id": run_id,
             "generated_utc": datetime.now(timezone.utc).isoformat(),
             "status": "SCORE_CALIBRATION_BLOCKED",
             "input_file": str(input_path),
@@ -484,7 +499,67 @@ def run_replay_score_calibration(
             "recommendations": [],
         }
 
-    raw = pd.read_csv(input_path, encoding="utf-8-sig")
+    raw = pd.read_csv(input_path, encoding="utf-8-sig", low_memory=False)
+    source_rows_total = int(len(raw))
+    selected_replay_run_id = ""
+    contract = CURRENT_MODEL_CONTRACT.as_dict()
+    if "run_id" in raw.columns and all(column in raw.columns for column in contract):
+        compatible = pd.Series(True, index=raw.index)
+        for column, expected in contract.items():
+            compatible &= raw[column].astype(str).eq(expected)
+        compatible_frame = raw[compatible]
+        if not compatible_frame.empty:
+            latest_run = str(compatible_frame["run_id"].dropna().iloc[-1])
+            selected_replay_run_id = latest_run
+            raw = compatible_frame[compatible_frame["run_id"].astype(str) == latest_run].copy()
+    data_hash = dataset_fingerprint(
+        raw,
+        ["decision_id", "candle_timestamp", "symbol", "timeframe", "replay_split", "score", "net_return_pct"],
+    )
+    enforce_holdout = (
+        input_path.resolve() == Path(DEFAULT_FILE).resolve()
+        if enforce_one_shot_holdout is None
+        else bool(enforce_one_shot_holdout)
+    )
+    registry = ExperimentRegistry(registry_path)
+    registry.start_run(
+        run_id,
+        "CALIBRATION",
+        hyperparameters={
+            "calibration_version": SCORE_CALIBRATION_VERSION,
+            "enforce_one_shot_holdout": enforce_holdout,
+            "features": [feature for feature, _ in FEATURES],
+        },
+        data_start_utc=str(raw.get("candle_timestamp", pd.Series(dtype=str)).min() or ""),
+        data_end_utc=str(raw.get("candle_timestamp", pd.Series(dtype=str)).max() or ""),
+        data_fingerprint=data_hash,
+        parent_run_id=selected_replay_run_id,
+    )
+    holdout_claimed = True
+    if enforce_holdout:
+        holdout_claimed = registry.claim_holdout(data_hash, "SCORE_CALIBRATION_FINAL", run_id)
+    if not holdout_claimed:
+        blocked = {
+            "version": VERSION,
+            "run_id": run_id,
+            "generated_utc": datetime.now(timezone.utc).isoformat(),
+            "status": "SCORE_CALIBRATION_BLOCKED_HOLDOUT_REUSE",
+            "input_file": str(input_path),
+            "rows_total": int(len(raw)),
+            "source_rows_total": source_rows_total,
+            "rows_analyzed": 0,
+            "data_fingerprint": data_hash,
+            "model_contract": CURRENT_MODEL_CONTRACT.as_dict(),
+            "source_replay_run_id": selected_replay_run_id,
+            "holdout_claimed": False,
+            "score_calibration": {}, "score_bands": [], "feature_attribution": [],
+            "interactions": [], "segments": [], "forward_shadow_candidates": [],
+            "blockers": ["This dataset's final TEST hold-out was already consumed by score calibration."],
+            "warnings": ["Create a new untouched time period; do not tune against the reused TEST split."],
+            "recommendations": [],
+        }
+        registry.finish_run(run_id, "BLOCKED", blocked)
+        return blocked
     frame, schema_info, blockers, warnings = _prepare(raw)
     score_bands: List[Dict[str, Any]] = []
     score_calibration: Dict[str, Any] = {}
@@ -495,6 +570,7 @@ def run_replay_score_calibration(
     if not blockers:
         score_bands, score_calibration = _band_analysis(frame)
         feature_rows = _feature_analysis(frame)
+        feature_rows = add_fdr_to_feature_rows(feature_rows)
         interactions = _interaction_analysis(frame, feature_rows)
         segments = _segment_analysis(frame)
 
@@ -515,14 +591,19 @@ def run_replay_score_calibration(
         "Interaction thresholds are learned only from TRAIN and applied unchanged to Validation/Test.",
     ])
 
-    return {
+    report = {
         "version": VERSION,
-        "run_id": "replay_score_calibration_" + datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S"),
+        "run_id": run_id,
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "status": status,
         "input_file": str(input_path),
         "rows_total": int(len(raw)),
+        "source_rows_total": source_rows_total,
         "rows_analyzed": int(len(frame)),
+        "data_fingerprint": data_hash,
+        "model_contract": CURRENT_MODEL_CONTRACT.as_dict(),
+        "source_replay_run_id": selected_replay_run_id,
+        "holdout_claimed": holdout_claimed,
         "schema": schema_info,
         "score_calibration": score_calibration,
         "score_bands": score_bands,
@@ -534,6 +615,8 @@ def run_replay_score_calibration(
         "warnings": warnings,
         "recommendations": recommendations,
     }
+    registry.finish_run(run_id, "BLOCKED" if blockers else "COMPLETED", report)
+    return report
 
 
 def format_replay_score_calibration_console(report: Dict[str, Any], compact: bool = True) -> str:

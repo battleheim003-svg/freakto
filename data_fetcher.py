@@ -1,6 +1,7 @@
 import pandas as pd
 import ccxt
 from config import SYMBOL, TIMEFRAME
+from engine.market_data_contract import keep_closed_candles_only
 
 
 EXCHANGE_ORDER = ["kucoin", "kraken", "bybit", "okx"]
@@ -81,11 +82,16 @@ def fetch_ohlcv(symbol=None, timeframe=None, limit=220):
                 raise RuntimeError("No candles returned")
 
             df = _to_dataframe(candles, provider=exchange_name)
+            df, incomplete_removed = keep_closed_candles_only(df, timeframe)
+            if df.empty:
+                raise RuntimeError("No fully closed candles returned")
 
             print(f"✅ {len(df)} کندل از {exchange_name} دریافت شد")
             print(f"آخرین قیمت: {df['close'].iloc[-1]}")
             print(f"Provider ذخیره شد: {df.attrs.get('provider')}")
 
+            if incomplete_removed:
+                print(f"Incomplete candles removed: {incomplete_removed}")
             return df
 
         except Exception as error:

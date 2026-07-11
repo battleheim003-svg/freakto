@@ -22,3 +22,5 @@ paper_trading_log.json
 
 # v10 generated historical market cache
 /data/market_replay/
+/logs/experiments/*.sqlite3*
+/logs/market_replay/checkpoints/

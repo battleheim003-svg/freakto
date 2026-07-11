@@ -14,6 +14,7 @@ from .learning_overrides import apply_learning_overrides
 from .external_features import score_external_context
 from .risk_reward import calculate_risk_reward
 from .score import OpportunityV2, confidence_label, _zones
+from .model_contract import CURRENT_MODEL_CONTRACT
 
 
 class DecisionEngine:
@@ -141,6 +142,7 @@ class DecisionEngine:
                 "onchain_signal_score": safe_float(row.get("onchain_signal_score"), 0.0),
                 "onchain_status": str(row.get("onchain_status", "") or ""),
                 "engine": "DecisionEngine",
+                **CURRENT_MODEL_CONTRACT.as_dict(),
                 "allow_learning_overrides": self.allow_learning_overrides,
                 "allow_historical_edge": self.allow_historical_edge,
                 "replay_safe": not self.allow_learning_overrides and not self.allow_historical_edge,

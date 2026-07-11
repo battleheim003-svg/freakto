@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import unittest
+import tempfile
+from pathlib import Path
 
 import pandas as pd
 
@@ -40,24 +42,40 @@ class ReplayScoreCalibrationTests(unittest.TestCase):
 
     def test_monotonic_score_is_detected(self) -> None:
         frame = self._frame(inverse=False)
-        path = "/tmp/freakto_score_calibration_positive.csv"
-        frame.to_csv(path, index=False)
-        result = run_replay_score_calibration(path)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "positive.csv"
+            frame.to_csv(path, index=False)
+            result = run_replay_score_calibration(path)
         self.assertFalse(result["blockers"])
         self.assertIn(result["score_calibration"]["verdict"], {"SCORE_MONOTONIC_RESEARCH_SIGNAL", "SCORE_WEAK_OR_NON_MONOTONIC"})
         self.assertGreater(result["rows_analyzed"], 0)
 
     def test_inverse_score_is_detected(self) -> None:
         frame = self._frame(inverse=True)
-        path = "/tmp/freakto_score_calibration_inverse.csv"
-        frame.to_csv(path, index=False)
-        result = run_replay_score_calibration(path)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "inverse.csv"
+            frame.to_csv(path, index=False)
+            result = run_replay_score_calibration(path)
         self.assertEqual(result["score_calibration"]["verdict"], "SCORE_INVERTED_OR_MISCALIBRATED")
 
     def test_missing_file_is_blocked(self) -> None:
-        result = run_replay_score_calibration("/tmp/does_not_exist_replay.csv")
+        result = run_replay_score_calibration(Path(tempfile.gettempdir()) / "does_not_exist_replay.csv")
         self.assertEqual(result["status"], "SCORE_CALIBRATION_BLOCKED")
         self.assertTrue(result["blockers"])
+
+    def test_holdout_cannot_be_consumed_twice(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "replay.csv"
+            registry = Path(temp_dir) / "registry.sqlite3"
+            self._frame().to_csv(path, index=False)
+            first = run_replay_score_calibration(
+                path, enforce_one_shot_holdout=True, registry_path=registry
+            )
+            second = run_replay_score_calibration(
+                path, enforce_one_shot_holdout=True, registry_path=registry
+            )
+            self.assertTrue(first["holdout_claimed"])
+            self.assertEqual(second["status"], "SCORE_CALIBRATION_BLOCKED_HOLDOUT_REUSE")
 
 
 if __name__ == "__main__":

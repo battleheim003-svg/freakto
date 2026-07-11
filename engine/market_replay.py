@@ -34,9 +34,12 @@ from engine.historical_data_store import (
     timeframe_to_milliseconds,
     utc_now_iso,
 )
+from engine.execution_model import adaptive_horizon, estimate_execution_cost
+from engine.experiment_registry import ExperimentRegistry, fingerprint
+from engine.model_contract import CURRENT_MODEL_CONTRACT
 
 
-VERSION = "v10.1.5"
+VERSION = "v10.3.0"
 REPLAY_DIR = Path("logs") / "market_replay"
 CHECKPOINT_DIR = REPLAY_DIR / "checkpoints"
 CUMULATIVE_REPLAY_FILE = REPLAY_DIR / "market_replay_evaluations.csv"
@@ -78,6 +81,10 @@ class MarketReplayConfig:
     max_decisions_per_symbol: int = 0
     fee_bps_per_side: float = 10.0
     slippage_bps_per_side: float = 5.0
+    dynamic_execution_costs: bool = True
+    max_slippage_bps_per_side: float = 100.0
+    execution_delay_candles: int = 1
+    adaptive_evaluation_horizon: bool = True
     context_file: str = ""
     context_max_age_hours: float = 24.0
     checkpoint_every: int = 250
@@ -244,6 +251,11 @@ def _config_fingerprint(config: MarketReplayConfig) -> str:
         "include_neutral": config.include_neutral,
         "fee_bps_per_side": config.fee_bps_per_side,
         "slippage_bps_per_side": config.slippage_bps_per_side,
+        "dynamic_execution_costs": config.dynamic_execution_costs,
+        "max_slippage_bps_per_side": config.max_slippage_bps_per_side,
+        "execution_delay_candles": config.execution_delay_candles,
+        "adaptive_evaluation_horizon": config.adaptive_evaluation_horizon,
+        **CURRENT_MODEL_CONTRACT.as_dict(),
         "context_digest": context_digest,
         "context_max_age_hours": config.context_max_age_hours,
         "replay_safety": "learning_off_historical_edge_off",
@@ -567,22 +579,39 @@ def _row_from_opportunity(
     data_fingerprint: str,
 ) -> Dict[str, Any]:
     timestamp = full_df.iloc[signal_idx]["timestamp"]
-    entry_price = float(full_df.iloc[signal_idx]["close"])
+    delay = max(1, int(config.execution_delay_candles))
+    entry_idx = signal_idx + delay
+    if entry_idx >= len(full_df):
+        raise ValueError("no execution candle is available after the decision")
+    # The decision is made after signal candle close.  A paper/replay fill is
+    # therefore based on the next available candle open, never that same close.
+    entry_price = float(full_df.iloc[entry_idx]["open"])
     side = str(opportunity.side)
     stop_price = _parse_price(opportunity.stop_zone)
     targets = _parse_targets(opportunity.targets)
+    raw = getattr(opportunity, "raw", {}) or {}
+    primary_horizon = max([int(value) for value in config.horizons if int(value) > 0] or [6])
+    regime_label = str(raw.get("regime_label", ""))
+    adaptive_primary = adaptive_horizon(primary_horizon, regime_label) if config.adaptive_evaluation_horizon else primary_horizon
+    evaluation_horizons = sorted(set([*config.horizons, adaptive_primary]))
+    cost = estimate_execution_cost(
+        full_df.iloc[signal_idx],
+        fee_bps_per_side=config.fee_bps_per_side,
+        base_slippage_bps_per_side=config.slippage_bps_per_side,
+        dynamic=config.dynamic_execution_costs,
+        max_slippage_bps_per_side=config.max_slippage_bps_per_side,
+    )
     path = _evaluate_replay_path(
         full_df,
-        signal_idx=signal_idx,
+        signal_idx=entry_idx - 1,
         side=side,
         entry_price=entry_price,
         stop_price=stop_price,
         targets=targets,
-        horizons=config.horizons,
-        fee_bps_per_side=config.fee_bps_per_side,
-        slippage_bps_per_side=config.slippage_bps_per_side,
+        horizons=evaluation_horizons,
+        fee_bps_per_side=cost.fee_bps_per_side,
+        slippage_bps_per_side=cost.slippage_bps_per_side,
     )
-    raw = getattr(opportunity, "raw", {}) or {}
     row: Dict[str, Any] = {
         "source": config.source,
         "run_id": run_id,
@@ -590,6 +619,11 @@ def _row_from_opportunity(
         "replay_experiment_id": experiment_id,
         "replay_data_fingerprint": data_fingerprint,
         "candle_timestamp": pd.Timestamp(timestamp).isoformat(),
+        "feature_cutoff_timestamp": pd.Timestamp(timestamp).isoformat(),
+        "decision_time_basis": "AFTER_BAR_CLOSE",
+        "execution_timestamp": pd.Timestamp(full_df.iloc[entry_idx]["timestamp"]).isoformat(),
+        "execution_price_basis": "NEXT_AVAILABLE_BAR_OPEN",
+        "execution_delay_candles": delay,
         "symbol": symbol,
         "timeframe": config.timeframe,
         "provider": provider,
@@ -610,8 +644,14 @@ def _row_from_opportunity(
         "entry_zone": opportunity.entry_zone,
         "stop_zone": opportunity.stop_zone,
         "targets": json.dumps(opportunity.targets, ensure_ascii=False),
-        "fee_bps_per_side": config.fee_bps_per_side,
-        "slippage_bps_per_side": config.slippage_bps_per_side,
+        "fee_bps_per_side": cost.fee_bps_per_side,
+        "slippage_bps_per_side": cost.slippage_bps_per_side,
+        "round_trip_cost_pct": cost.round_trip_cost_pct,
+        "execution_volatility_multiplier": cost.volatility_multiplier,
+        "execution_liquidity_multiplier": cost.liquidity_multiplier,
+        "dynamic_execution_costs": bool(config.dynamic_execution_costs),
+        "adaptive_horizon_candles": adaptive_primary,
+        **CURRENT_MODEL_CONTRACT.as_dict(),
         "regime_label": raw.get("regime_label", ""),
         "regime_confidence": raw.get("regime_confidence", ""),
         "long_score": raw.get("long_score", ""),
@@ -634,7 +674,6 @@ def _row_from_opportunity(
     # v10.1.5 canonical evaluation recorder.  The replay engine already
     # calculates horizon metrics above; these aliases make the primary
     # research outcome explicit and stable for downstream optimization.
-    primary_horizon = max([int(value) for value in config.horizons if int(value) > 0] or [6])
     primary_label = _horizon_label(config.timeframe, primary_horizon)
     market_col = f"market_return_after_{primary_horizon}c_pct"
     gross_col = f"gross_signed_return_after_{primary_horizon}c_pct"
@@ -668,6 +707,8 @@ def _row_from_opportunity(
             else "PENDING"
         ),
         "evaluation_metric_source": f"{gross_col}|{net_col}",
+        "adaptive_gross_return_pct": row.get(f"gross_signed_return_after_{adaptive_primary}c_pct"),
+        "adaptive_net_return_pct": row.get(f"net_signed_return_after_{adaptive_primary}c_pct"),
     })
     # Compatibility aliases used by older optimization prototypes.
     row["return"] = row.get("gross_return_pct")
@@ -699,9 +740,13 @@ def _save_checkpoint(run: MarketReplayRun, state: Dict[str, Any], rows: List[Dic
         "state": state,
         "updated_utc": utc_now_iso(),
     }
-    checkpoint_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    checkpoint_temp = checkpoint_path.with_name(checkpoint_path.name + ".tmp")
+    checkpoint_temp.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    checkpoint_temp.replace(checkpoint_path)
     if rows:
-        pd.DataFrame(rows).to_csv(rows_path, index=False, encoding="utf-8-sig")
+        rows_temp = rows_path.with_name(rows_path.name + ".tmp")
+        pd.DataFrame(rows).to_csv(rows_temp, index=False, encoding="utf-8-sig")
+        rows_temp.replace(rows_path)
     run.checkpoint_path = str(checkpoint_path)
 
 
@@ -709,7 +754,7 @@ def _write_union_csv(path: Path, new_rows: pd.DataFrame, *, dedupe_columns: Sequ
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists() and path.stat().st_size:
         try:
-            old = pd.read_csv(path, encoding="utf-8-sig")
+            old = pd.read_csv(path, encoding="utf-8-sig", low_memory=False)
             combined = pd.concat([old, new_rows], ignore_index=True, sort=False)
         except Exception:
             combined = new_rows.copy()
@@ -717,7 +762,9 @@ def _write_union_csv(path: Path, new_rows: pd.DataFrame, *, dedupe_columns: Sequ
         combined = new_rows.copy()
     if dedupe_columns and all(column in combined.columns for column in dedupe_columns):
         combined = combined.drop_duplicates(subset=list(dedupe_columns), keep="last")
-    combined.to_csv(path, index=False, encoding="utf-8-sig")
+    temp = path.with_name(path.name + ".tmp")
+    combined.to_csv(temp, index=False, encoding="utf-8-sig")
+    temp.replace(path)
 
 
 def _bool_series(series: pd.Series) -> pd.Series:
@@ -900,6 +947,17 @@ def run_market_replay(
         started_utc=utc_now_iso(),
         config=asdict(config),
     )
+    registry = ExperimentRegistry()
+    registry_started = False
+    if save:
+        registry.start_run(
+            run_id,
+            "REPLAY",
+            hyperparameters=asdict(config),
+            data_start_utc=config.start_utc,
+            data_end_utc=config.end_utc,
+        )
+        registry_started = True
     checkpoint_state: Dict[str, Any] = {"next_index": {}, "completed_symbols": []}
     accumulated_rows: List[Dict[str, Any]] = []
     if resume:
@@ -957,7 +1015,9 @@ def run_market_replay(
                 raise RuntimeError(f"feature leakage audit failed: {symbol_result.leakage_audit.status}")
 
             max_horizon = max(config.horizons) if config.horizons else 0
-            last_signal_index = len(featured) - max_horizon - 1
+            if config.adaptive_evaluation_horizon:
+                max_horizon *= 2
+            last_signal_index = len(featured) - max_horizon - max(1, int(config.execution_delay_candles))
             first_signal_index = max(config.min_window, 35)
             if last_signal_index < first_signal_index:
                 raise ValueError(f"insufficient replay candles after warmup: {len(featured)}")
@@ -1016,7 +1076,7 @@ def run_market_replay(
             if save:
                 _save_checkpoint(run, checkpoint_state, accumulated_rows)
             print(
-                f"✅ Replay {symbol}: candles={len(featured)} decisions={symbol_rows} "
+                f"[OK] Replay {symbol}: candles={len(featured)} decisions={symbol_rows} "
                 f"provider={provider} audit={symbol_result.leakage_audit.status} context_matches={context_matches}"
             )
         except Exception as exc:
@@ -1024,14 +1084,15 @@ def run_market_replay(
             run.error_count += 1
             run.symbol_results = [item for item in run.symbol_results if item.symbol != symbol]
             run.symbol_results.append(symbol_result)
-            print(f"❌ Replay {symbol}: {symbol_result.error}")
+            print(f"[ERROR] Replay {symbol}: {symbol_result.error}")
 
     frame = pd.DataFrame(accumulated_rows)
     if not frame.empty and "decision_id" in frame.columns:
         frame = frame.drop_duplicates(subset=["decision_id"], keep="last").sort_values(["symbol", "candle_timestamp"]).reset_index(drop=True)
 
     run.finished_utc = utc_now_iso()
-    run.ok = bool(len(frame)) and any(item.ok for item in run.symbol_results)
+    completed_count = sum(1 for item in run.symbol_results if item.ok)
+    run.ok = bool(len(frame)) and completed_count == len(config.symbols) and run.error_count == 0
     metric_horizon = max(config.horizons) if config.horizons else 6
     summary = summarize_market_replay(
         frame,
@@ -1070,6 +1131,24 @@ def run_market_replay(
         }]), dedupe_columns=["run_id"])
         checkpoint_state["finished"] = True
         _save_checkpoint(run, checkpoint_state, accumulated_rows)
+
+    if registry_started:
+        if not frame.empty:
+            registry.update_data_provenance(
+                run_id,
+                data_start_utc=str(frame["candle_timestamp"].min()),
+                data_end_utc=str(frame["candle_timestamp"].max()),
+                data_fingerprint=fingerprint(sorted(frame["replay_data_fingerprint"].astype(str).unique())),
+            )
+        registry.finish_run(
+            run_id,
+            "COMPLETED" if run.ok else "FAILED",
+            {
+                "summary": asdict(summary),
+                "output_csv": run.output_csv,
+                "output_report": run.output_report,
+            },
+        )
 
     return run, summary, frame
 
@@ -1122,7 +1201,7 @@ def load_market_replay_status(path: Path | str = CUMULATIVE_REPLAY_FILE) -> Mark
 def format_market_replay_console(summary: MarketReplaySummary, compact: bool = False) -> str:
     lines = [
         "=" * 112,
-        f"⏪ Freakto Market Replay Engine {VERSION}",
+        f"Freakto Market Replay Engine {VERSION}",
         "=" * 112,
         f"Status                 : {summary.status}",
         f"Run ID                 : {summary.run_id}",
@@ -1155,10 +1234,10 @@ def format_market_replay_console(summary: MarketReplaySummary, compact: bool = F
             )
     if summary.blockers:
         lines.extend(["", "Blockers:"])
-        lines.extend(f"⛔ {item}" for item in summary.blockers)
+        lines.extend(f"[BLOCKER] {item}" for item in summary.blockers)
     if summary.warnings:
         lines.extend(["", "Warnings:"])
-        lines.extend(f"⚠️ {item}" for item in summary.warnings)
+        lines.extend(f"[WARNING] {item}" for item in summary.warnings)
     lines.append("=" * 112)
     return "\n".join(lines)
 

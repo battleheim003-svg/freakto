@@ -24,6 +24,9 @@ from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 import pandas as pd
 
 from engine.csv_utils import read_csv_dicts_lenient
+from engine.experiment_registry import ExperimentRegistry
+from engine.model_contract import CURRENT_MODEL_CONTRACT, ModelContract
+from engine.research_validation import dataset_fingerprint
 
 
 LOG_DIR = Path("logs")
@@ -483,6 +486,18 @@ def run_historical_backtest(config: HistoricalBacktestConfig) -> Tuple[Historica
         started_utc=utc_now_iso(),
         symbols_requested=len(config.symbols),
     )
+    registry = ExperimentRegistry()
+    legacy_contract = ModelContract(
+        feature_set_version=CURRENT_MODEL_CONTRACT.feature_set_version,
+        model_version=CURRENT_MODEL_CONTRACT.model_version,
+        calibration_version=CURRENT_MODEL_CONTRACT.calibration_version,
+        execution_model_version="legacy-same-close-fixed-cost-v1",
+        split_protocol_version=CURRENT_MODEL_CONTRACT.split_protocol_version,
+    )
+    registry.start_run(
+        run.run_id, "BACKTEST", hyperparameters=asdict(config), contract=legacy_contract,
+        notes="Legacy backtest retained for compatibility; MarketReplay is the paper-readiness authority.",
+    )
     all_rows: List[Dict] = []
     # Heavy/external imports stay inside execution path so `--status` works
     # even in CI environments where ccxt/ta are not installed yet.
@@ -591,6 +606,17 @@ def run_historical_backtest(config: HistoricalBacktestConfig) -> Tuple[Historica
         "output_csv": run.output_csv,
         "output_report": run.output_report,
     }])
+
+    registry.update_data_provenance(
+        run.run_id,
+        data_start_utc=str(run_df.get("candle_timestamp", pd.Series(dtype=str)).min() or ""),
+        data_end_utc=str(run_df.get("candle_timestamp", pd.Series(dtype=str)).max() or ""),
+        data_fingerprint=dataset_fingerprint(run_df, ["decision_id", "candle_timestamp", "symbol", "timeframe"]),
+    )
+    registry.finish_run(
+        run.run_id, "COMPLETED" if run.ok else "FAILED",
+        {"summary": asdict(summary), "output_csv": run.output_csv, "output_report": run.output_report},
+    )
 
     print(f"🧾 Backtest CSV ذخیره شد: {output_csv}")
     print(f"📝 Backtest report ذخیره شد: {output_report}")

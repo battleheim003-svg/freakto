@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 from typing import List
 
@@ -21,6 +22,11 @@ from engine.market_replay import (
     run_market_replay,
 )
 from telegram_notifier import send_telegram_message
+
+
+def _safe_print(text: str) -> None:
+    encoding = sys.stdout.encoding or "utf-8"
+    print(str(text).encode(encoding, errors="replace").decode(encoding))
 
 
 def _symbols(value: str) -> List[str]:
@@ -69,6 +75,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-decisions-per-symbol", type=int, default=0)
     parser.add_argument("--fee-bps", type=float, default=10.0, help="Fee per entry/exit side")
     parser.add_argument("--slippage-bps", type=float, default=5.0, help="Slippage per entry/exit side")
+    parser.add_argument("--fixed-execution-costs", action="store_true", help="Disable volatility/liquidity slippage adjustment")
+    parser.add_argument("--max-slippage-bps", type=float, default=100.0)
+    parser.add_argument("--execution-delay-candles", type=int, default=1, help="Minimum bars between decision and executable fill")
+    parser.add_argument("--fixed-evaluation-horizon", action="store_true", help="Disable regime-adaptive companion horizon")
     parser.add_argument("--context-file", default="", help="Optional timestamped historical context CSV")
     parser.add_argument("--context-max-age-hours", type=float, default=24.0)
     parser.add_argument("--checkpoint-every", type=int, default=250)
@@ -111,6 +121,10 @@ def _replay_config(args, symbols: List[str]) -> MarketReplayConfig:
         max_decisions_per_symbol=args.max_decisions_per_symbol,
         fee_bps_per_side=args.fee_bps,
         slippage_bps_per_side=args.slippage_bps,
+        dynamic_execution_costs=not args.fixed_execution_costs,
+        max_slippage_bps_per_side=args.max_slippage_bps,
+        execution_delay_candles=max(1, args.execution_delay_candles),
+        adaptive_evaluation_horizon=not args.fixed_evaluation_horizon,
         context_file=args.context_file,
         context_max_age_hours=args.context_max_age_hours,
         checkpoint_every=args.checkpoint_every,
@@ -146,7 +160,7 @@ def main() -> None:
         output_blocks.append(format_historical_data_console(data_report, compact=args.compact))
         if args.full and data_report.completed_symbols == 0:
             text = "\n\n".join(output_blocks)
-            print(text)
+            _safe_print(text)
             raise SystemExit("Historical data build returned no usable datasets; replay was not started.")
 
     if args.replay or args.full or args.resume:
@@ -159,11 +173,11 @@ def main() -> None:
         output_blocks.append(format_market_replay_console(summary, compact=args.compact))
         if not run.ok:
             text = "\n\n".join(output_blocks)
-            print(text)
+            _safe_print(text)
             raise SystemExit(1)
 
     text = "\n\n".join(output_blocks)
-    print(text)
+    _safe_print(text)
     if args.send:
         send_telegram_message(text)
 

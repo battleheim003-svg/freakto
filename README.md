@@ -1,5 +1,13 @@
 # Freakto — Crypto Research & Decision Intelligence Platform
 
+## Paper-trade readiness (v10.3)
+
+The research and paper paths now use explicit version contracts, an Experiment
+Registry, one-shot TEST hold-outs, causal closed-candle features, next-bar replay
+execution and dynamic costs. Run `python paper_trading_dashboard.py --preflight`
+before recording a new paper observation. See
+`PAPER_TRADE_READINESS_RUNBOOK.md` for the full protocol and current results.
+
 Freakto یک سیستم پژوهشی برای تحلیل بازار کریپتو، ساخت تصمیم، ارزیابی تاریخی، Forward Test، Paper Trading و تحلیل علت‌های حرکت بازار است.
 
 هدف پروژه تولید سیگنال کور نیست. هر تصمیم باید از چند لایه عبور کند:

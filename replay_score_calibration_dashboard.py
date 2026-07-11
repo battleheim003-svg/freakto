@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import argparse
+import builtins
+import sys
 
 from engine.replay_score_calibration import (
     DEFAULT_FILE,
@@ -10,6 +12,12 @@ from engine.replay_score_calibration import (
     run_replay_score_calibration,
     save_replay_score_calibration,
 )
+
+
+def print(value) -> None:
+    """Console-safe local print for Windows legacy code pages."""
+    encoding = sys.stdout.encoding or "utf-8"
+    builtins.print(str(value).encode(encoding, errors="replace").decode(encoding))
 
 
 def build_parser() -> argparse.ArgumentParser:

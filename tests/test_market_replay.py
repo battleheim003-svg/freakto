@@ -2,6 +2,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -51,11 +52,12 @@ class MarketReplayTests(unittest.TestCase):
                 batch_limit=50,
                 data_dir=temp_dir,
             )
-            result = build_symbol_history(
-                request,
-                "BTC/USDT",
-                exchange_factory=lambda _: FakeExchange(rows),
-            )
+            with patch("engine.historical_data_store._write_quality"):
+                result = build_symbol_history(
+                    request,
+                    "BTC/USDT",
+                    exchange_factory=lambda _: FakeExchange(rows),
+                )
             self.assertTrue(result.ok)
             self.assertEqual(result.rows, 300)
             self.assertEqual(result.quality.coverage_pct, 100.0)
@@ -100,6 +102,10 @@ class MarketReplayTests(unittest.TestCase):
             self.assertFalse(rows["learning_overrides_enabled"].astype(bool).any())
             self.assertFalse(rows["historical_edge_enabled"].astype(bool).any())
             self.assertTrue((pd.to_numeric(rows["historical_edge_score"]) == 0).all())
+            self.assertTrue(rows["dynamic_execution_costs"].astype(bool).all())
+            self.assertTrue((rows["execution_price_basis"] == "NEXT_AVAILABLE_BAR_OPEN").all())
+            self.assertTrue((pd.to_datetime(rows["execution_timestamp"]) > pd.to_datetime(rows["candle_timestamp"])).all())
+            self.assertTrue(rows["feature_set_version"].astype(str).str.len().gt(0).all())
 
     def test_historical_context_uses_backward_only_merge(self):
         market = pd.DataFrame({

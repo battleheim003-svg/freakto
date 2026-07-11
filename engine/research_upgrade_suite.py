@@ -243,6 +243,27 @@ def run_meta_labeling(*, horizon: str = "24h", min_samples: int = 120) -> Dict[s
     col = RETURN_COLUMNS.get(horizon, "return_after_24h_pct")
     if col not in df.columns:
         return {"run_id": rid, "generated_utc": utc_now_iso(), "status": "MISSING_RETURN_COLUMN", "blockers": [f"ستون {col} پیدا نشد."], "warnings": [], "top_features": []}
+    from engine.meta_labeling import run_meta_label_validation
+
+    ordered = time_ordered(df).reset_index(drop=True)
+    ordered["normalized_net_return"] = pd.to_numeric(ordered[col], errors="coerce")
+    if "replay_split" not in ordered.columns and "normalized_split" not in ordered.columns:
+        total = len(ordered)
+        ordered["replay_split"] = [
+            "TRAIN_60" if index < int(total * 0.60)
+            else "VALIDATION_20" if index < int(total * 0.80)
+            else "TEST_20"
+            for index in range(total)
+        ]
+    report = run_meta_label_validation(ordered, min_samples=min_samples)
+    report["horizon"] = horizon
+    report["generated_utc"] = utc_now_iso()
+    report["top_features"] = [
+        {**item, "weight": item.get("coefficient", 0.0)}
+        for item in report.get("feature_attribution", [])
+    ]
+    return report
+
     features = ["score", "trend_score", "momentum_score", "volume_score", "structure_score", "historical_edge_score", "long_score", "short_score"]
     Xdf = df[features].apply(pd.to_numeric, errors="coerce").fillna(0)
     y = (pd.to_numeric(df[col], errors="coerce").fillna(0) > 0).astype(int)

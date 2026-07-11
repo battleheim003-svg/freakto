@@ -12,7 +12,6 @@ Paper Trading Engine:
 
 from __future__ import annotations
 
-import csv
 import hashlib
 import json
 from dataclasses import dataclass, field
@@ -23,6 +22,9 @@ from typing import Iterable, List, Optional
 import pandas as pd
 
 from .common import fmt_price
+from .execution_model import estimate_execution_cost
+from .model_contract import CURRENT_MODEL_CONTRACT
+from .paper_trade_readiness import run_paper_trade_preflight
 
 LOGS_DIR = Path("logs")
 PAPER_DIR = LOGS_DIR / "paper_trading"
@@ -32,6 +34,8 @@ PAPER_EVALUATIONS_FILE = LOGS_DIR / "paper_trade_evaluations.csv"
 PAPER_ALLOWED_RECOMMENDATIONS = {"ELITE", "ACTIONABLE", "WATCHLIST"}
 DEFAULT_MIN_RR = 1.20
 DEFAULT_MIN_CONFIDENCE = 50
+DEFAULT_FEE_BPS_PER_SIDE = 10.0
+DEFAULT_SLIPPAGE_BPS_PER_SIDE = 5.0
 
 
 @dataclass
@@ -66,6 +70,8 @@ class PaperRecordResult:
     duplicates: int = 0
     rows: List[dict] = field(default_factory=list)
     skipped_reasons: List[str] = field(default_factory=list)
+    preflight_status: str = "NOT_RUN"
+    blockers: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -155,14 +161,11 @@ def _append_rows(path: Path, rows: List[dict]) -> None:
     if not rows:
         return
     path.parent.mkdir(parents=True, exist_ok=True)
-    file_exists = path.exists()
-    fieldnames = list(rows[0].keys())
-    with path.open("a", newline="", encoding="utf-8-sig") as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
-        if not file_exists:
-            writer.writeheader()
-        for row in rows:
-            writer.writerow(row)
+    existing = _load_csv(path)
+    combined = pd.concat([existing, pd.DataFrame(rows)], ignore_index=True, sort=False)
+    temp = path.with_suffix(path.suffix + ".tmp")
+    combined.to_csv(temp, index=False, encoding="utf-8-sig")
+    temp.replace(path)
 
 
 # ---------- candidate creation ----------
@@ -215,18 +218,33 @@ def _candidate_is_allowed(candidate: PaperTradeCandidate, min_rr: float, min_con
     return True, "OK"
 
 
-def record_paper_trades_from_portfolio(result, min_rr: float = DEFAULT_MIN_RR, min_confidence: int = DEFAULT_MIN_CONFIDENCE) -> PaperRecordResult:
+def record_paper_trades_from_portfolio(
+    result,
+    min_rr: float = DEFAULT_MIN_RR,
+    min_confidence: int = DEFAULT_MIN_CONFIDENCE,
+    *,
+    require_preflight: bool = True,
+    fee_bps_per_side: float = DEFAULT_FEE_BPS_PER_SIDE,
+    slippage_bps_per_side: float = DEFAULT_SLIPPAGE_BPS_PER_SIDE,
+) -> PaperRecordResult:
     """Record paper trades from eligible PortfolioScanResult candidates.
 
     This is intentionally conservative. MONITOR candidates are not recorded as trades.
     """
     items = list(getattr(result, "ranked_items", []) or [])
+    preflight = run_paper_trade_preflight()
+    if require_preflight and not preflight.ready:
+        return PaperRecordResult(
+            attempted=len(items), skipped=len(items), preflight_status=preflight.status,
+            blockers=list(preflight.blockers),
+            skipped_reasons=["Paper trade recording blocked by research preflight."],
+        )
     market_breadth = getattr(result, "market_breadth", None)
     existing = _load_csv(PAPER_TRADES_FILE)
     existing_ids = set(existing.get("paper_trade_id", [])) if not existing.empty else set()
 
     rows = []
-    record_result = PaperRecordResult(attempted=len(items))
+    record_result = PaperRecordResult(attempted=len(items), preflight_status=preflight.status)
     now = datetime.now(timezone.utc).isoformat()
 
     for item in items:
@@ -272,6 +290,10 @@ def record_paper_trades_from_portfolio(result, min_rr: float = DEFAULT_MIN_RR, m
             "market_mode": candidate.market_mode,
             "risk_tone": candidate.risk_tone,
             "provider": candidate.provider,
+            **CURRENT_MODEL_CONTRACT.as_dict(),
+            "fee_bps_per_side": float(fee_bps_per_side),
+            "base_slippage_bps_per_side": float(slippage_bps_per_side),
+            "dynamic_execution_costs": True,
             "status": "OPEN",
             "source": candidate.source,
             "notes": " | ".join(str(x) for x in candidate.notes[:8]),
@@ -333,6 +355,11 @@ def _evaluate_one_trade(trade: dict, market_df: pd.DataFrame) -> dict:
         "exit_time": "",
         "exit_price": None,
         "r_multiple": 0.0,
+        "gross_r_multiple": 0.0,
+        "net_r_multiple": 0.0,
+        "round_trip_cost_pct": 0.0,
+        "cost_r": 0.0,
+        "effective_slippage_bps_per_side": 0.0,
         "mfe_r": 0.0,
         "mae_r": 0.0,
         "latest_unrealized_r": 0.0,
@@ -413,6 +440,26 @@ def _evaluate_one_trade(trade: dict, market_df: pd.DataFrame) -> dict:
         base["r_multiple"] = round(float(latest_r), 4)
         base["reason"] = "Trade still open; mark-to-market R shown."
 
+    entry_candle = future.iloc[0]
+    entry_open = _safe_float(entry_candle.get("open")) or entry
+    candle_range_pct = abs(float(entry_candle.get("high", entry_open)) - float(entry_candle.get("low", entry_open))) / max(entry_open, 1e-12)
+    cost = estimate_execution_cost(
+        {"atr_pct": candle_range_pct, "cross_exchange_volume_ratio": 1.0},
+        fee_bps_per_side=_safe_float(trade.get("fee_bps_per_side")) or DEFAULT_FEE_BPS_PER_SIDE,
+        base_slippage_bps_per_side=_safe_float(trade.get("base_slippage_bps_per_side")) or DEFAULT_SLIPPAGE_BPS_PER_SIDE,
+        dynamic=str(trade.get("dynamic_execution_costs", "true")).lower() in {"true", "1", "yes"},
+    )
+    risk_pct = risk_abs / entry * 100.0
+    cost_r = cost.round_trip_cost_pct / max(risk_pct, 1e-12)
+    gross_r = float(base["r_multiple"])
+    net_r = gross_r - cost_r if side in {"LONG", "SHORT"} else gross_r
+    base["gross_r_multiple"] = round(gross_r, 4)
+    base["net_r_multiple"] = round(net_r, 4)
+    base["r_multiple"] = round(net_r, 4)
+    base["round_trip_cost_pct"] = cost.round_trip_cost_pct
+    base["cost_r"] = round(cost_r, 4)
+    base["effective_slippage_bps_per_side"] = cost.slippage_bps_per_side
+
     return base
 
 
@@ -480,10 +527,9 @@ def evaluate_paper_trades(fetcher, limit: int = 500) -> PaperEvaluationSummary:
         rows.append(row)
 
     PAPER_EVALUATIONS_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with PAPER_EVALUATIONS_FILE.open("w", newline="", encoding="utf-8-sig") as file:
-        writer = csv.DictWriter(file, fieldnames=list(rows[0].keys()))
-        writer.writeheader()
-        writer.writerows(rows)
+    temp = PAPER_EVALUATIONS_FILE.with_suffix(PAPER_EVALUATIONS_FILE.suffix + ".tmp")
+    pd.DataFrame(rows).to_csv(temp, index=False, encoding="utf-8-sig")
+    temp.replace(PAPER_EVALUATIONS_FILE)
 
     summary = summarize_paper_evaluations(pd.DataFrame(rows))
     report = format_paper_evaluation_report(summary, rows)
@@ -537,6 +583,10 @@ def format_paper_record_result(result: PaperRecordResult) -> str:
     lines.append(f"Recorded trades      : {result.recorded}")
     lines.append(f"Skipped candidates   : {result.skipped}")
     lines.append(f"Duplicate trades     : {result.duplicates}")
+    lines.append(f"Preflight status     : {result.preflight_status}")
+    if result.blockers:
+        lines.append("Blockers:")
+        lines.extend(f"- {item}" for item in result.blockers)
     if result.rows:
         lines.append("")
         lines.append("Recorded:")

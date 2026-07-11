@@ -17,6 +17,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable, List, Optional
 
+from engine.experiment_registry import ExperimentRegistry, fingerprint
+
 try:
     import pandas as pd
 except Exception:  # pragma: no cover
@@ -522,6 +524,18 @@ def run_forward_cycle(
     FORWARD_DIR.mkdir(parents=True, exist_ok=True)
     run_dir = FORWARD_DIR / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
+    registry = ExperimentRegistry()
+    registry.start_run(
+        run_id,
+        "FORWARD_TEST",
+        hyperparameters={
+            "continue_on_error": continue_on_error,
+            "dry_run": dry_run,
+            "validate_after_cycle": plan.validate_after_cycle,
+            "tasks": [asdict(task) for task in plan.tasks],
+        },
+        data_start_utc=_iso(started),
+    )
 
     if dry_run:
         finished = _utc_now()
@@ -547,6 +561,11 @@ def run_forward_cycle(
         )
         report = save_forward_run_report(result, progress=build_forward_progress())
         result.report_file = str(report)
+        registry.update_data_provenance(
+            run_id, data_start_utc=result.started_utc, data_end_utc=result.finished_utc,
+            data_fingerprint=fingerprint([asdict(task) for task in result.tasks]),
+        )
+        registry.finish_run(run_id, "COMPLETED", asdict(result))
         return result
 
     task_results: List[TaskRunResult] = []
@@ -620,6 +639,11 @@ def run_forward_cycle(
     report = save_forward_run_report(result, progress=build_forward_progress())
     result.report_file = str(report)
     append_forward_run(result)
+    registry.update_data_provenance(
+        run_id, data_start_utc=result.started_utc, data_end_utc=result.finished_utc,
+        data_fingerprint=fingerprint([asdict(task) for task in result.tasks]),
+    )
+    registry.finish_run(run_id, "COMPLETED" if result.ok else "FAILED", asdict(result))
     return result
 
 

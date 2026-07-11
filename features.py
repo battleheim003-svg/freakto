@@ -6,6 +6,7 @@
 import pandas as pd
 import ta
 from config import LOOKAHEAD_CANDLES, ATR_MULTIPLIER
+from engine.model_contract import FEATURE_SET_VERSION
 
 
 def add_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -42,6 +43,11 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     # فاصله‌ی نسبی قیمت از میانگین‌ها (نرمال‌سازی شده)
     df["dist_sma_10"] = (df["close"] - df["sma_10"]) / df["close"]
     df["dist_sma_30"] = (df["close"] - df["sma_30"]) / df["close"]
+
+    # Metadata is kept in attrs so it cannot accidentally become a model
+    # feature, while every caller can still persist the exact feature contract.
+    df.attrs["feature_set_version"] = FEATURE_SET_VERSION
+    df.attrs["feature_time_basis"] = "BAR_CLOSE_CAUSAL"
 
     return df
 

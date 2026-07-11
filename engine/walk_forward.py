@@ -13,13 +13,23 @@ import csv
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 import pandas as pd
 
 LOGS_DIR = Path("logs")
 WF_DIR = LOGS_DIR / "walk_forward"
 EVALUATIONS_FILE = LOGS_DIR / "decision_evaluations.csv"
+
+
+@dataclass
+class WalkForwardFold:
+    fold: int
+    train_samples: int
+    test_samples: int
+    learned_threshold: Optional[float]
+    train_avg24: float
+    test_avg24: float
 
 
 @dataclass
@@ -37,6 +47,9 @@ class WalkForwardResult:
     stability_gap: float
     verdict: str
     notes: List[str] = field(default_factory=list)
+    refit_count: int = 0
+    holdout_samples_reserved: int = 0
+    folds: List[WalkForwardFold] = field(default_factory=list)
 
 
 def _load_complete_evals() -> pd.DataFrame:
@@ -145,15 +158,75 @@ def run_walk_forward_validation() -> List[WalkForwardResult]:
     df = _load_complete_evals()
     if df.empty:
         return []
+    # The final 20% is an untouched hold-out. Walk-forward folds operate only
+    # on the earlier development period and refit their threshold each time.
+    development_end = max(2, int(len(df) * 0.80))
+    development = df.iloc[:development_end].copy()
+    holdout_count = max(0, len(df) - development_end)
     results = []
-    for name, func in _filters():
-        try:
-            mask = func(df)
-        except Exception:
-            mask = pd.Series([False] * len(df), index=df.index)
-        subset = df[mask].copy()
-        train, test = _split_train_test(subset)
-        results.append(_evaluate(name, train, test))
+
+    def expanding_folds(frame: pd.DataFrame, count: int = 3):
+        if len(frame) < 12:
+            return []
+        initial = max(6, int(len(frame) * 0.40))
+        remaining = len(frame) - initial
+        width = max(1, remaining // count)
+        folds = []
+        for fold in range(count):
+            train_end = initial + fold * width
+            test_end = len(frame) if fold == count - 1 else min(len(frame), train_end + width)
+            if test_end > train_end:
+                folds.append((frame.iloc[:train_end].copy(), frame.iloc[train_end:test_end].copy()))
+        return folds
+
+    fold_pairs = expanding_folds(development)
+    strategies = [
+        ("All complete decisions (expanding)", None),
+        ("Score threshold refit each fold", "REFIT_SCORE"),
+        ("WATCHLIST or better (expanding)", "ACTIONABLE"),
+    ]
+    for name, mode in strategies:
+        fold_rows: List[WalkForwardFold] = []
+        train_parts = []
+        test_parts = []
+        for fold_number, (raw_train, raw_test) in enumerate(fold_pairs, start=1):
+            learned_threshold: Optional[float] = None
+            train = raw_train
+            test = raw_test
+            if mode == "REFIT_SCORE":
+                best = None
+                for threshold in (50, 55, 60, 65, 70, 75, 80):
+                    candidate = raw_train[pd.to_numeric(raw_train.get("score"), errors="coerce").fillna(0) >= threshold]
+                    if len(candidate) < max(10, int(len(raw_train) * 0.10)):
+                        continue
+                    key = (_avg24(candidate), len(candidate))
+                    if best is None or key > best[0]:
+                        best = (key, float(threshold))
+                learned_threshold = best[1] if best else 50.0
+                train = raw_train[pd.to_numeric(raw_train.get("score"), errors="coerce").fillna(0) >= learned_threshold]
+                test = raw_test[pd.to_numeric(raw_test.get("score"), errors="coerce").fillna(0) >= learned_threshold]
+            elif mode == "ACTIONABLE":
+                allowed = ["WATCHLIST", "ACTIONABLE", "HIGH_ACTIONABILITY"]
+                train = raw_train[raw_train.get("actionability", pd.Series("", index=raw_train.index)).astype(str).isin(allowed)]
+                test = raw_test[raw_test.get("actionability", pd.Series("", index=raw_test.index)).astype(str).isin(allowed)]
+            train_parts.append(train)
+            test_parts.append(test)
+            fold_rows.append(WalkForwardFold(
+                fold=fold_number,
+                train_samples=len(train),
+                test_samples=len(test),
+                learned_threshold=learned_threshold,
+                train_avg24=_avg24(train),
+                test_avg24=_avg24(test),
+            ))
+        combined_train = pd.concat(train_parts, ignore_index=True) if train_parts else pd.DataFrame()
+        combined_test = pd.concat(test_parts, ignore_index=True) if test_parts else pd.DataFrame()
+        result = _evaluate(name, combined_train, combined_test)
+        result.refit_count = len(fold_rows) if mode == "REFIT_SCORE" else 0
+        result.holdout_samples_reserved = holdout_count
+        result.folds = fold_rows
+        result.notes.append(f"Final chronological hold-out reserved and not evaluated: n={holdout_count}.")
+        results.append(result)
     return sorted(results, key=lambda r: (r.verdict == "STABLE_POSITIVE", r.test_avg24, r.test_win_rate), reverse=True)
 
 
@@ -177,6 +250,8 @@ def save_walk_forward_results(results: List[WalkForwardResult]) -> tuple[Path, P
             "test_directional_win_rate": r.test_directional_win_rate,
             "stability_gap": r.stability_gap,
             "verdict": r.verdict,
+            "refit_count": r.refit_count,
+            "holdout_samples_reserved": r.holdout_samples_reserved,
             "notes": " | ".join(r.notes),
         })
 
