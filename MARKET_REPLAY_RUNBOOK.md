@@ -233,3 +233,14 @@ python -X utf8 replay_real_metrics_dashboard.py --compact
 ```
 
 Backfill قبل از بازنویسی CSV، Backup زمان‌دار می‌سازد.
+
+
+## v10.2 Score Calibration
+
+پس از Replay و v10.1.5:
+
+```cmd
+python -X utf8 replay_score_calibration_dashboard.py --compact
+```
+
+این مرحله monotonicity Score، Feature attribution، Feature interactions و عملکرد Symbol/Regime/Side را روی Splitهای زمانی بررسی می‌کند.

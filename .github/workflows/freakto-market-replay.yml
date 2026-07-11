@@ -1,4 +1,4 @@
-name: Freakto Market Replay v10
+name: Freakto Market Replay v10.2
 
 on:
   workflow_dispatch:
@@ -60,11 +60,11 @@ jobs:
 
       - name: Compile v10 modules
         run: |
-          python -m py_compile engine/historical_data_store.py engine/market_replay.py market_replay_dashboard.py
+          python -m py_compile engine/historical_data_store.py engine/market_replay.py market_replay_dashboard.py engine/replay_evaluation_recorder.py engine/replay_score_calibration.py replay_score_calibration_dashboard.py
 
       - name: Run tests
         run: |
-          python -m unittest tests.test_market_replay
+          python -m unittest tests.test_market_replay tests.test_replay_evaluation_recorder tests.test_replay_score_calibration
 
       - name: Build data and replay
         shell: bash
@@ -77,6 +77,14 @@ jobs:
             --years "${{ inputs.years }}" \
             --step "${{ inputs.step }}" \
             --compact $EXTRA
+
+      - name: Canonical replay metrics
+        run: |
+          python -X utf8 replay_evaluation_recorder_dashboard.py --apply
+
+      - name: Score calibration and feature attribution
+        run: |
+          python -X utf8 replay_score_calibration_dashboard.py --compact
 
       - name: Upload replay artifacts
         if: always()

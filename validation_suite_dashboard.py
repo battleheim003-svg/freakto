@@ -17,7 +17,8 @@ Runs validation + risk intelligence together:
 14) Forward Shadow Coverage & Bull Probe
 15) Root Cause Discovery
 16) Research Robustness & Intelligence Suite
-17) Advanced Live Readiness Score
+17) Replay Score Calibration & Feature Attribution
+18) Advanced Live Readiness Score
 """
 
 import argparse
@@ -49,6 +50,11 @@ from engine.root_cause_forward_validation import run_root_cause_forward_validati
 from engine.root_cause_sample_tracker import run_root_cause_sample_tracker, format_root_cause_sample_console, save_root_cause_sample_report
 from engine.evidence_graph import run_evidence_graph, format_evidence_graph_console, save_evidence_graph_report
 from engine.market_replay import load_market_replay_status, format_market_replay_console
+from engine.replay_score_calibration import (
+    run_replay_score_calibration,
+    format_replay_score_calibration_console,
+    save_replay_score_calibration,
+)
 from telegram_notifier import send_telegram_message
 
 SUITE_DIR = Path("logs") / "validation_suite"
@@ -86,6 +92,7 @@ def main():
     root_cause_samples = run_root_cause_sample_tracker()
     evidence_graph = run_evidence_graph()
     market_replay = load_market_replay_status()
+    replay_score_calibration = run_replay_score_calibration()
     research_suite = run_full_research_suite(save=False)
     readiness = assess_advanced_live_readiness()
 
@@ -108,10 +115,11 @@ def main():
     root_cause_samples_text = format_root_cause_sample_console(root_cause_samples, compact=True)
     evidence_graph_text = format_evidence_graph_console(evidence_graph, compact=True)
     market_replay_text = format_market_replay_console(market_replay, compact=True)
+    replay_score_calibration_text = format_replay_score_calibration_console(replay_score_calibration, compact=True)
     research_suite_text = format_full_suite_console(research_suite)
     readiness_text = format_advanced_readiness_console(readiness)
 
-    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, gate_sim_text, forward_regime_label_text, shadow_gate_text, regime_gate_matrix_text, forward_shadow_coverage_text, root_cause_text, root_cause_forward_text, root_cause_samples_text, evidence_graph_text, market_replay_text, research_suite_text, readiness_text])
+    combined = "\n\n".join([metric_text, edge_text, regime_text, memory_text, calibration_text, monte_text, forward_text, backtest_text, backtest_diag_text, gate_sim_text, forward_regime_label_text, shadow_gate_text, regime_gate_matrix_text, forward_shadow_coverage_text, root_cause_text, root_cause_forward_text, root_cause_samples_text, evidence_graph_text, market_replay_text, replay_score_calibration_text, research_suite_text, readiness_text])
     print(combined)
 
     metric_report = save_metric_definitions_report()
@@ -131,6 +139,7 @@ def main():
     root_cause_forward_json, root_cause_forward_report, root_cause_forward_summary_csv, root_cause_forward_rows_csv, root_cause_forward_obs = save_root_cause_forward_report(root_cause_forward)
     root_cause_samples_json, root_cause_samples_report, root_cause_samples_csv, root_cause_samples_obs = save_root_cause_sample_report(root_cause_samples)
     evidence_graph_json, evidence_graph_report, evidence_graph_nodes_csv, evidence_graph_edges_csv, evidence_graph_paths_csv, evidence_graph_obs = save_evidence_graph_report(evidence_graph)
+    replay_calibration_paths = save_replay_score_calibration(replay_score_calibration)
     research_suite_json, research_suite_report = save_full_suite(research_suite)
     readiness_json, readiness_report = save_advanced_readiness(readiness)
     combined_path = _save_combined_report(combined)
@@ -184,6 +193,8 @@ def main():
     print(f"📊 Evidence graph nodes CSV ذخیره شد: {evidence_graph_nodes_csv}")
     print(f"📊 Evidence graph edges CSV ذخیره شد: {evidence_graph_edges_csv}")
     print(f"📄 Evidence graph paths CSV ذخیره شد: {evidence_graph_paths_csv}")
+    print(f"🧬 Replay score calibration JSON ذخیره شد: {replay_calibration_paths.json_path}")
+    print(f"📝 Replay score calibration report ذخیره شد: {replay_calibration_paths.report_path}")
     print(f"🧠 Research suite JSON ذخیره شد: {research_suite_json}")
     print(f"📝 Research suite report ذخیره شد: {research_suite_report}")
     print(f"🚦 Advanced readiness JSON ذخیره شد: {readiness_json}")

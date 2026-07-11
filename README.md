@@ -112,3 +112,12 @@ data/manual_events.csv          رویدادهای curated اختیاری
 ## وضعیت فعلی پروژه
 
 Freakto در فاز **Research, Historical Replay, Forward Validation و Paper Evaluation** است. وجود ماژول‌های پیشرفته به معنی آماده‌بودن Live نیست؛ کیفیت نهایی به تعداد نمونه، ثبات در دوره‌های مختلف بازار، هزینه‌ی معامله و نتیجه‌ی Forward/Paper بستگی دارد.
+
+
+## Replay Score Calibration (v10.2)
+
+```cmd
+python -X utf8 replay_score_calibration_dashboard.py --compact
+```
+
+This research-only lab checks score monotonicity, component-feature attribution, interactions and symbol/regime/side stability without changing Paper or Live settings.

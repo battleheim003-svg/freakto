@@ -515,3 +515,15 @@ python -X utf8 replay_real_metrics_dashboard.py --compact
 ```
 
 تا وقتی Validation و Test با sample کافی مثبت نباشند، هیچ Threshold نباید وارد Paper/Live شود.
+
+
+## v10.2.0 — Score Calibration & Feature Attribution Lab
+
+بعد از استانداردسازی metricهای Replay، این مرحله بررسی می‌کند آیا Score بالاتر واقعاً نتیجه بهتر می‌دهد و کدام Featureها رابطه پایدار یا معکوس با Net Return دارند:
+
+```cmd
+python -X utf8 replay_evaluation_recorder_dashboard.py --apply
+python -X utf8 replay_score_calibration_dashboard.py --compact
+```
+
+Thresholdهای Feature فقط از TRAIN ساخته می‌شوند و بدون تغییر روی Validation/Test اجرا می‌شوند. هیچ Weight یا Strategy به‌صورت خودکار تغییر نمی‌کند؛ خروجی فقط Research و Forward Shadow Candidate است.

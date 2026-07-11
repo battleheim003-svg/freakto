@@ -70,7 +70,7 @@ from engine.research_utils import (
     write_text,
 )
 
-VERSION = "v10.0.0"
+VERSION = "v10.2.0"
 SUITE_DIR = RESEARCH_DIR / "v6_suite"
 
 
@@ -782,6 +782,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
     from engine.root_cause_sample_tracker import run_root_cause_sample_tracker
     from engine.evidence_graph import run_evidence_graph
     from engine.market_replay import load_market_replay_status
+    from engine.replay_score_calibration import run_replay_score_calibration
 
     sections = {
         "gate_robustness": run_gate_robustness(),
@@ -803,6 +804,7 @@ def run_full_research_suite(*, save: bool = True) -> Dict[str, Any]:
         "root_cause_sample_tracker": asdict(run_root_cause_sample_tracker()),
         "evidence_graph": asdict(run_evidence_graph()),
         "market_replay": asdict(load_market_replay_status()),
+        "replay_score_calibration": run_replay_score_calibration(),
         "cross_exchange_validation": run_cross_exchange_validation(),
         "research_db": run_research_db_export(),
         "pipeline_health": run_pipeline_health(),
@@ -886,6 +888,15 @@ def format_full_suite_console(report: Dict[str, Any], compact: bool = True) -> s
         lines.append("\nMarket Replay v10:")
         lines.append(f"- {mr.get('status')} | rows={mr.get('total_rows')} | complete={mr.get('complete_rows')} | directional={mr.get('directional_rows')}")
         lines.append(f"- test/research audit={mr.get('leakage_audit_status')} | avg_net24={mr.get('avg_net_24h_pct')}% | PF={mr.get('profit_factor_24h')}")
+    rsc = report.get("sections", {}).get("replay_score_calibration", {})
+    if rsc:
+        score = rsc.get("score_calibration", {})
+        test = score.get("splits", {}).get("TEST_20", {})
+        lines.append("\nReplay Score Calibration v10.2:")
+        lines.append(f"- {rsc.get('status')} | rows={rsc.get('rows_analyzed')} | score={score.get('verdict')} | candidates={len(rsc.get('forward_shadow_candidates', []))}")
+        lines.append(f"- test_monotonicity={test.get('band_monotonicity_spearman')} | high-low={test.get('high_minus_low_avg_net_pct')}% | violations={test.get('adjacent_band_violations')}")
+        for row in rsc.get("feature_attribution", [])[:4]:
+            lines.append(f"- {row.get('feature')}: test_Q4-Q1={row.get('test_20_high_minus_low_pct')}% | {row.get('verdict')}")
     rcd = report.get("sections", {}).get("root_cause_discovery", {})
     if rcd:
         lines.append("\nRoot Cause Discovery:")
