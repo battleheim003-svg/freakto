@@ -1,9 +1,12 @@
-New files:
-- engine/segmented_calibration.py
-- engine/segmented_threshold_optimizer.py
-- segmented_calibration_validation.py
-- tests/test_segmented_calibration.py
-- tests/test_segmented_threshold_optimizer.py
-- SEGMENTED_CALIBRATION_RUNBOOK.md
-- SEGMENTED_CALIBRATION_REAL_RESULT.md
-- CHANGED_FILES.txt
+New files in this change set:
+
+engine/score_attribution.py
+engine/component_ablation.py
+score_attribution_analysis.py
+tests/test_score_attribution.py
+tests/test_component_ablation.py
+SCORE_ATTRIBUTION_RUNBOOK.md
+SCORE_ATTRIBUTION_REAL_RESULT.md
+CHANGED_FILES.txt
+
+No runtime score weight, calibration policy, Paper setting, or Live setting was modified.

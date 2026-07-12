@@ -1,0 +1,258 @@
+﻿scope,component,component_label,bin_order,bin_label,sample_count,component_mean,avg_return,median_return,win_rate
+ALL,trend_score,Trend,0,"(5.999, 10.4]",48,6.0,-0.173755,-0.413527,0.416667
+ALL,trend_score,Trend,1,"(10.4, 14.8]",7,11.0,-0.556099,-0.896001,0.428571
+ALL,trend_score,Trend,2,"(14.8, 19.2]",1236,17.0,-0.558493,-0.665685,0.375405
+ALL,trend_score,Trend,3,"(19.2, 23.6]",14,22.0,0.33748,-0.036669,0.5
+ALL,trend_score,Trend,4,"(23.6, 28.0]",12869,28.0,-0.428599,-0.702953,0.387287
+ALL,momentum_score,Momentum,0,"(7.999, 12.4]",39,10.923077,-0.203387,-0.487468,0.410256
+ALL,momentum_score,Momentum,1,"(12.4, 16.8]",499,14.689379,-0.255065,-0.542443,0.39479
+ALL,momentum_score,Momentum,2,"(16.8, 21.2]",3543,18.639853,-0.403818,-0.659256,0.401919
+ALL,momentum_score,Momentum,3,"(21.2, 25.6]",6059,23.419541,-0.478121,-0.724933,0.37597
+ALL,momentum_score,Momentum,4,"(25.6, 30.0]",4034,28.254834,-0.433954,-0.701693,0.387457
+ALL,volume_score,Volume,0,"(-0.001, 3.6]",6598,0.743862,-0.486069,-0.690549,0.375417
+ALL,volume_score,Volume,1,"(3.6, 7.2]",3418,5.778525,-0.32703,-0.673774,0.400527
+ALL,volume_score,Volume,2,"(7.2, 10.8]",1483,9.0,-0.466956,-0.740881,0.389076
+ALL,volume_score,Volume,3,"(10.8, 14.4]",2052,11.716374,-0.447615,-0.716005,0.38694
+ALL,volume_score,Volume,4,"(14.4, 18.0]",623,15.024077,-0.445535,-0.650929,0.418941
+ALL,structure_score,Structure,0,"(-0.001, 2.0]",440,0.018182,-0.365289,-0.533238,0.390909
+ALL,structure_score,Structure,1,"(2.0, 4.0]",2667,3.217473,-0.505666,-0.729163,0.370454
+ALL,structure_score,Structure,2,"(4.0, 6.0]",5063,5.980446,-0.505578,-0.688759,0.380012
+ALL,structure_score,Structure,3,"(6.0, 8.0]",2617,7.140237,-0.353557,-0.690297,0.397784
+ALL,structure_score,Structure,4,"(8.0, 10.0]",3387,10.0,-0.359937,-0.716638,0.399469
+ALL,regime_score,Regime,0,"(-8.001, -5.4]",43,-8.0,-1.068512,-0.967613,0.302326
+ALL,regime_score,Regime,1,"(-5.4, -2.8]",692,-4.83526,-0.420784,-0.659347,0.388728
+ALL,regime_score,Regime,2,"(-2.8, -0.2]",181,-2.0,-0.768233,-0.839866,0.292818
+ALL,regime_score,Regime,3,"(-0.2, 2.4]",357,0.0,-0.960582,-1.157139,0.313725
+ALL,regime_score,Regime,4,"(2.4, 5.0]",12901,5.0,-0.418133,-0.674272,0.38997
+ALL,risk_penalty,Risk Penalty,0,"(-25.001, -20.0]",55,-21.254545,-3.05568,-2.990469,0.309091
+ALL,risk_penalty,Risk Penalty,1,"(-20.0, -15.0]",367,-16.681199,-0.557956,-1.840336,0.370572
+ALL,risk_penalty,Risk Penalty,2,"(-15.0, -10.0]",1377,-11.984749,-0.207182,-0.635033,0.437908
+ALL,risk_penalty,Risk Penalty,3,"(-10.0, -5.0]",4540,-6.961674,-0.406069,-0.67651,0.394273
+ALL,risk_penalty,Risk Penalty,4,"(-5.0, 0.0]",7835,-1.593363,-0.473742,-0.682438,0.374218
+ALL,external_context_score,External Context,0,CONSTANT,14174,0.0,-0.438369,-0.696932,0.386482
+ALL,adaptive_adjustment,Adaptive Adjustment,0,"(-8.001, -5.2]",111,-7.387387,-0.567464,-0.65353,0.378378
+ALL,adaptive_adjustment,Adaptive Adjustment,1,"(-5.2, -2.4]",1799,-3.668149,-0.346146,-0.64264,0.397443
+ALL,adaptive_adjustment,Adaptive Adjustment,2,"(-2.4, 0.4]",6120,-0.723529,-0.503075,-0.70199,0.375654
+ALL,adaptive_adjustment,Adaptive Adjustment,3,"(0.4, 3.2]",4180,1.98445,-0.403788,-0.673879,0.390909
+ALL,adaptive_adjustment,Adaptive Adjustment,4,"(3.2, 6.0]",1964,5.339104,-0.38752,-0.829765,0.401222
+ALL,historical_edge_score,Historical Edge,0,CONSTANT,14174,0.0,-0.438369,-0.696932,0.386482
+SIDE:LONG,trend_score,Trend,0,"(5.999, 10.4]",16,6.0,-1.131189,-1.102993,0.1875
+SIDE:LONG,trend_score,Trend,1,"(10.4, 14.8]",5,11.0,-0.820922,-0.896001,0.4
+SIDE:LONG,trend_score,Trend,2,"(14.8, 19.2]",610,17.0,-0.545938,-0.698454,0.37377
+SIDE:LONG,trend_score,Trend,3,"(19.2, 23.6]",7,22.0,0.691504,1.297325,0.571429
+SIDE:LONG,trend_score,Trend,4,"(23.6, 28.0]",6815,28.0,-0.267794,-0.593291,0.404989
+SIDE:LONG,momentum_score,Momentum,0,"(7.999, 12.4]",26,10.884615,-0.056048,-0.511942,0.384615
+SIDE:LONG,momentum_score,Momentum,1,"(12.4, 16.8]",282,14.670213,-0.163726,-0.513523,0.404255
+SIDE:LONG,momentum_score,Momentum,2,"(16.8, 21.2]",1910,18.663874,-0.283529,-0.644767,0.404712
+SIDE:LONG,momentum_score,Momentum,3,"(21.2, 25.6]",3134,23.440651,-0.274197,-0.581593,0.402999
+SIDE:LONG,momentum_score,Momentum,4,"(25.6, 30.0]",2101,28.260828,-0.345977,-0.648413,0.398382
+SIDE:LONG,volume_score,Volume,0,"(-0.001, 3.6]",3441,0.696309,-0.385143,-0.590633,0.394071
+SIDE:LONG,volume_score,Volume,1,"(3.6, 7.2]",1823,5.864509,-0.231782,-0.638231,0.40757
+SIDE:LONG,volume_score,Volume,2,"(7.2, 10.8]",791,9.0,-0.286505,-0.634032,0.413401
+SIDE:LONG,volume_score,Volume,3,"(10.8, 14.4]",1073,11.785648,-0.151493,-0.660021,0.400746
+SIDE:LONG,volume_score,Volume,4,"(14.4, 18.0]",325,15.046154,-0.118168,-0.457947,0.433846
+SIDE:LONG,structure_score,Structure,0,"(-0.001, 2.0]",240,0.0,-0.138621,-0.347577,0.433333
+SIDE:LONG,structure_score,Structure,1,"(2.0, 4.0]",1402,3.246077,-0.414463,-0.668635,0.39301
+SIDE:LONG,structure_score,Structure,2,"(4.0, 6.0]",2575,5.990291,-0.406344,-0.60318,0.396893
+SIDE:LONG,structure_score,Structure,3,"(6.0, 8.0]",1428,7.116947,-0.271311,-0.724525,0.39986
+SIDE:LONG,structure_score,Structure,4,"(8.0, 10.0]",1808,10.0,-0.070401,-0.559918,0.41427
+SIDE:LONG,regime_score,Regime,0,"(-8.001, -5.4]",12,-8.0,-1.807278,-1.817439,0.166667
+SIDE:LONG,regime_score,Regime,1,"(-5.4, -2.8]",355,-4.842254,-0.309898,-0.56799,0.419718
+SIDE:LONG,regime_score,Regime,2,"(-2.8, -0.2]",107,-2.0,-0.542507,-0.727299,0.327103
+SIDE:LONG,regime_score,Regime,3,"(-0.2, 2.4]",170,0.0,-1.011833,-1.535788,0.258824
+SIDE:LONG,regime_score,Regime,4,"(2.4, 5.0]",6809,5.0,-0.266359,-0.570125,0.406374
+SIDE:LONG,risk_penalty,Risk Penalty,0,"(-25.001, -20.0]",16,-21.1875,-1.254979,-2.641262,0.375
+SIDE:LONG,risk_penalty,Risk Penalty,1,"(-20.0, -15.0]",164,-16.762195,1.398582,-1.355208,0.396341
+SIDE:LONG,risk_penalty,Risk Penalty,2,"(-15.0, -10.0]",705,-11.965957,0.088572,-0.541935,0.439716
+SIDE:LONG,risk_penalty,Risk Penalty,3,"(-10.0, -5.0]",2430,-6.922222,-0.361036,-0.676973,0.399588
+SIDE:LONG,risk_penalty,Risk Penalty,4,"(-5.0, 0.0]",4138,-1.559207,-0.379365,-0.564202,0.397535
+SIDE:LONG,external_context_score,External Context,0,CONSTANT,7453,0.0,-0.291882,-0.608507,0.40212
+SIDE:LONG,adaptive_adjustment,Adaptive Adjustment,0,"(-8.001, -5.2]",46,-7.26087,-0.777995,-0.737948,0.347826
+SIDE:LONG,adaptive_adjustment,Adaptive Adjustment,1,"(-5.2, -2.4]",936,-3.662393,-0.226155,-0.564202,0.417735
+SIDE:LONG,adaptive_adjustment,Adaptive Adjustment,2,"(-2.4, 0.4]",3210,-0.71215,-0.429806,-0.652837,0.390654
+SIDE:LONG,adaptive_adjustment,Adaptive Adjustment,3,"(0.4, 3.2]",2203,1.975942,-0.267421,-0.544954,0.405356
+SIDE:LONG,adaptive_adjustment,Adaptive Adjustment,4,"(3.2, 6.0]",1058,5.336484,0.038637,-0.665871,0.418715
+SIDE:LONG,historical_edge_score,Historical Edge,0,CONSTANT,7453,0.0,-0.291882,-0.608507,0.40212
+SIDE:SHORT,trend_score,Trend,0,"(5.999, 10.4]",32,6.0,0.304963,0.305655,0.53125
+SIDE:SHORT,trend_score,Trend,1,"(10.4, 14.8]",2,11.0,0.105956,0.105956,0.5
+SIDE:SHORT,trend_score,Trend,2,"(14.8, 19.2]",626,17.0,-0.570727,-0.562731,0.376997
+SIDE:SHORT,trend_score,Trend,3,"(19.2, 23.6]",7,22.0,-0.016544,-0.146297,0.428571
+SIDE:SHORT,trend_score,Trend,4,"(23.6, 28.0]",6054,28.0,-0.609617,-0.800526,0.36736
+SIDE:SHORT,momentum_score,Momentum,0,"(10.999, 14.8]",148,13.702703,-0.27602,-0.439925,0.398649
+SIDE:SHORT,momentum_score,Momentum,1,"(14.8, 18.6]",722,16.912742,-0.447624,-0.63063,0.400277
+SIDE:SHORT,momentum_score,Momentum,2,"(18.6, 22.4]",2127,20.892337,-0.674481,-0.79703,0.370005
+SIDE:SHORT,momentum_score,Momentum,3,"(22.4, 26.2]",1994,24.456369,-0.66155,-0.888223,0.349047
+SIDE:SHORT,momentum_score,Momentum,4,"(26.2, 30.0]",1730,28.512139,-0.531941,-0.742207,0.375723
+SIDE:SHORT,volume_score,Volume,0,"(-0.001, 3.0]",3157,0.795692,-0.596075,-0.776314,0.355084
+SIDE:SHORT,volume_score,Volume,1,"(3.0, 6.0]",903,4.668882,-0.427398,-0.743537,0.372093
+SIDE:SHORT,volume_score,Volume,2,"(6.0, 9.0]",1384,8.0,-0.5601,-0.765152,0.390173
+SIDE:SHORT,volume_score,Volume,3,"(9.0, 12.0]",666,11.001502,-0.798199,-0.816088,0.37988
+SIDE:SHORT,volume_score,Volume,4,"(12.0, 15.0]",611,13.97545,-0.758619,-0.84368,0.378069
+SIDE:SHORT,structure_score,Structure,0,"(-0.001, 2.0]",200,0.04,-0.63729,-0.780304,0.34
+SIDE:SHORT,structure_score,Structure,1,"(2.0, 4.0]",1265,3.185771,-0.606747,-0.766299,0.345455
+SIDE:SHORT,structure_score,Structure,2,"(4.0, 6.0]",2488,5.970257,-0.608281,-0.777793,0.36254
+SIDE:SHORT,structure_score,Structure,3,"(6.0, 8.0]",1189,7.168209,-0.452334,-0.675778,0.39529
+SIDE:SHORT,structure_score,Structure,4,"(8.0, 10.0]",1579,10.0,-0.691464,-0.84723,0.382521
+SIDE:SHORT,regime_score,Regime,0,"(-8.001, -5.4]",31,-8.0,-0.782538,-0.615424,0.354839
+SIDE:SHORT,regime_score,Regime,1,"(-5.4, -2.8]",337,-4.827893,-0.537592,-0.73772,0.356083
+SIDE:SHORT,regime_score,Regime,2,"(-2.8, -0.2]",74,-2.0,-1.09462,-0.913589,0.243243
+SIDE:SHORT,regime_score,Regime,3,"(-0.2, 2.4]",187,0.0,-0.913989,-0.806621,0.363636
+SIDE:SHORT,regime_score,Regime,4,"(2.4, 5.0]",6092,5.0,-0.587771,-0.776453,0.371635
+SIDE:SHORT,risk_penalty,Risk Penalty,0,"(-23.001, -18.4]",67,-20.328358,-5.844483,-4.459172,0.19403
+SIDE:SHORT,risk_penalty,Risk Penalty,1,"(-18.4, -13.8]",229,-15.707424,-1.317006,-1.853611,0.384279
+SIDE:SHORT,risk_penalty,Risk Penalty,2,"(-13.8, -9.2]",618,-11.830097,-0.382975,-0.72745,0.443366
+SIDE:SHORT,risk_penalty,Risk Penalty,3,"(-9.2, -4.6]",2110,-7.007109,-0.457931,-0.675484,0.388152
+SIDE:SHORT,risk_penalty,Risk Penalty,4,"(-4.6, 0.0]",3697,-1.631593,-0.579377,-0.770263,0.34812
+SIDE:SHORT,external_context_score,External Context,0,CONSTANT,6721,0.0,-0.60081,-0.775219,0.369141
+SIDE:SHORT,adaptive_adjustment,Adaptive Adjustment,0,"(-8.001, -5.2]",65,-7.476923,-0.418472,-0.533992,0.4
+SIDE:SHORT,adaptive_adjustment,Adaptive Adjustment,1,"(-5.2, -2.4]",863,-3.674392,-0.476287,-0.730779,0.375435
+SIDE:SHORT,adaptive_adjustment,Adaptive Adjustment,2,"(-2.4, 0.4]",2910,-0.736082,-0.583896,-0.739293,0.359107
+SIDE:SHORT,adaptive_adjustment,Adaptive Adjustment,3,"(0.4, 3.2]",1977,1.99393,-0.555743,-0.825483,0.37481
+SIDE:SHORT,adaptive_adjustment,Adaptive Adjustment,4,"(3.2, 6.0]",906,5.342163,-0.885173,-1.018231,0.380795
+SIDE:SHORT,historical_edge_score,Historical Edge,0,CONSTANT,6721,0.0,-0.60081,-0.775219,0.369141
+REGIME:BULL,trend_score,Trend,0,"(5.999, 10.4]",16,6.0,-1.131189,-1.102993,0.1875
+REGIME:BULL,trend_score,Trend,1,"(10.4, 14.8]",5,11.0,-0.820922,-0.896001,0.4
+REGIME:BULL,trend_score,Trend,2,"(14.8, 19.2]",359,17.0,-0.298516,-0.333366,0.440111
+REGIME:BULL,trend_score,Trend,3,"(19.2, 23.6]",7,22.0,0.691504,1.297325,0.571429
+REGIME:BULL,trend_score,Trend,4,"(23.6, 28.0]",6453,28.0,-0.265515,-0.594738,0.404618
+REGIME:BULL,momentum_score,Momentum,0,"(7.999, 12.4]",26,10.884615,-0.056048,-0.511942,0.384615
+REGIME:BULL,momentum_score,Momentum,1,"(12.4, 16.8]",282,14.670213,-0.163726,-0.513523,0.404255
+REGIME:BULL,momentum_score,Momentum,2,"(16.8, 21.2]",1904,18.659139,-0.28659,-0.653525,0.403887
+REGIME:BULL,momentum_score,Momentum,3,"(21.2, 25.6]",2978,23.403962,-0.245689,-0.548677,0.408328
+REGIME:BULL,momentum_score,Momentum,4,"(25.6, 30.0]",1650,28.110909,-0.310873,-0.555381,0.405455
+REGIME:BULL,volume_score,Volume,0,"(-0.001, 3.6]",3320,0.69006,-0.39212,-0.591865,0.393675
+REGIME:BULL,volume_score,Volume,1,"(3.6, 7.2]",1670,5.851497,-0.190512,-0.543699,0.417365
+REGIME:BULL,volume_score,Volume,2,"(7.2, 10.8]",698,9.0,-0.254519,-0.619005,0.418338
+REGIME:BULL,volume_score,Volume,3,"(10.8, 14.4]",899,11.736374,-0.03662,-0.534019,0.412681
+REGIME:BULL,volume_score,Volume,4,"(14.4, 18.0]",253,15.043478,-0.028961,-0.450407,0.438735
+REGIME:BULL,structure_score,Structure,0,"(-0.001, 2.0]",235,0.0,-0.268485,-0.402991,0.421277
+REGIME:BULL,structure_score,Structure,1,"(2.0, 4.0]",1207,3.283347,-0.367353,-0.602377,0.398509
+REGIME:BULL,structure_score,Structure,2,"(4.0, 6.0]",2565,5.992203,-0.402706,-0.60318,0.397271
+REGIME:BULL,structure_score,Structure,3,"(6.0, 8.0]",1031,7.161979,-0.16404,-0.608549,0.418041
+REGIME:BULL,structure_score,Structure,4,"(8.0, 10.0]",1802,10.0,-0.071777,-0.552234,0.415094
+REGIME:BULL,regime_score,Regime,0,"(-8.001, -1.5]",31,-8.0,-0.782538,-0.615424,0.354839
+REGIME:BULL,regime_score,Regime,1,"(-1.5, 5.0]",6809,5.0,-0.266359,-0.570125,0.406374
+REGIME:BULL,risk_penalty,Risk Penalty,0,"(-25.001, -20.0]",16,-21.1875,-1.254979,-2.641262,0.375
+REGIME:BULL,risk_penalty,Risk Penalty,1,"(-20.0, -15.0]",162,-16.771605,1.462585,-1.355208,0.395062
+REGIME:BULL,risk_penalty,Risk Penalty,2,"(-15.0, -10.0]",692,-11.962428,0.092232,-0.545292,0.440751
+REGIME:BULL,risk_penalty,Risk Penalty,3,"(-10.0, -5.0]",2280,-6.943421,-0.327124,-0.656772,0.402632
+REGIME:BULL,risk_penalty,Risk Penalty,4,"(-5.0, 0.0]",3690,-1.626016,-0.372016,-0.532878,0.402439
+REGIME:BULL,external_context_score,External Context,0,CONSTANT,6840,0.0,-0.268698,-0.571382,0.40614
+REGIME:BULL,adaptive_adjustment,Adaptive Adjustment,0,"(-8.001, -5.2]",31,-8.0,-0.782538,-0.615424,0.354839
+REGIME:BULL,adaptive_adjustment,Adaptive Adjustment,1,"(-5.2, -2.4]",615,-3.0,-0.188241,-0.563605,0.41626
+REGIME:BULL,adaptive_adjustment,Adaptive Adjustment,2,"(-2.4, 0.4]",2958,-0.717377,-0.399223,-0.591082,0.399256
+REGIME:BULL,adaptive_adjustment,Adaptive Adjustment,3,"(0.4, 3.2]",2178,1.987144,-0.256127,-0.535118,0.407254
+REGIME:BULL,adaptive_adjustment,Adaptive Adjustment,4,"(3.2, 6.0]",1058,5.336484,0.038637,-0.665871,0.418715
+REGIME:BULL,historical_edge_score,Historical Edge,0,CONSTANT,6840,0.0,-0.268698,-0.571382,0.40614
+REGIME:BEAR,trend_score,Trend,0,"(5.999, 10.4]",31,6.0,0.300646,0.17253,0.516129
+REGIME:BEAR,trend_score,Trend,1,"(10.4, 14.8]",2,11.0,0.105956,0.105956,0.5
+REGIME:BEAR,trend_score,Trend,2,"(14.8, 19.2]",365,17.0,-0.345021,-0.535194,0.383562
+REGIME:BEAR,trend_score,Trend,3,"(19.2, 23.6]",7,22.0,-0.016544,-0.146297,0.428571
+REGIME:BEAR,trend_score,Trend,4,"(23.6, 28.0]",5699,28.0,-0.611664,-0.809105,0.369539
+REGIME:BEAR,momentum_score,Momentum,0,"(10.999, 14.8]",148,13.702703,-0.27602,-0.439925,0.398649
+REGIME:BEAR,momentum_score,Momentum,1,"(14.8, 18.6]",722,16.912742,-0.447624,-0.63063,0.400277
+REGIME:BEAR,momentum_score,Momentum,2,"(18.6, 22.4]",2096,20.883111,-0.661594,-0.788098,0.37166
+REGIME:BEAR,momentum_score,Momentum,3,"(22.4, 26.2]",1844,24.43872,-0.646095,-0.85841,0.355748
+REGIME:BEAR,momentum_score,Momentum,4,"(26.2, 30.0]",1294,28.349304,-0.510239,-0.774253,0.373261
+REGIME:BEAR,volume_score,Volume,0,"(-0.001, 3.0]",3035,0.788797,-0.588069,-0.775219,0.357825
+REGIME:BEAR,volume_score,Volume,1,"(3.0, 6.0]",842,4.684086,-0.423995,-0.715788,0.37886
+REGIME:BEAR,volume_score,Volume,2,"(6.0, 9.0]",1212,7.986799,-0.504336,-0.764144,0.39934
+REGIME:BEAR,volume_score,Volume,3,"(9.0, 12.0]",546,11.0,-0.820049,-0.875634,0.375458
+REGIME:BEAR,volume_score,Volume,4,"(12.0, 15.0]",469,13.976546,-0.856271,-0.91071,0.366738
+REGIME:BEAR,structure_score,Structure,0,"(-0.001, 2.0]",187,0.032086,-0.794063,-0.881637,0.331551
+REGIME:BEAR,structure_score,Structure,1,"(2.0, 4.0]",1044,3.185824,-0.508979,-0.772722,0.35728
+REGIME:BEAR,structure_score,Structure,2,"(4.0, 6.0]",2475,5.974545,-0.60443,-0.777997,0.362828
+REGIME:BEAR,structure_score,Structure,3,"(6.0, 8.0]",824,7.242718,-0.407889,-0.645755,0.401699
+REGIME:BEAR,structure_score,Structure,4,"(8.0, 10.0]",1574,10.0,-0.692794,-0.844693,0.382465
+REGIME:BEAR,regime_score,Regime,0,"(-8.001, -1.5]",12,-8.0,-1.807278,-1.817439,0.166667
+REGIME:BEAR,regime_score,Regime,1,"(-1.5, 5.0]",6092,5.0,-0.587771,-0.776453,0.371635
+REGIME:BEAR,risk_penalty,Risk Penalty,0,"(-23.001, -18.4]",67,-20.328358,-5.844483,-4.459172,0.19403
+REGIME:BEAR,risk_penalty,Risk Penalty,1,"(-18.4, -13.8]",228,-15.70614,-1.365529,-1.874321,0.381579
+REGIME:BEAR,risk_penalty,Risk Penalty,2,"(-13.8, -9.2]",607,-11.818781,-0.40547,-0.74989,0.439868
+REGIME:BEAR,risk_penalty,Risk Penalty,3,"(-9.2, -4.6]",1956,-7.032209,-0.449002,-0.706948,0.383947
+REGIME:BEAR,risk_penalty,Risk Penalty,4,"(-4.6, 0.0]",3246,-1.703635,-0.546857,-0.760895,0.353666
+REGIME:BEAR,external_context_score,External Context,0,CONSTANT,6104,0.0,-0.590168,-0.778682,0.371232
+REGIME:BEAR,adaptive_adjustment,Adaptive Adjustment,0,"(-8.001, -5.2]",12,-8.0,-1.807278,-1.817439,0.166667
+REGIME:BEAR,adaptive_adjustment,Adaptive Adjustment,1,"(-5.2, -2.4]",560,-3.0,-0.415731,-0.704479,0.391071
+REGIME:BEAR,adaptive_adjustment,Adaptive Adjustment,2,"(-2.4, 0.4]",2664,-0.75976,-0.555529,-0.723271,0.361486
+REGIME:BEAR,adaptive_adjustment,Adaptive Adjustment,3,"(0.4, 3.2]",1962,2.001529,-0.54332,-0.822601,0.375637
+REGIME:BEAR,adaptive_adjustment,Adaptive Adjustment,4,"(3.2, 6.0]",906,5.342163,-0.885173,-1.018231,0.380795
+REGIME:BEAR,historical_edge_score,Historical Edge,0,CONSTANT,6104,0.0,-0.590168,-0.778682,0.371232
+REGIME:SIDEWAYS,trend_score,Trend,0,"(16.999, 22.5]",86,17.0,-0.416291,-0.393936,0.430233
+REGIME:SIDEWAYS,trend_score,Trend,1,"(22.5, 28.0]",492,28.0,-0.385629,-0.664591,0.384146
+REGIME:SIDEWAYS,momentum_score,Momentum,0,"(19.999, 22.0]",26,21.923077,-0.741878,-0.387389,0.423077
+REGIME:SIDEWAYS,momentum_score,Momentum,1,"(22.0, 24.0]",59,23.932203,-0.749514,-0.65731,0.322034
+REGIME:SIDEWAYS,momentum_score,Momentum,2,"(24.0, 26.0]",98,25.234694,-0.547969,-0.906357,0.295918
+REGIME:SIDEWAYS,momentum_score,Momentum,3,"(26.0, 28.0]",173,27.531792,-0.520666,-0.693914,0.393064
+REGIME:SIDEWAYS,momentum_score,Momentum,4,"(28.0, 30.0]",222,30.0,-0.082181,-0.363462,0.445946
+REGIME:SIDEWAYS,volume_score,Volume,0,"(-0.001, 3.2]",116,0.905172,-0.308865,-0.741452,0.37931
+REGIME:SIDEWAYS,volume_score,Volume,1,"(3.2, 6.4]",56,4.446429,-0.510071,-0.570039,0.339286
+REGIME:SIDEWAYS,volume_score,Volume,2,"(6.4, 9.6]",168,8.107143,-0.468048,-0.716103,0.375
+REGIME:SIDEWAYS,volume_score,Volume,3,"(9.6, 12.8]",104,11.019231,0.012655,-0.450095,0.442308
+REGIME:SIDEWAYS,volume_score,Volume,4,"(12.8, 16.0]",134,13.932836,-0.625537,-0.466203,0.402985
+REGIME:SIDEWAYS,structure_score,Structure,0,"(2.999, 4.333]",206,3.0,-0.532005,-0.659347,0.368932
+REGIME:SIDEWAYS,structure_score,Structure,1,"(4.333, 5.667]",6,5.0,-0.359252,-0.231911,0.5
+REGIME:SIDEWAYS,structure_score,Structure,2,"(5.667, 7.0]",366,7.0,-0.310879,-0.613654,0.401639
+REGIME:SIDEWAYS,regime_score,Regime,0,CONSTANT,578,-5.0,-0.390191,-0.637301,0.391003
+REGIME:SIDEWAYS,risk_penalty,Risk Penalty,0,"(-12.001, -9.6]",3,-12.0,0.042595,-0.830554,0.333333
+REGIME:SIDEWAYS,risk_penalty,Risk Penalty,1,"(-9.6, -7.2]",34,-9.0,-0.351901,-0.229768,0.441176
+REGIME:SIDEWAYS,risk_penalty,Risk Penalty,2,"(-7.2, -4.8]",67,-5.268657,-0.133627,0.272689,0.522388
+REGIME:SIDEWAYS,risk_penalty,Risk Penalty,3,"(-4.8, -2.4]",38,-4.0,-0.639368,-0.692444,0.315789
+REGIME:SIDEWAYS,risk_penalty,Risk Penalty,4,"(-2.4, 0.0]",436,-0.66055,-0.413864,-0.663196,0.373853
+REGIME:SIDEWAYS,external_context_score,External Context,0,CONSTANT,578,0.0,-0.390191,-0.637301,0.391003
+REGIME:SIDEWAYS,adaptive_adjustment,Adaptive Adjustment,0,CONSTANT,578,-5.0,-0.390191,-0.637301,0.391003
+REGIME:SIDEWAYS,historical_edge_score,Historical Edge,0,CONSTANT,578,0.0,-0.390191,-0.637301,0.391003
+REGIME:VOLATILE,trend_score,Trend,0,"(16.999, 22.5]",10,17.0,-0.262996,-1.94025,0.3
+REGIME:VOLATILE,trend_score,Trend,1,"(22.5, 28.0]",104,28.0,-0.60598,-0.710121,0.384615
+REGIME:VOLATILE,momentum_score,Momentum,0,"(20.999, 22.8]",5,21.6,-0.481978,0.550446,0.6
+REGIME:VOLATILE,momentum_score,Momentum,1,"(22.8, 24.6]",24,24.0,-0.329527,-1.358351,0.333333
+REGIME:VOLATILE,momentum_score,Momentum,2,"(24.6, 26.4]",8,25.0,-1.243927,-1.727141,0.125
+REGIME:VOLATILE,momentum_score,Momentum,3,"(26.4, 28.2]",35,27.371429,-1.005341,-0.735894,0.428571
+REGIME:VOLATILE,momentum_score,Momentum,4,"(28.2, 30.0]",42,30.0,-0.242738,-0.626605,0.380952
+REGIME:VOLATILE,volume_score,Volume,0,"(-0.001, 3.6]",3,1.666667,-1.271576,-2.190496,0.333333
+REGIME:VOLATILE,volume_score,Volume,1,"(3.6, 7.2]",17,6.882353,-2.032041,-1.443865,0.411765
+REGIME:VOLATILE,volume_score,Volume,2,"(7.2, 10.8]",24,9.0,-0.253682,-0.898219,0.333333
+REGIME:VOLATILE,volume_score,Volume,3,"(10.8, 14.4]",43,11.883721,-0.440527,-1.152521,0.348837
+REGIME:VOLATILE,volume_score,Volume,4,"(14.4, 18.0]",27,15.111111,-0.083758,-0.457947,0.444444
+REGIME:VOLATILE,structure_score,Structure,0,"(-0.001, 2.0]",3,0.0,3.231931,-0.273892,0.333333
+REGIME:VOLATILE,structure_score,Structure,1,"(2.0, 4.0]",37,3.243243,-1.263978,-1.152521,0.324324
+REGIME:VOLATILE,structure_score,Structure,2,"(4.0, 6.0]",1,6.0,-6.863788,-6.863788,0.0
+REGIME:VOLATILE,structure_score,Structure,3,"(6.0, 8.0]",68,7.0,-0.457622,-0.701974,0.411765
+REGIME:VOLATILE,structure_score,Structure,4,"(8.0, 10.0]",5,10.0,1.88032,-2.460631,0.4
+REGIME:VOLATILE,regime_score,Regime,0,CONSTANT,114,-4.0,-0.575894,-0.831452,0.377193
+REGIME:VOLATILE,risk_penalty,Risk Penalty,0,"(-16.001, -12.8]",11,-13.818182,1.813794,3.199972,0.727273
+REGIME:VOLATILE,risk_penalty,Risk Penalty,1,"(-12.8, -9.6]",12,-11.833333,-0.651084,-0.403795,0.416667
+REGIME:VOLATILE,risk_penalty,Risk Penalty,2,"(-9.6, -6.4]",49,-8.816327,-0.642343,-0.735894,0.367347
+REGIME:VOLATILE,risk_penalty,Risk Penalty,3,"(-6.4, -3.2]",32,-4.96875,-0.935321,-1.383246,0.3125
+REGIME:VOLATILE,risk_penalty,Risk Penalty,4,"(-3.2, 0.0]",10,-1.4,-1.638554,-2.069706,0.2
+REGIME:VOLATILE,external_context_score,External Context,0,CONSTANT,114,0.0,-0.575894,-0.831452,0.377193
+REGIME:VOLATILE,adaptive_adjustment,Adaptive Adjustment,0,"(-7.001, -5.5]",68,-7.0,-0.250624,-0.549546,0.426471
+REGIME:VOLATILE,adaptive_adjustment,Adaptive Adjustment,1,"(-5.5, -4.0]",46,-4.0,-1.056728,-1.499826,0.304348
+REGIME:VOLATILE,historical_edge_score,Historical Edge,0,CONSTANT,114,0.0,-0.575894,-0.831452,0.377193
+REGIME:QUIET,trend_score,Trend,0,"(16.999, 22.5]",60,17.0,-1.256665,-1.332601,0.25
+REGIME:QUIET,trend_score,Trend,1,"(22.5, 28.0]",121,28.0,-0.526035,-0.723122,0.31405
+REGIME:QUIET,momentum_score,Momentum,0,"(18.999, 21.2]",9,20.222222,-2.107536,-0.839866,0.222222
+REGIME:QUIET,momentum_score,Momentum,1,"(21.2, 23.4]",11,22.454545,-0.846043,-0.429363,0.363636
+REGIME:QUIET,momentum_score,Momentum,2,"(23.4, 25.6]",44,24.431818,-1.330126,-0.868996,0.204545
+REGIME:QUIET,momentum_score,Momentum,3,"(25.6, 27.8]",24,26.375,-0.378395,-0.596924,0.25
+REGIME:QUIET,momentum_score,Momentum,4,"(27.8, 30.0]",93,29.225806,-0.464181,-0.993469,0.344086
+REGIME:QUIET,volume_score,Volume,0,"(-0.001, 3.0]",75,0.813333,-0.522105,-0.766808,0.306667
+REGIME:QUIET,volume_score,Volume,1,"(3.0, 6.0]",35,4.2,-0.566867,-0.840745,0.342857
+REGIME:QUIET,volume_score,Volume,2,"(6.0, 9.0]",31,8.290323,-0.518032,-0.606039,0.258065
+REGIME:QUIET,volume_score,Volume,3,"(9.0, 12.0]",19,11.0,-2.293737,-2.570953,0.210526
+REGIME:QUIET,volume_score,Volume,4,"(12.0, 15.0]",21,13.47619,-0.971997,-1.39072,0.285714
+REGIME:QUIET,structure_score,Structure,0,"(-0.001, 2.0]",15,0.133333,2.744061,2.345347,0.666667
+REGIME:QUIET,structure_score,Structure,1,"(2.0, 4.0]",92,3.380435,-1.229947,-1.101606,0.26087
+REGIME:QUIET,structure_score,Structure,2,"(4.0, 6.0]",10,5.6,-1.706809,-0.635601,0.2
+REGIME:QUIET,structure_score,Structure,3,"(6.0, 8.0]",58,7.0,-0.711713,-0.869456,0.275862
+REGIME:QUIET,structure_score,Structure,4,"(8.0, 10.0]",6,10.0,-1.451414,-1.79706,0.166667
+REGIME:QUIET,regime_score,Regime,0,CONSTANT,181,-2.0,-0.768233,-0.839866,0.292818
+REGIME:QUIET,risk_penalty,Risk Penalty,0,"(-9.001, -7.2]",6,-9.0,-2.827123,-3.750529,0.166667
+REGIME:QUIET,risk_penalty,Risk Penalty,1,"(-7.2, -5.4]",2,-6.0,-0.435901,-0.435901,0.5
+REGIME:QUIET,risk_penalty,Risk Penalty,2,"(-5.4, -3.6]",13,-4.461538,-1.835538,-1.66824,0.0
+REGIME:QUIET,risk_penalty,Risk Penalty,3,"(-3.6, -1.8]",42,-2.0,-0.62105,-0.648635,0.357143
+REGIME:QUIET,risk_penalty,Risk Penalty,4,"(-1.8, 0.0]",118,0.0,-0.603979,-0.799665,0.305085
+REGIME:QUIET,external_context_score,External Context,0,CONSTANT,181,0.0,-0.768233,-0.839866,0.292818
+REGIME:QUIET,adaptive_adjustment,Adaptive Adjustment,0,"(-2.001, -0.5]",141,-2.0,-0.532321,-0.727299,0.304965
+REGIME:QUIET,adaptive_adjustment,Adaptive Adjustment,1,"(-0.5, 1.0]",40,1.0,-1.599824,-1.807794,0.25
+REGIME:QUIET,historical_edge_score,Historical Edge,0,CONSTANT,181,0.0,-0.768233,-0.839866,0.292818

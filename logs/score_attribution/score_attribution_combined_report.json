@@ -1,0 +1,99 @@
+{
+  "attribution": {
+    "created_utc": "2026-07-12T17:00:31.491955+00:00",
+    "version": "v10.6.0",
+    "status": "COMPLETE",
+    "dataset_path": "logs\\market_replay\\market_replay_evaluations.csv",
+    "dataset_sha256": "0e21961d442a937011dac067b60102ae7ddfd288bc02e4b55fe3c63505872beb",
+    "selected_run_id": "market_replay_20260711_192507",
+    "rows_loaded": 78452,
+    "rows_usable": 14174,
+    "components": [
+      "trend_score",
+      "momentum_score",
+      "volume_score",
+      "structure_score",
+      "regime_score",
+      "risk_penalty",
+      "external_context_score",
+      "adaptive_adjustment",
+      "historical_edge_score"
+    ],
+    "return_column": "net_signed_return_after_6c_pct",
+    "warnings": [
+      "Selected latest replay run market_replay_20260711_192507; ignored 3 older runs to avoid repeated market-history counting."
+    ],
+    "blockers": [],
+    "dataset_summary": {
+      "start_timestamp": "2023-07-30 12:00:00+00:00",
+      "end_timestamp": "2026-07-08 12:00:00+00:00",
+      "symbols": 6,
+      "timeframes": 1,
+      "long_rows": 7453,
+      "short_rows": 6721,
+      "score_spearman_return": 0.01230666
+    },
+    "model_metrics": {
+      "development_rows": 9915,
+      "holdout_rows": 4253,
+      "purge_rows": 6,
+      "ridge_alpha": 10.0,
+      "holdout_mse": 10.85178695,
+      "holdout_mae": 2.35444507,
+      "holdout_r2": -0.003166,
+      "holdout_spearman_prediction_return": -0.01331757
+    },
+    "key_findings": [
+      "The multivariate component model failed to generalize on chronological Holdout; direct weight promotion is not justified.",
+      "Higher values were associated with worse future net return for: Momentum.",
+      "Higher values were associated with better future net return for: Regime, Risk Penalty.",
+      "No positive holdout permutation value was observed for: Trend, Volume, Structure.",
+      "Actual win rate was below the payoff-implied break-even win rate; loss magnitude, not only hit rate, is a root cause.",
+      "No adequately sampled score band had positive expectancy and profit factor >= 1; higher total score was not a reliable edge proxy.",
+      "Positive score bands were sparse and non-promotable: 90-100 (n=30)."
+    ],
+    "output_files": {
+      "component_summary": "logs\\score_attribution\\component_attribution.csv",
+      "component_bins": "logs\\score_attribution\\component_bins.csv",
+      "model_attribution": "logs\\score_attribution\\model_attribution.csv",
+      "score_bands": "logs\\score_attribution\\score_band_performance.csv",
+      "economics": "logs\\score_attribution\\decision_economics.csv",
+      "report": "logs\\score_attribution\\score_attribution_report.json"
+    }
+  },
+  "ablation": {
+    "created_utc": "2026-07-12T17:00:33.149770+00:00",
+    "version": "v10.6.0",
+    "status": "COMPLETE",
+    "rows_usable": 14174,
+    "components": [
+      "trend_score",
+      "momentum_score",
+      "volume_score",
+      "structure_score",
+      "regime_score",
+      "risk_penalty",
+      "external_context_score",
+      "adaptive_adjustment",
+      "historical_edge_score"
+    ],
+    "blockers": [],
+    "warnings": [],
+    "key_findings": [
+      "Removing these components made fixed-gate holdout expectancy less negative, but did not restore edge: Structure.",
+      "Removing these components reduced fixed-gate holdout expectancy: Volume.",
+      "The full-score threshold selected on Optimize failed on untouched Holdout, confirming temporal instability.",
+      "Ablation findings are diagnostic only; runtime weights remain unchanged until a new walk-forward replay validates them."
+    ],
+    "output_files": {
+      "summary": "logs\\score_attribution\\component_ablation_summary.csv",
+      "threshold_candidates": "logs\\score_attribution\\component_ablation_threshold_candidates.csv",
+      "report": "logs\\score_attribution\\component_ablation_report.json"
+    }
+  },
+  "safety": {
+    "research_only": true,
+    "paper_live_settings_changed": false,
+    "automatic_weight_promotion": false
+  }
+}
