@@ -1,0 +1,16 @@
+فایل‌های تغییرکرده:
+- engine/decision.py
+- engine/score.py
+- decision_logger.py
+- monitor.py
+
+فایل‌های جدید:
+- engine/calibration_mapper.py
+- tests/test_calibration_mapper.py
+- tests/test_empirical_edge_gate.py
+- pytest.ini
+- CALIBRATION_EDGE_GATE_README.md
+
+نتیجه تست:
+- 6 passed
+- python compileall: passed

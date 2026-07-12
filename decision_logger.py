@@ -13,8 +13,6 @@ import hashlib
 from pathlib import Path
 from datetime import datetime, timezone
 
-from engine.csv_utils import migrate_csv_header
-
 
 LOG_DIR = Path("logs")
 LOG_FILE = LOG_DIR / "decisions.csv"
@@ -43,53 +41,6 @@ def _component_max(opportunity, name):
         if component.name == name:
             return component.max_points
     return 0
-
-
-def _normalize_regime_label(value):
-    text = str(value or "").strip().upper().replace("-", "_").replace(" ", "_")
-    aliases = {
-        "BULL": "TRENDING_BULL",
-        "BULLISH": "TRENDING_BULL",
-        "BEAR": "TRENDING_BEAR",
-        "BEARISH": "TRENDING_BEAR",
-        "RANGING": "SIDEWAYS",
-        "RANGE": "SIDEWAYS",
-        "HIGH_VOL": "VOLATILE",
-        "LOW_VOL": "QUIET",
-    }
-    text = aliases.get(text, text)
-    return text if text in {"TRENDING_BULL", "TRENDING_BEAR", "SIDEWAYS", "VOLATILE", "QUIET"} else "UNKNOWN"
-
-
-def _regime_metadata(label, risk_label=""):
-    label = _normalize_regime_label(label)
-    if label == "TRENDING_BULL":
-        trend_state = "BULLISH"
-    elif label == "TRENDING_BEAR":
-        trend_state = "BEARISH"
-    elif label == "SIDEWAYS":
-        trend_state = "SIDEWAYS"
-    elif label == "VOLATILE":
-        trend_state = "VOLATILE"
-    elif label == "QUIET":
-        trend_state = "QUIET"
-    else:
-        trend_state = "UNKNOWN"
-
-    risk = str(risk_label or "").lower()
-    if label == "VOLATILE":
-        volatility_state = "HIGH_VOL"
-    elif label == "QUIET":
-        volatility_state = "LOW_VOL"
-    elif "high" in risk or "زیاد" in risk or "بالا" in risk:
-        volatility_state = "ELEVATED_RISK_VOL"
-    elif "low" in risk or "کم" in risk or "پایین" in risk:
-        volatility_state = "NORMAL_OR_LOW_VOL"
-    else:
-        volatility_state = "NORMAL_VOL"
-
-    market_phase = "UNKNOWN" if trend_state == "UNKNOWN" and volatility_state == "NORMAL_VOL" else f"{trend_state}__{volatility_state}"
-    return label, trend_state, volatility_state, market_phase
 
 
 def _make_decision_id(opportunity, latest_timestamp, price):
@@ -123,14 +74,6 @@ def log_decision(opportunity, latest_timestamp, price, provider=None):
         price=price,
     )
 
-    raw = getattr(opportunity, "raw", {}) or {}
-    regime_label, trend_state, volatility_state, market_phase = _regime_metadata(
-        raw.get("regime_label", ""),
-        opportunity.risk_label,
-    )
-    regime_source = "decision_engine_raw" if regime_label != "UNKNOWN" else "missing_on_log"
-    regime_quality = "DIRECT_ENGINE" if regime_label != "UNKNOWN" else "UNKNOWN"
-
     row = {
         "decision_id": decision_id,
         "logged_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -140,6 +83,12 @@ def log_decision(opportunity, latest_timestamp, price, provider=None):
         "price": float(price),
         "side": opportunity.side,
         "score": int(opportunity.score),
+        "calibrated_score": opportunity.raw.get("calibrated_score"),
+        "calibrated_probability": opportunity.raw.get("calibrated_probability"),
+        "calibration_sample_count": opportunity.raw.get("calibration_sample_count", 0),
+        "calibration_status": opportunity.raw.get("calibration_status", "UNAVAILABLE"),
+        "edge_gate_passed": bool(opportunity.raw.get("edge_gate_passed", False)),
+        "expected_edge": opportunity.raw.get("expected_edge"),
         "confidence_label": opportunity.confidence_label,
         "risk_label": opportunity.risk_label,
         "actionability": opportunity.actionability_label,
@@ -155,81 +104,15 @@ def log_decision(opportunity, latest_timestamp, price, provider=None):
         "volume_max": _component_max(opportunity, "Volume"),
         "structure_score": _component_score(opportunity, "Structure"),
         "structure_max": _component_max(opportunity, "Structure"),
-        "historical_edge_score": _component_score(opportunity, "Historical Edge"),
-        "historical_edge_max": _component_max(opportunity, "Historical Edge"),
         "risk_penalty": _component_score(opportunity, "Risk Penalty"),
         "risk_max": _component_max(opportunity, "Risk Penalty"),
-        "regime_label": regime_label,
-        "regime_confidence": raw.get("regime_confidence", ""),
-        "regime_adjustment": raw.get("regime_adjustment", ""),
-        "regime_source": regime_source,
-        "regime_label_quality": regime_quality,
-        "trend_state": trend_state,
-        "volatility_state": volatility_state,
-        "market_phase": market_phase,
-        "primary_cause": raw.get("primary_cause", ""),
-        "cause_confidence": raw.get("cause_confidence", ""),
-        "catalyst_score": raw.get("catalyst_score", ""),
-        "event_risk": raw.get("event_risk", ""),
-        "technical_event_conflict": raw.get("technical_event_conflict", ""),
-        "causal_alignment": raw.get("causal_alignment", ""),
-        "causal_verdict": raw.get("causal_verdict", ""),
-        "causal_source_count": raw.get("causal_source_count", ""),
-        "causal_trusted_source_count": raw.get("causal_trusted_source_count", ""),
-        "causal_manual_event_count": raw.get("causal_manual_event_count", ""),
-        "causal_auto_event_count": raw.get("causal_auto_event_count", ""),
-        "causal_top_sources": raw.get("causal_top_sources", ""),
-        "causal_notes": raw.get("causal_notes", ""),
-        "market_narrative_label": raw.get("market_narrative_label", ""),
-        "market_narrative_confidence": raw.get("market_narrative_confidence", ""),
-        "market_narrative_direction": raw.get("market_narrative_direction", ""),
-        "market_narrative_theme": raw.get("market_narrative_theme", ""),
-        "market_narrative_score": raw.get("market_narrative_score", ""),
-        "market_narrative_event_risk": raw.get("market_narrative_event_risk", ""),
-        "market_narrative_conflict": raw.get("market_narrative_conflict", ""),
-        "market_narrative_summary": raw.get("market_narrative_summary", ""),
-        "narrative_alignment": raw.get("narrative_alignment", ""),
-        "narrative_conflict_score": raw.get("narrative_conflict_score", ""),
-        "narrative_adjustment": raw.get("narrative_adjustment", ""),
-        "narrative_adjusted_score": raw.get("narrative_adjusted_score", ""),
-        "narrative_action_override": raw.get("narrative_action_override", ""),
-        "narrative_decision_verdict": raw.get("narrative_decision_verdict", ""),
-        "narrative_decision_notes": raw.get("narrative_decision_notes", ""),
-        "root_cause_primary": raw.get("root_cause_primary", ""),
-        "root_cause_direction": raw.get("root_cause_direction", ""),
-        "root_cause_confidence": raw.get("root_cause_confidence", ""),
-        "root_cause_probability_pct": raw.get("root_cause_probability_pct", ""),
-        "root_cause_evidence_quality": raw.get("root_cause_evidence_quality", ""),
-        "root_cause_verdict": raw.get("root_cause_verdict", ""),
-        "root_cause_evidence_total": raw.get("root_cause_evidence_total", ""),
-        "root_cause_official_evidence_total": raw.get("root_cause_official_evidence_total", ""),
-        "root_cause_top_causes": raw.get("root_cause_top_causes", ""),
-        "root_cause_summary": raw.get("root_cause_summary", ""),
-        "long_score": raw.get("long_score", ""),
-        "short_score": raw.get("short_score", ""),
         "reasons": _safe_join(positive_reasons),
         "warnings": _safe_join(risk_warnings),
         "provider": provider or "",
     }
 
-    fieldnames = list(row.keys())
-
-    # Older Freakto versions wrote a shorter decisions.csv header. Appending a
-    # wider v4.7+ row under that old header creates a mixed-schema CSV that
-    # breaks pandas.read_csv during forward-test cycles. Normalize the header
-    # before appending so long-running projects remain upgrade-safe.
-    if file_exists:
-        try:
-            migrated = migrate_csv_header(LOG_FILE, fieldnames)
-            if migrated:
-                print("🛠️ decisions.csv schema migrated to current header.")
-        except Exception as error:
-            print(f"⚠️ decisions.csv schema migration skipped: {type(error).__name__}: {error}")
-
-    file_exists = LOG_FILE.exists() and LOG_FILE.stat().st_size > 0
-
     with LOG_FILE.open("a", newline="", encoding="utf-8-sig") as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames, extrasaction="ignore")
+        writer = csv.DictWriter(file, fieldnames=list(row.keys()))
 
         if not file_exists:
             writer.writeheader()

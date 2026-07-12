@@ -10,28 +10,14 @@ from .risk import score_risk, risk_label
 from .regime import detect_market_regime
 from .adaptive import score_adaptive_adjustment
 from .historical_edge import score_historical_edge
-from .learning_overrides import apply_learning_overrides
-from .external_features import score_external_context
-from .risk_reward import calculate_risk_reward
 from .score import OpportunityV2, confidence_label, _zones
-from .model_contract import CURRENT_MODEL_CONTRACT
+from .calibration_mapper import ScoreCalibrator, evaluate_edge_gate
 
 
 class DecisionEngine:
-    def __init__(
-        self,
-        min_side_score: int = 50,
-        *,
-        allow_learning_overrides: bool = True,
-        allow_historical_edge: bool = True,
-    ):
+    def __init__(self, min_side_score: int = 50, calibrator=None):
         self.min_side_score = min_side_score
-        # Market Replay disables both switches.  Their persisted files may
-        # contain information learned after the historical candle and would
-        # otherwise create silent look-ahead leakage.  Live/Forward behavior
-        # remains unchanged because both options default to True.
-        self.allow_learning_overrides = bool(allow_learning_overrides)
-        self.allow_historical_edge = bool(allow_historical_edge)
+        self.calibrator = calibrator or ScoreCalibrator()
 
     def analyze(self, df: pd.DataFrame, symbol: str, timeframe: str) -> OpportunityV2:
         required = [
@@ -97,6 +83,9 @@ class DecisionEngine:
 
         reasons, warnings = self._collect_explanations(components)
 
+        calibration = self.calibrator.map_score(score)
+        edge_gate = evaluate_edge_gate(calibration)
+
         if side == "NEUTRAL":
             reasons = ["هیچ سمت بازار به اندازه کافی هم‌راستا نیست."]
             warnings.append(
@@ -110,7 +99,7 @@ class DecisionEngine:
             ScoreComponent("Risk Penalty", 0, 25),
         )
 
-        opportunity = OpportunityV2(
+        return OpportunityV2(
             symbol=symbol,
             timeframe=timeframe,
             side=side,
@@ -128,40 +117,24 @@ class DecisionEngine:
                 "timestamp": str(latest_timestamp),
                 "long_score": long_score,
                 "short_score": short_score,
+                "raw_score": score,
+                "calibrated_score": calibration.calibrated_score,
+                "calibrated_probability": calibration.calibrated_probability,
+                "calibration_sample_count": calibration.sample_count,
+                "calibration_status": calibration.status,
+                "calibration_source": calibration.source,
+                "calibration_reason": calibration.reason,
+                "edge_gate_passed": edge_gate.passed,
+                "expected_edge": edge_gate.expected_edge,
+                "edge_gate_failures": list(edge_gate.failures),
                 "regime_label": regime.label,
                 "regime_confidence": regime.confidence,
                 "regime_adjustment": regime.adjustment,
                 "regime_reasons": regime.reasons,
                 "regime_warnings": regime.warnings,
-                "cross_exchange_volume": safe_float(row.get("cross_exchange_volume"), 0.0),
-                "cross_exchange_volume_ratio": safe_float(row.get("cross_exchange_volume_ratio"), 1.0),
-                "cross_exchange_provider_count": safe_float(row.get("cross_exchange_provider_count"), 0.0),
-                "news_sentiment_score": safe_float(row.get("news_sentiment_score"), 0.0),
-                "news_sentiment_summary": str(row.get("news_sentiment_summary", "") or ""),
-                "onchain_active_addresses": safe_float(row.get("onchain_active_addresses"), 0.0),
-                "onchain_signal_score": safe_float(row.get("onchain_signal_score"), 0.0),
-                "onchain_status": str(row.get("onchain_status", "") or ""),
                 "engine": "DecisionEngine",
-                **CURRENT_MODEL_CONTRACT.as_dict(),
-                "allow_learning_overrides": self.allow_learning_overrides,
-                "allow_historical_edge": self.allow_historical_edge,
-                "replay_safe": not self.allow_learning_overrides and not self.allow_historical_edge,
             },
         )
-        rr = calculate_risk_reward(opportunity)
-        opportunity.raw.update({
-            "risk_plan_valid": rr.is_valid,
-            "risk_plan_entry": rr.entry,
-            "risk_plan_stop_loss": rr.stop,
-            "risk_plan_stop_distance_pct": rr.stop_distance_pct,
-            "risk_plan_take_profit_1": rr.targets[0].price if len(rr.targets) > 0 else None,
-            "risk_plan_take_profit_2": rr.targets[1].price if len(rr.targets) > 1 else None,
-            "risk_plan_take_profit_3": rr.targets[2].price if len(rr.targets) > 2 else None,
-            "risk_plan_rr_1": rr.targets[0].rr if len(rr.targets) > 0 else None,
-            "risk_plan_rr_2": rr.targets[1].rr if len(rr.targets) > 1 else None,
-            "risk_plan_rr_3": rr.targets[2].rr if len(rr.targets) > 2 else None,
-        })
-        return opportunity
 
     def _get_latest_timestamp(self, df: pd.DataFrame):
         if "timestamp" in df.columns:
@@ -231,16 +204,7 @@ class DecisionEngine:
             score_structure(row, recent_df, side),
             self._regime_component(side, regime),
             score_risk(row, side),
-            score_external_context(row, side),
         ]
-
-        if self.allow_learning_overrides:
-            components, learning_state, learning_component = apply_learning_overrides(components)
-
-            # Learning Override در v3.3 فقط وقتی فایل staging وجود داشته باشد در Breakdown دیده می‌شود.
-            # اگر فعال نباشد، امتیاز آن صفر است و فقط دلیل/هشدار ایمنی گزارش می‌شود.
-            if learning_state.exists:
-                components.append(learning_component)
 
         adaptive_adjustment = score_adaptive_adjustment(
             components=components,
@@ -252,23 +216,14 @@ class DecisionEngine:
 
         base_score = max(0, min(100, int(sum(component.points for component in components))))
 
-        if self.allow_historical_edge:
-            historical_edge = score_historical_edge(
-                symbol=symbol,
-                timeframe=timeframe,
-                side=side,
-                components=components,
-                base_score=base_score,
-                current_timestamp=str(latest_timestamp),
-            )
-        else:
-            historical_edge = ScoreComponent(
-                name="Historical Edge",
-                points=0,
-                max_points=8,
-                reasons=[],
-                warnings=[],
-            )
+        historical_edge = score_historical_edge(
+            symbol=symbol,
+            timeframe=timeframe,
+            side=side,
+            components=components,
+            base_score=base_score,
+            current_timestamp=str(latest_timestamp),
+        )
 
         components.append(historical_edge)
 

@@ -12,9 +12,6 @@ from .risk import score_risk, risk_label
 from .explain import explain_component, explain_decision
 from .confidence import calculate_confidence
 from .similarity import find_similar_snapshots, format_similarity_for_telegram
-from .trade_quality import build_trade_intelligence_card, format_trade_card_lines
-from .intelligence import build_intelligence_report, format_intelligence_telegram
-from .risk_reward import calculate_risk_reward
 
 
 @dataclass
@@ -78,6 +75,10 @@ class OpportunityV2:
         if regime == "SIDEWAYS":
             failures.append("Market Regime رنج است و کیفیت سیگنال جهت‌دار کاهش دارد.")
 
+        if not self.raw.get("edge_gate_passed", False):
+            edge_failures = self.raw.get("edge_gate_failures", [])
+            failures.extend(edge_failures or ["Empirical Edge Gate پاس نشده است."])
+
         return failures
 
     @property
@@ -111,6 +112,9 @@ class OpportunityV2:
 
         if regime not in {"TRENDING_BULL", "TRENDING_BEAR"}:
             failures.append("Market Regime برای فرصت درجه‌یک هم‌راستا نیست.")
+
+        if not self.raw.get("edge_gate_passed", False):
+            failures.append("Empirical Edge Gate برای فرصت درجه‌یک پاس نشده است.")
 
         return failures
 
@@ -154,20 +158,6 @@ def confidence_label(score: int) -> str:
     if score >= 55:
         return "Medium"
     return "Low"
-
-
-def _dedupe_text(items: List[str]) -> List[str]:
-    seen = set()
-    result = []
-
-    for item in items:
-        key = str(item).strip()
-        if not key or key in seen:
-            continue
-        seen.add(key)
-        result.append(item)
-
-    return result
 
 
 def _zones(row, side: str) -> tuple[str, str, list[str]]:
@@ -252,38 +242,6 @@ def _format_confidence(opportunity: OpportunityV2) -> List[str]:
     return lines
 
 
-def _format_trade_intelligence(opportunity: OpportunityV2) -> List[str]:
-    card = build_trade_intelligence_card(opportunity)
-    return format_trade_card_lines(card)
-
-
-def _format_risk_plan(opportunity: OpportunityV2) -> List[str]:
-    rr = calculate_risk_reward(opportunity)
-    lines = ["*Stop Loss / Take Profit Plan:*"]
-    if not rr.is_valid:
-        lines.append(f"- {rr.reason}")
-        return lines
-
-    if not opportunity.is_actionable:
-        lines.append("- Research-only plan: Quality Gate is not fully passed yet.")
-    lines.append(f"- Entry: `{fmt_price(rr.entry)}`")
-    lines.append(f"- Stop Loss: `{fmt_price(rr.stop)}`")
-    lines.append(f"- Stop Distance: `{rr.stop_distance_pct:.2f}%`")
-    if rr.targets:
-        for target in rr.targets[:3]:
-            if target.price is None:
-                continue
-            rr_text = f"{target.rr:.2f}" if target.rr is not None else "n/a"
-            lines.append(f"- {target.label} Take Profit: `{fmt_price(target.price)}` | R:R `{rr_text}`")
-    return lines
-
-
-
-
-def _format_intelligence_layer(opportunity: OpportunityV2) -> List[str]:
-    report = build_intelligence_report(opportunity)
-    return format_intelligence_telegram(report)
-
 def _format_market_regime(opportunity: OpportunityV2) -> List[str]:
     label = opportunity.raw.get("regime_label")
     confidence = opportunity.raw.get("regime_confidence")
@@ -311,6 +269,27 @@ def _format_market_regime(opportunity: OpportunityV2) -> List[str]:
         for warning in warnings[:3]:
             lines.append(f"  ⚠️ {warning}")
 
+    return lines
+
+
+def _format_calibration(opportunity: OpportunityV2) -> List[str]:
+    status = opportunity.raw.get("calibration_status", "UNAVAILABLE")
+    probability = opportunity.raw.get("calibrated_probability")
+    calibrated_score = opportunity.raw.get("calibrated_score")
+    sample_count = opportunity.raw.get("calibration_sample_count", 0)
+    expected_edge = opportunity.raw.get("expected_edge")
+    gate_passed = opportunity.raw.get("edge_gate_passed", False)
+
+    lines = ["*Empirical Calibration:*", f"- Status: *{status}*"]
+    if probability is not None:
+        lines.append(f"- Calibrated Probability: *{probability:.1%}*")
+        lines.append(f"- Calibrated Score: *{calibrated_score}/100*")
+        lines.append(f"- Supporting Samples: *{sample_count}*")
+    if expected_edge is not None:
+        lines.append(f"- Expected Edge vs 50%: *{expected_edge:.1%}*")
+    lines.append(f"- Edge Gate: *{'PASS' if gate_passed else 'FAIL'}*")
+    for failure in opportunity.raw.get("edge_gate_failures", [])[:3]:
+        lines.append(f"  ⚠️ {failure}")
     return lines
 
 
@@ -430,9 +409,9 @@ def format_opportunity_v2_message(opportunity: OpportunityV2) -> str:
         else "⚪"
     )
 
-    title = "Freakto Market Bias v4"
+    title = "Freakto Market Bias v2"
     if opportunity.is_actionable:
-        title = "Freakto Opportunity Engine v4"
+        title = "Freakto Opportunity Engine v2"
 
     lines = [
         f"{icon} *{title}*",
@@ -448,18 +427,12 @@ def format_opportunity_v2_message(opportunity: OpportunityV2) -> str:
     lines.append("")
     lines.extend(_format_confidence(opportunity))
 
+    lines.append("")
+    lines.extend(_format_calibration(opportunity))
+
     similarity = find_similar_snapshots(opportunity)
     lines.append("")
     lines.extend(format_similarity_for_telegram(similarity))
-
-    lines.append("")
-    lines.extend(_format_trade_intelligence(opportunity))
-
-    lines.append("")
-    lines.extend(_format_risk_plan(opportunity))
-
-    lines.append("")
-    lines.extend(_format_intelligence_layer(opportunity))
 
     market_regime = _format_market_regime(opportunity)
     if market_regime:
@@ -501,11 +474,10 @@ def format_opportunity_v2_message(opportunity: OpportunityV2) -> str:
     lines.append("")
     lines.extend(_format_component_explanations(opportunity))
 
-    deduped_warnings = _dedupe_text(opportunity.warnings)
-    if deduped_warnings:
+    if opportunity.warnings:
         lines.append("")
         lines.append("*هشدارهای ریسک:*")
-        for warning in deduped_warnings[:6]:
+        for warning in opportunity.warnings[:6]:
             lines.append(f"⚠️ {warning}")
 
     lines.append("")
