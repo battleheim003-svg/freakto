@@ -1,0 +1,5 @@
+horizon_candles,ambiguous_rows,ambiguity_rate,stop_first_expectancy,target_first_expectancy,overall_expectancy_sensitivity,total_return_sensitivity,ambiguous_trade_mean_sensitivity
+1,137,0.009666,-0.562625,-0.543148,0.019477,276.071801,2.015123
+3,137,0.009666,-0.550343,-0.517954,0.032389,459.079791,3.350947
+6,137,0.009666,-0.534581,-0.49636,0.038221,541.738452,3.954295
+12,137,0.009666,-0.518273,-0.479304,0.038968,545.986042,3.9853
