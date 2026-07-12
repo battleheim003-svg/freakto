@@ -15,9 +15,25 @@ from .calibration_mapper import ScoreCalibrator, evaluate_edge_gate
 
 
 class DecisionEngine:
-    def __init__(self, min_side_score: int = 50, calibrator=None):
+    def __init__(
+        self,
+        min_side_score: int = 50,
+        calibrator=None,
+        *,
+        allow_learning_overrides: bool = True,
+        allow_historical_edge: bool = True,
+    ):
+        """Create a decision engine with explicit research-safety controls.
+
+        ``allow_learning_overrides`` and ``allow_historical_edge`` default to
+        ``True`` to preserve the normal monitor/forward behaviour. Historical
+        replay passes both flags as ``False`` so persisted state cannot leak
+        into a causal replay run.
+        """
         self.min_side_score = min_side_score
         self.calibrator = calibrator or ScoreCalibrator()
+        self.allow_learning_overrides = bool(allow_learning_overrides)
+        self.allow_historical_edge = bool(allow_historical_edge)
 
     def analyze(self, df: pd.DataFrame, symbol: str, timeframe: str) -> OpportunityV2:
         required = [
@@ -127,6 +143,11 @@ class DecisionEngine:
                 "edge_gate_passed": edge_gate.passed,
                 "expected_edge": edge_gate.expected_edge,
                 "edge_gate_failures": list(edge_gate.failures),
+                "allow_learning_overrides": self.allow_learning_overrides,
+                "allow_historical_edge": self.allow_historical_edge,
+                "replay_safe": not (
+                    self.allow_learning_overrides or self.allow_historical_edge
+                ),
                 "regime_label": regime.label,
                 "regime_confidence": regime.confidence,
                 "regime_adjustment": regime.adjustment,
@@ -216,14 +237,24 @@ class DecisionEngine:
 
         base_score = max(0, min(100, int(sum(component.points for component in components))))
 
-        historical_edge = score_historical_edge(
-            symbol=symbol,
-            timeframe=timeframe,
-            side=side,
-            components=components,
-            base_score=base_score,
-            current_timestamp=str(latest_timestamp),
-        )
+        if self.allow_historical_edge:
+            historical_edge = score_historical_edge(
+                symbol=symbol,
+                timeframe=timeframe,
+                side=side,
+                components=components,
+                base_score=base_score,
+                current_timestamp=str(latest_timestamp),
+            )
+        else:
+            historical_edge = ScoreComponent(
+                name="Historical Edge",
+                points=0,
+                max_points=12,
+                warnings=[
+                    "Historical Edge در حالت Replay غیرفعال است تا داده پایدار گذشته وارد تصمیم نشود."
+                ],
+            )
 
         components.append(historical_edge)
 
