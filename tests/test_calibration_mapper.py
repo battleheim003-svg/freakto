@@ -64,3 +64,34 @@ def test_edge_gate_requires_probability_and_edge(tmp_path):
     assert weak.passed is False
     assert strong.passed is True
     assert strong.expected_edge == 0.15
+
+
+def test_only_promoted_policy_is_loaded(tmp_path):
+    import json
+    from engine.calibration_mapper import load_edge_gate_policy
+
+    policy_path = tmp_path / "policy.json"
+    policy_path.write_text(
+        json.dumps(
+            {
+                "status": "RECOMMENDED",
+                "min_probability": 0.66,
+                "min_samples": 200,
+                "break_even_probability": 0.50,
+                "min_expected_edge": 0.05,
+            }
+        ),
+        encoding="utf-8",
+    )
+    ignored = load_edge_gate_policy(policy_path)
+    assert ignored.status == "IGNORED_NOT_PROMOTED"
+    assert ignored.min_probability == 0.55
+
+    payload = json.loads(policy_path.read_text(encoding="utf-8"))
+    payload["status"] = "PROMOTED"
+    payload["approved"] = True
+    policy_path.write_text(json.dumps(payload), encoding="utf-8")
+    active = load_edge_gate_policy(policy_path)
+    assert active.status == "PROMOTED"
+    assert active.min_probability == 0.66
+    assert active.min_samples == 200

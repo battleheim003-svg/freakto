@@ -1,0 +1,134 @@
+{
+  "created_utc": "2026-07-12T15:39:47.931801+00:00",
+  "status": "FAIL",
+  "dataset_path": "logs\\calibration_dataset\\calibration_training.csv",
+  "dataset_sha256": "111fd022b17d7ad213f1be01ddde31ec33901076d6432b84c00bd8c5d10f2ce8",
+  "rows_loaded": 3200,
+  "rows_usable": 3200,
+  "warnings": [],
+  "blockers": [
+    "No positive out-of-sample threshold candidate survived the optimization constraints."
+  ],
+  "splits": [
+    {
+      "name": "train",
+      "rows": 1914,
+      "start_timestamp": "2026-03-24 20:00:00+00:00",
+      "end_timestamp": "2026-05-30 12:00:00+00:00"
+    },
+    {
+      "name": "optimize",
+      "rows": 634,
+      "start_timestamp": "2026-05-30 16:00:00+00:00",
+      "end_timestamp": "2026-06-19 12:00:00+00:00"
+    },
+    {
+      "name": "holdout",
+      "rows": 640,
+      "start_timestamp": "2026-06-19 16:00:00+00:00",
+      "end_timestamp": "2026-07-09 12:00:00+00:00"
+    }
+  ],
+  "recommended_policy": null,
+  "baseline_holdout": {
+    "sample_count": 129,
+    "win_count": 65,
+    "loss_count": 64,
+    "flat_count": 0,
+    "win_rate": 0.503876,
+    "avg_return": -0.20594,
+    "median_return": 0.021604,
+    "expectancy": -0.20594,
+    "profit_factor": 0.806459,
+    "max_drawdown": -51.587203,
+    "total_return": -26.566261
+  },
+  "baseline_by_side": {
+    "LONG": {
+      "sample_count": 71,
+      "win_count": 39,
+      "loss_count": 32,
+      "flat_count": 0,
+      "win_rate": 0.549296,
+      "avg_return": -0.040498,
+      "median_return": 0.210613,
+      "expectancy": -0.040498,
+      "profit_factor": 0.960625,
+      "max_drawdown": -38.890096,
+      "total_return": -2.875373
+    },
+    "SHORT": {
+      "sample_count": 58,
+      "win_count": 26,
+      "loss_count": 32,
+      "flat_count": 0,
+      "win_rate": 0.448276,
+      "avg_return": -0.408464,
+      "median_return": -0.539563,
+      "expectancy": -0.408464,
+      "profit_factor": 0.631208,
+      "max_drawdown": -50.527542,
+      "total_return": -23.690888
+    }
+  },
+  "optimized_holdout": {
+    "sample_count": 0,
+    "win_count": 0,
+    "loss_count": 0,
+    "flat_count": 0,
+    "win_rate": 0.0,
+    "avg_return": 0.0,
+    "median_return": 0.0,
+    "expectancy": 0.0,
+    "profit_factor": 0.0,
+    "max_drawdown": 0.0,
+    "total_return": 0.0
+  },
+  "holdout_by_side": {
+    "LONG": {
+      "sample_count": 0,
+      "win_count": 0,
+      "loss_count": 0,
+      "flat_count": 0,
+      "win_rate": 0.0,
+      "avg_return": 0.0,
+      "median_return": 0.0,
+      "expectancy": 0.0,
+      "profit_factor": 0.0,
+      "max_drawdown": 0.0,
+      "total_return": 0.0
+    },
+    "SHORT": {
+      "sample_count": 0,
+      "win_count": 0,
+      "loss_count": 0,
+      "flat_count": 0,
+      "win_rate": 0.0,
+      "avg_return": 0.0,
+      "median_return": 0.0,
+      "expectancy": 0.0,
+      "profit_factor": 0.0,
+      "max_drawdown": 0.0,
+      "total_return": 0.0
+    }
+  },
+  "calibration_metrics": {
+    "sample_count": 640,
+    "brier_score": 0.273966,
+    "log_loss": 0.74531,
+    "ece": 0.164032,
+    "mce": 0.366853
+  },
+  "output_files": {
+    "training_mapping": "logs\\calibration_validation\\score_calibration_train.csv",
+    "threshold_candidates": "logs\\calibration_validation\\threshold_candidates.csv",
+    "calibration_diagnostics": "logs\\calibration_validation\\calibration_bucket_diagnostics.csv",
+    "holdout_scored": "logs\\calibration_validation\\holdout_scored.csv",
+    "summary_csv": "logs\\calibration_validation\\calibration_validation_report.csv",
+    "recommended_policy": "logs\\calibration_validation\\recommended_edge_gate_policy.json",
+    "candidate_mapping": "logs\\calibration_validation\\score_calibration_candidate.csv",
+    "raw_threshold_diagnostics": "logs\\calibration_validation\\raw_threshold_diagnostics.csv",
+    "report_json": "logs\\calibration_validation\\calibration_validation_report.json"
+  },
+  "promoted": false
+}

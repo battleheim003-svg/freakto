@@ -1,0 +1,7 @@
+﻿segment,sample_count,win_count,loss_count,flat_count,win_rate,avg_return,median_return,expectancy,profit_factor,max_drawdown,total_return
+baseline_holdout,129,65,64,0,0.503876,-0.20594,0.021604,-0.20594,0.806459,-51.587203,-26.566261
+optimized_holdout,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+baseline_long,71,39,32,0,0.549296,-0.040498,0.210613,-0.040498,0.960625,-38.890096,-2.875373
+baseline_short,58,26,32,0,0.448276,-0.408464,-0.539563,-0.408464,0.631208,-50.527542,-23.690888
+optimized_long,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+optimized_short,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0

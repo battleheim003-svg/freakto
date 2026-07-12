@@ -1,14 +1,15 @@
 """Empirical score calibration and edge gating for Freakto.
 
 The mapper converts the engine's raw 0..100 score into an empirical probability
-using a calibration table produced from replay/evaluation data.  It deliberately
-fails closed: missing, stale, malformed, or under-sampled calibration data can
-never promote a decision to ACTIONABLE.
+using a calibration table produced from replay/evaluation data. It deliberately
+fails closed: missing, malformed, or under-sampled calibration data can never
+promote a decision to ACTIONABLE.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+import json
 from pathlib import Path
 from typing import Iterable, Optional
 
@@ -16,6 +17,8 @@ import pandas as pd
 
 
 DEFAULT_CALIBRATION_PATH = Path("logs/calibration/score_calibration.csv")
+DEFAULT_DATASET = Path("logs/calibration_dataset/calibration_training.csv")
+DEFAULT_EDGE_GATE_POLICY_PATH = Path("logs/calibration/edge_gate_policy.json")
 
 
 @dataclass(frozen=True)
@@ -41,10 +44,79 @@ class CalibrationResult:
 
 
 @dataclass(frozen=True)
+class EdgeGatePolicy:
+    min_probability: float = 0.55
+    min_samples: int = 100
+    break_even_probability: float = 0.50
+    min_expected_edge: float = 0.03
+    status: str = "DEFAULT"
+    source: str = "built-in defaults"
+
+
+@dataclass(frozen=True)
 class EdgeGateResult:
     passed: bool
     expected_edge: Optional[float]
     failures: tuple[str, ...]
+    policy_status: str = "DEFAULT"
+    policy_source: str = "built-in defaults"
+
+
+@dataclass(frozen=True)
+class CalibrationEstimate:
+    """Backward-compatible bucket estimate used by legacy dashboards."""
+
+    score: float
+    probability: float
+    samples: int
+    verdict: str
+
+
+def _bucket(score: float) -> str:
+    low = int(float(score) // 10 * 10)
+    return f"score_{low}_{low + 9}"
+
+
+def build_mapping(dataset_path: Path | str = DEFAULT_DATASET) -> pd.DataFrame:
+    """Build the legacy bucket mapping without changing its public schema."""
+    path = Path(dataset_path)
+    if not path.exists():
+        return pd.DataFrame()
+    try:
+        frame = pd.read_csv(path, encoding="utf-8-sig", low_memory=False)
+    except Exception:
+        return pd.DataFrame()
+    if "evaluated_return" not in frame.columns or "score" not in frame.columns:
+        return pd.DataFrame()
+
+    frame = frame.copy()
+    frame["evaluated_return"] = pd.to_numeric(frame["evaluated_return"], errors="coerce")
+    frame["score"] = pd.to_numeric(frame["score"], errors="coerce")
+    frame = frame.dropna(subset=["evaluated_return", "score"])
+    frame["win"] = frame["evaluated_return"] > 0
+    frame["score_bucket"] = frame["score"].map(_bucket)
+    mapping = (
+        frame.groupby("score_bucket")
+        .agg(
+            samples=("win", "size"),
+            historical_probability=("win", "mean"),
+            avg_return=("evaluated_return", "mean"),
+        )
+        .reset_index()
+    )
+    mapping["historical_probability"] = (mapping["historical_probability"] * 100).round(2)
+    return mapping
+
+
+def estimate_probability(score: float, mapping: pd.DataFrame) -> CalibrationEstimate:
+    bucket = _bucket(score)
+    if mapping.empty or "score_bucket" not in mapping.columns or bucket not in set(mapping["score_bucket"]):
+        return CalibrationEstimate(float(score), 50.0, 0, "NO_DATA")
+    row = mapping[mapping["score_bucket"] == bucket].iloc[0]
+    probability = float(row["historical_probability"])
+    samples = int(row["samples"])
+    verdict = "VALID" if samples >= 100 else "LOW_SAMPLE"
+    return CalibrationEstimate(float(score), probability, samples, verdict)
 
 
 class ScoreCalibrator:
@@ -54,6 +126,7 @@ class ScoreCalibrator:
     PROBABILITY_COLUMNS = (
         "calibrated_probability",
         "observed_success_rate",
+        "historical_probability",
         "success_rate",
         "win_rate",
         "probability",
@@ -165,7 +238,6 @@ class ScoreCalibrator:
         else:
             weight = (score - left.raw_score) / (right.raw_score - left.raw_score)
             probability = left.probability + weight * (right.probability - left.probability)
-            # Conservative support: interpolation is only as strong as its weaker endpoint.
             sample_count = min(left.sample_count, right.sample_count)
 
         probability = max(0.0, min(1.0, float(probability)))
@@ -187,37 +259,100 @@ class ScoreCalibrator:
         )
 
 
+def _normalize_probability(value: object, default: float) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return default
+    if number > 1.0:
+        number /= 100.0
+    return max(0.0, min(1.0, number))
+
+
+def load_edge_gate_policy(
+    policy_path: Path | str = DEFAULT_EDGE_GATE_POLICY_PATH,
+) -> EdgeGatePolicy:
+    """Load only explicitly promoted policies; otherwise return safe defaults."""
+    path = Path(policy_path)
+    default = EdgeGatePolicy(source=str(path) if path.exists() else "built-in defaults")
+    if not path.exists():
+        return default
+
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return EdgeGatePolicy(status="INVALID", source=str(path))
+
+    status = str(payload.get("status", "")).upper()
+    approved = bool(payload.get("approved", False))
+    if status not in {"PROMOTED", "ACTIVE", "APPROVED"} and not approved:
+        return EdgeGatePolicy(status="IGNORED_NOT_PROMOTED", source=str(path))
+
+    min_probability = _normalize_probability(payload.get("min_probability"), default.min_probability)
+    break_even = _normalize_probability(payload.get("break_even_probability"), default.break_even_probability)
+    min_edge = _normalize_probability(payload.get("min_expected_edge"), default.min_expected_edge)
+    try:
+        min_samples = max(1, int(payload.get("min_samples", default.min_samples)))
+    except (TypeError, ValueError):
+        min_samples = default.min_samples
+
+    if min_probability < break_even or min_edge < 0:
+        return EdgeGatePolicy(status="INVALID", source=str(path))
+
+    return EdgeGatePolicy(
+        min_probability=min_probability,
+        min_samples=min_samples,
+        break_even_probability=break_even,
+        min_expected_edge=min_edge,
+        status="PROMOTED",
+        source=str(path),
+    )
+
+
 def evaluate_edge_gate(
     calibration: CalibrationResult,
     *,
-    min_probability: float = 0.55,
-    min_samples: int = 100,
-    break_even_probability: float = 0.50,
-    min_expected_edge: float = 0.03,
+    min_probability: Optional[float] = None,
+    min_samples: Optional[int] = None,
+    break_even_probability: Optional[float] = None,
+    min_expected_edge: Optional[float] = None,
+    policy: Optional[EdgeGatePolicy] = None,
+    policy_path: Path | str = DEFAULT_EDGE_GATE_POLICY_PATH,
 ) -> EdgeGateResult:
     """Require empirical support and a probability margin above break-even."""
+    resolved = policy or load_edge_gate_policy(policy_path)
+    required_probability = resolved.min_probability if min_probability is None else float(min_probability)
+    required_samples = resolved.min_samples if min_samples is None else int(min_samples)
+    break_even = resolved.break_even_probability if break_even_probability is None else float(break_even_probability)
+    required_edge = resolved.min_expected_edge if min_expected_edge is None else float(min_expected_edge)
 
     failures: list[str] = []
     probability = calibration.calibrated_probability
 
     if probability is None:
         failures.append("کالیبراسیون تجربی در دسترس نیست.")
-        return EdgeGateResult(False, None, tuple(failures))
+        return EdgeGateResult(False, None, tuple(failures), resolved.status, resolved.source)
 
-    if calibration.sample_count < min_samples:
+    if calibration.sample_count < required_samples:
         failures.append(
-            f"حجم نمونه کالیبراسیون کافی نیست ({calibration.sample_count} < {min_samples})."
+            f"حجم نمونه کالیبراسیون کافی نیست ({calibration.sample_count} < {required_samples})."
         )
 
-    if probability < min_probability:
+    if probability < required_probability:
         failures.append(
-            f"احتمال کالیبره‌شده کمتر از حد لازم است ({probability:.1%} < {min_probability:.1%})."
+            f"احتمال کالیبره‌شده کمتر از حد لازم است ({probability:.1%} < {required_probability:.1%})."
         )
 
-    expected_edge = probability - break_even_probability
-    if expected_edge < min_expected_edge:
+    expected_edge = probability - break_even
+    if expected_edge < required_edge:
         failures.append(
-            f"Edge تجربی کافی نیست ({expected_edge:.1%} < {min_expected_edge:.1%})."
+            f"Edge تجربی کافی نیست ({expected_edge:.1%} < {required_edge:.1%})."
         )
 
-    return EdgeGateResult(not failures, round(expected_edge, 6), tuple(failures))
+    return EdgeGateResult(
+        not failures,
+        round(expected_edge, 6),
+        tuple(failures),
+        resolved.status,
+        resolved.source,
+    )
