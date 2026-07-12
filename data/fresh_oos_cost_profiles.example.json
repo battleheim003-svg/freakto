@@ -1,0 +1,17 @@
+{
+  "okx:BTC/USDT": {
+    "fee_bps_per_side": 10.0,
+    "slippage_bps_per_side": 5.0,
+    "source": "USER_VERIFIED_EXCHANGE_AND_SYMBOL_PROFILE"
+  },
+  "okx:*": {
+    "fee_bps_per_side": 10.0,
+    "slippage_bps_per_side": 7.0,
+    "source": "USER_VERIFIED_EXCHANGE_DEFAULT"
+  },
+  "default": {
+    "fee_bps_per_side": 15.0,
+    "slippage_bps_per_side": 10.0,
+    "source": "CONSERVATIVE_USER_FALLBACK"
+  }
+}

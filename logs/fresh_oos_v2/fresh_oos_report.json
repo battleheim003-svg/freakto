@@ -1,0 +1,86 @@
+{
+  "status": "READY_AWAITING_FRESH_DATA",
+  "mode": "FRESH_OOS_FIXED_BENCHMARK_ONLY",
+  "development_dataset_id": "7eb70bc7f68045dfa5a7",
+  "development_cutoff_utc": "2026-07-09T12:00:00+00:00",
+  "source_replay_rows": 78452,
+  "fresh_rows": 0,
+  "fresh_directional_rows": 0,
+  "fixed_threshold": 70.0,
+  "all_directional": {
+    "sample_count": 0,
+    "win_count": 0,
+    "loss_count": 0,
+    "win_rate": 0.0,
+    "expectancy": 0.0,
+    "median_return": 0.0,
+    "profit_factor": 0.0,
+    "total_return": 0.0,
+    "max_drawdown": 0.0,
+    "positive_time_folds": 0,
+    "total_time_folds": 4
+  },
+  "fixed_gate": {
+    "sample_count": 0,
+    "win_count": 0,
+    "loss_count": 0,
+    "win_rate": 0.0,
+    "expectancy": 0.0,
+    "median_return": 0.0,
+    "profit_factor": 0.0,
+    "total_return": 0.0,
+    "max_drawdown": 0.0,
+    "positive_time_folds": 0,
+    "total_time_folds": 4
+  },
+  "by_symbol": [],
+  "by_side": [],
+  "by_regime": [],
+  "coverage": {
+    "requested_symbols": [
+      "BTC/USDT",
+      "ETH/USDT",
+      "SOL/USDT"
+    ],
+    "requested_timeframes": [
+      "4h"
+    ],
+    "requested_pairs": [
+      "BTC/USDT|4h",
+      "ETH/USDT|4h",
+      "SOL/USDT|4h"
+    ],
+    "observed_pairs": [],
+    "missing_pairs": [
+      "BTC/USDT|4h",
+      "ETH/USDT|4h",
+      "SOL/USDT|4h"
+    ],
+    "symbol_counts": {},
+    "timeframe_counts": {},
+    "provider_counts": {}
+  },
+  "blockers": [
+    "fresh directional sample count 0 is below required 300"
+  ],
+  "warnings": [
+    "BTC/USDT has only 0 fresh directional rows",
+    "ETH/USDT has only 0 fresh directional rows",
+    "SOL/USDT has only 0 fresh directional rows",
+    "missing requested symbol/timeframe pairs: ['BTC/USDT|4h', 'ETH/USDT|4h', 'SOL/USDT|4h']"
+  ],
+  "feature_store": {
+    "status": "READY_AWAITING_FRESH_DATA",
+    "feature_rows": 0,
+    "path_rows": 0,
+    "complete_path_rows": 0,
+    "pending_path_rows": 0,
+    "feature_file": "logs\\fresh_oos_v2\\feature_store_v2\\fresh_oos_features_v2.csv.gz",
+    "path_file": "logs\\fresh_oos_v2\\feature_store_v2\\fresh_oos_outcome_paths_v2.csv.gz",
+    "manifest_file": "logs\\fresh_oos_v2\\feature_store_v2\\feature_store_v2_manifest.json",
+    "validation_errors": [],
+    "warnings": []
+  },
+  "promotion_applied": false,
+  "paper_live_enabled": false
+}

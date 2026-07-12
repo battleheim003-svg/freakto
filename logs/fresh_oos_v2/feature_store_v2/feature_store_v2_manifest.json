@@ -1,0 +1,8 @@
+{
+  "schema_version": "2.0.0",
+  "status": "READY_AWAITING_FRESH_DATA",
+  "feature_rows": 0,
+  "path_rows": 0,
+  "research_mode": "FRESH_OOS_RESEARCH_ONLY",
+  "paper_live_enabled": false
+}
