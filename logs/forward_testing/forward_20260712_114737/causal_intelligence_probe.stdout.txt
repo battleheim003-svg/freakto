@@ -1,0 +1,60 @@
+==============================================================================================================
+🧠 Freakto Causal/Event Intelligence Core v7.2.0
+==============================================================================================================
+Status                 : CAUSAL_CONTEXT_PARTIAL_SOURCES
+Run ID                 : causal_intel_20260712_114834
+Symbol / TF            : BTC/USDT | 4h
+Collect Live Sources   : True
+Sources OK/Failed      : 15 / 2
+Trusted Sources OK     : 14
+Manual Events Loaded   : 0
+Auto Events Loaded     : 11
+
+Causal Context:
+- Primary Cause        : MULTI_SOURCE_EVENT_CONSENSUS
+- Cause Confidence     : HIGH
+- Catalyst Score       : 11/100
+- Event Risk           : HIGH
+- Technical Conflict   : LOW
+- Alignment            : NEUTRAL_DECISION_CONTEXT_ONLY
+- Verdict              : CAUSAL_CONTEXT_WEAK_OR_RISKY
+- Evidence Strength    : 0.6745 (MEDIUM)
+- Claim Status         : PLAUSIBLE_HYPOTHESIS
+- Independent Sources  : 7
+- Direction Agreement  : 0.8
+
+Alternative Explanations:
+- Internal alternative: NO_CLEAR_INTERNAL_CAUSE (No strong causal pattern detected from current internal features)
+- Conflicting evidence: SEC Press Releases RSS: The Securities and Exchange Commission’s Office of the Advocate for Small Business Capital Formation and the Division of Corporation Finance will co-host a 
+- The move may be explained by broad market beta or liquidity rather than the named event.
+
+Internal Causes:
+- NO_CLEAR_INTERNAL_CAUSE: dir=NEUTRAL | conf=LOW | score=0 | No strong causal pattern detected from current internal features
+
+Source Health:
+- auto_events: OK | TIER_1_OFFICIAL_REGULATOR | dir=NEUTRAL | risk=HIGH
+- auto_events: OK | TIER_1_OFFICIAL_MACRO | dir=NEUTRAL | risk=HIGH
+- auto_events: OK | TIER_1_OFFICIAL_MACRO | dir=BEARISH | risk=HIGH
+- auto_events: OK | TIER_1_OFFICIAL_MACRO | dir=NEUTRAL | risk=HIGH
+- auto_events: OK | TIER_1_OFFICIAL_REGULATOR | dir=BULLISH | risk=HIGH
+- auto_events: OK | TIER_1_OFFICIAL_REGULATOR | dir=NEUTRAL | risk=HIGH
+- auto_events: OK | TIER_1_OFFICIAL_MACRO | dir=BEARISH | risk=HIGH
+- auto_events: OK | TIER_1_OFFICIAL_REGULATOR | dir=BEARISH | risk=HIGH
+- auto_events: OK | TIER_1_OFFICIAL_MACRO | dir=NEUTRAL | risk=HIGH
+- auto_events: OK | TIER_1_OFFICIAL_REGULATOR | dir=NEUTRAL | risk=HIGH
+- auto_events: OK | TIER_1_OFFICIAL_MACRO | dir=BEARISH | risk=HIGH
+- coingecko_global: OK | TIER_2_MARKET_AGGREGATOR | dir=NEUTRAL | risk=LOW
+
+Recommendations:
+→ manual_events.csv فعال است؛ رویدادهای high-impact را با source_url معتبر ادامه بده.
+→ auto_events.csv فعال است؛ Automatic Event Collector قبل از Causal Intelligence باید اجرا شود.
+→ در v7 نتایج causal/narrative فقط به decision log و research reports اضافه می‌شود؛ هیچ Paper/Live فعال نمی‌شود.
+
+Warnings:
+⚠️ Causal Intelligence یک لایه پژوهشی است و به‌تنهایی سیگنال خرید/فروش نمی‌سازد.
+⚠️ جمع‌آوری APIهای عمومی ممکن است با rate limit یا محدودیت منطقه‌ای روبه‌رو شود؛ شکست source نباید چرخه Forward را fail کند.
+==============================================================================================================
+🧠 Causal intelligence JSON ذخیره شد: logs/causal/causal_intelligence_causal_intel_20260712_114834.json
+📝 Causal intelligence report ذخیره شد: logs/causal/causal_intelligence_report_causal_intel_20260712_114834.md
+📊 Causal source health CSV ذخیره شد: logs/causal/causal_source_health_causal_intel_20260712_114834.csv
+🧾 Causal observations ledger ذخیره شد: logs/causal/causal_observations.csv
