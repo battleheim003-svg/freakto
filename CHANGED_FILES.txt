@@ -1,13 +1,9 @@
-Freakto Replay Safety Compatibility Fix
-
-Changed:
-- engine/decision.py
-
-Added:
-- tests/test_decision_replay_safety.py
-
-Fixes:
-- Restores DecisionEngine constructor support for allow_learning_overrides and allow_historical_edge.
-- Disables Historical Edge reads during causal Market Replay.
-- Exports replay safety flags in OpportunityV2.raw for Market Replay audit rows.
-- Preserves normal engine behavior through True defaults.
+New files:
+- engine/segmented_calibration.py
+- engine/segmented_threshold_optimizer.py
+- segmented_calibration_validation.py
+- tests/test_segmented_calibration.py
+- tests/test_segmented_threshold_optimizer.py
+- SEGMENTED_CALIBRATION_RUNBOOK.md
+- SEGMENTED_CALIBRATION_REAL_RESULT.md
+- CHANGED_FILES.txt
