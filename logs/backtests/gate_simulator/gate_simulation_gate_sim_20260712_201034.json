@@ -1,0 +1,29 @@
+{
+  "run_id": "gate_sim_20260712_201034",
+  "generated_utc": "2026-07-12T20:10:34.502416+00:00",
+  "status": "NO_BACKTEST_DATA",
+  "horizon": "24h",
+  "min_samples": 30,
+  "total_rows": 0,
+  "complete_rows": 0,
+  "directional_samples": 0,
+  "baseline_avg_return_pct": 0.0,
+  "baseline_win_rate": 0.0,
+  "baseline_target_1_hit_rate": 0.0,
+  "baseline_stop_hit_rate": 0.0,
+  "gates_tested": 0,
+  "positive_gates": 0,
+  "research_candidates": 0,
+  "small_sample_positive_gates": 0,
+  "top_gates": [],
+  "results": [],
+  "blockers": [
+    "هیچ فایل historical_backtest_evaluations.csv پیدا نشد."
+  ],
+  "recommendations": [
+    "اول historical_backtest_dashboard.py را اجرا کن، سپس gate simulator را اجرا کن."
+  ],
+  "warnings": [
+    "این ابزار فقط research است و هیچ معامله‌ای ثبت نمی‌کند."
+  ]
+}
