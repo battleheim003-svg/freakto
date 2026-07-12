@@ -26,7 +26,7 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tupl
 import pandas as pd
 
 
-VERSION = "v10.0.0"
+VERSION = "v10.0.1"
 DEFAULT_DATA_DIR = Path("data") / "market_replay"
 DEFAULT_REPORT_DIR = Path("logs") / "market_replay" / "data_quality"
 DEFAULT_EXCHANGE_ORDER = ("kucoin", "okx", "bybit", "kraken")
@@ -480,6 +480,47 @@ def _requested_provider_order(request: HistoricalDataRequest) -> List[str]:
     return result
 
 
+
+def _cache_covers_requested_end(
+    quality: DatasetQuality,
+    *,
+    requested_end: datetime,
+    timeframe: str,
+    max_lag_candles: int = 1,
+) -> bool:
+    """Return True only when cached OHLCV reaches the requested range end.
+
+    Long historical windows can retain very high percentage coverage while
+    still being several recent candles stale.  Coverage alone is therefore
+    insufficient for update decisions.  One-candle lag is allowed because
+    exchanges commonly expose only the last fully closed candle.
+    """
+    if not quality.actual_end_utc:
+        return False
+    actual_end = parse_utc(quality.actual_end_utc)
+    requested_floor = floor_datetime_to_timeframe(requested_end, timeframe)
+    tolerance = timedelta(
+        milliseconds=timeframe_to_milliseconds(timeframe) * max(0, int(max_lag_candles))
+    )
+    return actual_end >= requested_floor - tolerance
+
+
+def _incremental_fetch_start(
+    existing: pd.DataFrame,
+    *,
+    requested_start: datetime,
+    timeframe: str,
+) -> datetime:
+    """Start one candle before the cached tail to refresh/append safely."""
+    if existing is None or existing.empty or "timestamp" not in existing.columns:
+        return requested_start
+    latest = pd.to_datetime(existing["timestamp"], utc=True, errors="coerce").max()
+    if pd.isna(latest):
+        return requested_start
+    overlap = timedelta(milliseconds=timeframe_to_milliseconds(timeframe))
+    candidate = latest.to_pydatetime() - overlap
+    return max(requested_start, candidate)
+
 def build_symbol_history(
     request: HistoricalDataRequest,
     symbol: str,
@@ -505,7 +546,16 @@ def build_symbol_history(
                 requested_start=start,
                 requested_end=end,
             )
-            if cached_quality.coverage_pct >= request.min_acceptable_coverage_pct and cached_quality.invalid_ohlc_rows == 0:
+            cache_is_fresh = _cache_covers_requested_end(
+                cached_quality,
+                requested_end=end,
+                timeframe=request.timeframe,
+            )
+            if (
+                cached_quality.coverage_pct >= request.min_acceptable_coverage_pct
+                and cached_quality.invalid_ohlc_rows == 0
+                and cache_is_fresh
+            ):
                 result = HistoricalDatasetResult(
                     symbol=symbol,
                     timeframe=request.timeframe,
@@ -529,14 +579,29 @@ def build_symbol_history(
     best_provider = ""
     attempts: List[Dict[str, Any]] = []
 
-    for provider in _requested_provider_order(request):
+    provider_order = _requested_provider_order(request)
+    if not existing.empty:
+        cached_provider = str(existing["provider"].dropna().iloc[-1]) if "provider" in existing else ""
+        if cached_provider in provider_order:
+            provider_order = [cached_provider] + [name for name in provider_order if name != cached_provider]
+
+    for provider in provider_order:
         attempt_started = utc_now_iso()
         try:
+            fetch_start = start
+            if not existing.empty:
+                existing_provider = str(existing["provider"].dropna().iloc[-1]) if "provider" in existing else ""
+                if existing_provider == provider:
+                    fetch_start = _incremental_fetch_start(
+                        existing,
+                        requested_start=start,
+                        timeframe=request.timeframe,
+                    )
             fetched = fetch_exchange_history(
                 exchange_name=provider,
                 symbol=symbol,
                 timeframe=request.timeframe,
-                start=start,
+                start=fetch_start,
                 end=end,
                 batch_limit=request.batch_limit,
                 max_retries=request.max_retries,
