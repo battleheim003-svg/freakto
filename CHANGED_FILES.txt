@@ -1,8 +1,9 @@
+engine/trade_geometry.py
+engine/execution_cost_optimizer.py
 engine/outcome_economics.py
-engine/exit_policy_audit.py
-label_outcome_economics_analysis.py
-tests/test_outcome_economics.py
-tests/test_exit_policy_audit.py
-LABEL_OUTCOME_ECONOMICS_RUNBOOK.md
-LABEL_OUTCOME_ECONOMICS_REAL_RESULT.md
+execution_cost_geometry_analysis.py
+tests/test_trade_geometry.py
+tests/test_execution_cost_optimizer.py
+EXECUTION_COST_GEOMETRY_RUNBOOK.md
+EXECUTION_COST_GEOMETRY_REAL_RESULT.md
 CHANGED_FILES.txt

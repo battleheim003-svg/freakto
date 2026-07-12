@@ -221,7 +221,7 @@ def adaptive_horizon_return(frame: pd.DataFrame, *, net: bool = True) -> pd.Seri
 def return_metrics(values: Sequence[float] | pd.Series) -> ReturnMetrics:
     series = pd.to_numeric(pd.Series(values), errors="coerce").dropna().astype(float)
     if series.empty:
-        return ReturnMetrics(0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        return ReturnMetrics(0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     wins = series[series > 0]
     losses = series[series < 0]
     flats = series[series == 0]
