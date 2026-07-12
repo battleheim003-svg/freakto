@@ -1,9 +1,4 @@
-engine/fresh_oos_feature_store.py
 engine/fresh_oos_replay.py
-fresh_oos_replay_analysis.py
-tests/test_fresh_oos_feature_store.py
 tests/test_fresh_oos_replay.py
-data/fresh_oos_cost_profiles.example.json
 FRESH_OOS_FEATURE_STORE_RUNBOOK.md
-FRESH_OOS_FEATURE_STORE_REAL_RESULT.md
 CHANGED_FILES.txt

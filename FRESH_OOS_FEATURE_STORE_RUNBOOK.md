@@ -54,7 +54,7 @@ logs/fresh_oos_v2/fresh_oos_coverage.csv
 
 ## Cost profiles
 
-Recorded Replay fee and slippage fields have priority. When they are absent, the registry reads an optional JSON profile and finally uses a conservative built-in fallback. Copy `data_fresh_oos_cost_profiles.example.json` and replace values only with fees and slippage verified for the exact exchange/account/symbol.
+Recorded Replay fee and slippage fields have priority. When they are absent, the registry reads an optional JSON profile and finally uses a conservative built-in fallback. Copy `data/fresh_oos_cost_profiles.example.json` and replace values only with fees and slippage verified for the exact exchange/account/symbol.
 
 ## Interpreting statuses
 
@@ -62,3 +62,15 @@ Recorded Replay fee and slippage fields have priority. When they are absent, the
 - `COMPLETE_NO_PROMOTION`: enough fresh data exists, but the fixed benchmark failed.
 - `PASS_FIXED_BENCHMARK_RESEARCH_ONLY`: untouched OOS passed the fixed benchmark; still no automatic Paper/Live activation.
 - `FAILED_DATA_INTEGRITY`: overlap, duplicate IDs, path-order violation or feature/outcome leakage was detected.
+
+## Warm-up behavior for fresh replay
+
+Fresh OOS keeps the Development cutoff as the strict decision boundary, but it preloads older candles before that cutoff for causal indicator warm-up and future-horizon accounting. Warm-up candles are never returned as fresh decisions.
+
+This separation is required because `MarketReplayConfig.start_utc` filters the OHLCV frame before feature calculation. Starting exactly one candle after the cutoff can leave fewer than 14 candles and cause errors such as:
+
+```text
+IndexError: index 13 is out of bounds for axis 0 with size 6
+```
+
+After the warm-up fix, a short post-cutoff history should return `READY_AWAITING_FRESH_DATA` without per-symbol replay errors. Fresh decisions appear only when enough later candles exist to complete the configured evaluation horizon.

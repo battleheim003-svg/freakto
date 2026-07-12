@@ -217,7 +217,7 @@ def _load_histories(config: FreshOOSConfig) -> Dict[Tuple[str, str], pd.DataFram
     return histories
 
 
-def _next_candle_timestamp(cutoff_utc: str, timeframe: str) -> str:
+def _timeframe_delta(timeframe: str) -> pd.Timedelta:
     text = str(timeframe).strip().lower()
     if len(text) < 2:
         raise ValueError(f"unsupported timeframe: {timeframe}")
@@ -226,10 +226,49 @@ def _next_candle_timestamp(cutoff_utc: str, timeframe: str) -> str:
     units = {"m": "min", "h": "h", "d": "D", "w": "W"}
     if count <= 0 or unit not in units:
         raise ValueError(f"unsupported timeframe: {timeframe}")
+    return pd.Timedelta(count, unit=units[unit])
+
+
+def _next_candle_timestamp(cutoff_utc: str, timeframe: str) -> str:
     cutoff = pd.Timestamp(cutoff_utc)
     if cutoff.tzinfo is None:
         cutoff = cutoff.tz_localize("UTC")
-    return (cutoff + pd.Timedelta(count, unit=units[unit])).isoformat()
+    return (cutoff + _timeframe_delta(timeframe)).isoformat()
+
+
+def _warmup_start_timestamp(
+    cutoff_utc: str,
+    timeframe: str,
+    *,
+    min_window: int,
+    horizons: Sequence[int],
+    execution_delay_candles: int = 1,
+    adaptive_evaluation_horizon: bool = True,
+    safety_candles: int = 8,
+) -> str:
+    """Return a causal pre-roll start while keeping OOS output post-cutoff only.
+
+    MarketReplayConfig.start_utc filters the OHLCV frame before feature
+    calculation. Starting exactly after the development cutoff can therefore
+    leave only a handful of fresh candles and break indicators that require a
+    longer warm-up (for example RSI-14). The pre-roll is feature context only;
+    `_run_replay_after_cutoff` removes every replay row at or before the frozen
+    cutoff before returning it.
+    """
+    positive_horizons = [int(value) for value in horizons if int(value) > 0]
+    max_horizon = max(positive_horizons or [1])
+    if adaptive_evaluation_horizon:
+        max_horizon *= 2
+    required_candles = (
+        max(1, int(min_window))
+        + max_horizon
+        + max(1, int(execution_delay_candles))
+        + max(0, int(safety_candles))
+    )
+    cutoff = pd.Timestamp(cutoff_utc)
+    if cutoff.tzinfo is None:
+        cutoff = cutoff.tz_localize("UTC")
+    return (cutoff - (_timeframe_delta(timeframe) * required_candles)).isoformat()
 
 
 def _run_replay_after_cutoff(config: FreshOOSConfig, manifest: DevelopmentFreezeManifest) -> pd.DataFrame:
@@ -239,20 +278,40 @@ def _run_replay_after_cutoff(config: FreshOOSConfig, manifest: DevelopmentFreeze
         raise RuntimeError(f"current market replay engine is unavailable: {exc}") from exc
     all_rows: List[pd.DataFrame] = []
     for timeframe in config.timeframes:
+        horizons = sorted(set([1, 3, 6, 12, max(24, int(config.max_path_candles))]))
+        min_window = 120
+        execution_delay = 1
+        adaptive_horizon = True
         replay_config = MarketReplayConfig(
             symbols=list(config.symbols),
             timeframe=timeframe,
-            start_utc=_next_candle_timestamp(manifest.cutoff_timestamp_utc, timeframe),
+            # IMPORTANT: this is a causal feature warm-up range, not the OOS
+            # decision boundary. Returned rows are filtered against the frozen
+            # cutoff below. Starting at the next candle caused short-frame
+            # indicator failures when only a few fresh candles existed.
+            start_utc=_warmup_start_timestamp(
+                manifest.cutoff_timestamp_utc,
+                timeframe,
+                min_window=min_window,
+                horizons=horizons,
+                execution_delay_candles=execution_delay,
+                adaptive_evaluation_horizon=adaptive_horizon,
+            ),
             data_dir=config.data_dir,
-            horizons=[1, 3, 6, 12, max(24, config.max_path_candles)],
+            min_window=min_window,
+            horizons=horizons,
             include_neutral=True,
+            execution_delay_candles=execution_delay,
+            adaptive_evaluation_horizon=adaptive_horizon,
             strict_leakage_audit=True,
             source="FRESH_OOS_REPLAY_V2",
         )
         run_id = "fresh_oos_v2_" + datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S") + "_" + timeframe
         _run, _summary, rows = run_market_replay(replay_config, run_id=run_id, save=False)
         if isinstance(rows, pd.DataFrame) and not rows.empty:
-            all_rows.append(rows)
+            fresh_rows = strictly_fresh_rows(rows, manifest.cutoff_timestamp_utc)
+            if not fresh_rows.empty:
+                all_rows.append(fresh_rows)
     return pd.concat(all_rows, ignore_index=True) if all_rows else pd.DataFrame()
 
 
