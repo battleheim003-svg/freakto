@@ -1,0 +1,7 @@
+﻿probe,filters,verdict,forward_data_source,shadow_gate_source,shadow_rows_seen,forward_samples,forward_avg_pct,forward_win_rate,forward_t1_rate,forward_stop_rate,forward_mfe_mae,backtest_samples,backtest_net_avg_pct,backtest_win_rate,backtest_t1_rate,backtest_stop_rate,backtest_mfe_mae
+BULL_STRUCTURE_SCORE_GE_10,"{'regime_label': 'TRENDING_BULL', 'structure_score_min': 10}",FORWARD_PROMISING_LOW_SAMPLE_BACKTEST_CONFLICT,shadow_ledger_sync,STRUCTURE_SCORE_GE_10,14,14,0.8834,100.0,100.0,85.71,1.785,0,0.0,0.0,0.0,0.0,0.0
+BULL_STRUCTURE_SCORE_GE_10_LONG,"{'regime_label': 'TRENDING_BULL', 'structure_score_min': 10, 'side': 'LONG'}",FORWARD_PROMISING_LOW_SAMPLE_BACKTEST_CONFLICT,shadow_ledger_sync,STRUCTURE_SCORE_GE_10,14,14,0.8834,100.0,100.0,85.71,1.785,0,0.0,0.0,0.0,0.0,0.0
+BULL_RISK_MEDIUM,"{'regime_label': 'TRENDING_BULL', 'risk_medium': True}",FORWARD_PROMISING_LOW_SAMPLE_BACKTEST_CONFLICT,shadow_ledger_sync,RISK_MEDIUM,1,1,0.5361,100.0,0.0,0.0,2.017,0,0.0,0.0,0.0,0.0,0.0
+BULL_VOLUME_SCORE_GE_10,"{'regime_label': 'TRENDING_BULL', 'volume_score_min': 10}",NO_FORWARD_SAMPLE,decision_evaluations,VOLUME_SCORE_GE_10,0,0,0.0,0.0,0.0,0.0,0.0,0,0.0,0.0,0.0,0.0,0.0
+BULL_SCORE_GE_80,"{'regime_label': 'TRENDING_BULL', 'score_min': 80}",NO_FORWARD_SAMPLE,decision_evaluations,SCORE_GE_80,0,0,0.0,0.0,0.0,0.0,0.0,0,0.0,0.0,0.0,0.0,0.0
+BULL_BNB_LONG_SCORE_GE_60,"{'regime_label': 'TRENDING_BULL', 'symbol': 'BNB/USDT', 'side': 'LONG', 'score_min': 60}",NO_FORWARD_SAMPLE,decision_evaluations,BNB_LONG_SCORE_GE_60,0,0,0.0,0.0,0.0,0.0,0.0,0,0.0,0.0,0.0,0.0,0.0

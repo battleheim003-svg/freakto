@@ -1,0 +1,8 @@
+﻿regime,side,actionability,samples,target_1_hit_rate,directional_win_rate,avg_24h_return_pct,profit_factor,stop_hit_rate,avg_score,avg_mfe_pct,avg_mae_pct,verdict,notes
+TRENDING_BULL,LONG,NOT_ACTIONABLE,6,66.67,66.67,0.2484,1.4806,33.33,49.6667,2.0144,-1.898,REGIME_POSITIVE,در این رژیم نشانه اولیه Edge مثبت دیده می‌شود.
+TRENDING_BULL,LONG,WATCHLIST,24,87.5,75.0,0.3575,2.3117,79.17,65.5417,2.9017,-2.1401,MIXED_POSITIVE,بازده مثبت است اما کیفیت آماری کامل نیست.
+TRENDING_BULL,NEUTRAL,MONITOR_ONLY,16,0.0,62.5,0.919,3.4814,0.0,30.375,2.6147,-2.6168,MIXED_POSITIVE,بازده مثبت است اما کیفیت آماری کامل نیست.
+TRENDING_BEAR,NEUTRAL,MONITOR_ONLY,7,0.0,100.0,1.9942,13.9593,0.0,31.0,3.1576,-0.6642,MIXED_POSITIVE,بازده مثبت است اما کیفیت آماری کامل نیست.
+TRENDING_BULL,LONG,ACTIONABLE,1,100.0,100.0,0.4897,0.4897,100.0,70.0,3.3818,-2.0299,LOW_SAMPLE,نمونه کمتر از 5 است؛ فقط برای رصد.
+SIDEWAYS,NEUTRAL,MONITOR_ONLY,1,0.0,0.0,-0.5747,0.0,0.0,35.0,0.5485,-0.8086,LOW_SAMPLE,نمونه کمتر از 5 است؛ فقط برای رصد.
+TRENDING_BEAR,SHORT,NOT_ACTIONABLE,1,0.0,0.0,-2.8484,0.0,100.0,46.0,0.0184,-4.3917,LOW_SAMPLE,نمونه کمتر از 5 است؛ فقط برای رصد.

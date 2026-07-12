@@ -1,0 +1,109 @@
+{
+  "created_utc": "2026-07-12T15:43:23.146163+00:00",
+  "level": "PAPER_TRADING_PHASE",
+  "score": 62,
+  "live_ready": false,
+  "paper_ready": true,
+  "allowed_risk_pct": 0.0,
+  "components": [
+    {
+      "name": "Data Sufficiency",
+      "score": 7,
+      "max_score": 20,
+      "status": "LOW",
+      "notes": [
+        "Complete evaluations: 56/100",
+        "Closed paper trades: 0/30"
+      ],
+      "blockers": [
+        "Complete evaluations هنوز کافی نیست: 56/100",
+        "Closed paper trades هنوز کافی نیست: 0/30"
+      ]
+    },
+    {
+      "name": "Decision Edge",
+      "score": 20,
+      "max_score": 23,
+      "status": "PARTIAL",
+      "notes": [
+        "Decision quality: MIXED_VALIDATION",
+        "Directional Win 71.43% | Expectancy 0.6393pct | PF 2.8852",
+        "Stop 41.07% | Sharpe-like 3.1745"
+      ],
+      "blockers": [
+        "Decision sample کمتر از 100 است: 56"
+      ]
+    },
+    {
+      "name": "Paper Edge",
+      "score": 0,
+      "max_score": 20,
+      "status": "LOW",
+      "notes": [
+        "Paper quality: NO_DATA",
+        "Closed 0 | Paper Win 0.00% | Expectancy 0.0000R | PF 0.0000",
+        "Max drawdown 0.0000R"
+      ],
+      "blockers": [
+        "Paper sample کمتر از 30 معامله بسته‌شده است: 0",
+        "Paper expectancy هنوز مثبت نیست."
+      ]
+    },
+    {
+      "name": "Regime Stability",
+      "score": 18,
+      "max_score": 18,
+      "status": "PASS",
+      "notes": [
+        "Regime verdict: REGIME_EDGE_EMERGING",
+        "Known/Unknown: 56/0",
+        "Best/Worst: TRENDING_BEAR/TRENDING_BULL"
+      ],
+      "blockers": []
+    },
+    {
+      "name": "Validation Stability",
+      "score": 12,
+      "max_score": 12,
+      "status": "PASS",
+      "notes": [
+        "Strategy Lab اجرا شده و نمونه دارد.",
+        "Walk-Forward Validation اجرا شده و test sample دارد."
+      ],
+      "blockers": []
+    },
+    {
+      "name": "Operational Safety",
+      "score": 5,
+      "max_score": 7,
+      "status": "PARTIAL",
+      "notes": [
+        "Auto-live trading در پروژه فعال نیست.",
+        "Readiness Gate قبل از هر تست عملی باید بررسی شود."
+      ],
+      "blockers": [
+        "Stop Hit Rate بالاست: 41.07%"
+      ]
+    }
+  ],
+  "blockers": [
+    "Complete evaluations هنوز کافی نیست: 56/100",
+    "Closed paper trades هنوز کافی نیست: 0/30",
+    "Decision sample کمتر از 100 است: 56",
+    "Paper sample کمتر از 30 معامله بسته‌شده است: 0",
+    "Paper expectancy هنوز مثبت نیست.",
+    "Stop Hit Rate بالاست: 41.07%",
+    "Market Replay هنوز برای Live معتبر نیست: NO_REPLAY_ROWS (rows=0, audit=FAILED_NO_REPLAY_ROWS)"
+  ],
+  "warnings": [
+    "Paper Trading هنوز نتیجه بسته‌شده ندارد.",
+    "Market Replay v10 باید روی Test split و بعد در Forward تأیید شود؛ این مانع Paper آزمایشی نیست اما Live را مسدود می‌کند."
+  ],
+  "conclusion": "پروژه در فاز Paper/Forward Test است؛ پول واقعی هنوز مجاز نیست.",
+  "edge_quality": "EARLY_EDGE_OBSERVED",
+  "regime_verdict": "REGIME_EDGE_EMERGING",
+  "complete_evaluations": 56,
+  "closed_paper_trades": 0,
+  "paper_expectancy_r": 0.0,
+  "decision_profit_factor": 2.8852
+}
