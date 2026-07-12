@@ -1,12 +1,8 @@
-New files in this change set:
-
-engine/score_attribution.py
-engine/component_ablation.py
-score_attribution_analysis.py
-tests/test_score_attribution.py
-tests/test_component_ablation.py
-SCORE_ATTRIBUTION_RUNBOOK.md
-SCORE_ATTRIBUTION_REAL_RESULT.md
+engine/expectancy_challenger.py
+engine/champion_challenger.py
+champion_challenger_analysis.py
+tests/test_expectancy_challenger.py
+tests/test_champion_challenger.py
+CHAMPION_CHALLENGER_RUNBOOK.md
+CHAMPION_CHALLENGER_REAL_RESULT.md
 CHANGED_FILES.txt
-
-No runtime score weight, calibration policy, Paper setting, or Live setting was modified.

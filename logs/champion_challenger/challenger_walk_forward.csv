@@ -1,0 +1,16 @@
+﻿fold,variant,status,selected_threshold_pct,sample_count,win_count,loss_count,flat_count,win_rate,avg_return,median_return,expectancy,profit_factor,max_drawdown,total_return,expectancy_standard_error,expectancy_ci95_lower,expectancy_ci95_upper,pass,blocker
+WF_1,EXPECTANCY_BASE,NO_OPTIMIZE_POLICY,,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,False,Walk-forward test did not preserve positive edge.
+WF_2,EXPECTANCY_BASE,EVALUATED,0.3,96,27,69,0,0.28125,-2.377206,-2.10502,-2.377206,0.288484,-228.985621,-228.211763,0.510245,-3.377286,-1.377126,False,Walk-forward test did not preserve positive edge.
+WF_3,EXPECTANCY_BASE,NO_OPTIMIZE_POLICY,,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,False,Walk-forward test did not preserve positive edge.
+WF_1,EXPECTANCY_NO_MOMENTUM,NO_OPTIMIZE_POLICY,,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,False,Walk-forward test did not preserve positive edge.
+WF_2,EXPECTANCY_NO_MOMENTUM,EVALUATED,0.25,144,42,102,0,0.291667,-1.95422,-1.850185,-1.95422,0.332415,-280.463007,-281.407613,0.394332,-2.727111,-1.181328,False,Walk-forward test did not preserve positive edge.
+WF_3,EXPECTANCY_NO_MOMENTUM,NO_OPTIMIZE_POLICY,,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,False,Walk-forward test did not preserve positive edge.
+WF_1,EXPECTANCY_STRUCTURE_GATE,NO_OPTIMIZE_POLICY,,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,False,Walk-forward test did not preserve positive edge.
+WF_2,EXPECTANCY_STRUCTURE_GATE,EVALUATED,0.3,91,26,65,0,0.285714,-2.30683,-2.142196,-2.30683,0.302368,-210.69539,-209.921532,0.522498,-3.330927,-1.282733,False,Walk-forward test did not preserve positive edge.
+WF_3,EXPECTANCY_STRUCTURE_GATE,NO_OPTIMIZE_POLICY,,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,False,Walk-forward test did not preserve positive edge.
+WF_1,EXPECTANCY_LONG_ONLY,NO_OPTIMIZE_POLICY,,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,False,Walk-forward test did not preserve positive edge.
+WF_2,EXPECTANCY_LONG_ONLY,EVALUATED,0.3,56,19,37,0,0.339286,-1.407164,-0.954595,-1.407164,0.413776,-79.180956,-78.801189,0.568413,-2.521253,-0.293075,False,Walk-forward test did not preserve positive edge.
+WF_3,EXPECTANCY_LONG_ONLY,NO_OPTIMIZE_POLICY,,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,False,Walk-forward test did not preserve positive edge.
+WF_1,EXPECTANCY_SHORT_DISABLED,NO_OPTIMIZE_POLICY,,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,False,Walk-forward test did not preserve positive edge.
+WF_2,EXPECTANCY_SHORT_DISABLED,EVALUATED,0.3,56,19,37,0,0.339286,-1.407164,-0.954595,-1.407164,0.413776,-79.180956,-78.801189,0.568413,-2.521253,-0.293075,False,Walk-forward test did not preserve positive edge.
+WF_3,EXPECTANCY_SHORT_DISABLED,NO_OPTIMIZE_POLICY,,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,False,Walk-forward test did not preserve positive edge.
