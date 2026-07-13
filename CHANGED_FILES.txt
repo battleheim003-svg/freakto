@@ -1,8 +1,13 @@
-NEW engine/multi_cycle_feature_decay.py
-NEW engine/regime_drift.py
-NEW multi_cycle_feature_decay_analysis.py
-NEW tests/test_multi_cycle_feature_decay.py
-NEW tests/test_regime_drift.py
-NEW MULTI_CYCLE_FEATURE_DECAY_RUNBOOK.md
-NEW MULTI_CYCLE_FEATURE_DECAY_IMPLEMENTATION_RESULT.md
-UPDATED CHANGED_FILES.txt
+Feature Architecture v2 & Baseline Benchmark Suite
+
+NEW
+- engine/feature_architecture_v2.py
+- engine/baseline_benchmarks.py
+- feature_architecture_v2_analysis.py
+- tests/test_feature_architecture_v2.py
+- tests/test_baseline_benchmarks.py
+- FEATURE_ARCHITECTURE_V2_RUNBOOK.md
+- FEATURE_ARCHITECTURE_V2_IMPLEMENTATION_RESULT.md
+- CHANGED_FILES.txt
+
+No runtime DecisionEngine, score weight, Paper setting, or Live setting is modified.
