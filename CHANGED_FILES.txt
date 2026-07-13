@@ -1,13 +1,9 @@
-Feature Architecture v2 & Baseline Benchmark Suite
-
-NEW
-- engine/feature_architecture_v2.py
-- engine/baseline_benchmarks.py
-- feature_architecture_v2_analysis.py
-- tests/test_feature_architecture_v2.py
-- tests/test_baseline_benchmarks.py
-- FEATURE_ARCHITECTURE_V2_RUNBOOK.md
-- FEATURE_ARCHITECTURE_V2_IMPLEMENTATION_RESULT.md
-- CHANGED_FILES.txt
-
-No runtime DecisionEngine, score weight, Paper setting, or Live setting is modified.
+engine/event_opportunity_universe.py
+engine/cost_aware_label_v2.py
+engine/event_opportunity_benchmarks.py
+event_opportunity_v2_analysis.py
+tests/test_event_opportunity_universe.py
+tests/test_cost_aware_label_v2.py
+EVENT_OPPORTUNITY_UNIVERSE_RUNBOOK.md
+EVENT_OPPORTUNITY_UNIVERSE_IMPLEMENTATION_RESULT.md
+CHANGED_FILES.txt

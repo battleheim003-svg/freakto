@@ -1,0 +1,45 @@
+{
+  "status": "INSUFFICIENT_EVENT_UNIVERSE",
+  "mode": "EVENT_OPPORTUNITY_COST_AWARE_DEVELOPMENT_ONLY",
+  "version": "2.0.0",
+  "created_utc": "2026-07-13T18:51:02.130104+00:00",
+  "selected_replay_window": "FULL",
+  "available_replay_windows": [
+    "3Y",
+    "5Y",
+    "FULL"
+  ],
+  "development_cutoff_utc": "2026-07-09T12:00:00Z",
+  "rows_loaded": 48535,
+  "directional_rows": 16150,
+  "event_rows": 0,
+  "cost_gated_event_rows": 0,
+  "event_rate": 0.0,
+  "split_boundaries": {},
+  "development_candidate": null,
+  "fresh_oos_required": true,
+  "key_findings": [],
+  "blockers": [
+    "The sparse event universe does not yet contain enough chronological events."
+  ],
+  "warnings": [
+    "Event detectors use entry-time replay fields only; replay proxies are not equivalent to full order-book events.",
+    "Triple-Barrier labels use future outcome fields only after the event universe is frozen."
+  ],
+  "output_files": {
+    "event_universe": "logs\\event_opportunity_v2\\event_universe.csv",
+    "event_overlap": "logs\\event_opportunity_v2\\event_overlap.csv",
+    "cost_aware_label_summary": "logs\\event_opportunity_v2\\cost_aware_label_summary.csv",
+    "event_family_benchmarks": "logs\\event_opportunity_v2\\event_family_benchmarks.csv",
+    "holdout_benchmarks": "logs\\event_opportunity_v2\\holdout_benchmarks.csv",
+    "meta_threshold_candidates": "logs\\event_opportunity_v2\\meta_threshold_candidates.csv",
+    "meta_model_coefficients": "logs\\event_opportunity_v2\\meta_model_coefficients.csv",
+    "walk_forward": "logs\\event_opportunity_v2\\walk_forward.csv",
+    "prediction_sample": "logs\\event_opportunity_v2\\prediction_sample.csv",
+    "candidate_manifest": "logs\\event_opportunity_v2\\frozen_event_candidate_manifest.json",
+    "json": "logs\\event_opportunity_v2\\event_opportunity_v2_report.json",
+    "markdown": "logs\\event_opportunity_v2\\event_opportunity_v2_report.md"
+  },
+  "promotion_applied": false,
+  "paper_live_enabled": false
+}
