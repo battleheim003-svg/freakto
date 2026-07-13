@@ -1,49 +1,34 @@
-# Multi-Cycle Historical Archive v2 — Implementation Result
+# Multi-Cycle Historical Archive v2.1 — Implementation Result
 
-## وضعیت پیاده‌سازی
+## وضعیت
 
 ```text
-Status              : IMPLEMENTED_AND_TESTED
-Mode                : DEVELOPMENT_RESEARCH_ONLY
-New tests           : 16 passed
-Reconstructed suite : 109 passed
-Compileall          : passed
-Promotion applied   : False
-Paper/Live enabled  : False
+Status                    : IMPLEMENTED_AND_TESTED
+Historical Store Version  : v10.0.2
+Multi-Cycle Version       : 2.1.0
+New regression tests      : 5 passed
+Reconstructed suite       : 114 passed
+Compile                    : passed
+Promotion applied         : False
+Paper/Live enabled        : False
 ```
+
+نسخه کامل کاربر قبل از این اصلاح 131 تست داشت؛ پس انتظار محلی پس از جایگزینی فایل‌ها `136 passed` است.
 
 ## موارد تکمیل‌شده
 
-- آرشیو جداگانه `3Y / 5Y / FULL`
-- سقف زمانی مشترک و منجمد Development Cutoff
-- عدم تغییر `data/market_replay`
-- عدم تغییر Fresh OOS Freeze
-- نسخه‌بندی Dataset و SHA-256
-- کنترل Provider consistency
-- تشخیص Listing/Provider boundary
-- Replay جداگانه هر پنجره با `save=False`
-- Fixed benchmark بدون تنظیم مجدد Threshold
-- Rolling-window validation
-- Expanding-window validation بدون هم‌پوشانی Train/Test
-- Drift diagnostics با PSI و distribution shift
-- Regime stability درون و بین پنجره‌ها
-- Fail-Closed در Hash mismatch، Provider mixing، Post-cutoff rows یا Leakage failure
+- کشف خودکار Listing boundary برای FULL
+- عبور مرحله‌ای از Batchهای خالی قبل از Listing
+- پالایش مرز اولین داده تا دقت یک کندل
+- شروع مستقل BTC/ETH/SOL
+- Fallback Provider بدون ادغام Providerها
+- ثبت تعداد Probe و منبع Listing boundary در Manifest
+- Replay فقط با Symbolهای Archive‌شده و تأییدشده
+- `PARTIAL_FULL_HISTORY` برای FULL ناقص ولی قابل استفاده
+- Fail-Closed برای Hash، Provider mixing، Cutoff و Leakage failure
+- حذف Replay قدیمی در خروجی خالی یا Skip
+- خروجی `archive_build_issues.csv`
 
-## Smoke Test مصنوعی
+## محدودیت محیط اجرا
 
-برای اطمینان از تولید واقعی تمام خروجی‌ها، سه آرشیو و سه Replay مصنوعی ساخته و بررسی شدند:
-
-```text
-Dataset manifests  : 3
-Validation status  : COMPLETE_NO_PROMOTION
-Rolling windows    : 47
-Expanding windows  : 35
-Drift diagnostics  : 21
-Regime rows        : 8
-```
-
-## محدودیت اجرای این محیط
-
-دریافت تاریخچه واقعی صرافی و اجرای Replay چندساله به اتصال اینترنت و Cache محلی فعلی پروژه نیاز دارد. این محیط به دیتاست فعلی 6593 کندلی سیستم کاربر و API صرافی دسترسی نداشت؛ بنابراین نتیجه واقعی 3Y/5Y/FULL باید با دستور Runbook روی سیستم پروژه تولید شود.
-
-این محدودیت روی کامل‌بودن کد و تست‌ها اثر ندارد، اما اعداد واقعی Profit Factor، Expectancy و Drift فقط بعد از اجرای محلی معتبر خواهند بود.
+این محیط دسترسی اینترنتی به API صرافی و فایل‌های Market Replay کامل سیستم کاربر نداشت. رفتار Listing bootstrap، Provider fallback، Partial FULL و stale-output cleanup با Exchangeهای مصنوعی و تست‌های رگرسیون بررسی شد. اعداد واقعی FULL پس از اجرای دستور Runbook روی سیستم کاربر تولید می‌شوند.

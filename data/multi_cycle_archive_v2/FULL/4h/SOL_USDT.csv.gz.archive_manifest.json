@@ -1,0 +1,28 @@
+{
+  "version": "2.1.0",
+  "dataset_version_id": "5669a82f8f76e53bed83",
+  "window": "FULL",
+  "symbol": "SOL/USDT",
+  "timeframe": "4h",
+  "provider": "kucoin",
+  "requested_start_utc": "2017-01-01T00:00:00+00:00",
+  "requested_end_utc": "2026-07-09T12:00:00+00:00",
+  "actual_start_utc": "2021-08-04T08:00:00+00:00",
+  "actual_end_utc": "2026-07-09T12:00:00+00:00",
+  "rows": 10802,
+  "coverage_pct": 51.783,
+  "gap_count": 0,
+  "listing_boundary_detected": true,
+  "provider_consistent": true,
+  "source_file": "data\\multi_cycle_archive_v2\\_staging\\FULL\\4h\\SOL_USDT.csv.gz",
+  "archive_file": "data\\multi_cycle_archive_v2\\FULL\\4h\\SOL_USDT.csv.gz",
+  "sha256": "73a6952e0ffe886a37fd8549e58e55bab9685e538592ec8b2e20471c9e687ce7",
+  "generated_utc": "2026-07-13T17:02:38.821812+00:00",
+  "listing_probe_count": 27,
+  "listing_boundary_source": "DISCOVERED_BY_EMPTY_RANGE_PROBING",
+  "blockers": [],
+  "warnings": [
+    "Actual history starts at 2021-08-04T08:00:00+00:00, after requested start; this is treated as a listing/provider boundary.",
+    "Listing boundary discovered after 27 provider probes."
+  ]
+}

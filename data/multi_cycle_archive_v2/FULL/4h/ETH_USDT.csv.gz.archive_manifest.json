@@ -1,0 +1,28 @@
+{
+  "version": "2.1.0",
+  "dataset_version_id": "4cca275779caf06d48dc",
+  "window": "FULL",
+  "symbol": "ETH/USDT",
+  "timeframe": "4h",
+  "provider": "kucoin",
+  "requested_start_utc": "2017-01-01T00:00:00+00:00",
+  "requested_end_utc": "2026-07-09T12:00:00+00:00",
+  "actual_start_utc": "2017-10-18T16:00:00+00:00",
+  "actual_end_utc": "2026-07-09T12:00:00+00:00",
+  "rows": 19041,
+  "coverage_pct": 91.28,
+  "gap_count": 40,
+  "listing_boundary_detected": true,
+  "provider_consistent": true,
+  "source_file": "data\\multi_cycle_archive_v2\\_staging\\FULL\\4h\\ETH_USDT.csv.gz",
+  "archive_file": "data\\multi_cycle_archive_v2\\FULL\\4h\\ETH_USDT.csv.gz",
+  "sha256": "92891b1e09ac63cb70ea7f26162e49dfed6acee8a3c4dfae996a4664b08d0f50",
+  "generated_utc": "2026-07-13T17:02:38.521063+00:00",
+  "listing_probe_count": 12,
+  "listing_boundary_source": "DISCOVERED_BY_EMPTY_RANGE_PROBING",
+  "blockers": [],
+  "warnings": [
+    "Actual history starts at 2017-10-18T16:00:00+00:00, after requested start; this is treated as a listing/provider boundary.",
+    "Listing boundary discovered after 12 provider probes."
+  ]
+}

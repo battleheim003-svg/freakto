@@ -2,13 +2,13 @@
   "symbol": "SOL/USDT",
   "timeframe": "4h",
   "provider": "kucoin",
-  "requested_start_utc": "2021-07-09T12:00:00+00:00",
+  "requested_start_utc": "2017-01-01T00:00:00+00:00",
   "requested_end_utc": "2026-07-09T12:00:00+00:00",
   "actual_start_utc": "2021-08-04T08:00:00+00:00",
   "actual_end_utc": "2026-07-09T12:00:00+00:00",
-  "expected_candles": 10957,
+  "expected_candles": 20860,
   "actual_candles": 10802,
-  "coverage_pct": 98.585,
+  "coverage_pct": 51.783,
   "duplicate_rows_removed": 0,
   "missing_candles_estimate": 0,
   "gap_count": 0,
@@ -18,7 +18,9 @@
   "zero_volume_rows": 0,
   "monotonic_timestamps": true,
   "no_future_rows": true,
-  "continuity_status": "CONTINUOUS",
-  "readiness_status": "REPLAY_READY",
-  "warnings": []
+  "continuity_status": "PARTIAL_OR_INVALID",
+  "readiness_status": "PARTIAL_HISTORY",
+  "warnings": [
+    "Coverage کمتر از 90% است: 51.78%"
+  ]
 }

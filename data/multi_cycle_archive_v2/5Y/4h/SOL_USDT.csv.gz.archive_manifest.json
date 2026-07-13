@@ -1,6 +1,6 @@
 {
-  "version": "2.0.0",
-  "dataset_version_id": "9a58b03d5e941e5163d5",
+  "version": "2.1.0",
+  "dataset_version_id": "de584c4d7cefe598adb5",
   "window": "5Y",
   "symbol": "SOL/USDT",
   "timeframe": "4h",
@@ -16,8 +16,10 @@
   "provider_consistent": true,
   "source_file": "data\\multi_cycle_archive_v2\\_staging\\5Y\\4h\\SOL_USDT.csv.gz",
   "archive_file": "data\\multi_cycle_archive_v2\\5Y\\4h\\SOL_USDT.csv.gz",
-  "sha256": "48a98570a417f7ba48f9f496ee852d4e62201a5a7f4b1507a1edbaee54e7712c",
-  "generated_utc": "2026-07-13T05:50:28.990318+00:00",
+  "sha256": "aa496c31932abe90503f16a45e353b568c43925e3c42b9afd54446eff8b65383",
+  "generated_utc": "2026-07-13T17:00:21.931077+00:00",
+  "listing_probe_count": 0,
+  "listing_boundary_source": "REQUEST_START_OR_PROVIDER_RESPONSE",
   "blockers": [],
   "warnings": []
 }

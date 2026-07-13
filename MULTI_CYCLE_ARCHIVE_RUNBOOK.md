@@ -1,16 +1,34 @@
-# Freakto Multi-Cycle Historical Archive v2 — Runbook
+# Freakto Multi-Cycle Historical Archive v2.1 — Runbook
 
-این ابزار یک آرشیو Development چندچرخه‌ای می‌سازد و **هیچ تغییری در Fresh OOS Freeze، Paper یا Live ایجاد نمی‌کند**.
+این ابزار آرشیو Development چندچرخه‌ای را جدا از Fresh OOS می‌سازد و **هیچ تغییری در Paper یا Live ایجاد نمی‌کند**.
 
-## هدف
-
-سه پنجره جدا ساخته می‌شود:
+## پنجره‌ها
 
 - `3Y`: سه سال منتهی به Development Cutoff
 - `5Y`: پنج سال منتهی به Development Cutoff
-- `FULL`: از تاریخ پایه مشخص‌شده تا Development Cutoff
+- `FULL`: از تاریخ پایه تا اولین کندل واقعی موجود هر Symbol و سپس تا Cutoff
 
-تمام پنجره‌ها به یک Cutoff منجمد ختم می‌شوند. هیچ داده‌ای بعد از Cutoff وارد Training/Development Archive نمی‌شود.
+تمام پنجره‌ها به Cutoff منجمد زیر ختم می‌شوند:
+
+```text
+2026-07-09T12:00:00Z
+```
+
+هیچ داده‌ای بعد از این زمان وارد Development Archive نمی‌شود.
+
+## اصلاح Full-history bootstrap
+
+نسخه 2.1 مشکل Providerهایی را برطرف می‌کند که وقتی `since` قبل از تاریخ Listing باشد، به‌جای اولین کندل موجود، Batch خالی برمی‌گردانند.
+
+رفتار جدید:
+
+1. فقط برای پنجره `FULL` بازه‌های خالی به‌صورت مرحله‌ای Probe می‌شوند.
+2. پس از یافتن اولین Batch غیرخالی، مرز آخرین Empty و اولین Non-empty تا دقت یک Timeframe پالایش می‌شود.
+3. هر Symbol تاریخ شروع مستقل دارد؛ BTC، ETH و SOL مجبور نیستند از یک تاریخ مشترک داده داشته باشند.
+4. هر Provider جداگانه ارزیابی می‌شود و داده چند صرافی در یک Dataset مخلوط نمی‌شود.
+5. اگر بعضی Symbolهای FULL قابل دریافت نباشند، وضعیت `PARTIAL_FULL_HISTORY` ثبت می‌شود؛ پنجره‌های سالم 3Y/5Y و Symbolهای سالم FULL همچنان قابل Replay هستند.
+6. Replay هر پنجره فقط با Symbolهای دارای Archive تأییدشده اجرا می‌شود.
+7. اگر یک Replay خالی یا Skip شود، فایل Replay قدیمی همان پنجره حذف می‌شود تا Validation از خروجی stale استفاده نکند.
 
 ## مسیرهای خروجی
 
@@ -21,46 +39,48 @@ data/multi_cycle_archive_v2/FULL/
 logs/multi_cycle_archive_v2/
 ```
 
-آرشیو اصلی `data/market_replay` و پوشه زیر دست‌نخورده باقی می‌مانند:
+این مسیرها دست‌نخورده می‌مانند:
 
 ```text
+data/market_replay/
 logs/fresh_oos_v2/development_freeze/
 ```
 
-## اجرای تست‌ها
+## تست‌ها
 
 ```bat
 python -m pytest
 ```
 
-## ساخت آرشیوها
-
-بهتر است Cutoff را صریح وارد کنی. Cutoff فعلی پروژه:
+پس از این اصلاح، روی نسخه‌ای که 131 تست داشت انتظار می‌رود:
 
 ```text
-2026-07-09T12:00:00Z
+136 passed
 ```
 
-ساخت آرشیو سه‌ساله، پنج‌ساله و Full-history:
-
-```bat
-python -X utf8 multi_cycle_archive_analysis.py --build --symbols BTC/USDT,ETH/USDT,SOL/USDT --timeframe 4h --windows 3Y,5Y,FULL --cutoff 2026-07-09T12:00:00Z --full-start 2017-01-01T00:00:00Z --step 1
-```
-
-دریافت Full-history ممکن است زمان‌بر باشد. ابزار برای هر Symbol/Timeframe فقط یک Provider را نگه می‌دارد و Providerها را در یک Dataset مخلوط نمی‌کند.
-
-## اجرای Replay چندچرخه‌ای
-
-پس از کامل‌شدن آرشیوها:
-
-```bat
-python -X utf8 multi_cycle_archive_analysis.py --run-replay --symbols BTC/USDT,ETH/USDT,SOL/USDT --timeframe 4h --windows 3Y,5Y,FULL --cutoff 2026-07-09T12:00:00Z --step 1
-```
-
-ساخت و Replay در یک مرحله:
+## ساخت و Replay کامل
 
 ```bat
 python -X utf8 multi_cycle_archive_analysis.py --build --run-replay --symbols BTC/USDT,ETH/USDT,SOL/USDT --timeframe 4h --windows 3Y,5Y,FULL --cutoff 2026-07-09T12:00:00Z --full-start 2017-01-01T00:00:00Z --step 1
+```
+
+FULL discovery به‌صورت پیش‌فرض فعال است. تنظیمات اختیاری:
+
+```bat
+--listing-probe-days 90
+--max-listing-probes 80
+```
+
+غیرفعال‌کردن Discovery فقط برای تست یا عیب‌یابی:
+
+```bat
+--no-full-discovery
+```
+
+برای بازسازی کامل Cacheهای Staging:
+
+```bat
+--force-refresh
 ```
 
 ## خروجی‌ها
@@ -69,6 +89,7 @@ python -X utf8 multi_cycle_archive_analysis.py --build --run-replay --symbols BT
 logs/multi_cycle_archive_v2/multi_cycle_archive_report.json
 logs/multi_cycle_archive_v2/multi_cycle_archive_report.md
 logs/multi_cycle_archive_v2/archive_dataset_manifest.csv
+logs/multi_cycle_archive_v2/archive_build_issues.csv
 logs/multi_cycle_archive_v2/multi_cycle_validation_report.json
 logs/multi_cycle_archive_v2/rolling_validation.csv
 logs/multi_cycle_archive_v2/expanding_validation.csv
@@ -79,27 +100,36 @@ logs/multi_cycle_archive_v2/replays/5y_replay.csv.gz
 logs/multi_cycle_archive_v2/replays/full_replay.csv.gz
 ```
 
-## کنترل‌های ایمنی
+هر Manifest اکنون این فیلدها را نیز دارد:
 
-- هر Dataset دارای SHA-256 و `dataset_version_id` است.
-- هر Dataset فقط یک Provider دارد.
-- Listing/Provider boundary به‌صورت Warning ثبت می‌شود؛ داده مصنوعی برای قبل از Listing ساخته نمی‌شود.
-- هر ردیف بعد از Development Cutoff حذف و Block می‌شود.
-- Rolling و Expanding Windowها فقط برای ارزیابی هستند.
-- Threshold ثابت `score >= 70` تغییر نمی‌کند.
-- هیچ Weight یا Gate روی داده چندچرخه‌ای Tune یا Promote نمی‌شود.
-- `promotion_applied=False` و `paper_live_enabled=False` همیشه حفظ می‌شوند.
+```text
+listing_probe_count
+listing_boundary_source
+listing_boundary_detected
+actual_start_utc
+provider
+```
 
 ## تفسیر Status
 
 ```text
-READY_TO_BUILD           آرشیوی هنوز ساخته نشده است.
-PARTIAL_ARCHIVE          حداقل یک Symbol/Window موجود نیست.
-ARCHIVE_READY            آرشیوها آماده‌اند ولی Replay اجرا نشده است.
-COMPLETE_RESEARCH_ONLY   آرشیو و Replay کامل شده‌اند؛ هیچ Promotion انجام نشده است.
-FAIL_CLOSED              Hash، Provider، Cutoff یا Leakage Audit معتبر نیست.
+READY_TO_BUILD            هنوز Archive ساخته نشده است.
+PARTIAL_ARCHIVE           حداقل یک Dataset غیر-FULL موجود نیست.
+PARTIAL_FULL_HISTORY      3Y/5Y یا بخشی از FULL سالم است، ولی یک یا چند Dataset FULL موجود نیست.
+ARCHIVE_READY             Archiveها آماده‌اند ولی Replay اجرا نشده است.
+COMPLETE_RESEARCH_ONLY    Archive و Replay کامل شده‌اند؛ هیچ Promotion انجام نشده است.
+FAIL_CLOSED               Hash، Provider، Cutoff، Replay یا Leakage Audit معتبر نیست.
 ```
 
-## نکته درباره FULL History
+`PARTIAL_FULL_HISTORY` خطای امنیتی نیست. این Status می‌گوید تاریخ کامل یک یا چند Symbol از Providerهای مجاز قابل دریافت نبوده است؛ Datasetهای موجود همچنان بدون مخلوط‌کردن Provider استفاده می‌شوند.
 
-برای نمادهایی مثل SOL، تاریخ واقعی ممکن است دیرتر از `--full-start` آغاز شود. ابزار این وضعیت را به‌عنوان `listing_boundary_detected=true` ثبت می‌کند و Coverage را جعل نمی‌کند.
+## کنترل‌های ایمنی
+
+- SHA-256 و `dataset_version_id` برای هر Dataset
+- یک Provider برای هر Symbol/Timeframe/Window
+- عدم ساخت داده مصنوعی قبل از Listing
+- حذف تمام ردیف‌های بعد از Development Cutoff
+- Fixed benchmark برابر `score >= 70`
+- بدون Tune یا Promotion روی آرشیو چندچرخه‌ای
+- `promotion_applied=False`
+- `paper_live_enabled=False`

@@ -1,6 +1,6 @@
 {
-  "version": "2.0.0",
-  "dataset_version_id": "3b5c5977be52f921c963",
+  "version": "2.1.0",
+  "dataset_version_id": "f478963680f80d23c5b6",
   "window": "5Y",
   "symbol": "ETH/USDT",
   "timeframe": "4h",
@@ -16,8 +16,10 @@
   "provider_consistent": true,
   "source_file": "data\\multi_cycle_archive_v2\\_staging\\5Y\\4h\\ETH_USDT.csv.gz",
   "archive_file": "data\\multi_cycle_archive_v2\\5Y\\4h\\ETH_USDT.csv.gz",
-  "sha256": "2134f22c2fcbf7833bd6815f3f7a2c296d53e5066fd47440b9801dd57340240d",
-  "generated_utc": "2026-07-13T05:50:28.735495+00:00",
+  "sha256": "0ccbe58267847c688f49eae70f6de957616c07362ab39c6c98590c3550538870",
+  "generated_utc": "2026-07-13T17:00:21.684746+00:00",
+  "listing_probe_count": 0,
+  "listing_boundary_source": "REQUEST_START_OR_PROVIDER_RESPONSE",
   "blockers": [],
   "warnings": []
 }

@@ -131,3 +131,81 @@ def test_empty_existing_archive_reports_ready_to_build(tmp_path):
     assert report.status == "PARTIAL_ARCHIVE"
     assert report.promotion_applied is False
     assert report.paper_live_enabled is False
+
+
+def test_missing_full_symbol_returns_partial_full_history_and_replays_available_only(tmp_path, monkeypatch):
+    import engine.multi_cycle_archive as module
+
+    config = config_for(
+        tmp_path,
+        symbols=["BTC/USDT", "SOL/USDT"],
+        windows=["FULL"],
+        build_archives=True,
+        run_replays=True,
+    )
+    window = ArchiveWindow("FULL", "2017-01-01T00:00:00+00:00", "2025-01-01T00:00:00+00:00", None)
+    manifest = build_dataset_manifest(
+        market_frame(start="2020-01-01", periods=50),
+        config=config,
+        window=window,
+        symbol="BTC/USDT",
+    )
+
+    monkeypatch.setattr(module, "resolve_archive_windows", lambda *_: [window])
+    monkeypatch.setattr(
+        module,
+        "_build_window",
+        lambda *_args, **_kwargs: (
+            [manifest],
+            [{
+                "window": "FULL",
+                "symbol": "SOL/USDT",
+                "timeframe": "4h",
+                "status": "NO_USABLE_PROVIDER_HISTORY",
+                "error": "no data",
+                "attempts": [],
+                "listing_probe_count": 4,
+            }],
+        ),
+    )
+    observed = {}
+
+    def fake_replay(_config, _window, *, symbols=None):
+        observed["symbols"] = list(symbols or [])
+        rows = pd.DataFrame({
+            "side": ["LONG"],
+            "score": [80],
+            "candle_timestamp": [pd.Timestamp("2024-01-01", tz="UTC")],
+        })
+        return ({
+            "window": "FULL",
+            "run_id": "test",
+            "ok": True,
+            "status": "COMPLETE",
+            "rows": 1,
+            "directional_rows": 1,
+            "leakage_audit_status": "PASSED_NO_LOOKAHEAD",
+        }, rows)
+
+    monkeypatch.setattr(module, "_replay_window", fake_replay)
+    report = run_multi_cycle_archive(config)
+
+    assert report.status == "PARTIAL_FULL_HISTORY"
+    assert report.blockers == []
+    assert observed["symbols"] == ["BTC/USDT"]
+    assert report.replay_runs[0]["missing_symbols"] == ["SOL/USDT"]
+    assert report.build_issues[0]["symbol"] == "SOL/USDT"
+
+
+def test_empty_replay_removes_stale_output(tmp_path):
+    import engine.multi_cycle_archive as module
+
+    config = config_for(tmp_path)
+    stale = Path(config.output_dir) / "replays" / "full_replay.csv.gz"
+    stale.parent.mkdir(parents=True)
+    stale.write_bytes(b"old")
+
+    output = module._write_replay_rows(config, "FULL", pd.DataFrame())
+
+    assert output == ""
+    assert not stale.exists()

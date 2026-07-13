@@ -1,4 +1,4 @@
-"""CLI for Freakto Multi-Cycle Historical Archive v2."""
+"""CLI for Freakto Multi-Cycle Historical Archive v2.1."""
 from __future__ import annotations
 
 import argparse
@@ -20,7 +20,7 @@ def _csv_list(value: str) -> List[str]:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Freakto Multi-Cycle Historical Archive v2")
+    parser = argparse.ArgumentParser(description="Freakto Multi-Cycle Historical Archive v2.1")
     parser.add_argument("--symbols", default="BTC/USDT,ETH/USDT,SOL/USDT")
     parser.add_argument("--timeframe", default="4h")
     parser.add_argument("--windows", default="3Y,5Y,FULL")
@@ -35,6 +35,23 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--build", action="store_true", help="Fetch/build separated development archives.")
     parser.add_argument("--run-replay", action="store_true", help="Run replay for 3Y/5Y/FULL archives.")
     parser.add_argument("--force-refresh", action="store_true")
+    parser.add_argument(
+        "--listing-probe-days",
+        type=int,
+        default=90,
+        help="Coarse probe interval used only for FULL-history listing discovery.",
+    )
+    parser.add_argument(
+        "--max-listing-probes",
+        type=int,
+        default=80,
+        help="Maximum empty-range and boundary-refinement probes per provider/symbol.",
+    )
+    parser.add_argument(
+        "--no-full-discovery",
+        action="store_true",
+        help="Disable automatic listing-boundary discovery for FULL history.",
+    )
     parser.add_argument("--step", type=int, default=1)
     parser.add_argument("--score-threshold", type=float, default=70.0)
     parser.add_argument("--rolling-days", type=int, default=365)
@@ -47,13 +64,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _write_markdown(archive_report, validation_report, output_dir: Path) -> None:
     lines = [
-        "# Freakto Multi-Cycle Historical Archive v2",
+        "# Freakto Multi-Cycle Historical Archive v2.1",
         "",
         f"- Archive status: **{archive_report.status}**",
         f"- Validation status: **{validation_report.status}**",
         f"- Development cutoff: `{archive_report.development_cutoff_utc}`",
         f"- Dataset manifests: **{len(archive_report.datasets)}**",
         f"- Replay windows: **{len(archive_report.replay_runs)}**",
+        f"- Build issues: **{len(getattr(archive_report, 'build_issues', []))}**",
         f"- Fixed benchmark: `score >= {validation_report.fixed_score_threshold:g}`",
         f"- Promotion applied: **{validation_report.promotion_applied}**",
         f"- Paper/Live enabled: **{validation_report.paper_live_enabled}**",
@@ -111,6 +129,9 @@ def main() -> int:
         build_archives=bool(args.build),
         run_replays=bool(args.run_replay),
         force_refresh=bool(args.force_refresh),
+        full_history_discovery=not bool(args.no_full_discovery),
+        listing_probe_days=max(1, int(args.listing_probe_days)),
+        max_listing_probes=max(1, int(args.max_listing_probes)),
         replay_step=max(1, int(args.step)),
         fixed_score_threshold=float(args.score_threshold),
     )
@@ -130,7 +151,7 @@ def main() -> int:
     _write_markdown(archive_report, validation_report, output_dir)
 
     print("=" * 116)
-    print("Freakto Multi-Cycle Historical Archive v2")
+    print("Freakto Multi-Cycle Historical Archive v2.1")
     print("=" * 116)
     print(f"Archive status            : {archive_report.status}")
     print(f"Validation status         : {validation_report.status}")
@@ -138,6 +159,7 @@ def main() -> int:
     print(f"Development cutoff        : {archive_report.development_cutoff_utc}")
     print(f"Archive datasets          : {len(archive_report.datasets)}")
     print(f"Replay windows            : {len(archive_report.replay_runs)}")
+    print(f"Build issues              : {len(getattr(archive_report, 'build_issues', []))}")
     print(f"Fixed threshold           : score >= {validation_report.fixed_score_threshold:g}")
     print(f"Rolling windows           : {len(validation_report.rolling_windows)}")
     print(f"Expanding windows         : {len(validation_report.expanding_windows)}")

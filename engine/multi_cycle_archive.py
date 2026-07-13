@@ -28,7 +28,7 @@ from engine.historical_data_store import (
     timeframe_to_milliseconds,
 )
 
-VERSION = "2.0.0"
+VERSION = "2.1.0"
 DEFAULT_ARCHIVE_ROOT = Path("data") / "multi_cycle_archive_v2"
 DEFAULT_OUTPUT_DIR = Path("logs") / "multi_cycle_archive_v2"
 DEFAULT_FRESH_FREEZE_DIR = Path("logs") / "fresh_oos_v2" / "development_freeze"
@@ -67,6 +67,9 @@ class MultiCycleArchiveConfig:
     fixed_score_threshold: float = 70.0
     strict_provider_consistency: bool = True
     listing_boundary_tolerance_days: int = 30
+    full_history_discovery: bool = True
+    listing_probe_days: int = 90
+    max_listing_probes: int = 80
 
 
 @dataclass
@@ -90,6 +93,8 @@ class ArchiveDatasetManifest:
     archive_file: str
     sha256: str
     generated_utc: str
+    listing_probe_count: int = 0
+    listing_boundary_source: str = "REQUEST_START_OR_PROVIDER_RESPONSE"
     blockers: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
 
@@ -104,6 +109,7 @@ class MultiCycleArchiveReport:
     windows: List[Dict[str, Any]]
     datasets: List[Dict[str, Any]]
     replay_runs: List[Dict[str, Any]]
+    build_issues: List[Dict[str, Any]]
     blockers: List[str]
     warnings: List[str]
     promotion_applied: bool = False
@@ -355,7 +361,7 @@ def _build_window(
     window: ArchiveWindow,
     *,
     exchange_factory: Optional[Callable[[str], Any]] = None,
-) -> List[ArchiveDatasetManifest]:
+) -> Tuple[List[ArchiveDatasetManifest], List[Dict[str, Any]]]:
     staging_root = Path(config.archive_root) / "_staging" / window.name
     request = HistoricalDataRequest(
         symbols=list(config.symbols),
@@ -371,29 +377,55 @@ def _build_window(
         data_dir=str(staging_root),
         update_existing=True,
         force_refresh=config.force_refresh,
+        discover_listing_boundary=bool(config.full_history_discovery and window.name == "FULL"),
+        listing_probe_days=max(1, int(config.listing_probe_days)),
+        max_listing_probes=max(1, int(config.max_listing_probes)),
     )
     report = build_historical_data(request, exchange_factory=exchange_factory)
     manifests: List[ArchiveDatasetManifest] = []
+    issues: List[Dict[str, Any]] = []
     for result in report.results:
         if not result.ok or not result.dataset_path:
+            issues.append({
+                "window": window.name,
+                "symbol": result.symbol,
+                "timeframe": config.timeframe,
+                "status": "NO_USABLE_PROVIDER_HISTORY",
+                "error": result.error or "Historical archive build failed.",
+                "attempts": result.attempts,
+                "listing_probe_count": int(getattr(result, "listing_probe_count", 0) or 0),
+            })
             continue
         frame = load_history(result.symbol, config.timeframe, staging_root)
         frame = _filtered_to_cutoff(frame, window.end_utc)
         coverage, gaps = _quality_fields(result)
-        manifests.append(
-            build_dataset_manifest(
-                frame,
-                config=config,
-                window=window,
-                symbol=result.symbol,
-                provider_hint=result.provider,
-                coverage_pct=coverage,
-                gap_count=gaps,
-                source_file=result.dataset_path,
-            )
+        manifest = build_dataset_manifest(
+            frame,
+            config=config,
+            window=window,
+            symbol=result.symbol,
+            provider_hint=result.provider,
+            coverage_pct=coverage,
+            gap_count=gaps,
+            source_file=result.dataset_path,
         )
-    return manifests
-
+        manifest.listing_probe_count = int(getattr(result, "listing_probe_count", 0) or 0)
+        if bool(getattr(result, "listing_boundary_discovered", False)):
+            manifest.listing_boundary_source = "DISCOVERED_BY_EMPTY_RANGE_PROBING"
+            manifest.warnings.append(
+                f"Listing boundary discovered after {manifest.listing_probe_count} provider probes."
+            )
+        elif manifest.listing_boundary_detected:
+            manifest.listing_boundary_source = "PROVIDER_FIRST_AVAILABLE_CANDLE"
+        if manifest.listing_probe_count or manifest.listing_boundary_detected:
+            manifest_path = Path(manifest.archive_file).with_suffix(
+                Path(manifest.archive_file).suffix + ".archive_manifest.json"
+            )
+            manifest_path.write_text(
+                json.dumps(asdict(manifest), ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+        manifests.append(manifest)
+    return manifests, issues
 
 def _load_existing_manifests(config: MultiCycleArchiveConfig, windows: Sequence[ArchiveWindow]) -> List[ArchiveDatasetManifest]:
     manifests: List[ArchiveDatasetManifest] = []
@@ -407,13 +439,18 @@ def _load_existing_manifests(config: MultiCycleArchiveConfig, windows: Sequence[
     return manifests
 
 
-def _replay_window(config: MultiCycleArchiveConfig, window: ArchiveWindow) -> Tuple[Dict[str, Any], pd.DataFrame]:
+def _replay_window(
+    config: MultiCycleArchiveConfig,
+    window: ArchiveWindow,
+    *,
+    symbols: Optional[Sequence[str]] = None,
+) -> Tuple[Dict[str, Any], pd.DataFrame]:
     try:
         from engine.market_replay import MarketReplayConfig, run_market_replay  # type: ignore
     except Exception as exc:
         raise RuntimeError(f"Market Replay is unavailable: {exc}") from exc
     replay_config = MarketReplayConfig(
-        symbols=list(config.symbols),
+        symbols=list(symbols or config.symbols),
         timeframe=config.timeframe,
         start_utc=window.start_utc,
         end_utc=window.end_utc,
@@ -439,9 +476,11 @@ def _replay_window(config: MultiCycleArchiveConfig, window: ArchiveWindow) -> Tu
 
 
 def _write_replay_rows(config: MultiCycleArchiveConfig, window: str, rows: pd.DataFrame) -> str:
-    if rows is None or rows.empty:
-        return ""
     path = Path(config.output_dir) / "replays" / f"{window.lower()}_replay.csv.gz"
+    if rows is None or rows.empty:
+        if path.exists():
+            path.unlink()
+        return ""
     path.parent.mkdir(parents=True, exist_ok=True)
     rows.to_csv(path, index=False, compression="gzip", encoding="utf-8")
     return str(path)
@@ -456,12 +495,17 @@ def run_multi_cycle_archive(
     cutoff = resolve_development_cutoff(config)
     windows = resolve_archive_windows(config, cutoff)
     manifests: List[ArchiveDatasetManifest] = []
+    build_issues: List[Dict[str, Any]] = []
     blockers: List[str] = []
     warnings: List[str] = []
 
     if config.build_archives:
         for window in windows:
-            manifests.extend(_build_window(config, window, exchange_factory=exchange_factory))
+            window_manifests, window_issues = _build_window(
+                config, window, exchange_factory=exchange_factory
+            )
+            manifests.extend(window_manifests)
+            build_issues.extend(window_issues)
     else:
         manifests = _load_existing_manifests(config, windows)
 
@@ -470,23 +514,84 @@ def run_multi_cycle_archive(
     missing = sorted(expected - observed)
     if missing:
         warnings.append(f"Missing archive datasets: {missing}")
+    for issue in build_issues:
+        warnings.append(
+            f"{issue.get('window')} {issue.get('symbol')}: {issue.get('error')}"
+        )
 
+    verified_keys = set()
     for manifest in manifests:
         blockers.extend(manifest.blockers)
         warnings.extend(manifest.warnings)
-        blockers.extend(verify_archive_manifest(asdict(manifest)))
+        verification = verify_archive_manifest(asdict(manifest))
+        blockers.extend(verification)
+        if not manifest.blockers and not verification:
+            verified_keys.add((manifest.window, manifest.symbol))
 
     replay_runs: List[Dict[str, Any]] = []
     if config.run_replays and not blockers:
         for window in windows:
-            payload, rows = _replay_window(config, window)
+            available_symbols = [
+                symbol for symbol in config.symbols
+                if (window.name, symbol) in verified_keys
+            ]
+            if not available_symbols:
+                _write_replay_rows(config, window.name, pd.DataFrame())
+                replay_runs.append({
+                    "window": window.name,
+                    "run_id": "",
+                    "ok": False,
+                    "status": "SKIPPED_NO_ARCHIVE_DATA",
+                    "rows": 0,
+                    "directional_rows": 0,
+                    "symbols_requested": list(config.symbols),
+                    "symbols_replayed": [],
+                    "missing_symbols": list(config.symbols),
+                    "leakage_audit_status": "NOT_RUN_NO_DATA",
+                    "output_csv": "",
+                })
+                warnings.append(f"Replay skipped for {window.name}: no verified archive datasets.")
+                continue
+            try:
+                payload, rows = _replay_window(config, window, symbols=available_symbols)
+            except Exception as exc:
+                _write_replay_rows(config, window.name, pd.DataFrame())
+                blockers.append(
+                    f"Replay failed for {window.name}: {type(exc).__name__}: {exc}"
+                )
+                replay_runs.append({
+                    "window": window.name,
+                    "run_id": "",
+                    "ok": False,
+                    "status": "FAILED_REPLAY_EXCEPTION",
+                    "rows": 0,
+                    "directional_rows": 0,
+                    "symbols_requested": list(config.symbols),
+                    "symbols_replayed": available_symbols,
+                    "missing_symbols": [s for s in config.symbols if s not in available_symbols],
+                    "leakage_audit_status": "FAILED_REPLAY_EXCEPTION",
+                    "output_csv": "",
+                })
+                continue
+            payload["symbols_requested"] = list(config.symbols)
+            payload["symbols_replayed"] = available_symbols
+            payload["missing_symbols"] = [s for s in config.symbols if s not in available_symbols]
             payload["output_csv"] = _write_replay_rows(config, window.name, rows)
             replay_runs.append(payload)
             if payload.get("leakage_audit_status") not in {"PASSED_NO_LOOKAHEAD", "PASSED"}:
-                blockers.append(f"Leakage audit did not pass for {window.name}: {payload.get('leakage_audit_status')}")
+                blockers.append(
+                    f"Leakage audit did not pass for {window.name}: {payload.get('leakage_audit_status')}"
+                )
 
+    missing_full = [item for item in missing if item[0] == "FULL"]
     if blockers:
         status = "FAIL_CLOSED"
+    elif (
+        missing_full
+        and manifests
+        and any(window.name == "FULL" for window in windows)
+    ):
+        status = "PARTIAL_FULL_HISTORY"
     elif missing:
         status = "PARTIAL_ARCHIVE"
     elif config.run_replays:
@@ -505,6 +610,7 @@ def run_multi_cycle_archive(
         windows=[asdict(window) for window in windows],
         datasets=[asdict(item) for item in manifests],
         replay_runs=replay_runs,
+        build_issues=build_issues,
         blockers=sorted(set(blockers)),
         warnings=sorted(set(warnings)),
         promotion_applied=False,
@@ -517,4 +623,6 @@ def run_multi_cycle_archive(
     )
     dataset_rows = [asdict(item) for item in manifests]
     pd.DataFrame(dataset_rows).to_csv(output / "archive_dataset_manifest.csv", index=False, encoding="utf-8-sig")
+    pd.DataFrame(build_issues).to_csv(output / "archive_build_issues.csv", index=False, encoding="utf-8-sig")
     return report
+

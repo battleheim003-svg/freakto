@@ -1,6 +1,6 @@
 {
-  "version": "2.0.0",
-  "dataset_version_id": "c84ea1946383eef0ccf1",
+  "version": "2.1.0",
+  "dataset_version_id": "adc28499a450afa0b30c",
   "window": "5Y",
   "symbol": "BTC/USDT",
   "timeframe": "4h",
@@ -16,8 +16,10 @@
   "provider_consistent": true,
   "source_file": "data\\multi_cycle_archive_v2\\_staging\\5Y\\4h\\BTC_USDT.csv.gz",
   "archive_file": "data\\multi_cycle_archive_v2\\5Y\\4h\\BTC_USDT.csv.gz",
-  "sha256": "1bcbb27f9beae42beb0e234e060f0e439fc651bb5da5f8da501bf44072696459",
-  "generated_utc": "2026-07-13T05:50:28.454528+00:00",
+  "sha256": "9f0d0820cbdd3b5431a4736a22c45e9a40fbbd1d8edb270d03bc678257cf47b5",
+  "generated_utc": "2026-07-13T17:00:21.401514+00:00",
+  "listing_probe_count": 0,
+  "listing_boundary_source": "REQUEST_START_OR_PROVIDER_RESPONSE",
   "blockers": [],
   "warnings": []
 }

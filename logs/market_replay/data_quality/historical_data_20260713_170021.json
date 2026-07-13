@@ -1,0 +1,213 @@
+{
+  "run_id": "historical_data_20260713_170021",
+  "version": "v10.0.2",
+  "started_utc": "2026-07-13T17:00:21.932074+00:00",
+  "finished_utc": "2026-07-13T17:02:37.574454+00:00",
+  "requested_symbols": 3,
+  "completed_symbols": 3,
+  "failed_symbols": 0,
+  "total_rows": 48931,
+  "ready_datasets": 2,
+  "partial_datasets": 1,
+  "results": [
+    {
+      "symbol": "BTC/USDT",
+      "timeframe": "4h",
+      "ok": true,
+      "provider": "kucoin",
+      "dataset_path": "data\\multi_cycle_archive_v2\\_staging\\FULL\\4h\\BTC_USDT.csv.gz",
+      "manifest_path": "data\\multi_cycle_archive_v2\\_staging\\FULL\\4h\\BTC_USDT.manifest.json",
+      "rows": 19088,
+      "fetched_rows": 19088,
+      "used_cache": false,
+      "attempts": [
+        {
+          "provider": "kucoin",
+          "started_utc": "2026-07-13T17:00:21.933076+00:00",
+          "finished_utc": "2026-07-13T17:00:43.705109+00:00",
+          "ok": true,
+          "rows": 19088,
+          "coverage_pct": 91.505,
+          "listing_boundary_discovered": true,
+          "listing_probe_count": 12,
+          "error": ""
+        }
+      ],
+      "quality": {
+        "symbol": "BTC/USDT",
+        "timeframe": "4h",
+        "provider": "kucoin",
+        "requested_start_utc": "2017-01-01T00:00:00+00:00",
+        "requested_end_utc": "2026-07-09T12:00:00+00:00",
+        "actual_start_utc": "2017-10-18T16:00:00+00:00",
+        "actual_end_utc": "2026-07-09T12:00:00+00:00",
+        "expected_candles": 20860,
+        "actual_candles": 19088,
+        "coverage_pct": 91.505,
+        "duplicate_rows_removed": 0,
+        "missing_candles_estimate": 28,
+        "gap_count": 18,
+        "largest_gap_candles": 4,
+        "invalid_ohlc_rows": 0,
+        "nonpositive_price_rows": 0,
+        "zero_volume_rows": 4,
+        "monotonic_timestamps": true,
+        "no_future_rows": true,
+        "continuity_status": "USABLE_WITH_MINOR_GAPS",
+        "readiness_status": "REPLAY_READY_WITH_WARNINGS",
+        "warnings": [
+          "18 شکاف زمانی شناسایی شد؛ missing≈28"
+        ]
+      },
+      "error": "",
+      "listing_boundary_discovered": true,
+      "listing_probe_count": 12
+    },
+    {
+      "symbol": "ETH/USDT",
+      "timeframe": "4h",
+      "ok": true,
+      "provider": "kucoin",
+      "dataset_path": "data\\multi_cycle_archive_v2\\_staging\\FULL\\4h\\ETH_USDT.csv.gz",
+      "manifest_path": "data\\multi_cycle_archive_v2\\_staging\\FULL\\4h\\ETH_USDT.manifest.json",
+      "rows": 19041,
+      "fetched_rows": 19041,
+      "used_cache": false,
+      "attempts": [
+        {
+          "provider": "kucoin",
+          "started_utc": "2026-07-13T17:00:44.036507+00:00",
+          "finished_utc": "2026-07-13T17:01:03.177042+00:00",
+          "ok": true,
+          "rows": 19041,
+          "coverage_pct": 91.28,
+          "listing_boundary_discovered": true,
+          "listing_probe_count": 12,
+          "error": ""
+        }
+      ],
+      "quality": {
+        "symbol": "ETH/USDT",
+        "timeframe": "4h",
+        "provider": "kucoin",
+        "requested_start_utc": "2017-01-01T00:00:00+00:00",
+        "requested_end_utc": "2026-07-09T12:00:00+00:00",
+        "actual_start_utc": "2017-10-18T16:00:00+00:00",
+        "actual_end_utc": "2026-07-09T12:00:00+00:00",
+        "expected_candles": 20860,
+        "actual_candles": 19041,
+        "coverage_pct": 91.28,
+        "duplicate_rows_removed": 0,
+        "missing_candles_estimate": 75,
+        "gap_count": 40,
+        "largest_gap_candles": 8,
+        "invalid_ohlc_rows": 0,
+        "nonpositive_price_rows": 0,
+        "zero_volume_rows": 4,
+        "monotonic_timestamps": true,
+        "no_future_rows": true,
+        "continuity_status": "USABLE_WITH_MINOR_GAPS",
+        "readiness_status": "REPLAY_READY_WITH_WARNINGS",
+        "warnings": [
+          "40 شکاف زمانی شناسایی شد؛ missing≈75"
+        ]
+      },
+      "error": "",
+      "listing_boundary_discovered": true,
+      "listing_probe_count": 12
+    },
+    {
+      "symbol": "SOL/USDT",
+      "timeframe": "4h",
+      "ok": true,
+      "provider": "kucoin",
+      "dataset_path": "data\\multi_cycle_archive_v2\\_staging\\FULL\\4h\\SOL_USDT.csv.gz",
+      "manifest_path": "data\\multi_cycle_archive_v2\\_staging\\FULL\\4h\\SOL_USDT.manifest.json",
+      "rows": 10802,
+      "fetched_rows": 10802,
+      "used_cache": false,
+      "attempts": [
+        {
+          "provider": "kucoin",
+          "started_utc": "2026-07-13T17:01:03.512560+00:00",
+          "finished_utc": "2026-07-13T17:01:23.956107+00:00",
+          "ok": true,
+          "rows": 10802,
+          "coverage_pct": 51.783,
+          "listing_boundary_discovered": true,
+          "listing_probe_count": 27,
+          "error": ""
+        },
+        {
+          "provider": "okx",
+          "started_utc": "2026-07-13T17:01:23.956107+00:00",
+          "finished_utc": "2026-07-13T17:01:55.054485+00:00",
+          "ok": true,
+          "rows": 3876,
+          "coverage_pct": 18.581,
+          "listing_boundary_discovered": true,
+          "listing_probe_count": 24,
+          "error": ""
+        },
+        {
+          "provider": "bybit",
+          "started_utc": "2026-07-13T17:01:55.054485+00:00",
+          "finished_utc": "2026-07-13T17:02:22.202277+00:00",
+          "ok": true,
+          "rows": 10335,
+          "coverage_pct": 49.545,
+          "listing_boundary_discovered": true,
+          "listing_probe_count": 1,
+          "error": ""
+        },
+        {
+          "provider": "kraken",
+          "started_utc": "2026-07-13T17:02:22.202277+00:00",
+          "finished_utc": "2026-07-13T17:02:37.359120+00:00",
+          "ok": true,
+          "rows": 696,
+          "coverage_pct": 3.337,
+          "listing_boundary_discovered": true,
+          "listing_probe_count": 1,
+          "error": ""
+        }
+      ],
+      "quality": {
+        "symbol": "SOL/USDT",
+        "timeframe": "4h",
+        "provider": "kucoin",
+        "requested_start_utc": "2017-01-01T00:00:00+00:00",
+        "requested_end_utc": "2026-07-09T12:00:00+00:00",
+        "actual_start_utc": "2021-08-04T08:00:00+00:00",
+        "actual_end_utc": "2026-07-09T12:00:00+00:00",
+        "expected_candles": 20860,
+        "actual_candles": 10802,
+        "coverage_pct": 51.783,
+        "duplicate_rows_removed": 0,
+        "missing_candles_estimate": 0,
+        "gap_count": 0,
+        "largest_gap_candles": 0,
+        "invalid_ohlc_rows": 0,
+        "nonpositive_price_rows": 0,
+        "zero_volume_rows": 0,
+        "monotonic_timestamps": true,
+        "no_future_rows": true,
+        "continuity_status": "PARTIAL_OR_INVALID",
+        "readiness_status": "PARTIAL_HISTORY",
+        "warnings": [
+          "Coverage کمتر از 90% است: 51.78%"
+        ]
+      },
+      "error": "",
+      "listing_boundary_discovered": true,
+      "listing_probe_count": 27
+    }
+  ],
+  "blockers": [
+    "فقط 2/3 dataset به وضعیت Replay Ready رسید."
+  ],
+  "warnings": [
+    "Historical OHLCV به‌تنهایی خبرها و داده‌های مشتقه تاریخی را بازسازی نمی‌کند.",
+    "Market Replay باید با حالت replay-safe اجرا شود تا Historical Edge و Learning Override آینده وارد گذشته نشوند."
+  ]
+}

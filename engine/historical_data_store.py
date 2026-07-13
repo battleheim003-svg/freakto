@@ -26,7 +26,7 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tupl
 import pandas as pd
 
 
-VERSION = "v10.0.1"
+VERSION = "v10.0.2"
 DEFAULT_DATA_DIR = Path("data") / "market_replay"
 DEFAULT_REPORT_DIR = Path("logs") / "market_replay" / "data_quality"
 DEFAULT_EXCHANGE_ORDER = ("kucoin", "okx", "bybit", "kraken")
@@ -49,6 +49,9 @@ class HistoricalDataRequest:
     data_dir: str = str(DEFAULT_DATA_DIR)
     update_existing: bool = True
     force_refresh: bool = False
+    discover_listing_boundary: bool = False
+    listing_probe_days: int = 90
+    max_listing_probes: int = 80
 
 
 @dataclass
@@ -91,6 +94,8 @@ class HistoricalDatasetResult:
     attempts: List[Dict[str, Any]] = field(default_factory=list)
     quality: Optional[DatasetQuality] = None
     error: str = ""
+    listing_boundary_discovered: bool = False
+    listing_probe_count: int = 0
 
 
 @dataclass
@@ -404,15 +409,41 @@ def fetch_exchange_history(
     max_retries: int = 3,
     retry_backoff_seconds: float = 1.5,
     exchange_factory: Optional[Callable[[str], Any]] = None,
+    discover_listing_boundary: bool = False,
+    listing_probe_days: int = 90,
+    max_listing_probes: int = 80,
 ) -> pd.DataFrame:
+    """Fetch one-provider OHLCV, optionally discovering a late listing boundary.
+
+    Some exchanges return an empty batch when ``since`` predates the market's
+    listing instead of returning their first available candle.  In discovery
+    mode we advance through empty ranges, then binary-search the final empty to
+    non-empty interval down to one timeframe.  Normal three/five-year updates
+    retain the original stop-on-empty behaviour.
+    """
     factory = exchange_factory or _create_exchange
     exchange = factory(exchange_name)
     tf_ms = timeframe_to_milliseconds(timeframe)
-    since = int(floor_datetime_to_timeframe(start, timeframe).timestamp() * 1000)
+    initial_since = int(floor_datetime_to_timeframe(start, timeframe).timestamp() * 1000)
+    since = initial_since
     end_ms = int(end.timestamp() * 1000)
     batch_limit = max(10, min(int(batch_limit), 1500))
     rows: List[List[Any]] = []
     stagnant_batches = 0
+    probe_count = 0
+    listing_boundary_discovered = False
+    first_nonempty_since: Optional[int] = None
+
+    def fetch_batch(cursor: int):
+        return _fetch_with_retries(
+            exchange,
+            symbol=symbol,
+            timeframe=timeframe,
+            since=cursor,
+            limit=batch_limit,
+            max_retries=max_retries,
+            retry_backoff_seconds=retry_backoff_seconds,
+        )
 
     try:
         if hasattr(exchange, "load_markets"):
@@ -420,16 +451,61 @@ def fetch_exchange_history(
         if getattr(exchange, "markets", None) and symbol not in exchange.markets:
             raise ValueError(f"{symbol} is not available on {exchange_name}")
 
-        while since <= end_ms:
-            batch = _fetch_with_retries(
-                exchange,
-                symbol=symbol,
-                timeframe=timeframe,
-                since=since,
-                limit=batch_limit,
-                max_retries=max_retries,
-                retry_backoff_seconds=retry_backoff_seconds,
+        if discover_listing_boundary:
+            probe_step_ms = max(
+                tf_ms,
+                int(max(1, int(listing_probe_days)) * 86_400_000),
             )
+            max_probes = max(1, int(max_listing_probes))
+            cursor = initial_since
+            last_empty: Optional[int] = None
+            high_nonempty: Optional[int] = None
+
+            while cursor <= end_ms and probe_count < max_probes:
+                batch = fetch_batch(cursor)
+                probe_count += 1
+                if batch:
+                    high_nonempty = cursor
+                    break
+                last_empty = cursor
+                if cursor >= end_ms:
+                    break
+                cursor = min(end_ms, cursor + probe_step_ms)
+
+            if high_nonempty is None:
+                empty = pd.DataFrame(columns=OHLCV_COLUMNS + ["provider"])
+                empty.attrs.update({
+                    "listing_boundary_discovered": False,
+                    "listing_probe_count": probe_count,
+                    "first_nonempty_since_utc": "",
+                })
+                return empty
+
+            # Refine the last empty/non-empty interval to one candle so the
+            # archive does not silently omit the first weeks/months of trading.
+            if last_empty is not None and high_nonempty - last_empty > tf_ms:
+                low = last_empty
+                high = high_nonempty
+                while high - low > tf_ms and probe_count < max_probes:
+                    midpoint = ((low + high) // (2 * tf_ms)) * tf_ms
+                    if midpoint <= low:
+                        midpoint = low + tf_ms
+                    if midpoint >= high:
+                        break
+                    batch = fetch_batch(midpoint)
+                    probe_count += 1
+                    if batch:
+                        high = midpoint
+                    else:
+                        low = midpoint
+                high_nonempty = high
+                listing_boundary_discovered = high_nonempty > initial_since
+
+            since = high_nonempty
+            first_nonempty_since = high_nonempty
+
+        while since <= end_ms:
+            batch = fetch_batch(since)
             if not batch:
                 break
 
@@ -459,15 +535,32 @@ def fetch_exchange_history(
                 pass
 
     if not rows:
-        return pd.DataFrame(columns=OHLCV_COLUMNS + ["provider"])
+        empty = pd.DataFrame(columns=OHLCV_COLUMNS + ["provider"])
+        empty.attrs.update({
+            "listing_boundary_discovered": listing_boundary_discovered,
+            "listing_probe_count": probe_count,
+            "first_nonempty_since_utc": (
+                datetime.fromtimestamp(first_nonempty_since / 1000, tz=timezone.utc).isoformat()
+                if first_nonempty_since is not None else ""
+            ),
+        })
+        return empty
 
     frame = pd.DataFrame(rows, columns=OHLCV_COLUMNS)
     frame["timestamp"] = pd.to_datetime(frame["timestamp"], unit="ms", utc=True)
     frame["provider"] = exchange_name
     frame, _ = _normalise_frame(frame, provider=exchange_name)
     mask = (frame["timestamp"] >= pd.Timestamp(start)) & (frame["timestamp"] <= pd.Timestamp(end))
-    return frame.loc[mask].reset_index(drop=True)
-
+    frame = frame.loc[mask].reset_index(drop=True)
+    frame.attrs.update({
+        "listing_boundary_discovered": bool(listing_boundary_discovered or (len(frame) and frame["timestamp"].min() > pd.Timestamp(start))),
+        "listing_probe_count": probe_count,
+        "first_nonempty_since_utc": (
+            datetime.fromtimestamp(first_nonempty_since / 1000, tz=timezone.utc).isoformat()
+            if first_nonempty_since is not None else ""
+        ),
+    })
+    return frame
 
 def _requested_provider_order(request: HistoricalDataRequest) -> List[str]:
     if request.exchange and request.exchange.lower() != "auto":
@@ -577,6 +670,8 @@ def build_symbol_history(
     best_frame = pd.DataFrame()
     best_quality: Optional[DatasetQuality] = None
     best_provider = ""
+    best_listing_boundary_discovered = False
+    best_listing_probe_count = 0
     attempts: List[Dict[str, Any]] = []
 
     provider_order = _requested_provider_order(request)
@@ -592,11 +687,20 @@ def build_symbol_history(
             if not existing.empty:
                 existing_provider = str(existing["provider"].dropna().iloc[-1]) if "provider" in existing else ""
                 if existing_provider == provider:
-                    fetch_start = _incremental_fetch_start(
-                        existing,
-                        requested_start=start,
-                        timeframe=request.timeframe,
+                    existing_start = pd.to_datetime(
+                        existing.get("timestamp"), utc=True, errors="coerce"
+                    ).min()
+                    needs_full_boundary_scan = bool(
+                        request.discover_listing_boundary
+                        and pd.notna(existing_start)
+                        and existing_start > pd.Timestamp(start)
                     )
+                    if not needs_full_boundary_scan:
+                        fetch_start = _incremental_fetch_start(
+                            existing,
+                            requested_start=start,
+                            timeframe=request.timeframe,
+                        )
             fetched = fetch_exchange_history(
                 exchange_name=provider,
                 symbol=symbol,
@@ -607,7 +711,12 @@ def build_symbol_history(
                 max_retries=request.max_retries,
                 retry_backoff_seconds=request.retry_backoff_seconds,
                 exchange_factory=exchange_factory,
+                discover_listing_boundary=request.discover_listing_boundary,
+                listing_probe_days=request.listing_probe_days,
+                max_listing_probes=request.max_listing_probes,
             )
+            listing_boundary_discovered = bool(fetched.attrs.get("listing_boundary_discovered", False))
+            listing_probe_count = int(fetched.attrs.get("listing_probe_count", 0) or 0)
             combined = fetched
             # Only merge cached data if it comes from the same provider. This keeps
             # the dataset's market microstructure consistent.
@@ -632,12 +741,16 @@ def build_symbol_history(
                 "ok": bool(len(combined)),
                 "rows": int(len(combined)),
                 "coverage_pct": quality.coverage_pct,
+                "listing_boundary_discovered": listing_boundary_discovered,
+                "listing_probe_count": listing_probe_count,
                 "error": "",
             })
             if best_quality is None or quality.coverage_pct > best_quality.coverage_pct:
                 best_frame = combined
                 best_quality = quality
                 best_provider = provider
+                best_listing_boundary_discovered = listing_boundary_discovered
+                best_listing_probe_count = listing_probe_count
             if quality.coverage_pct >= request.min_acceptable_coverage_pct and quality.invalid_ohlc_rows == 0:
                 break
         except Exception as exc:
@@ -648,6 +761,8 @@ def build_symbol_history(
                 "ok": False,
                 "rows": 0,
                 "coverage_pct": 0.0,
+                "listing_boundary_discovered": False,
+                "listing_probe_count": 0,
                 "error": f"{type(exc).__name__}: {exc}",
             })
 
@@ -660,6 +775,8 @@ def build_symbol_history(
             manifest_path=str(mpath),
             attempts=attempts,
             error="No provider returned usable historical OHLCV data.",
+            listing_boundary_discovered=False,
+            listing_probe_count=max((int(item.get("listing_probe_count", 0) or 0) for item in attempts), default=0),
         )
 
     saved_path = save_history(best_frame, symbol, request.timeframe, request.data_dir)
@@ -676,6 +793,8 @@ def build_symbol_history(
         attempts=attempts,
         quality=best_quality,
         error="" if best_quality.actual_candles else "Historical data is empty after validation.",
+        listing_boundary_discovered=best_listing_boundary_discovered,
+        listing_probe_count=best_listing_probe_count,
     )
     _write_manifest(result, request, mpath)
     _write_quality(best_quality)

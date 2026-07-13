@@ -1,0 +1,118 @@
+{
+  "version": "v10.0.2",
+  "generated_utc": "2026-07-13T17:02:37.572714+00:00",
+  "request": {
+    "symbols": [
+      "BTC/USDT",
+      "ETH/USDT",
+      "SOL/USDT"
+    ],
+    "timeframe": "4h",
+    "start_utc": "2017-01-01T00:00:00+00:00",
+    "end_utc": "2026-07-09T12:00:00+00:00",
+    "years": 3.0,
+    "exchange": "auto",
+    "exchange_order": [
+      "kucoin",
+      "okx",
+      "bybit",
+      "kraken"
+    ],
+    "batch_limit": 1000,
+    "max_retries": 3,
+    "retry_backoff_seconds": 1.5,
+    "min_acceptable_coverage_pct": 90.0,
+    "data_dir": "data\\multi_cycle_archive_v2\\_staging\\FULL",
+    "update_existing": true,
+    "force_refresh": true,
+    "discover_listing_boundary": true,
+    "listing_probe_days": 90,
+    "max_listing_probes": 80
+  },
+  "result": {
+    "symbol": "SOL/USDT",
+    "timeframe": "4h",
+    "ok": true,
+    "provider": "kucoin",
+    "dataset_path": "data\\multi_cycle_archive_v2\\_staging\\FULL\\4h\\SOL_USDT.csv.gz",
+    "manifest_path": "data\\multi_cycle_archive_v2\\_staging\\FULL\\4h\\SOL_USDT.manifest.json",
+    "rows": 10802,
+    "fetched_rows": 10802,
+    "used_cache": false,
+    "attempts": [
+      {
+        "provider": "kucoin",
+        "started_utc": "2026-07-13T17:01:03.512560+00:00",
+        "finished_utc": "2026-07-13T17:01:23.956107+00:00",
+        "ok": true,
+        "rows": 10802,
+        "coverage_pct": 51.783,
+        "listing_boundary_discovered": true,
+        "listing_probe_count": 27,
+        "error": ""
+      },
+      {
+        "provider": "okx",
+        "started_utc": "2026-07-13T17:01:23.956107+00:00",
+        "finished_utc": "2026-07-13T17:01:55.054485+00:00",
+        "ok": true,
+        "rows": 3876,
+        "coverage_pct": 18.581,
+        "listing_boundary_discovered": true,
+        "listing_probe_count": 24,
+        "error": ""
+      },
+      {
+        "provider": "bybit",
+        "started_utc": "2026-07-13T17:01:55.054485+00:00",
+        "finished_utc": "2026-07-13T17:02:22.202277+00:00",
+        "ok": true,
+        "rows": 10335,
+        "coverage_pct": 49.545,
+        "listing_boundary_discovered": true,
+        "listing_probe_count": 1,
+        "error": ""
+      },
+      {
+        "provider": "kraken",
+        "started_utc": "2026-07-13T17:02:22.202277+00:00",
+        "finished_utc": "2026-07-13T17:02:37.359120+00:00",
+        "ok": true,
+        "rows": 696,
+        "coverage_pct": 3.337,
+        "listing_boundary_discovered": true,
+        "listing_probe_count": 1,
+        "error": ""
+      }
+    ],
+    "quality": {
+      "symbol": "SOL/USDT",
+      "timeframe": "4h",
+      "provider": "kucoin",
+      "requested_start_utc": "2017-01-01T00:00:00+00:00",
+      "requested_end_utc": "2026-07-09T12:00:00+00:00",
+      "actual_start_utc": "2021-08-04T08:00:00+00:00",
+      "actual_end_utc": "2026-07-09T12:00:00+00:00",
+      "expected_candles": 20860,
+      "actual_candles": 10802,
+      "coverage_pct": 51.783,
+      "duplicate_rows_removed": 0,
+      "missing_candles_estimate": 0,
+      "gap_count": 0,
+      "largest_gap_candles": 0,
+      "invalid_ohlc_rows": 0,
+      "nonpositive_price_rows": 0,
+      "zero_volume_rows": 0,
+      "monotonic_timestamps": true,
+      "no_future_rows": true,
+      "continuity_status": "PARTIAL_OR_INVALID",
+      "readiness_status": "PARTIAL_HISTORY",
+      "warnings": [
+        "Coverage کمتر از 90% است: 51.78%"
+      ]
+    },
+    "error": "",
+    "listing_boundary_discovered": true,
+    "listing_probe_count": 27
+  }
+}
