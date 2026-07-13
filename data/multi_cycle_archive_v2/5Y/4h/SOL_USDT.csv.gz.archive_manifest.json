@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "dataset_version_id": "9a58b03d5e941e5163d5",
+  "window": "5Y",
+  "symbol": "SOL/USDT",
+  "timeframe": "4h",
+  "provider": "kucoin",
+  "requested_start_utc": "2021-07-09T12:00:00+00:00",
+  "requested_end_utc": "2026-07-09T12:00:00+00:00",
+  "actual_start_utc": "2021-08-04T08:00:00+00:00",
+  "actual_end_utc": "2026-07-09T12:00:00+00:00",
+  "rows": 10802,
+  "coverage_pct": 98.585,
+  "gap_count": 0,
+  "listing_boundary_detected": false,
+  "provider_consistent": true,
+  "source_file": "data\\multi_cycle_archive_v2\\_staging\\5Y\\4h\\SOL_USDT.csv.gz",
+  "archive_file": "data\\multi_cycle_archive_v2\\5Y\\4h\\SOL_USDT.csv.gz",
+  "sha256": "48a98570a417f7ba48f9f496ee852d4e62201a5a7f4b1507a1edbaee54e7712c",
+  "generated_utc": "2026-07-13T05:50:28.990318+00:00",
+  "blockers": [],
+  "warnings": []
+}

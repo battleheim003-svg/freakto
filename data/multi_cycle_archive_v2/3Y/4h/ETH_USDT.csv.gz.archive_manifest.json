@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "dataset_version_id": "4c4a5f8685975e1edafe",
+  "window": "3Y",
+  "symbol": "ETH/USDT",
+  "timeframe": "4h",
+  "provider": "kucoin",
+  "requested_start_utc": "2023-07-09T12:00:00+00:00",
+  "requested_end_utc": "2026-07-09T12:00:00+00:00",
+  "actual_start_utc": "2023-07-09T12:00:00+00:00",
+  "actual_end_utc": "2026-07-09T12:00:00+00:00",
+  "rows": 6577,
+  "coverage_pct": 100.0,
+  "gap_count": 0,
+  "listing_boundary_detected": false,
+  "provider_consistent": true,
+  "source_file": "data\\multi_cycle_archive_v2\\_staging\\3Y\\4h\\ETH_USDT.csv.gz",
+  "archive_file": "data\\multi_cycle_archive_v2\\3Y\\4h\\ETH_USDT.csv.gz",
+  "sha256": "5501691029cd7032db34d5a9e65bdb8a69a0fb2ff7c8447ab476e2a948341b10",
+  "generated_utc": "2026-07-13T05:50:01.019855+00:00",
+  "blockers": [],
+  "warnings": []
+}

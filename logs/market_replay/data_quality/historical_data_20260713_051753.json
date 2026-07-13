@@ -1,0 +1,160 @@
+{
+  "run_id": "historical_data_20260713_051753",
+  "version": "v10.0.1",
+  "started_utc": "2026-07-13T05:17:53.654781+00:00",
+  "finished_utc": "2026-07-13T05:18:06.930738+00:00",
+  "requested_symbols": 3,
+  "completed_symbols": 3,
+  "failed_symbols": 0,
+  "total_rows": 19779,
+  "ready_datasets": 3,
+  "partial_datasets": 0,
+  "results": [
+    {
+      "symbol": "BTC/USDT",
+      "timeframe": "4h",
+      "ok": true,
+      "provider": "kucoin",
+      "dataset_path": "data\\market_replay\\4h\\BTC_USDT.csv.gz",
+      "manifest_path": "data\\market_replay\\4h\\BTC_USDT.manifest.json",
+      "rows": 6593,
+      "fetched_rows": 6593,
+      "used_cache": false,
+      "attempts": [
+        {
+          "provider": "kucoin",
+          "started_utc": "2026-07-13T05:17:53.726876+00:00",
+          "finished_utc": "2026-07-13T05:18:00.052020+00:00",
+          "ok": true,
+          "rows": 6593,
+          "coverage_pct": 100.0,
+          "error": ""
+        }
+      ],
+      "quality": {
+        "symbol": "BTC/USDT",
+        "timeframe": "4h",
+        "provider": "kucoin",
+        "requested_start_utc": "2023-07-13T04:00:00+00:00",
+        "requested_end_utc": "2026-07-13T04:00:00+00:00",
+        "actual_start_utc": "2023-07-13T04:00:00+00:00",
+        "actual_end_utc": "2026-07-13T04:00:00+00:00",
+        "expected_candles": 6577,
+        "actual_candles": 6577,
+        "coverage_pct": 100.0,
+        "duplicate_rows_removed": 2,
+        "missing_candles_estimate": 0,
+        "gap_count": 0,
+        "largest_gap_candles": 0,
+        "invalid_ohlc_rows": 0,
+        "nonpositive_price_rows": 0,
+        "zero_volume_rows": 0,
+        "monotonic_timestamps": true,
+        "no_future_rows": true,
+        "continuity_status": "CONTINUOUS",
+        "readiness_status": "REPLAY_READY",
+        "warnings": []
+      },
+      "error": ""
+    },
+    {
+      "symbol": "ETH/USDT",
+      "timeframe": "4h",
+      "ok": true,
+      "provider": "kucoin",
+      "dataset_path": "data\\market_replay\\4h\\ETH_USDT.csv.gz",
+      "manifest_path": "data\\market_replay\\4h\\ETH_USDT.manifest.json",
+      "rows": 6593,
+      "fetched_rows": 6593,
+      "used_cache": false,
+      "attempts": [
+        {
+          "provider": "kucoin",
+          "started_utc": "2026-07-13T05:18:00.238773+00:00",
+          "finished_utc": "2026-07-13T05:18:03.393695+00:00",
+          "ok": true,
+          "rows": 6593,
+          "coverage_pct": 100.0,
+          "error": ""
+        }
+      ],
+      "quality": {
+        "symbol": "ETH/USDT",
+        "timeframe": "4h",
+        "provider": "kucoin",
+        "requested_start_utc": "2023-07-13T04:00:00+00:00",
+        "requested_end_utc": "2026-07-13T04:00:00+00:00",
+        "actual_start_utc": "2023-07-13T04:00:00+00:00",
+        "actual_end_utc": "2026-07-13T04:00:00+00:00",
+        "expected_candles": 6577,
+        "actual_candles": 6577,
+        "coverage_pct": 100.0,
+        "duplicate_rows_removed": 2,
+        "missing_candles_estimate": 0,
+        "gap_count": 0,
+        "largest_gap_candles": 0,
+        "invalid_ohlc_rows": 0,
+        "nonpositive_price_rows": 0,
+        "zero_volume_rows": 0,
+        "monotonic_timestamps": true,
+        "no_future_rows": true,
+        "continuity_status": "CONTINUOUS",
+        "readiness_status": "REPLAY_READY",
+        "warnings": []
+      },
+      "error": ""
+    },
+    {
+      "symbol": "SOL/USDT",
+      "timeframe": "4h",
+      "ok": true,
+      "provider": "kucoin",
+      "dataset_path": "data\\market_replay\\4h\\SOL_USDT.csv.gz",
+      "manifest_path": "data\\market_replay\\4h\\SOL_USDT.manifest.json",
+      "rows": 6593,
+      "fetched_rows": 6593,
+      "used_cache": false,
+      "attempts": [
+        {
+          "provider": "kucoin",
+          "started_utc": "2026-07-13T05:18:03.603311+00:00",
+          "finished_utc": "2026-07-13T05:18:06.807061+00:00",
+          "ok": true,
+          "rows": 6593,
+          "coverage_pct": 100.0,
+          "error": ""
+        }
+      ],
+      "quality": {
+        "symbol": "SOL/USDT",
+        "timeframe": "4h",
+        "provider": "kucoin",
+        "requested_start_utc": "2023-07-13T04:00:00+00:00",
+        "requested_end_utc": "2026-07-13T04:00:00+00:00",
+        "actual_start_utc": "2023-07-13T04:00:00+00:00",
+        "actual_end_utc": "2026-07-13T04:00:00+00:00",
+        "expected_candles": 6577,
+        "actual_candles": 6577,
+        "coverage_pct": 100.0,
+        "duplicate_rows_removed": 2,
+        "missing_candles_estimate": 0,
+        "gap_count": 0,
+        "largest_gap_candles": 0,
+        "invalid_ohlc_rows": 0,
+        "nonpositive_price_rows": 0,
+        "zero_volume_rows": 0,
+        "monotonic_timestamps": true,
+        "no_future_rows": true,
+        "continuity_status": "CONTINUOUS",
+        "readiness_status": "REPLAY_READY",
+        "warnings": []
+      },
+      "error": ""
+    }
+  ],
+  "blockers": [],
+  "warnings": [
+    "Historical OHLCV به‌تنهایی خبرها و داده‌های مشتقه تاریخی را بازسازی نمی‌کند.",
+    "Market Replay باید با حالت replay-safe اجرا شود تا Historical Edge و Learning Override آینده وارد گذشته نشوند."
+  ]
+}

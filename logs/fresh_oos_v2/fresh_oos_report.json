@@ -3,7 +3,7 @@
   "mode": "FRESH_OOS_FIXED_BENCHMARK_ONLY",
   "development_dataset_id": "7eb70bc7f68045dfa5a7",
   "development_cutoff_utc": "2026-07-09T12:00:00+00:00",
-  "source_replay_rows": 97826,
+  "source_replay_rows": 117209,
   "fresh_rows": 0,
   "fresh_directional_rows": 0,
   "fixed_threshold": 70.0,

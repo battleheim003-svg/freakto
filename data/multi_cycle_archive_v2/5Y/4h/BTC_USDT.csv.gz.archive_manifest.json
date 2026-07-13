@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "dataset_version_id": "c84ea1946383eef0ccf1",
+  "window": "5Y",
+  "symbol": "BTC/USDT",
+  "timeframe": "4h",
+  "provider": "kucoin",
+  "requested_start_utc": "2021-07-09T12:00:00+00:00",
+  "requested_end_utc": "2026-07-09T12:00:00+00:00",
+  "actual_start_utc": "2021-07-09T12:00:00+00:00",
+  "actual_end_utc": "2026-07-09T12:00:00+00:00",
+  "rows": 10957,
+  "coverage_pct": 100.0,
+  "gap_count": 0,
+  "listing_boundary_detected": false,
+  "provider_consistent": true,
+  "source_file": "data\\multi_cycle_archive_v2\\_staging\\5Y\\4h\\BTC_USDT.csv.gz",
+  "archive_file": "data\\multi_cycle_archive_v2\\5Y\\4h\\BTC_USDT.csv.gz",
+  "sha256": "1bcbb27f9beae42beb0e234e060f0e439fc651bb5da5f8da501bf44072696459",
+  "generated_utc": "2026-07-13T05:50:28.454528+00:00",
+  "blockers": [],
+  "warnings": []
+}
