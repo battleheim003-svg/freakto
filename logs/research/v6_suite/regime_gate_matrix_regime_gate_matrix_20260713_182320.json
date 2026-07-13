@@ -1,0 +1,34 @@
+{
+  "run_id": "regime_gate_matrix_20260713_182320",
+  "generated_utc": "2026-07-13T18:23:20.231716+00:00",
+  "version": "v6.1.0",
+  "status": "NO_BACKTEST_DATA",
+  "horizon": "24h",
+  "min_samples": 10,
+  "candidate_min_samples": 30,
+  "fee_bps": 10.0,
+  "slippage_bps": 5.0,
+  "baseline_net": {
+    "samples": 0,
+    "avg_return_pct": 0.0,
+    "win_rate": 0.0,
+    "target_1_hit_rate": 0.0,
+    "stop_hit_rate": 0.0
+  },
+  "regimes_seen": [],
+  "gates_tested": 0,
+  "candidate_count": 0,
+  "regime_candidates": [],
+  "regime_gate_side_candidates": [],
+  "top_regime_gate": [],
+  "top_regime_gate_side": [],
+  "top_regime_side": [],
+  "top_regime_symbol": [],
+  "avoid_regimes": [],
+  "shadow_proposals": [],
+  "blockers": [
+    "هیچ historical_backtest_evaluations کامل برای ساخت Regime-Gate Matrix پیدا نشد."
+  ],
+  "warnings": [],
+  "recommendations": []
+}
