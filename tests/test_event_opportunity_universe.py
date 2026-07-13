@@ -202,3 +202,65 @@ def test_overlap_table_reports_pairs():
     assert not overlap.empty
     assert {"event_a", "event_b", "overlap_count"}.issubset(overlap.columns)
     assert overlap["overlap_count"].gt(0).all()
+
+
+def production_replay_schema(rows: int = 1200) -> pd.DataFrame:
+    rng = np.random.default_rng(991)
+    idx = np.arange(rows)
+    side = np.where(idx % 2 == 0, "LONG", "SHORT")
+    regime = np.where(idx % 9 < 3, "BULL", np.where(idx % 9 < 6, "BEAR", "SIDEWAYS"))
+    trend = rng.integers(0, 29, rows)
+    volume = rng.integers(0, 21, rows)
+    structure = rng.integers(0, 13, rows)
+    momentum = rng.integers(0, 31, rows)
+    long_score = trend + momentum + volume + structure
+    short_score = np.maximum(0, 80 - long_score)
+    volatility = 1.0 + rng.normal(0, 0.12, rows)
+    volatility[idx % 37 == 0] = 1.8
+    return pd.DataFrame({
+        "run_id": "market_replay_real_schema",
+        "decision_id": [f"real-{i}" for i in idx],
+        "candle_timestamp": pd.date_range("2020-01-01", periods=rows, freq="4h", tz="UTC"),
+        "symbol": np.array(["BTC/USDT", "ETH/USDT", "SOL/USDT"])[idx % 3],
+        "timeframe": "4h",
+        "side": side,
+        "score": np.maximum(long_score, short_score),
+        "regime_label": regime,
+        "long_score": long_score,
+        "short_score": short_score,
+        "trend_score": trend,
+        "momentum_score": momentum,
+        "volume_score": volume,
+        "structure_score": structure,
+        "regime_score": rng.integers(0, 9, rows),
+        "risk_penalty": rng.integers(0, 12, rows),
+        "execution_volatility_multiplier": volatility,
+        "round_trip_cost_pct": 0.55,
+        "entry_price": 100.0,
+        "targets": "[102.0, 104.0, 106.0]",
+        "stop_zone": "98.0 - 98.5",
+        "net_signed_return_after_6c_pct": rng.normal(-0.2, 1.5, rows),
+    })
+
+
+def test_real_replay_component_schema_produces_sparse_events_without_raw_indicators():
+    frame = production_replay_schema()
+    events, diagnostics = build_event_opportunity_universe(frame, config())
+    assert diagnostics.schema_mode == "REPLAY_COMPONENT_SCHEMA"
+    assert diagnostics.event_rows > 0
+    assert diagnostics.event_rows < diagnostics.rows_usable
+    assert diagnostics.breakout_rows > 0
+    assert diagnostics.volatility_expansion_rows > 0
+    assert "LIQUIDITY_SWEEP" in diagnostics.unavailable_event_families
+
+
+def test_component_schema_does_not_fabricate_liquidity_sweeps():
+    events, diagnostics = build_event_opportunity_universe(production_replay_schema(), config())
+    assert diagnostics.liquidity_sweep_rows == 0
+    assert not events["primary_event"].eq("LIQUIDITY_SWEEP").any()
+
+
+def test_event_family_counts_match_detected_masks():
+    events, diagnostics = build_event_opportunity_universe(production_replay_schema(), config())
+    assert diagnostics.breakout_rows >= int(events["primary_event"].eq("BREAKOUT_CONFIRMATION").sum())
+    assert diagnostics.mean_reversion_rows >= int(events["primary_event"].eq("EXTREME_MEAN_REVERSION").sum())

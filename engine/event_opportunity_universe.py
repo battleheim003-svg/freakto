@@ -18,7 +18,7 @@ import pandas as pd
 
 from engine.multi_cycle_validation import normalize_replay_rows
 
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 MODE = "EVENT_OPPORTUNITY_UNIVERSE_DEVELOPMENT_ONLY"
 
 LEAKAGE_TOKENS = (
@@ -51,7 +51,7 @@ ALIASES: Mapping[str, Tuple[str, ...]] = {
     "structure": ("structure_score",),
     "regime_score": ("regime_score",),
     "risk": ("risk_penalty",),
-    "atr": ("atr_pct", "atr_percent", "atr_14_pct", "atr_ratio_pct"),
+    "atr": ("atr_pct", "atr_percent", "atr_14_pct", "atr_ratio_pct", "execution_volatility_multiplier"),
     "rsi": ("rsi_14", "rsi"),
     "macd": ("macd_histogram", "macd_hist", "macd_diff"),
     "cost": (
@@ -101,7 +101,15 @@ class EventUniverseConfig:
     breakout_trend_min: float = 18.0
     mean_reversion_rsi_low: float = 30.0
     mean_reversion_rsi_high: float = 70.0
-    mean_reversion_regimes: Tuple[str, ...] = ("SIDEWAYS", "QUIET", "RANGE", "RANGING")
+    mean_reversion_regimes: Tuple[str, ...] = ("SIDEWAYS", "QUIET", "RANGE", "RANGING", "NEUTRAL")
+    proxy_lookback: int = 126
+    proxy_min_periods: int = 24
+    breakout_structure_quantile: float = 0.70
+    breakout_volume_quantile: float = 0.70
+    breakout_trend_quantile: float = 0.65
+    mean_reversion_momentum_quantile: float = 0.20
+    volatility_quantile: float = 0.80
+    transition_structure_quantile: float = 0.60
     volatility_lookback: int = 42
     volatility_expansion_ratio: float = 1.30
     volatility_prior_max_ratio: float = 1.05
@@ -123,6 +131,11 @@ class EventUniverseConfig:
             raise ValueError("development_cutoff_utc must include a timezone")
         if self.volatility_lookback < 5:
             raise ValueError("volatility_lookback must be at least 5")
+        if self.proxy_lookback < 10 or self.proxy_min_periods < 5:
+            raise ValueError("proxy lookback/min periods are too small")
+        for value in (self.breakout_structure_quantile, self.breakout_volume_quantile, self.breakout_trend_quantile, self.mean_reversion_momentum_quantile, self.volatility_quantile, self.transition_structure_quantile):
+            if not 0 < value < 1:
+                raise ValueError("proxy quantiles must be between 0 and 1")
         if self.volatility_expansion_ratio <= 1.0:
             raise ValueError("volatility_expansion_ratio must exceed 1")
         if self.minimum_target_to_cost < 0 or self.minimum_net_reward_risk < 0:
@@ -141,6 +154,13 @@ class EventUniverseDiagnostics:
     explicit_volatility_rows: int
     aggregate_score_used: bool = False
     outcome_fields_used: bool = False
+    breakout_rows: int = 0
+    mean_reversion_rows: int = 0
+    volatility_expansion_rows: int = 0
+    regime_transition_rows: int = 0
+    liquidity_sweep_rows: int = 0
+    schema_mode: str = "UNKNOWN"
+    unavailable_event_families: Tuple[str, ...] = ()
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -320,77 +340,115 @@ def _group_keys(frame: pd.DataFrame) -> List[str]:
     return keys or ["side"]
 
 
-def _event_masks(frame: pd.DataFrame, config: EventUniverseConfig) -> Tuple[Dict[str, pd.Series], Dict[str, int]]:
+def _causal_quantile(frame: pd.DataFrame, values: pd.Series, keys: Sequence[str], q: float, config: EventUniverseConfig) -> pd.Series:
+    tmp = frame.copy()
+    tmp["__proxy_value"] = pd.to_numeric(values, errors="coerce")
+    return tmp.groupby(list(keys), sort=False, dropna=False)["__proxy_value"].transform(
+        lambda series: series.shift(1).rolling(config.proxy_lookback, min_periods=config.proxy_min_periods).quantile(q)
+    )
+
+
+def _event_masks(frame: pd.DataFrame, config: EventUniverseConfig) -> Tuple[Dict[str, pd.Series], Dict[str, Any]]:
     trend = _numeric(frame, "trend", 0.0).fillna(0.0)
+    momentum = _numeric(frame, "momentum", 0.0).fillna(0.0)
     volume = _numeric(frame, "volume", 0.0).fillna(0.0)
     structure = _numeric(frame, "structure", 0.0).fillna(0.0)
-    atr = _numeric(frame, "atr", np.nan)
+    volatility = _numeric(frame, "atr", np.nan)
     rsi = _numeric(frame, "rsi", np.nan)
     side = frame["side"].astype(str).str.upper()
     regime = frame.get("regime", pd.Series("UNKNOWN", index=frame.index)).fillna("UNKNOWN").astype(str).str.upper()
+    long_score = pd.to_numeric(frame["long_score"], errors="coerce") if "long_score" in frame.columns else pd.Series(np.nan, index=frame.index, dtype=float)
+    short_score = pd.to_numeric(frame["short_score"], errors="coerce") if "short_score" in frame.columns else pd.Series(np.nan, index=frame.index, dtype=float)
 
     explicit_breakout = _truthy_series(frame, EXPLICIT_BREAKOUT_COLUMNS)
     explicit_volatility = _truthy_series(frame, EXPLICIT_VOL_EXPANSION_COLUMNS)
     explicit_sweep = _truthy_series(frame, EXPLICIT_SWEEP_COLUMNS)
 
-    aligned_regime = (side.eq("LONG") & regime.isin(["BULL", "BULLISH", "UPTREND"])) | (
-        side.eq("SHORT") & regime.isin(["BEAR", "BEARISH", "DOWNTREND"])
-    )
-    breakout_proxy = (
+    bull_labels = {"BULL", "BULLISH", "UPTREND", "TREND_UP", "RISK_ON"}
+    bear_labels = {"BEAR", "BEARISH", "DOWNTREND", "TREND_DOWN", "RISK_OFF"}
+    aligned_by_regime = (side.eq("LONG") & regime.isin(bull_labels)) | (side.eq("SHORT") & regime.isin(bear_labels))
+    aligned_by_scores = (side.eq("LONG") & long_score.ge(short_score)) | (side.eq("SHORT") & short_score.ge(long_score))
+    direction_aligned = aligned_by_regime | aligned_by_scores.fillna(False)
+
+    keys = _group_keys(frame)
+    structure_q = _causal_quantile(frame, structure, keys, config.breakout_structure_quantile, config)
+    volume_q = _causal_quantile(frame, volume, keys, config.breakout_volume_quantile, config)
+    trend_q = _causal_quantile(frame, trend, keys, config.breakout_trend_quantile, config)
+    momentum_low_q = _causal_quantile(frame, momentum, keys, config.mean_reversion_momentum_quantile, config)
+    volatility_q = _causal_quantile(frame, volatility, keys, config.volatility_quantile, config)
+    transition_structure_q = _causal_quantile(frame, structure, keys, config.transition_structure_quantile, config)
+
+    breakout_absolute = (
         structure.ge(config.breakout_structure_min)
         & volume.ge(config.breakout_volume_min)
         & trend.ge(config.breakout_trend_min)
-        & aligned_regime
     )
+    breakout_relative = structure.ge(structure_q) & volume.ge(volume_q) & trend.ge(trend_q)
+    breakout_proxy = direction_aligned & (breakout_absolute | breakout_relative)
 
-    mean_reversion = (
-        (side.eq("LONG") & rsi.le(config.mean_reversion_rsi_low))
-        | (side.eq("SHORT") & rsi.ge(config.mean_reversion_rsi_high))
-    ) & regime.isin([item.upper() for item in config.mean_reversion_regimes])
+    range_regime = regime.isin([item.upper() for item in config.mean_reversion_regimes])
+    rsi_signal = (side.eq("LONG") & rsi.le(config.mean_reversion_rsi_low)) | (
+        side.eq("SHORT") & rsi.ge(config.mean_reversion_rsi_high)
+    )
+    # The production replay currently does not persist RSI. In that schema, a
+    # weak momentum tail inside a range regime is a causal, entry-time proxy.
+    momentum_signal = momentum.le(momentum_low_q)
+    mean_reversion = range_regime & (rsi_signal.fillna(False) | momentum_signal.fillna(False))
 
-    keys = _group_keys(frame)
-    # Recompute causally with a temporary entry-time ATR column.
     tmp = frame.copy()
-    tmp["__event_atr"] = atr
+    tmp["__event_volatility"] = volatility
     groups_tmp = tmp.groupby(keys, sort=False, dropna=False)
-    past_median = groups_tmp["__event_atr"].transform(
-        lambda s: s.shift(1).rolling(config.volatility_lookback, min_periods=5).median()
+    past_median = groups_tmp["__event_volatility"].transform(
+        lambda series: series.shift(1).rolling(config.volatility_lookback, min_periods=5).median()
     )
-    atr_ratio = atr / past_median.replace(0, np.nan)
-    tmp["__event_atr_ratio"] = atr_ratio
-    prior_ratio = tmp.groupby(keys, sort=False, dropna=False)["__event_atr_ratio"].shift(1)
-    volatility_proxy = (
-        atr_ratio.ge(config.volatility_expansion_ratio)
-        & prior_ratio.le(config.volatility_prior_max_ratio)
-        & volume.ge(config.volatility_volume_min)
-    )
+    volatility_ratio = volatility / past_median.replace(0, np.nan)
+    tmp["__event_volatility_ratio"] = volatility_ratio
+    prior_ratio = tmp.groupby(keys, sort=False, dropna=False)["__event_volatility_ratio"].shift(1)
+    ratio_proxy = volatility_ratio.ge(config.volatility_expansion_ratio) & prior_ratio.le(config.volatility_prior_max_ratio)
+    quantile_proxy = volatility.ge(volatility_q) & volatility_q.notna()
+    volatility_proxy = (ratio_proxy | quantile_proxy) & volume.ge(volume_q.fillna(config.volatility_volume_min))
 
     previous_regime = frame.groupby(keys, sort=False, dropna=False)["regime"].shift(1) if "regime" in frame.columns else pd.Series(np.nan, index=frame.index)
     regime_transition = (
         previous_regime.notna()
         & regime.ne(previous_regime.astype(str).str.upper())
-        & aligned_regime
-        & structure.ge(config.regime_transition_structure_min)
-        & volume.ge(config.regime_transition_volume_min)
-        & trend.ge(config.regime_transition_trend_min)
+        & direction_aligned
+        & structure.ge(transition_structure_q.fillna(config.regime_transition_structure_min))
+        & volume.ge(volume_q.fillna(config.regime_transition_volume_min))
     )
 
+    # A liquidity sweep cannot be reconstructed honestly from component scores;
+    # it remains available only when an explicit entry-time sweep flag exists.
     sweep_direction = explicit_sweep & structure.ge(config.structure_sweep_min)
     masks = {
         "LIQUIDITY_SWEEP": sweep_direction,
         "BREAKOUT_CONFIRMATION": explicit_breakout | breakout_proxy,
-        "VOLATILITY_EXPANSION": explicit_volatility | volatility_proxy,
-        "REGIME_TRANSITION": regime_transition,
-        "EXTREME_MEAN_REVERSION": mean_reversion,
+        "VOLATILITY_EXPANSION": explicit_volatility | volatility_proxy.fillna(False),
+        "REGIME_TRANSITION": regime_transition.fillna(False),
+        "EXTREME_MEAN_REVERSION": mean_reversion.fillna(False),
     }
-    diagnostics = {
+    unavailable: List[str] = []
+    if not any(column in frame.columns for column in EXPLICIT_SWEEP_COLUMNS):
+        unavailable.append("LIQUIDITY_SWEEP")
+    schema_mode = "RAW_INDICATOR_SCHEMA" if (rsi.notna().any() or any(alias in frame.columns for alias in ALIASES["atr"][:-1])) else "REPLAY_COMPONENT_SCHEMA"
+    diagnostics: Dict[str, Any] = {
         "explicit_breakout_rows": int(explicit_breakout.sum()),
         "explicit_sweep_rows": int(explicit_sweep.sum()),
         "explicit_volatility_rows": int(explicit_volatility.sum()),
+        "breakout_rows": int(masks["BREAKOUT_CONFIRMATION"].sum()),
+        "mean_reversion_rows": int(masks["EXTREME_MEAN_REVERSION"].sum()),
+        "volatility_expansion_rows": int(masks["VOLATILITY_EXPANSION"].sum()),
+        "regime_transition_rows": int(masks["REGIME_TRANSITION"].sum()),
+        "liquidity_sweep_rows": int(masks["LIQUIDITY_SWEEP"].sum()),
+        "schema_mode": schema_mode,
+        "unavailable_event_families": tuple(unavailable),
     }
-    frame["event_atr_past_median"] = past_median
-    frame["event_atr_expansion_ratio"] = atr_ratio
+    frame["event_volatility_past_median"] = past_median
+    frame["event_volatility_expansion_ratio"] = volatility_ratio
     frame["event_previous_regime"] = previous_regime
+    frame["event_structure_threshold"] = structure_q
+    frame["event_volume_threshold"] = volume_q
+    frame["event_trend_threshold"] = trend_q
     return masks, diagnostics
 
 
@@ -495,6 +553,13 @@ def build_event_opportunity_universe(
         explicit_breakout_rows=explicit["explicit_breakout_rows"],
         explicit_sweep_rows=explicit["explicit_sweep_rows"],
         explicit_volatility_rows=explicit["explicit_volatility_rows"],
+        breakout_rows=explicit["breakout_rows"],
+        mean_reversion_rows=explicit["mean_reversion_rows"],
+        volatility_expansion_rows=explicit["volatility_expansion_rows"],
+        regime_transition_rows=explicit["regime_transition_rows"],
+        liquidity_sweep_rows=explicit["liquidity_sweep_rows"],
+        schema_mode=explicit["schema_mode"],
+        unavailable_event_families=explicit["unavailable_event_families"],
     )
     return event_only, diagnostics
 

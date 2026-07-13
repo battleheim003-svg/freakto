@@ -255,6 +255,15 @@ def analyze_event_opportunity_universe(
         "Event detectors use entry-time replay fields only; replay proxies are not equivalent to full order-book events.",
         "Triple-Barrier labels use future outcome fields only after the event universe is frozen.",
     ]
+    diagnostic_findings = [
+        f"Event detector schema mode: {diagnostics.schema_mode}.",
+        f"Raw family matches before priority: breakout={diagnostics.breakout_rows}, mean_reversion={diagnostics.mean_reversion_rows}, volatility_expansion={diagnostics.volatility_expansion_rows}, regime_transition={diagnostics.regime_transition_rows}, liquidity_sweep={diagnostics.liquidity_sweep_rows}.",
+    ]
+    if diagnostics.unavailable_event_families:
+        diagnostic_findings.append(
+            "Unavailable without explicit entry-time data: " + ", ".join(diagnostics.unavailable_event_families) + "."
+        )
+
     if labels.empty or len(labels) < config.minimum_train_events + config.minimum_optimize_events + config.minimum_holdout_events:
         report = EventOpportunityReport(
             status="INSUFFICIENT_EVENT_UNIVERSE",
@@ -272,7 +281,7 @@ def analyze_event_opportunity_universe(
             split_boundaries={},
             development_candidate=None,
             fresh_oos_required=True,
-            key_findings=[],
+            key_findings=diagnostic_findings,
             blockers=["The sparse event universe does not yet contain enough chronological events."],
             warnings=warnings,
         )
@@ -408,7 +417,7 @@ def analyze_event_opportunity_universe(
     top_event = str(event_counts.index[0]) if not event_counts.empty else "NONE"
     top_event_rows = int(event_counts.iloc[0]) if not event_counts.empty else 0
     cost_gate_rate = float(labels["cost_gate_pass"].mean()) if not labels.empty else 0.0
-    key_findings = [
+    key_findings = diagnostic_findings + [
         f"Sparse event detection retained {len(labels)} of {len(directional)} directional rows ({event_rate:.2%}).",
         f"The most common primary event was {top_event} with {top_event_rows} rows.",
         f"The pre-trade cost gate retained {int(labels['cost_gate_pass'].sum())} event rows ({cost_gate_rate:.2%}).",

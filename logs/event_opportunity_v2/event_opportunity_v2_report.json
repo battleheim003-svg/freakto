@@ -1,8 +1,8 @@
 {
-  "status": "INSUFFICIENT_EVENT_UNIVERSE",
+  "status": "COMPLETE_NO_DEVELOPMENT_CANDIDATE",
   "mode": "EVENT_OPPORTUNITY_COST_AWARE_DEVELOPMENT_ONLY",
   "version": "2.0.0",
-  "created_utc": "2026-07-13T18:51:02.130104+00:00",
+  "created_utc": "2026-07-13T19:01:11.878302+00:00",
   "selected_replay_window": "FULL",
   "available_replay_windows": [
     "3Y",
@@ -12,15 +12,40 @@
   "development_cutoff_utc": "2026-07-09T12:00:00Z",
   "rows_loaded": 48535,
   "directional_rows": 16150,
-  "event_rows": 0,
+  "event_rows": 3589,
   "cost_gated_event_rows": 0,
-  "event_rate": 0.0,
-  "split_boundaries": {},
+  "event_rate": 0.22222910216718267,
+  "split_boundaries": {
+    "train_end_utc": "2023-09-12T12:00:00+00:00",
+    "optimize_start_utc": "2023-09-19T08:00:00+00:00",
+    "optimize_end_utc": "2025-01-17T08:00:00+00:00",
+    "holdout_start_utc": "2025-01-19T08:00:00+00:00",
+    "purge_timestamps": "6"
+  },
   "development_candidate": null,
   "fresh_oos_required": true,
-  "key_findings": [],
+  "key_findings": [
+    "Event detector schema mode: REPLAY_COMPONENT_SCHEMA.",
+    "Raw family matches before priority: breakout=2449, mean_reversion=4, volatility_expansion=1420, regime_transition=823, liquidity_sweep=0.",
+    "Unavailable without explicit entry-time data: LIQUIDITY_SWEEP.",
+    "Sparse event detection retained 3589 of 16150 directional rows (22.22%).",
+    "The most common primary event was BREAKOUT_CONFIRMATION with 2449 rows.",
+    "The pre-trade cost gate retained 0 event rows (0.00%).",
+    "The fixed no-trade baseline has zero expectancy and zero drawdown; every tradable candidate must beat it after costs.",
+    "Meta-label Holdout selected n=0, expectancy=0.000000% and PF=0.0.",
+    "Walk-forward positive-fold fraction was 0.00%.",
+    "Best adequately sampled non-meta Holdout baseline expectancy was -0.285950%.",
+    "1025 decisions triggered multiple events; pre-declared priority prevented double counting.",
+    "No event/meta-label candidate is eligible for Fresh OOS freezing."
+  ],
   "blockers": [
-    "The sparse event universe does not yet contain enough chronological events."
+    "Meta model was not fitted",
+    "Meta-label model was not fitted: insufficient cost-gated train events",
+    "Meta-label Holdout sample count is below the promotion minimum.",
+    "Meta-label Holdout expectancy is not positive.",
+    "Meta-label Holdout profit factor is below the promotion minimum.",
+    "Meta-label Holdout confidence interval does not stay above zero.",
+    "Meta-label walk-forward positive-fold fraction is insufficient."
   ],
   "warnings": [
     "Event detectors use entry-time replay fields only; replay proxies are not equivalent to full order-book events.",

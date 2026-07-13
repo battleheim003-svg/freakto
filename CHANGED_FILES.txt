@@ -1,9 +1,5 @@
 engine/event_opportunity_universe.py
-engine/cost_aware_label_v2.py
 engine/event_opportunity_benchmarks.py
-event_opportunity_v2_analysis.py
 tests/test_event_opportunity_universe.py
-tests/test_cost_aware_label_v2.py
-EVENT_OPPORTUNITY_UNIVERSE_RUNBOOK.md
-EVENT_OPPORTUNITY_UNIVERSE_IMPLEMENTATION_RESULT.md
+EVENT_SCHEMA_COMPATIBILITY_FIX.md
 CHANGED_FILES.txt
