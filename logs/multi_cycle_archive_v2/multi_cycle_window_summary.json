@@ -52,5 +52,32 @@
     },
     "first_timestamp_utc":"2021-07-29T12:00:00+00:00",
     "last_timestamp_utc":"2026-07-07T12:00:00+00:00"
+  },
+  {
+    "window":"FULL",
+    "all_directional":{
+      "sample_count":16150,
+      "win_count":6221,
+      "loss_count":9929,
+      "win_rate":0.3852012384,
+      "expectancy":-0.5015416284,
+      "median_return":-0.7404715,
+      "profit_factor":0.703301946,
+      "total_return":-8099.897298,
+      "max_drawdown":-8272.026472
+    },
+    "fixed_gate":{
+      "sample_count":2900,
+      "win_count":1197,
+      "loss_count":1703,
+      "win_rate":0.4127586207,
+      "expectancy":-0.2327839317,
+      "median_return":-0.6503865,
+      "profit_factor":0.851253826,
+      "total_return":-675.073402,
+      "max_drawdown":-872.946969
+    },
+    "first_timestamp_utc":"2017-11-10T12:00:00+00:00",
+    "last_timestamp_utc":"2026-07-07T12:00:00+00:00"
   }
 ]

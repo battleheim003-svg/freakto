@@ -1,10 +1,11 @@
-# Freakto Multi-Cycle Historical Archive v2
+# Freakto Multi-Cycle Historical Archive v2.1
 
-- Archive status: **FAIL_CLOSED**
+- Archive status: **COMPLETE_RESEARCH_ONLY**
 - Validation status: **COMPLETE_NO_PROMOTION**
 - Development cutoff: `2026-07-09T12:00:00+00:00`
-- Dataset manifests: **6**
+- Dataset manifests: **9**
 - Replay windows: **3**
+- Build issues: **0**
 - Fixed benchmark: `score >= 70`
 - Promotion applied: **False**
 - Paper/Live enabled: **False**
@@ -27,8 +28,13 @@
 - Fixed-gate expectancy: -0.320953%
 - Fixed-gate PF: 0.7891801187780279
 
-## Blockers
-- Leakage audit did not pass for FULL: FAILED_NO_REPLAY_ROWS
+### FULL
+- Directional n: 16150
+- Directional expectancy: -0.501542%
+- Directional PF: 0.7033019459936399
+- Fixed-gate n: 2900
+- Fixed-gate expectancy: -0.232784%
+- Fixed-gate PF: 0.8512538260409789
 
 ## Safety
 
