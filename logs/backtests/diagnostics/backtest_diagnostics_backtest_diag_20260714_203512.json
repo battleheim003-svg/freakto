@@ -1,0 +1,26 @@
+{
+  "run_id": "backtest_diag_20260714_203512",
+  "generated_utc": "2026-07-14T20:35:12.664690+00:00",
+  "status": "NO_BACKTEST_DATA",
+  "total_rows": 0,
+  "complete_rows": 0,
+  "directional_samples": 0,
+  "avg_24h_return_pct": 0.0,
+  "directional_win_rate": 0.0,
+  "target_1_hit_rate": 0.0,
+  "stop_hit_rate": 0.0,
+  "mfe_mean_pct": 0.0,
+  "mae_mean_pct": 0.0,
+  "best_holding_period": "",
+  "best_holding_avg_return_pct": 0.0,
+  "tables": {},
+  "blockers": [
+    "هیچ داده historical_backtest_evaluations.csv وجود ندارد."
+  ],
+  "warnings": [
+    "ابتدا historical_backtest_dashboard.py را اجرا کن."
+  ],
+  "recommendations": [
+    "یک Backtest سبک اجرا کن و دوباره diagnostics بگیر."
+  ]
+}

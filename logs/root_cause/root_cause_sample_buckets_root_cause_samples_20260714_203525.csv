@@ -1,0 +1,2 @@
+﻿root_cause_primary,root_cause_direction,decision_rows,evaluated_cells,samples_4h,hit_rate_4h,avg_signed_return_4h_pct,samples_12h,hit_rate_12h,avg_signed_return_12h_pct,samples_24h,hit_rate_24h,avg_signed_return_24h_pct,avg_probability_pct,evidence_quality_mode,confidence_mode,maturity_level,sample_gap_to_min,sample_gap_to_research,sample_gap_to_candidate,provisional_verdict
+MACRO_POLICY_PRESSURE,BEARISH,18,51,18,72.22,0.0246,17,64.71,0.1716,16,81.25,0.4643,47.3106,HIGH,MEDIUM,RESEARCH_SAMPLE_READY,0,0,39,PROMISING_RESEARCH_WATCHLIST
