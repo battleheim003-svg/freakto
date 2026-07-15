@@ -232,6 +232,35 @@ def _recover_mixed_timestamps(frame: pd.DataFrame) -> pd.DataFrame:
     return recovered if len(recovered) > len(standard) else standard
 
 
+
+
+def _normalize_paper_entry_rows(frame: pd.DataFrame) -> pd.DataFrame:
+    """Normalize entry-time decision rows without requiring future outcomes."""
+    work = frame.copy()
+    ts_col = _first_existing(work, TIMESTAMP_CANDIDATES)
+    if ts_col is None:
+        return pd.DataFrame()
+    try:
+        work["__timestamp"] = pd.to_datetime(work[ts_col], utc=True, errors="coerce", format="mixed")
+    except TypeError:
+        work["__timestamp"] = pd.to_datetime(work[ts_col], utc=True, errors="coerce")
+    work["__return"] = np.nan
+    if "side" not in work.columns:
+        work["side"] = "NEUTRAL"
+    work["side"] = work["side"].fillna("NEUTRAL").astype(str).str.upper()
+    if "regime" not in work.columns:
+        work["regime"] = work.get("regime_label", "UNKNOWN")
+    work["regime"] = work["regime"].fillna("UNKNOWN").astype(str).str.upper()
+    if "score" not in work.columns:
+        work["score"] = np.nan
+    work["score"] = pd.to_numeric(work["score"], errors="coerce")
+    if "symbol" not in work.columns:
+        work["symbol"] = "UNKNOWN"
+    if "timeframe" not in work.columns:
+        work["timeframe"] = "4h"
+    return work.dropna(subset=["__timestamp"]).sort_values("__timestamp", kind="stable").reset_index(drop=True)
+
+
 def validate_event_feature_names(features: Sequence[str]) -> None:
     for name in features:
         lowered = str(name).strip().lower()
@@ -251,14 +280,16 @@ def prepare_event_rows(
     config.validate()
     if frame is None or frame.empty:
         return pd.DataFrame()
-    work = _recover_mixed_timestamps(frame)
+    work = _normalize_paper_entry_rows(frame) if time_scope == "paper" else _recover_mixed_timestamps(frame)
     cutoff = pd.Timestamp(config.development_cutoff_utc)
     if time_scope == "development":
         work = work[work["__timestamp"] <= cutoff].copy()
     elif time_scope == "fresh":
         work = work[work["__timestamp"] > cutoff].copy()
+    elif time_scope == "paper":
+        pass
     else:
-        raise ValueError("time_scope must be 'development' or 'fresh'")
+        raise ValueError("time_scope must be 'development', 'fresh' or 'paper'")
     if "regime_label" in work.columns and ("regime" not in work.columns or work["regime"].eq("UNKNOWN").all()):
         work["regime"] = work["regime_label"].fillna("UNKNOWN").astype(str).str.upper()
     if config.require_directional_side:
@@ -494,6 +525,11 @@ def build_event_opportunity_universe(
     for column in geometry.columns:
         work[column] = geometry[column]
     cost = _numeric(work, "cost", np.nan).clip(lower=0)
+    if time_scope == "paper":
+        fee_bps = pd.to_numeric(work.get("fee_bps_per_side", pd.Series(np.nan, index=work.index)), errors="coerce")
+        slippage_bps = pd.to_numeric(work.get("slippage_bps_per_side", work.get("base_slippage_bps_per_side", pd.Series(np.nan, index=work.index))), errors="coerce")
+        derived_cost = 2.0 * (fee_bps.fillna(10.0) + slippage_bps.fillna(5.0)) / 100.0
+        cost = cost.where(cost.notna(), derived_cost)
     risk = _numeric(work, "risk", 0.0).fillna(0.0)
     work["event_execution_cost_pct"] = cost
     work["gross_target_to_cost"] = work["target_distance_pct"] / cost.replace(0, np.nan)
