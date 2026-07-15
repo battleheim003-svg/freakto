@@ -17,6 +17,8 @@ import numpy as np
 import pandas as pd
 
 from engine.multi_cycle_validation import normalize_replay_rows
+from engine.geometry_parser import parse_trade_geometry
+from engine.cost_gate_diagnostics import rejection_reason
 
 VERSION = "2.0.1"
 MODE = "EVENT_OPPORTUNITY_UNIVERSE_DEVELOPMENT_ONLY"
@@ -275,65 +277,39 @@ def prepare_event_rows(
     return work.sort_values(sort_columns, kind="stable").reset_index(drop=True)
 
 
-def _parse_price_series(series: pd.Series) -> pd.Series:
-    def parse(value: Any) -> float:
-        if value is None:
-            return np.nan
-        if isinstance(value, (list, tuple)) and value:
-            value = value[0]
-        text = str(value).strip().replace("`", "").replace(",", "")
-        if not text or text.lower() in {"nan", "none", "null", "---"}:
-            return np.nan
-        try:
-            decoded = json.loads(text)
-            if isinstance(decoded, list) and decoded:
-                text = str(decoded[0])
-        except Exception:
-            pass
-        if " - " in text:
-            nums = []
-            for item in text.split(" - "):
-                try:
-                    nums.append(float(item))
-                except ValueError:
-                    continue
-            return float(np.mean(nums)) if nums else np.nan
-        try:
-            return float(text)
-        except ValueError:
-            return np.nan
-
-    return series.map(parse).astype(float)
-
-
 def _geometry(frame: pd.DataFrame) -> pd.DataFrame:
     entry_col = _first_existing(frame, ALIASES["entry"])
     target_col = _first_existing(frame, ALIASES["target"])
     stop_col = _first_existing(frame, ALIASES["stop"])
-    entry = _parse_price_series(frame[entry_col]) if entry_col else pd.Series(np.nan, index=frame.index)
-    target = _parse_price_series(frame[target_col]) if target_col else pd.Series(np.nan, index=frame.index)
-    stop = _parse_price_series(frame[stop_col]) if stop_col else pd.Series(np.nan, index=frame.index)
-    side = frame["side"].astype(str).str.upper()
-    target_distance = pd.Series(np.nan, index=frame.index, dtype=float)
-    stop_distance = pd.Series(np.nan, index=frame.index, dtype=float)
-    valid = entry.gt(0) & target.gt(0) & stop.gt(0)
-    long_mask = valid & side.eq("LONG")
-    short_mask = valid & side.eq("SHORT")
-    target_distance.loc[long_mask] = (target.loc[long_mask] / entry.loc[long_mask] - 1.0) * 100.0
-    stop_distance.loc[long_mask] = (1.0 - stop.loc[long_mask] / entry.loc[long_mask]) * 100.0
-    target_distance.loc[short_mask] = (1.0 - target.loc[short_mask] / entry.loc[short_mask]) * 100.0
-    stop_distance.loc[short_mask] = (stop.loc[short_mask] / entry.loc[short_mask] - 1.0) * 100.0
-    return pd.DataFrame(
-        {
-            "entry_price_normalized": entry,
-            "target_price_normalized": target,
-            "stop_price_normalized": stop,
-            "target_distance_pct": target_distance.clip(lower=0),
-            "stop_distance_pct": stop_distance.clip(lower=0),
-        },
-        index=frame.index,
-    )
-
+    entries = frame[entry_col] if entry_col else pd.Series(np.nan, index=frame.index)
+    targets = frame[target_col] if target_col else pd.Series(np.nan, index=frame.index)
+    stops = frame[stop_col] if stop_col else pd.Series(np.nan, index=frame.index)
+    records = []
+    for idx in frame.index:
+        parsed = parse_trade_geometry(entries.loc[idx], stops.loc[idx], targets.loc[idx], frame.loc[idx, "side"])
+        if parsed.geometry_valid:
+            if str(frame.loc[idx, "side"]).upper() == "LONG":
+                target_distance = (parsed.target / parsed.entry - 1.0) * 100.0
+                stop_distance = (1.0 - parsed.stop / parsed.entry) * 100.0
+            else:
+                target_distance = (1.0 - parsed.target / parsed.entry) * 100.0
+                stop_distance = (parsed.stop / parsed.entry - 1.0) * 100.0
+        else:
+            target_distance = np.nan
+            stop_distance = np.nan
+        records.append({
+            "entry_price_normalized": parsed.entry,
+            "target_price_normalized": parsed.target,
+            "stop_price_normalized": parsed.stop,
+            "entry_valid": parsed.entry_valid,
+            "stop_valid": parsed.stop_valid,
+            "target_valid": parsed.target_valid,
+            "geometry_valid": parsed.geometry_valid,
+            "geometry_parse_reason": parsed.parse_reason,
+            "target_distance_pct": max(0.0, target_distance) if np.isfinite(target_distance) else np.nan,
+            "stop_distance_pct": max(0.0, stop_distance) if np.isfinite(stop_distance) else np.nan,
+        })
+    return pd.DataFrame(records, index=frame.index)
 
 def _group_keys(frame: pd.DataFrame) -> List[str]:
     keys = [column for column in ("symbol", "timeframe") if column in frame.columns]
@@ -538,6 +514,13 @@ def build_event_opportunity_universe(
         & work["gross_target_to_cost"].ge(config.minimum_target_to_cost)
         & work["net_reward_risk"].ge(config.minimum_net_reward_risk)
         & risk.le(config.maximum_risk_penalty)
+    )
+    work["cost_gate_rejection_reason"] = rejection_reason(
+        work,
+        maximum_cost_pct=config.maximum_cost_pct,
+        minimum_target_to_cost=config.minimum_target_to_cost,
+        minimum_net_reward_risk=config.minimum_net_reward_risk,
+        maximum_risk_penalty=config.maximum_risk_penalty,
     )
     work["opportunity_id"] = (
         work["decision_id"].astype(str) + "|" + work["primary_event"].astype(str)

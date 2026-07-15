@@ -158,7 +158,7 @@ def _bool_series(frame: pd.DataFrame, column: str) -> pd.Series:
         return pd.Series(False, index=frame.index, dtype=bool)
     values = frame[column]
     numeric = pd.to_numeric(values, errors="coerce")
-    text = values.fillna("").astype(str).str.strip().str.lower()
+    text = values.astype("string").fillna("").str.strip().str.lower()
     return numeric.fillna(0).ne(0) | text.isin({"true", "yes", "y", "1", "hit", "target", "stop"})
 
 

@@ -1,5 +1,10 @@
+engine/geometry_parser.py
+engine/cost_gate_diagnostics.py
 engine/event_opportunity_universe.py
-engine/event_opportunity_benchmarks.py
-tests/test_event_opportunity_universe.py
-EVENT_SCHEMA_COMPATIBILITY_FIX.md
+engine/cost_aware_label_v2.py
+cost_gate_diagnostics_analysis.py
+tests/test_geometry_parser.py
+tests/test_cost_gate_diagnostics.py
+COST_GATE_DIAGNOSTICS_RUNBOOK.md
+COST_GATE_DIAGNOSTICS_IMPLEMENTATION_RESULT.md
 CHANGED_FILES.txt
