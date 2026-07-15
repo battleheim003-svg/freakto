@@ -1,0 +1,22 @@
+{
+  "run_id": "pipeline_health_20260715_073250",
+  "generated_utc": "2026-07-15T07:32:50.104412+00:00",
+  "status": "PIPELINE_HEALTHY",
+  "alerts": [],
+  "latest_forward_run": {
+    "run_id": "forward_20260715_073142",
+    "started_utc": "2026-07-15T07:31:42.246797+00:00",
+    "finished_utc": "2026-07-15T07:32:44.111268+00:00",
+    "duration_seconds": "61.86",
+    "mode": "EXECUTE",
+    "ok": "True",
+    "task_count": "17",
+    "failed_tasks": "nan",
+    "report_file": "logs/forward_testing/forward_20260715_073142_report.md",
+    "hours_since_last_run": 0.02
+  },
+  "forward_eval_rows": 70,
+  "forward_regime_known_rows": 61,
+  "forward_regime_unknown_rows": 9,
+  "shadow_signal_rows": 24
+}
