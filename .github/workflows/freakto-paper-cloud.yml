@@ -97,7 +97,7 @@ jobs:
       - name: Validate cloud runner tests
         if: ${{ github.event_name == 'schedule' || inputs.run_tests }}
         run: |
-          python -m pytest -q tests/test_cloud_state_sync.py tests/test_github_cloud_runner.py
+          python -m pytest -q tests/test_cloud_state_sync.py tests/test_github_cloud_runner.py tests/test_cloud_workflow_state_persistence.py
 
       - name: Run one paper research cycle
         id: cycle
@@ -134,24 +134,63 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          STATE_DIR="$(mktemp -d)"
-          cp .cloud-state/cloud_state.tar.gz "$STATE_DIR/"
-          cp .cloud-state/cloud_state_manifest.json "$STATE_DIR/"
-          cd "$STATE_DIR"
-          git init
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          if git ls-remote --exit-code --heads origin paper-state >/dev/null 2>&1; then
-            git fetch --depth=1 origin paper-state
-            git checkout -b paper-state FETCH_HEAD
-          else
-            git checkout --orphan paper-state
-          fi
-          git add cloud_state.tar.gz cloud_state_manifest.json
-          if git diff --cached --quiet; then
-            echo "Cloud state unchanged."
-            exit 0
-          fi
-          git commit -m "chore: persist paper research cloud state [skip ci]"
-          git push origin HEAD:paper-state
+
+          SOURCE_STATE_DIR="${GITHUB_WORKSPACE}/.cloud-state"
+          ARCHIVE_SOURCE="${SOURCE_STATE_DIR}/cloud_state.tar.gz"
+          MANIFEST_SOURCE="${SOURCE_STATE_DIR}/cloud_state_manifest.json"
+
+          test -s "$ARCHIVE_SOURCE"
+          test -s "$MANIFEST_SOURCE"
+
+          ROOT_TMP="$(mktemp -d)"
+          trap 'rm -rf "$ROOT_TMP"' EXIT
+
+          REMOTE_URL="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          MAX_PUSH_ATTEMPTS=3
+
+          for attempt in $(seq 1 "$MAX_PUSH_ATTEMPTS"); do
+            STATE_REPO="${ROOT_TMP}/attempt-${attempt}"
+            mkdir -p "$STATE_REPO"
+            cd "$STATE_REPO"
+
+            git init -b paper-state
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git remote add origin "$REMOTE_URL"
+
+            if git ls-remote --exit-code --heads origin paper-state >/dev/null 2>&1; then
+              git fetch --depth=1 origin paper-state
+              git checkout -B paper-state FETCH_HEAD
+            else
+              git checkout --orphan paper-state
+              git rm -rf . >/dev/null 2>&1 || true
+            fi
+
+            # Copy only after the branch working tree is ready. This prevents
+            # untracked files from blocking checkout on later workflow runs.
+            cp "$ARCHIVE_SOURCE" ./cloud_state.tar.gz
+            cp "$MANIFEST_SOURCE" ./cloud_state_manifest.json
+
+            git add cloud_state.tar.gz cloud_state_manifest.json
+            if git diff --cached --quiet; then
+              echo "Cloud state unchanged; nothing to persist."
+              exit 0
+            fi
+
+            git commit -m "chore: persist paper research cloud state [skip ci]"
+
+            if git push origin HEAD:paper-state; then
+              echo "Cloud state persisted successfully on attempt ${attempt}."
+              exit 0
+            fi
+
+            if [ "$attempt" -lt "$MAX_PUSH_ATTEMPTS" ]; then
+              echo "State push attempt ${attempt} failed; rebuilding from latest remote state."
+              cd "$ROOT_TMP"
+              rm -rf "$STATE_REPO"
+              sleep $((attempt * 3))
+            fi
+          done
+
+          echo "Unable to persist paper state after ${MAX_PUSH_ATTEMPTS} attempts." >&2
+          exit 1
