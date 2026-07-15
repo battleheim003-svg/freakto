@@ -62,7 +62,14 @@ def test_maintenance_cadence_runs_first_and_every_n_cycles():
 def test_cycle_commands_are_ordered_and_never_contain_live_order_command():
     commands = cycle_commands(OrchestratorConfig(project_root="."), "python")
     names = [item[0] for item in commands]
-    assert names == ["market_monitor", "decision_evaluator", "paper_scan", "paper_evaluator", "paper_status"]
+    assert names == [
+        "market_monitor",
+        "decision_evaluator",
+        "paper_scan",
+        "paper_evaluator",
+        "paper_performance_dashboard",
+        "paper_status",
+    ]
     text = " ".join(part for _, cmd, _ in commands for part in cmd).lower()
     assert "live" not in text
     assert "order" not in text
