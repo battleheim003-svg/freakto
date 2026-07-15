@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "status": "COMPLETE_NO_DEVELOPMENT_CANDIDATE",
   "candidate": null,
-  "selected_probability_threshold": null,
+  "selected_probability_threshold": 0.55,
   "development_cutoff_utc": "2026-07-09T12:00:00Z",
   "event_detection_uses_outcomes": false,
   "labels_are_cost_aware": true,
@@ -13,12 +13,7 @@
   "promotion_applied": false,
   "paper_live_enabled": false,
   "blockers": [
-    "Meta model was not fitted",
-    "Meta-label model was not fitted: insufficient cost-gated train events",
     "Meta-label Holdout sample count is below the promotion minimum.",
-    "Meta-label Holdout expectancy is not positive.",
-    "Meta-label Holdout profit factor is below the promotion minimum.",
-    "Meta-label Holdout confidence interval does not stay above zero.",
     "Meta-label walk-forward positive-fold fraction is insufficient."
   ]
 }
