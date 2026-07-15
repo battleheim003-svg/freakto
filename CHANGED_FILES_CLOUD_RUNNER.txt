@@ -1,0 +1,8 @@
+.github/workflows/freakto-paper-cloud.yml
+cloud_state_sync.py
+github_cloud_runner.py
+tests/test_cloud_state_sync.py
+tests/test_github_cloud_runner.py
+GITHUB_CLOUD_RUNNER_RUNBOOK.md
+GITHUB_CLOUD_RUNNER_IMPLEMENTATION_RESULT.md
+CHANGED_FILES_CLOUD_RUNNER.txt

@@ -1,0 +1,133 @@
+name: Freakto Paper Cloud Cycle
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_tests:
+        description: Run focused cloud tests before the cycle
+        required: false
+        default: true
+        type: boolean
+  schedule:
+    - cron: "7 0,4,8,12,16,20 * * *"
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  PYTHONUTF8: "1"
+  TZ: "UTC"
+  FREAKTO_CLOUD: "1"
+  LIVE_TRADING_ENABLED: "false"
+  REAL_CAPITAL_ENABLED: "false"
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  COINALYZE_API_KEY: ${{ secrets.COINALYZE_API_KEY }}
+
+concurrency:
+  group: freakto-paper-cloud-cycle
+  cancel-in-progress: false
+
+jobs:
+  paper-cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Restore persistent paper state
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .cloud-state
+          mkdir -p .cloud-state
+          if git ls-remote --exit-code --heads origin paper-state >/dev/null 2>&1; then
+            git fetch --depth=1 origin paper-state
+            git show FETCH_HEAD:cloud_state.tar.gz > .cloud-state/cloud_state.tar.gz || true
+            if [ -s .cloud-state/cloud_state.tar.gz ]; then
+              python cloud_state_sync.py restore --root . --archive .cloud-state/cloud_state.tar.gz
+            fi
+          else
+            echo "No paper-state branch exists yet; starting with an empty cloud state."
+          fi
+
+      - name: Validate cloud runner tests
+        if: ${{ github.event_name == 'schedule' || inputs.run_tests }}
+        run: |
+          pytest -q tests/test_cloud_state_sync.py tests/test_github_cloud_runner.py
+
+      - name: Run one paper research cycle
+        id: cycle
+        run: |
+          python -X utf8 github_cloud_runner.py
+
+      - name: Pack persistent paper state
+        if: always()
+        run: |
+          mkdir -p .cloud-state
+          python cloud_state_sync.py pack \
+            --root . \
+            --archive .cloud-state/cloud_state.tar.gz \
+            --manifest .cloud-state/cloud_state_manifest.json
+
+      - name: Upload cycle reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freakto-paper-cycle-${{ github.run_number }}
+          if-no-files-found: warn
+          retention-days: 30
+          path: |
+            logs/cloud_runner/**
+            logs/paper_cycle/**
+            logs/paper_launch_v2/**
+            logs/paper_trading/**
+            .cloud-state/cloud_state_manifest.json
+
+      - name: Persist state to paper-state branch
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          STATE_DIR="$(mktemp -d)"
+          cp .cloud-state/cloud_state.tar.gz "$STATE_DIR/"
+          cp .cloud-state/cloud_state_manifest.json "$STATE_DIR/"
+          cd "$STATE_DIR"
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code --heads origin paper-state >/dev/null 2>&1; then
+            git fetch --depth=1 origin paper-state
+            git checkout -b paper-state FETCH_HEAD
+          else
+            git checkout --orphan paper-state
+          fi
+          git add cloud_state.tar.gz cloud_state_manifest.json
+          if git diff --cached --quiet; then
+            echo "Cloud state unchanged."
+            exit 0
+          fi
+          git commit -m "chore: persist paper research cloud state [skip ci]"
+          git push origin HEAD:paper-state
