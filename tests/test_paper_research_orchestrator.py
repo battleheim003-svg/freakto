@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import subprocess
 
@@ -82,6 +83,14 @@ def test_process_lock_blocks_second_process_and_recovers_after_release(tmp_path:
         with pytest.raises(RuntimeError):
             ProcessLock(lock_path).acquire()
     assert not lock_path.exists()
+
+
+def test_pid_alive_for_current_process_never_calls_os_kill(monkeypatch):
+    def unsafe_kill(*_args, **_kwargs):
+        raise AssertionError("os.kill must not be used for the current process")
+
+    monkeypatch.setattr(os, "kill", unsafe_kill)
+    assert ProcessLock._pid_alive(os.getpid()) is True
 
 
 def test_run_step_retries_then_passes(tmp_path: Path):

@@ -15,6 +15,8 @@ The orchestrator never imports an exchange order API and cannot enable Live.
 from __future__ import annotations
 
 import argparse
+import ctypes
+from ctypes import wintypes
 from contextlib import AbstractContextManager
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -111,9 +113,50 @@ class ProcessLock(AbstractContextManager["ProcessLock"]):
         self.acquired = False
 
     @staticmethod
+    def _pid_alive_windows(pid: int) -> bool:
+        """Check a Windows PID without using ``os.kill(pid, 0)``.
+
+        ``os.kill(..., 0)`` is a Unix liveness probe. On Windows it is not a
+        safe no-op and can deliver a console control event to the process that
+        is being inspected. Use the Win32 process-query API instead.
+        """
+        process_query_limited_information = 0x1000
+        still_active = 259
+        error_access_denied = 5
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        kernel32.OpenProcess.restype = wintypes.HANDLE
+        kernel32.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
+        kernel32.GetExitCodeProcess.restype = wintypes.BOOL
+        kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+        kernel32.CloseHandle.restype = wintypes.BOOL
+
+        handle = kernel32.OpenProcess(process_query_limited_information, False, pid)
+        if not handle:
+            # Access denied still means that the PID exists, but the current
+            # account is not allowed to query it. Other errors are treated as
+            # a missing/stale PID.
+            return ctypes.get_last_error() == error_access_denied
+
+        try:
+            exit_code = wintypes.DWORD()
+            if not kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
+                return False
+            return int(exit_code.value) == still_active
+        finally:
+            kernel32.CloseHandle(handle)
+
+    @staticmethod
     def _pid_alive(pid: int) -> bool:
         if pid <= 0:
             return False
+        # The lock most commonly points to the current process. Returning here
+        # also prevents a Windows console signal from being sent to pytest.
+        if pid == os.getpid():
+            return True
+        if os.name == "nt":
+            return ProcessLock._pid_alive_windows(pid)
         try:
             os.kill(pid, 0)
         except ProcessLookupError:
