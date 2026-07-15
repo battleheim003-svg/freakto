@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "created_at_utc": "2026-07-15T10:56:57.217406+00:00",
+  "archive": "cloud_state.tar.gz",
+  "file_count": 18,
+  "total_bytes": 687522,
+  "files": [
+    {
+      "relative_path": "history/freakto_history.db",
+      "size_bytes": 540672,
+      "sha256": "b7bd26a57310e0d8ba8b01d2357b29f37ed45c6bfcb3e6ea34b99f7c6912dff1"
+    },
+    {
+      "relative_path": "logs/decisions.csv",
+      "size_bytes": 60329,
+      "sha256": "50b9077f754d57d1e16d1e6f347170a2b89a228c96dc5f7c498175175ee88ffb"
+    },
+    {
+      "relative_path": "logs/paper_cycle/cycle_history.jsonl",
+      "size_bytes": 37131,
+      "sha256": "1987bb9782799f975ebd0d4fd7b08c411bd19a7ca877922a994e56686bfaea8c"
+    },
+    {
+      "relative_path": "logs/paper_cycle/heartbeat.json",
+      "size_bytes": 148,
+      "sha256": "2a3200c99b1f95bda230cee42ebce0df5fcf8e93b57b195c863bb78d179175fc"
+    },
+    {
+      "relative_path": "logs/paper_cycle/last_cycle.json",
+      "size_bytes": 39574,
+      "sha256": "95cf2447aaf879aa5aff3c9f703988caa7824d3b3127322d3b0f6d10022432bc"
+    },
+    {
+      "relative_path": "logs/paper_cycle/orchestrator_state.json",
+      "size_bytes": 277,
+      "sha256": "8af8400982d9f166034722b439c3099916a71408a3f9a4c468a074ff0808d18d"
+    },
+    {
+      "relative_path": "logs/paper_launch_v2/arm_state.json",
+      "size_bytes": 287,
+      "sha256": "ed66bb21e1ab7867845d192482f1035bfeee832fcd7bfb41a65fb03b285fa0d0"
+    },
+    {
+      "relative_path": "logs/paper_launch_v2/deterministic_candidate_assessments.csv",
+      "size_bytes": 864,
+      "sha256": "331c7acd424c20a20e1293eed5da00dcd47d96fb0e4e4e961f4d0bc744a11cac"
+    },
+    {
+      "relative_path": "logs/paper_launch_v2/deterministic_candidate_walk_forward.csv",
+      "size_bytes": 4487,
+      "sha256": "bd4f6bccd352231bc74f81b63db47c54ee653f930ac76793c06c3e3bba91b03b"
+    },
+    {
+      "relative_path": "logs/paper_launch_v2/paper_launch_readiness.json",
+      "size_bytes": 2741,
+      "sha256": "23c0fff5507fe8698629c7040e12c8f804ce79f5624e55b4cac6143079089009"
+    },
+    {
+      "relative_path": "logs/paper_launch_v2/paper_launch_readiness.md",
+      "size_bytes": 489,
+      "sha256": "fd13daad06cd2b9eb2ba4e7e34bcd6164a1f33363d6feaf07b382acb180599b7"
+    },
+    {
+      "relative_path": "logs/paper_launch_v2/paper_observation_last_run.json",
+      "size_bytes": 217,
+      "sha256": "2ab511897b9a901e40c5892937444a6d49fee5210c80bdd2da61881d39e61fdb"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20260705_162530.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20260705_173932.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20260705_175020.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20260705_180122.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20260715_095506.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20260715_102005.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    }
+  ]
+}
