@@ -1,0 +1,10 @@
+.github/workflows/freakto-paper-cloud.yml
+cloud_state_sync.py
+engine/paper_performance_dashboard.py
+paper_performance_dashboard.py
+paper_research_orchestrator.py
+tests/test_paper_performance_dashboard.py
+tests/test_scheduled_paper_workflow.py
+PAPER_SCHEDULE_AND_PERFORMANCE_RUNBOOK.md
+PAPER_SCHEDULE_AND_PERFORMANCE_IMPLEMENTATION_RESULT.md
+CHANGED_FILES_SCHEDULE_PERFORMANCE.txt

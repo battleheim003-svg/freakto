@@ -370,6 +370,18 @@ def cycle_commands(config: OrchestratorConfig, python_executable: str) -> List[t
                 False,
             ),
             (
+                "paper_performance_dashboard",
+                [
+                    python_executable,
+                    "-X",
+                    "utf8",
+                    str(root / "paper_performance_dashboard.py"),
+                    "--output-dir",
+                    str(root / "logs" / "paper_performance"),
+                ],
+                False,
+            ),
+            (
                 "paper_status",
                 [python_executable, "-X", "utf8", str(root / "paper_trade_launch_dashboard.py"), "--status"],
                 False,

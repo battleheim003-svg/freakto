@@ -16,6 +16,7 @@ STATE_PATHS = (
     "logs/paper_trading",
     "logs/paper_launch_v2",
     "logs/paper_cycle",
+    "logs/paper_performance",
     "logs/fresh_oos",
     "logs/forward_test",
 )
