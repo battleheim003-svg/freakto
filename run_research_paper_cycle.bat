@@ -1,8 +1,14 @@
 @echo off
+setlocal
 cd /d %~dp0
-call .venv\Scripts\activate
-python -X utf8 monitor.py --once
-python -X utf8 paper_trade_launch_dashboard.py --scan --decision-file logs/decisions.csv
-python -X utf8 paper_trade_launch_dashboard.py --evaluate
-python -X utf8 paper_trade_launch_dashboard.py --status
+
+if not exist ".venv\Scripts\python.exe" (
+  echo [ERROR] Virtual environment not found: .venv\Scripts\python.exe
+  pause
+  exit /b 1
+)
+
+".venv\Scripts\python.exe" -X utf8 paper_research_orchestrator.py --once
+set EXIT_CODE=%ERRORLEVEL%
 pause
+exit /b %EXIT_CODE%

@@ -1,11 +1,7 @@
-engine/event_opportunity_universe.py
-engine/paper_readiness_v2.py
-engine/paper_observation_v2.py
-paper_trade_launch_dashboard.py
+paper_research_orchestrator.py
+run_paper_research_auto.bat
 run_research_paper_cycle.bat
-tests/test_event_paper_mode.py
-tests/test_paper_readiness_v2.py
-tests/test_paper_observation_v2.py
-PAPER_TRADE_LAUNCH_RUNBOOK.md
-PAPER_TRADE_LAUNCH_IMPLEMENTATION_RESULT.md
+tests/test_paper_research_orchestrator.py
+PAPER_RESEARCH_ORCHESTRATOR_RUNBOOK.md
+PAPER_RESEARCH_ORCHESTRATOR_IMPLEMENTATION_RESULT.md
 CHANGED_FILES.txt
