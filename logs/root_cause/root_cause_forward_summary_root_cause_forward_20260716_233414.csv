@@ -1,0 +1,2 @@
+﻿root_cause_primary,root_cause_direction,samples_total,evidence_quality_mode,confidence_mode,avg_probability_pct,samples_4h,hit_rate_4h,avg_signed_return_4h_pct,median_signed_return_4h_pct,samples_12h,hit_rate_12h,avg_signed_return_12h_pct,median_signed_return_12h_pct,samples_24h,hit_rate_24h,avg_signed_return_24h_pct,median_signed_return_24h_pct,validation_score,verdict
+MACRO_POLICY_PRESSURE,BEARISH,25,HIGH,MEDIUM,51.0692,25,68.0,-0.0029,0.1308,23,56.52,-0.0235,0.0632,22,72.73,0.1062,0.4506,15.7253,ROOT_CAUSE_FORWARD_RESEARCH_CANDIDATE
