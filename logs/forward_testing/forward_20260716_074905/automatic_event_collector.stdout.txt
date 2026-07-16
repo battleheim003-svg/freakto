@@ -1,0 +1,47 @@
+==============================================================================================================
+🗞️ Freakto Automatic Event Collector v7.0.0
+==============================================================================================================
+Status                 : AUTO_EVENTS_COLLECTED_HIGH_IMPACT
+Run ID                 : auto_events_20260716_074941
+Fetch Live / Apply     : True / True
+Lookback Hours         : 168
+Sources OK/Failed      : 6 / 1
+Fetched Items          : 135
+Significant Events     : 10
+New Events Written     : 8
+Total Auto Events      : 20
+High Impact Events     : 10
+Official Tier Events   : 10
+
+Top Events:
+- HIGH | BEARISH | macro | federal_reserve_press | q=ACTIONABLE_EVENT_CONTEXT | Federal Reserve Board issues enforcement action with TS Banking Group, Inc. and TS Contrarian Bancshares, Inc.
+- HIGH | BEARISH | macro | federal_reserve_speeches | q=SIGNIFICANT_EVENT | Bowman, Modernizing Financial Regulation
+- HIGH | NEUTRAL | regulatory | sec_press_releases | q=ACTIONABLE_EVENT_CONTEXT | SEC Office of Municipal Securities Updates FAQs for Registration of Municipal Advisors
+- HIGH | NEUTRAL | macro | federal_reserve_press | q=ACTIONABLE_EVENT_CONTEXT | Minutes of the Board's discount rate meetings on June 8 and June 17, 2026
+- HIGH | NEUTRAL | macro | federal_reserve_press | q=ACTIONABLE_EVENT_CONTEXT | Federal Reserve announces the leadership and objectives of its task forces to advance the conduct of monetary policy
+- HIGH | NEUTRAL | macro | federal_reserve_speeches | q=SIGNIFICANT_EVENT | Cook, Economic Outlook
+- HIGH | NEUTRAL | macro | federal_reserve_speeches | q=SIGNIFICANT_EVENT | Bowman, Responsible Innovation and Financial Inclusion
+- HIGH | NEUTRAL | macro | federal_reserve_speeches | q=SIGNIFICANT_EVENT | Barr, Will Artificial Intelligence Broadly Raise Living Standards or Drive Income and Wealth Inequality?
+
+Source Health:
+- sec_press_releases: OK | items=25 | events=1 | TIER_1_OFFICIAL_REGULATOR
+- sec_litigation_releases: OK | items=25 | events=0 | TIER_1_OFFICIAL_REGULATOR
+- federal_reserve_press: OK | items=20 | events=3 | TIER_1_OFFICIAL_MACRO
+- federal_reserve_speeches: OK | items=15 | events=5 | TIER_1_OFFICIAL_MACRO
+- ethereum_foundation_blog: OK | items=25 | events=1 | TIER_1_OFFICIAL_PROTOCOL
+- coinbase_blog: OK | items=25 | events=0 | TIER_2_OFFICIAL_COMPANY_BLOG
+- binance_announcements: FAILED | items=0 | events=0 | TIER_1_OFFICIAL_EXCHANGE_NEWS
+
+Recommendations:
+→ رویدادهای high-impact جمع شد؛ causal_intelligence_dashboard.py را اجرا کن تا روی تصمیم‌ها اثر context بررسی شود.
+→ manual_events.csv را فقط برای رویدادهای بسیار مهمی استفاده کن که collector از دست داده یا نیاز به curated override دارند.
+
+Warnings:
+⚠️ Automatic Event Collector فقط داده و tag تحقیقاتی تولید می‌کند؛ Paper/Live فعال نمی‌کند.
+⚠️ Event direction با keyword/rule ساده ساخته می‌شود و باید به عنوان catalyst context دیده شود، نه سیگنال مستقل.
+⚠️ 1 منبع رسمی fail شد؛ v7.0.0 چند fallback را امتحان می‌کند اما شکست source چرخه Forward را متوقف نمی‌کند.
+==============================================================================================================
+🗞️ Auto event JSON ذخیره شد: logs/events/auto_event_collector_auto_events_20260716_074941.json
+📝 Auto event report ذخیره شد: logs/events/auto_event_collector_report_auto_events_20260716_074941.md
+📊 Auto event source health CSV ذخیره شد: logs/events/auto_event_source_health_auto_events_20260716_074941.csv
+🧾 Auto event ledger: data/auto_events.csv
