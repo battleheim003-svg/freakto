@@ -1,0 +1,45 @@
+==============================================================================================================
+🧬 Freakto Root Cause Discovery Engine v8.1.0
+==============================================================================================================
+Status                 : ROOT_CAUSE_MIXED_WITH_CONTRADICTIONS
+Run ID                 : root_cause_20260717_231331
+Symbol / TF            : BTC/USDT | 4h
+Lookback Hours         : 168
+Decision Side/Score    : LONG | 52
+Narrative              : MIXED_NARRATIVE_CONFLICT | BEARISH | MACRO_POLICY
+Causal Context         : MULTI_SOURCE_EVENT_CONSENSUS | catalyst=44/100
+
+Root Cause:
+- Primary              : MACRO_POLICY_PRESSURE
+- Direction            : BEARISH
+- Confidence           : MEDIUM
+- Probability Share    : 59.31%
+- Evidence Quality     : HIGH
+- Verdict              : PROBABLE_CAUSE_BUT_CONFLICTED
+- Summary              : Probable root cause=MACRO_POLICY_PRESSURE; direction=BEARISH; confidence=MEDIUM; share=59.31%. قوی‌ترین evidence از federal_reserve_speeches است: Market narrative theme: MACRO_POLICY | هشدار: شواهد متضاد همزمان وجود دارد.
+- Evidence Total       : 15 | official=10 | event_rows=10
+
+Top Cause Hypotheses:
+- MACRO_POLICY_PRESSURE: p=59.31% | score=87.4057 | dir=BEARISH | evidence=10 | verdict=PRIMARY_PROBABLE_CAUSE
+- TECHNICAL_STRUCTURE_MOMENTUM: p=12.21% | score=18.0 | dir=BULLISH | evidence=1 | verdict=WEAK_SUPPORTING_CAUSE
+- MIXED_EVENT_CONFLICT: p=10.29% | score=15.158 | dir=MIXED_OR_NEUTRAL | evidence=2 | verdict=WEAK_SUPPORTING_CAUSE
+- LIQUIDITY_VOLUME_FLOW: p=10.18% | score=15.0 | dir=BULLISH | evidence=1 | verdict=WEAK_SUPPORTING_CAUSE
+- EXCHANGE_MARKET_ACCESS: p=8.02% | score=11.815 | dir=BULLISH | evidence=1 | verdict=WEAK_SUPPORTING_CAUSE
+
+Contradictions:
+⚠️ شواهد bullish و bearish همزمان قوی‌اند: bull=44.81, bear=87.41
+
+Recommendations:
+→ automatic_event_collector، causal_intelligence، market_narrative و narrative_decision را قبل از root_cause اجرا کن.
+→ اگر primary_root_cause چند هفته متوالی با outcome مثبت/منفی همبستگی داشت، بعداً می‌تواند وارد Root-Cause Gate Simulator شود.
+→ برای افزایش دقت، داده‌های derivatives/on-chain/ETF flow را به evidence registry اضافه کن.
+
+Warnings:
+⚠️ Root Cause Discovery احتمالات علّی پژوهشی می‌سازد؛ علت قطعی یا سیگنال خرید/فروش نیست.
+⚠️ این ماژول از outcome/return آینده برای تشخیص علت استفاده نمی‌کند تا leakage ایجاد نشود.
+⚠️ تا وقتی علت‌ها با forward outcomes اعتبارسنجی نشوند، Paper/Live نباید از آن‌ها استفاده کند.
+==============================================================================================================
+🧬 Root cause JSON ذخیره شد: logs/root_cause/root_cause_root_cause_20260717_231331.json
+📝 Root cause report ذخیره شد: logs/root_cause/root_cause_report_root_cause_20260717_231331.md
+📊 Root cause candidates CSV ذخیره شد: logs/root_cause/root_cause_candidates_root_cause_20260717_231331.csv
+🧾 Root cause observations ledger ذخیره شد: logs/root_cause/root_cause_observations.csv

@@ -1,0 +1,37 @@
+==============================================================================================================
+🕸️ Freakto Evidence Graph Engine v9.0.0
+==============================================================================================================
+Status                 : EVIDENCE_GRAPH_RESEARCH_SAMPLE_READY
+Run ID                 : evidence_graph_20260717_231335
+Evaluations File       : logs/decision_evaluations.csv
+Rows / Complete        : 79 / 77
+Graph Rows             : 26
+Nodes / Edges / Paths  : 20 / 40 / 30
+Graph Maturity         : RESEARCH_SAMPLE_READY
+Min/Research/Candidate : 10 / 30 / 90 evaluated cells
+
+Top Evidence Paths:
+- EVIDENCE_SOURCE:FEDERAL_RESERVE_PRESS -> ROOT_CAUSE:MACRO_POLICY_PRESSURE_BEARISH -> OUTCOME:ROOT_CAUSE_HIT_24H | n=3 hit24=100.0% avg24=2.5841% | LOW_SAMPLE_EDGE
+- EVIDENCE_SOURCE:FEDERAL_RESERVE_SPEECHES -> ROOT_CAUSE:MACRO_POLICY_PRESSURE_BEARISH -> OUTCOME:ROOT_CAUSE_HIT_24H | n=1 hit24=100.0% avg24=2.1886% | LOW_SAMPLE_EDGE
+- EVIDENCE_SOURCE:FEDERAL_RESERVE_SPEECHES -> ROOT_CAUSE:MACRO_POLICY_PRESSURE_BEARISH -> OUTCOME:ROOT_CAUSE_HIT_24H | n=1 hit24=100.0% avg24=1.9251% | LOW_SAMPLE_EDGE
+- EVIDENCE_SOURCE:FEDERAL_RESERVE_SPEECHES -> ROOT_CAUSE:MACRO_POLICY_PRESSURE_BEARISH -> OUTCOME:ROOT_CAUSE_HIT_24H | n=1 hit24=100.0% avg24=1.6197% | LOW_SAMPLE_EDGE
+- EVIDENCE_SOURCE:FEDERAL_RESERVE_PRESS -> ROOT_CAUSE:MACRO_POLICY_PRESSURE_BEARISH -> OUTCOME:ROOT_CAUSE_HIT_24H | n=1 hit24=100.0% avg24=1.403% | LOW_SAMPLE_EDGE
+
+Root Cause Learning Signals:
+- MACRO_POLICY_PRESSURE | BEARISH | n24=26 hit24=76.92% avg24=0.2897% | EVIDENCE_WEIGHT_CAN_BE_REVIEWED_UP
+
+Recommendations:
+→ چرخه Forward را منظم اجرا کن تا مسیرهای evidence به outcomeهای بیشتری وصل شوند.
+→ مسیرهایی که چند هفته متوالی hit-rate و signed-return مثبت دارند بعداً می‌توانند وارد Evidence Weight Review شوند.
+→ اگر یک منبع یا روایت در Forward چندبار fail شد، وزن آن باید فقط بعد از sample کافی بازبینی شود.
+
+Warnings:
+⚠️ Evidence Graph فقط رابطه‌های پژوهشی بین شواهد، روایت، علت و outcome را می‌سازد؛ سیگنال خرید/فروش نیست.
+⚠️ تا وقتی sample کافی وجود نداشته باشد، هیچ وزن evidence نباید برای Paper/Live تغییر کند.
+==============================================================================================================
+🕸️ Evidence graph JSON ذخیره شد: logs/evidence_graph/evidence_graph_evidence_graph_20260717_231335.json
+📝 Evidence graph report ذخیره شد: logs/evidence_graph/evidence_graph_report_evidence_graph_20260717_231335.md
+📊 Evidence graph nodes CSV ذخیره شد: logs/evidence_graph/evidence_graph_nodes_evidence_graph_20260717_231335.csv
+📊 Evidence graph edges CSV ذخیره شد: logs/evidence_graph/evidence_graph_edges_evidence_graph_20260717_231335.csv
+📄 Evidence graph paths CSV ذخیره شد: logs/evidence_graph/evidence_graph_paths_evidence_graph_20260717_231335.csv
+🧾 Evidence graph observations ledger ذخیره شد: logs/evidence_graph/evidence_graph_observations.csv
