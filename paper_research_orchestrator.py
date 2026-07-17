@@ -32,7 +32,7 @@ import sys
 import time
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence
 
-from engine.paper_observation_v2 import arm_paper_mode, load_arm_state
+from engine.paper_observation_v2 import arm_paper_mode, disarm_paper_mode, load_arm_state
 from engine.paper_readiness_v2 import build_paper_launch_readiness, write_paper_readiness_outputs
 
 VERSION = "1.0.0"
@@ -507,6 +507,9 @@ class PaperResearchOrchestrator:
         return readiness
 
     def _ensure_arm(self, readiness) -> Dict[str, Any]:
+        if (self.paper_output_dir / "operator_stop.flag").exists():
+            disarm_paper_mode(self.paper_output_dir)
+            return load_arm_state(self.paper_output_dir)
         state = load_arm_state(self.paper_output_dir)
         current_mode = str(state.get("mode", "DISARMED")).upper()
         desired_mode = current_mode

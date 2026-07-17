@@ -28,6 +28,10 @@ class PaperPerformanceSummary:
     worst_trade_r: float
     regime_count: int
     status: str
+    average_win_r: float = 0.0
+    average_loss_r: float = 0.0
+    pnl_excluding_best_trade_r: float = 0.0
+    pnl_excluding_best_symbol_r: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -183,6 +187,7 @@ def summarize_performance(ledger: pd.DataFrame) -> PaperPerformanceSummary:
     wins = int((values > 0).sum())
     losses = int((values < 0).sum())
     curve = build_equity_curve(ledger)
+    by_symbol = closed.groupby("symbol_normalized")["net_r"].sum() if len(closed) else pd.Series(dtype=float)
     return PaperPerformanceSummary(
         generated_at_utc=now,
         total_signals=int(len(ledger)),
@@ -200,6 +205,10 @@ def summarize_performance(ledger: pd.DataFrame) -> PaperPerformanceSummary:
         worst_trade_r=round(float(values.min()), 6) if len(closed) else 0.0,
         regime_count=int(ledger["regime_normalized"].nunique(dropna=True)),
         status="COMPLETE" if len(closed) else "COLLECTING_OPEN_TRADES",
+        average_win_r=round(float(values[values > 0].mean()), 6) if wins else 0.0,
+        average_loss_r=round(float(values[values < 0].mean()), 6) if losses else 0.0,
+        pnl_excluding_best_trade_r=round(float(values.sum() - values.max()), 6) if len(values) else 0.0,
+        pnl_excluding_best_symbol_r=round(float(values.sum() - by_symbol.max()), 6) if len(by_symbol) else 0.0,
     )
 
 
@@ -253,6 +262,8 @@ def write_outputs(
         "markdown": output / "paper_performance_dashboard.md",
         "ledger": output / "paper_performance_ledger.csv",
         "regimes": output / "paper_performance_by_regime.csv",
+        "symbols": output / "paper_performance_by_symbol.csv",
+        "events": output / "paper_performance_by_event.csv",
         "equity_csv": output / "paper_equity_curve.csv",
         "equity_png": output / "paper_equity_curve.png",
     }
@@ -260,6 +271,15 @@ def write_outputs(
     paths["markdown"].write_text(render_markdown(summary, regimes, equity), encoding="utf-8")
     ledger.to_csv(paths["ledger"], index=False, encoding="utf-8-sig")
     regimes.to_csv(paths["regimes"], index=False, encoding="utf-8-sig")
+    def grouped(column: str, label: str) -> pd.DataFrame:
+        if ledger.empty or column not in ledger: return pd.DataFrame(columns=[label, "closed", "wins", "losses", "profit_factor", "expectancy_r", "cumulative_r"])
+        rows = []
+        for name, group in ledger[ledger["closed"]].groupby(column, dropna=False):
+            values = group["net_r"]; rows.append({label: str(name), "closed": len(group), "wins": int((values > 0).sum()),
+                "losses": int((values < 0).sum()), "profit_factor": _profit_factor(values), "expectancy_r": float(values.mean()), "cumulative_r": float(values.sum())})
+        return pd.DataFrame(rows)
+    grouped("symbol_normalized", "symbol").to_csv(paths["symbols"], index=False, encoding="utf-8-sig")
+    grouped("regime_normalized", "event").to_csv(paths["events"], index=False, encoding="utf-8-sig")
     equity.to_csv(paths["equity_csv"], index=False, encoding="utf-8-sig")
     if make_plot:
         try:

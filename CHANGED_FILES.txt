@@ -1,7 +1,0 @@
-paper_research_orchestrator.py
-run_paper_research_auto.bat
-run_research_paper_cycle.bat
-tests/test_paper_research_orchestrator.py
-PAPER_RESEARCH_ORCHESTRATOR_RUNBOOK.md
-PAPER_RESEARCH_ORCHESTRATOR_IMPLEMENTATION_RESULT.md
-CHANGED_FILES.txt

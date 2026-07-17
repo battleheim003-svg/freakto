@@ -1,5 +1,0 @@
-.github/workflows/freakto-paper-cloud.yml
-paper_research_orchestrator.py
-tests/test_paper_research_orchestrator.py
-CLOUD_RUNNER_TEST_AND_ORCHESTRATOR_FIX.md
-CHANGED_FILES_CLOUD_FIX.txt

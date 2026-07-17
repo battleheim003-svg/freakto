@@ -24,3 +24,7 @@ paper_trading_log.json
 /data/market_replay/
 /logs/experiments/*.sqlite3*
 /logs/market_replay/checkpoints/
+/.cloud-state/
+*.tmp
+*.lock
+freakto_source.zip

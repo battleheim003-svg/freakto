@@ -1,0 +1,26 @@
+[
+  {
+    "path": "freakto_source.zip",
+    "classification": "DUPLICATE",
+    "reason": "آرشیو کامل ۲۹٫۵ مگابایتی پروژه و فاقد هرگونه ارجاع اجرایی است.",
+    "replacement": "Git repository / GitHub Artifacts",
+    "references_checked": ["imports", "subprocess", "workflows", "tests", "documentation", "config"],
+    "deletion_risk": "LOW"
+  },
+  {
+    "path": "CHANGED_FILES*.txt",
+    "classification": "GENERATED_OUTPUT",
+    "reason": "فهرست‌های موقت تحویل‌های قبلی هستند و نقش اجرایی ندارند.",
+    "replacement": "git log --name-status",
+    "references_checked": ["imports", "subprocess", "workflows", "tests", "documentation", "config"],
+    "deletion_risk": "LOW"
+  },
+  {
+    "path": "engine/confidence_calibration.py.patch_note.txt",
+    "classification": "UNUSED_CANDIDATE",
+    "reason": "یادداشت patch موقت است و فایل Python canonical موجود است.",
+    "replacement": "engine/confidence_calibration.py",
+    "references_checked": ["imports", "subprocess", "workflows", "tests", "documentation", "config"],
+    "deletion_risk": "LOW"
+  }
+]

@@ -1,4 +1,0 @@
-paper_research_orchestrator.py
-tests/test_paper_research_orchestrator.py
-WINDOWS_PROCESS_LOCK_FIX.md
-CHANGED_FILES_WINDOWS_LOCK_FIX.txt

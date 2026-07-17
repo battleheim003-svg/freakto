@@ -1,5 +1,7 @@
 # Freakto — Crypto Research & Decision Intelligence Platform
 
+راهنمای canonical معاملات آزمایشی و بدون سرمایه واقعی در [docs/paper/README.md](docs/paper/README.md) قرار دارد. شروع محلی: `start_paper_trading.bat`.
+
 ## Paper-trade readiness (v10.3)
 
 The research and paper paths now use explicit version contracts, an Experiment
