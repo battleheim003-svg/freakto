@@ -1,0 +1,22 @@
+{
+  "version": "v10.3.0",
+  "run_id": "replay_score_calibration_20260717_122215_682649",
+  "generated_utc": "2026-07-17T12:22:15.682704+00:00",
+  "status": "SCORE_CALIBRATION_BLOCKED",
+  "input_file": "logs/market_replay/market_replay_evaluations.csv",
+  "rows_total": 0,
+  "rows_analyzed": 0,
+  "score_calibration": {},
+  "score_bands": [],
+  "feature_attribution": [],
+  "interactions": [],
+  "segments": [],
+  "forward_shadow_candidates": [],
+  "blockers": [
+    "Replay evaluations file does not exist: logs/market_replay/market_replay_evaluations.csv"
+  ],
+  "warnings": [
+    "Score Calibration is research-only and never changes strategy settings."
+  ],
+  "recommendations": []
+}
