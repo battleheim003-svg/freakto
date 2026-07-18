@@ -1,0 +1,497 @@
+==========================================================================================
+🏆 Freakto Portfolio Scanner v4.6.1
+==========================================================================================
+Symbols: BTC/USDT, ETH/USDT, SOL/USDT, BNB/USDT, XRP/USDT, DOGE/USDT
+Primary TF: 4h
+MTF: 1h, 4h, 1d
+
+##########################################################################################
+🔎 Portfolio Scan: BTC/USDT
+##########################################################################################
+
+--- BTC/USDT | 1h ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: BTC/USDT
+تایم‌فریم: 1h
+تعداد: 260
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 259 کندل از kucoin دریافت شد
+آخرین قیمت: 64009.5
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ BTC/USDT 1h: LONG | Score 54 | Confidence 46%
+
+--- BTC/USDT | 4h ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: BTC/USDT
+تایم‌فریم: 4h
+تعداد: 220
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 219 کندل از kucoin دریافت شد
+آخرین قیمت: 64007.1
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ BTC/USDT 4h: NEUTRAL | Score 15 | Confidence 12%
+
+--- BTC/USDT | 1d ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: BTC/USDT
+تایم‌فریم: 1d
+تعداد: 220
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 219 کندل از kucoin دریافت شد
+آخرین قیمت: 63929.5
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ BTC/USDT 1d: LONG | Score 52 | Confidence 39%
+
+======================================================================
+🕓 Weighted Multi-Timeframe Consensus
+======================================================================
+  1h | LONG    | Score  54 | Confidence  46% | Weight 0.15
+  4h | NEUTRAL | Score  15 | Confidence  12% | Weight 0.35
+  1d | LONG    | Score  52 | Confidence  39% | Weight 0.50
+
+Consensus : 65%
+Direction : LONG
+Quality   : WEAK
+
+Counts  -> Bull=2  Bear=0  Neutral=1
+Weights -> Bull=0.65  Bear=0.00  Neutral=0.35
+======================================================================
+
+##########################################################################################
+🔎 Portfolio Scan: ETH/USDT
+##########################################################################################
+
+--- ETH/USDT | 1h ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: ETH/USDT
+تایم‌فریم: 1h
+تعداد: 260
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 259 کندل از kucoin دریافت شد
+آخرین قیمت: 1845.35
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ ETH/USDT 1h: NEUTRAL | Score 41 | Confidence 35%
+
+--- ETH/USDT | 4h ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: ETH/USDT
+تایم‌فریم: 4h
+تعداد: 220
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 219 کندل از kucoin دریافت شد
+آخرین قیمت: 1844.19
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ ETH/USDT 4h: SHORT | Score 57 | Confidence 38%
+
+--- ETH/USDT | 1d ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: ETH/USDT
+تایم‌فریم: 1d
+تعداد: 220
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 219 کندل از kucoin دریافت شد
+آخرین قیمت: 1841.78
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ ETH/USDT 1d: NEUTRAL | Score 39 | Confidence 30%
+
+======================================================================
+🕓 Weighted Multi-Timeframe Consensus
+======================================================================
+  1h | NEUTRAL | Score  41 | Confidence  35% | Weight 0.15
+  4h | SHORT   | Score  57 | Confidence  38% | Weight 0.35
+  1d | NEUTRAL | Score  39 | Confidence  30% | Weight 0.50
+
+Consensus : 65%
+Direction : NEUTRAL
+Quality   : MIXED
+
+Counts  -> Bull=0  Bear=1  Neutral=2
+Weights -> Bull=0.00  Bear=0.35  Neutral=0.65
+======================================================================
+
+##########################################################################################
+🔎 Portfolio Scan: SOL/USDT
+##########################################################################################
+
+--- SOL/USDT | 1h ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: SOL/USDT
+تایم‌فریم: 1h
+تعداد: 260
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 259 کندل از kucoin دریافت شد
+آخرین قیمت: 74.89
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ SOL/USDT 1h: NEUTRAL | Score 20 | Confidence 11%
+
+--- SOL/USDT | 4h ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: SOL/USDT
+تایم‌فریم: 4h
+تعداد: 220
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 219 کندل از kucoin دریافت شد
+آخرین قیمت: 74.95
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ SOL/USDT 4h: SHORT | Score 65 | Confidence 54%
+
+--- SOL/USDT | 1d ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: SOL/USDT
+تایم‌فریم: 1d
+تعداد: 220
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 219 کندل از kucoin دریافت شد
+آخرین قیمت: 75.03
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ SOL/USDT 1d: NEUTRAL | Score 24 | Confidence 23%
+
+======================================================================
+🕓 Weighted Multi-Timeframe Consensus
+======================================================================
+  1h | NEUTRAL | Score  20 | Confidence  11% | Weight 0.15
+  4h | SHORT   | Score  65 | Confidence  54% | Weight 0.35
+  1d | NEUTRAL | Score  24 | Confidence  23% | Weight 0.50
+
+Consensus : 65%
+Direction : NEUTRAL
+Quality   : MIXED
+
+Counts  -> Bull=0  Bear=1  Neutral=2
+Weights -> Bull=0.00  Bear=0.35  Neutral=0.65
+======================================================================
+
+##########################################################################################
+🔎 Portfolio Scan: BNB/USDT
+##########################################################################################
+
+--- BNB/USDT | 1h ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: BNB/USDT
+تایم‌فریم: 1h
+تعداد: 260
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 259 کندل از kucoin دریافت شد
+آخرین قیمت: 569.42
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ BNB/USDT 1h: LONG | Score 61 | Confidence 56%
+
+--- BNB/USDT | 4h ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: BNB/USDT
+تایم‌فریم: 4h
+تعداد: 220
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 219 کندل از kucoin دریافت شد
+آخرین قیمت: 567.737
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ BNB/USDT 4h: SHORT | Score 68 | Confidence 52%
+
+--- BNB/USDT | 1d ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: BNB/USDT
+تایم‌فریم: 1d
+تعداد: 220
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 219 کندل از kucoin دریافت شد
+آخرین قیمت: 567.857
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ BNB/USDT 1d: NEUTRAL | Score 23 | Confidence 20%
+
+======================================================================
+🕓 Weighted Multi-Timeframe Consensus
+======================================================================
+  1h | LONG    | Score  61 | Confidence  56% | Weight 0.15
+  4h | SHORT   | Score  68 | Confidence  52% | Weight 0.35
+  1d | NEUTRAL | Score  23 | Confidence  20% | Weight 0.50
+
+Consensus : 50%
+Direction : NEUTRAL
+Quality   : MIXED
+
+Counts  -> Bull=1  Bear=1  Neutral=1
+Weights -> Bull=0.15  Bear=0.35  Neutral=0.50
+======================================================================
+
+##########################################################################################
+🔎 Portfolio Scan: XRP/USDT
+##########################################################################################
+
+--- XRP/USDT | 1h ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: XRP/USDT
+تایم‌فریم: 1h
+تعداد: 260
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 259 کندل از kucoin دریافت شد
+آخرین قیمت: 1.08699
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ XRP/USDT 1h: NEUTRAL | Score 29 | Confidence 24%
+
+--- XRP/USDT | 4h ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: XRP/USDT
+تایم‌فریم: 4h
+تعداد: 220
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 219 کندل از kucoin دریافت شد
+آخرین قیمت: 1.0888
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ XRP/USDT 4h: NEUTRAL | Score 32 | Confidence 29%
+
+--- XRP/USDT | 1d ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: XRP/USDT
+تایم‌فریم: 1d
+تعداد: 220
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 219 کندل از kucoin دریافت شد
+آخرین قیمت: 1.08901
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ XRP/USDT 1d: NEUTRAL | Score 18 | Confidence 19%
+
+======================================================================
+🕓 Weighted Multi-Timeframe Consensus
+======================================================================
+  1h | NEUTRAL | Score  29 | Confidence  24% | Weight 0.15
+  4h | NEUTRAL | Score  32 | Confidence  29% | Weight 0.35
+  1d | NEUTRAL | Score  18 | Confidence  19% | Weight 0.50
+
+Consensus : 100%
+Direction : NEUTRAL
+Quality   : NEUTRAL_DOMINANT
+
+Counts  -> Bull=0  Bear=0  Neutral=3
+Weights -> Bull=0.00  Bear=0.00  Neutral=1.00
+======================================================================
+
+##########################################################################################
+🔎 Portfolio Scan: DOGE/USDT
+##########################################################################################
+
+--- DOGE/USDT | 1h ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: DOGE/USDT
+تایم‌فریم: 1h
+تعداد: 260
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 259 کندل از kucoin دریافت شد
+آخرین قیمت: 0.0722
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ DOGE/USDT 1h: NEUTRAL | Score 30 | Confidence 23%
+
+--- DOGE/USDT | 4h ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: DOGE/USDT
+تایم‌فریم: 4h
+تعداد: 220
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 219 کندل از kucoin دریافت شد
+آخرین قیمت: 0.07231
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ DOGE/USDT 4h: SHORT | Score 65 | Confidence 52%
+
+--- DOGE/USDT | 1d ---
+======================================================================
+📥 دریافت کندل‌ها با CCXT
+======================================================================
+نماد: DOGE/USDT
+تایم‌فریم: 1d
+تعداد: 220
+ترتیب منابع: kucoin, kraken, bybit, okx
+🔎 تلاش با kucoin ...
+✅ 219 کندل از kucoin دریافت شد
+آخرین قیمت: 0.07254
+Provider ذخیره شد: kucoin
+Incomplete candles removed: 1
+✅ DOGE/USDT 1d: NEUTRAL | Score 37 | Confidence 28%
+
+======================================================================
+🕓 Weighted Multi-Timeframe Consensus
+======================================================================
+  1h | NEUTRAL | Score  30 | Confidence  23% | Weight 0.15
+  4h | SHORT   | Score  65 | Confidence  52% | Weight 0.35
+  1d | NEUTRAL | Score  37 | Confidence  28% | Weight 0.50
+
+Consensus : 65%
+Direction : NEUTRAL
+Quality   : MIXED
+
+Counts  -> Bull=0  Bear=1  Neutral=2
+Weights -> Bull=0.00  Bear=0.35  Neutral=0.65
+======================================================================
+
+==============================================================================================================
+🏆 Freakto Portfolio Scanner v4.6.1
+==============================================================================================================
+
+==============================================================================================================
+🌐 Market Breadth Engine v4.6.1
+==============================================================================================================
+Market Mode : MIXED
+Risk Tone   : CAUTION
+Agreement   : 67/100
+Opp Strength: 37/100
+Avg Score   : 45.7
+Avg Conf    : 39.5%
+Avg Opp     : 32.5
+
+- بازار ترکیبی است؛ هم‌راستایی کافی بین نمادها دیده نمی‌شود.
+- Bullish: 0/6 (0.0%) | Bearish: 4/6 (66.7%) | Neutral: 2/6 (33.3%)
+- Actionable: 0 | Watchlist: 0 | Monitor: 3 | Ignore: 3
+
+Warnings:
+⚠️ هیچ فرصت actionable یا watchlist جدی در پورتفو دیده نشد.
+⚠️ میانگین Opportunity Score پایین است: 32.5
+==============================================================================================================
+
+📌 Closest / Monitor Candidates
+--------------------------------------------------------------------------------------------------------------
+#   Symbol       Side     Opp     Score   Conf    Quality      Trade     RR     Rec         MTF             Provider
+--------------------------------------------------------------------------------------------------------------
+1   BNB/USDT     SHORT    56.17   64      52      ⭐⭐ Weak      Avoid     0.83   MONITOR     NEUTRAL/50%     kucoin  
+2   SOL/USDT     SHORT    53.36   59      54      ⭐⭐ Weak      Avoid     0.9    MONITOR     NEUTRAL/65%     kucoin  
+3   DOGE/USDT    SHORT    52.86   59      52      ⭐⭐ Weak      Avoid     0.91   MONITOR     NEUTRAL/65%     kucoin  
+4   ETH/USDT     SHORT    31.06   51      38      ⭐ Ignore     Avoid     0.9    IGNORE      NEUTRAL/65%     kucoin  
+5   XRP/USDT     NEUTRAL  1.5     26      29      ⭐ Ignore     Avoid     0.0    IGNORE      NEUTRAL/100%    kucoin  
+6   BTC/USDT     NEUTRAL  0.0     15      12      ⭐ Ignore     Avoid     0.0    IGNORE      LONG/65%        kucoin  
+
+ℹ️ No actionable opportunity right now. Market is mostly monitor-only.
+==============================================================================================================
+====================================================================================================
+Portfolio Decision portfolio-decision-v1
+Status: PORTFOLIO_SHADOW_ONLY | Risk: HIGH
+Gross/Cash: 0.00% / 100.00%
+Correlation avg/max: 0.833 / 0.870 (HIGH)
+- BNB/USDT SHORT: allocate=0.00% shadow=33.36% p=0.0% E[R]=+0.000
+- DOGE/USDT SHORT: allocate=0.00% shadow=22.56% p=0.0% E[R]=+0.000
+- SOL/USDT SHORT: allocate=0.00% shadow=19.08% p=0.0% E[R]=+0.000
+[BLOCKER] No candidate has a validated positive calibrated expectancy; capital allocation is zero.
+[BLOCKER] Portfolio concentration is excessive: max pairwise correlation=0.870.
+====================================================================================================
+
+==============================================================================================================
+🧠 Freakto Daily AI Report v4.6.1
+==============================================================================================================
+Created UTC: 2026-07-18T11:34:14.683235+00:00
+
+Executive Summary:
+- حالت کلی بازار MIXED با Risk Tone برابر CAUTION است. Market Agreement برابر 67/100 و Opportunity Strength برابر 37/100 است.
+- پهنای بازار: Bullish 0.0%، Bearish 66.7%، Neutral 33.3%.
+- میانگین Opportunity Score برابر 32.5 و میانگین Confidence برابر 39.5% است.
+- هیچ فرصت Actionable یا Watchlist جدی در این اسکن دیده نشد.
+
+Market Context:
+- بازار ترکیبی است؛ هم‌راستایی کافی بین نمادها دیده نمی‌شود.
+- Bullish: 0/6 (0.0%) | Bearish: 4/6 (66.7%) | Neutral: 2/6 (33.3%)
+- Actionable: 0 | Watchlist: 0 | Monitor: 3 | Ignore: 3
+
+Intelligence Narrative:
+- Market Mode برابر MIXED و Risk Tone برابر CAUTION است؛ Market Agreement 67/100 و Opportunity Strength 37/100 است.
+- بازار روایت واحد ندارد؛ بخشی از نمادها نشانه‌های صعودی دارند اما هم‌راستایی جمعی کافی نیست.
+- نزدیک‌ترین کاندید فعلی BNB/USDT با Bias SHORT و Opportunity 56.17 است؛ Recommendation آن MONITOR است.
+- حتی نزدیک‌ترین کاندید هم هنوز از تایم‌فریم‌های بالاتر تأیید جهت‌دار نگرفته است.
+
+Candidates:
+- نزدیک‌ترین گزینه‌ها برای مانیتور:
+- BNB/USDT: SHORT | Opp 56.17 | Score 64 | Confidence 52% | MTF NEUTRAL/50% | Rec مانیتور.
+- SOL/USDT: SHORT | Opp 53.36 | Score 59 | Confidence 54% | MTF NEUTRAL/65% | Rec مانیتور.
+- DOGE/USDT: SHORT | Opp 52.86 | Score 59 | Confidence 52% | MTF NEUTRAL/65% | Rec مانیتور.
+
+Risk Notes:
+⚠️ هیچ فرصت actionable یا watchlist جدی در پورتفو دیده نشد.
+⚠️ میانگین Opportunity Score پایین است: 32.5
+
+Action Plan:
+✓ بازار ترکیبی است؛ فقط فرصت‌هایی بررسی شوند که هم‌زمان Score، Confidence و MTF مناسب دارند.
+✓ تا زمانی که MTF و Volume تأیید ندهند، ورود جدی پیشنهاد نمی‌شود.
+
+این گزارش توصیه مالی نیست؛ فقط خلاصه تصمیم‌یار بر اساس موتور Freakto است.
+==============================================================================================================
+🧠 Daily report ذخیره شد: logs/reports/daily_report_20260718_113414.md
+🧾 Portfolio scan ذخیره شد: logs/portfolio_scans.csv
+==============================================================================================================
+🧪 Freakto Paper Trading Recorder v4.7.1
+==============================================================================================================
+Attempted candidates : 6
+Recorded trades      : 0
+Skipped candidates   : 6
+Duplicate trades     : 0
+Preflight status     : BLOCKED_NO_REPLAY
+Blockers:
+- No cumulative market replay exists.
+
+Skipped examples:
+- Paper trade recording blocked by research preflight.
+==============================================================================================================
+✅ پیام ارسال شد
+✅ پیام ارسال شد
+✅ پیام Portfolio و Daily Report ارسال شد
