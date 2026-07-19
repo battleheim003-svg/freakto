@@ -1,9 +1,11 @@
 import csv
 import json
+import sys
+from types import SimpleNamespace
 
 import pytest
 
-from engine.live_demo import MarketSnapshot, MockBroker, run_live_loop
+from engine.live_demo import CcxtPublicMarketData, MarketSnapshot, MockBroker, run_live_loop
 
 
 class FakeMarketData:
@@ -87,3 +89,59 @@ def test_loop_routes_explicit_buy_decision(tmp_path):
         once=True,
     )
     assert item.positions["BTC/USDT"].amount == 0.5
+
+
+def test_public_data_falls_back_and_reports_provider(monkeypatch):
+    class BrokenExchange:
+        def __init__(self, _options):
+            pass
+
+        def fetch_ticker(self, _symbol):
+            raise TimeoutError("blocked endpoint")
+
+    class WorkingExchange:
+        def __init__(self, _options):
+            pass
+
+        def fetch_ticker(self, _symbol):
+            return {"last": 100, "bid": 99, "ask": 101}
+
+        def fetch_order_book(self, _symbol, limit=5):
+            assert limit == 5
+            return {"bids": [[99, 2]], "asks": [[101, 3]]}
+
+    monkeypatch.setitem(sys.modules, "ccxt", SimpleNamespace(broken=BrokenExchange, working=WorkingExchange))
+    source = CcxtPublicMarketData(("broken", "working"), retries=0)
+    result = source.fetch_snapshot("BTC/USDT")
+    assert result.provider == "working"
+    assert result.last == 100
+
+
+def test_public_data_failure_contains_provider_root_causes(monkeypatch):
+    class BrokenExchange:
+        def __init__(self, _options):
+            pass
+
+        def fetch_ticker(self, _symbol):
+            raise TimeoutError("blocked endpoint")
+
+    monkeypatch.setitem(sys.modules, "ccxt", SimpleNamespace(broken=BrokenExchange))
+    source = CcxtPublicMarketData("broken", retries=0)
+    with pytest.raises(RuntimeError, match=r"broken\[1\].*blocked endpoint"):
+        source.fetch_snapshot("BTC/USDT")
+
+
+def test_ctrl_c_during_wait_exits_without_traceback(tmp_path, capsys):
+    item = broker(tmp_path)
+
+    def interrupt(_seconds):
+        raise KeyboardInterrupt
+
+    run_live_loop(
+        "BTC/USDT",
+        item.market_data,
+        item,
+        lambda _snapshot, _broker: ("HOLD", 0.0),
+        sleeper=interrupt,
+    )
+    assert "stopped safely" in capsys.readouterr().out

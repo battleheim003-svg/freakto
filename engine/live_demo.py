@@ -14,7 +14,10 @@ import uuid
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Mapping, Protocol
+from typing import Callable, Mapping, Protocol, Sequence
+
+
+DEFAULT_PUBLIC_EXCHANGES = ("kucoin", "kraken", "bybit", "okx")
 
 
 def utc_now() -> str:
@@ -37,6 +40,7 @@ class MarketSnapshot:
     ask: float
     bid_size: float | None = None
     ask_size: float | None = None
+    provider: str = "unknown"
 
 
 class MarketDataSource(Protocol):
@@ -44,42 +48,58 @@ class MarketDataSource(Protocol):
 
 
 class CcxtPublicMarketData:
-    """Public CCXT ticker/order-book adapter with bounded exponential retry."""
+    """Public CCXT ticker/order-book adapter with provider fallback."""
 
-    def __init__(self, exchange_id: str = "okx", retries: int = 3, timeout_ms: int = 10_000):
+    def __init__(
+        self,
+        exchange_ids: str | Sequence[str] = DEFAULT_PUBLIC_EXCHANGES,
+        retries: int = 1,
+        timeout_ms: int = 10_000,
+    ):
         import ccxt
 
-        exchange_class = getattr(ccxt, exchange_id, None)
-        if exchange_class is None:
-            raise ValueError(f"Unsupported CCXT exchange: {exchange_id}")
-        self.exchange = exchange_class({"enableRateLimit": True, "timeout": int(timeout_ms)})
+        requested = [exchange_ids] if isinstance(exchange_ids, str) else list(exchange_ids)
+        if not requested:
+            raise ValueError("at least one exchange is required")
+        self.exchanges = []
+        for exchange_id in dict.fromkeys(str(item).lower().strip() for item in requested):
+            exchange_class = getattr(ccxt, exchange_id, None)
+            if exchange_class is None:
+                raise ValueError(f"Unsupported CCXT exchange: {exchange_id}")
+            options = {"enableRateLimit": True, "timeout": int(timeout_ms)}
+            if exchange_id == "bybit":
+                options["options"] = {"defaultType": "spot"}
+            self.exchanges.append((exchange_id, exchange_class(options)))
         self.retries = max(0, int(retries))
 
     def fetch_snapshot(self, symbol: str) -> MarketSnapshot:
-        last_error: Exception | None = None
-        for attempt in range(self.retries + 1):
-            try:
-                ticker = self.exchange.fetch_ticker(symbol)
-                book = self.exchange.fetch_order_book(symbol, limit=5)
-                bids = book.get("bids") or []
-                asks = book.get("asks") or []
-                last = float(ticker.get("last") or ticker.get("close"))
-                bid = float(bids[0][0] if bids else ticker.get("bid") or last)
-                ask = float(asks[0][0] if asks else ticker.get("ask") or last)
-                return MarketSnapshot(
-                    timestamp_utc=utc_now(),
-                    symbol=symbol,
-                    last=_positive_number(last, "last price"),
-                    bid=_positive_number(bid, "bid price"),
-                    ask=_positive_number(ask, "ask price"),
-                    bid_size=float(bids[0][1]) if bids else None,
-                    ask_size=float(asks[0][1]) if asks else None,
-                )
-            except Exception as exc:
-                last_error = exc
-                if attempt < self.retries:
-                    time.sleep(min(8.0, 2.0**attempt))
-        raise RuntimeError(f"market data unavailable for {symbol}") from last_error
+        errors: list[str] = []
+        for exchange_id, exchange in self.exchanges:
+            for attempt in range(self.retries + 1):
+                try:
+                    ticker = exchange.fetch_ticker(symbol)
+                    book = exchange.fetch_order_book(symbol, limit=5)
+                    bids = book.get("bids") or []
+                    asks = book.get("asks") or []
+                    last = float(ticker.get("last") or ticker.get("close"))
+                    bid = float(bids[0][0] if bids else ticker.get("bid") or last)
+                    ask = float(asks[0][0] if asks else ticker.get("ask") or last)
+                    return MarketSnapshot(
+                        timestamp_utc=utc_now(),
+                        symbol=symbol,
+                        last=_positive_number(last, "last price"),
+                        bid=_positive_number(bid, "bid price"),
+                        ask=_positive_number(ask, "ask price"),
+                        bid_size=float(bids[0][1]) if bids else None,
+                        ask_size=float(asks[0][1]) if asks else None,
+                        provider=exchange_id,
+                    )
+                except Exception as exc:
+                    detail = " ".join(str(exc).split())
+                    errors.append(f"{exchange_id}[{attempt + 1}]: {type(exc).__name__}: {detail}")
+                    if attempt < self.retries:
+                        time.sleep(min(4.0, 2.0**attempt))
+        raise RuntimeError(f"market data unavailable for {symbol}; " + " | ".join(errors))
 
 
 @dataclass
@@ -268,7 +288,7 @@ def run_live_loop(
             equity = broker.equity({symbol: snapshot.last})
             print(
                 f"{snapshot.timestamp_utc} | {symbol} last={snapshot.last:.8f} "
-                f"bid={snapshot.bid:.8f} ask={snapshot.ask:.8f} action={action} "
+                f"bid={snapshot.bid:.8f} ask={snapshot.ask:.8f} provider={snapshot.provider} action={action} "
                 f"equity=${equity:,.2f}",
                 flush=True,
             )
@@ -281,4 +301,8 @@ def run_live_loop(
             print(f"Live demo cycle warning: {type(exc).__name__}: {exc}", flush=True)
         if once:
             return
-        sleeper(interval_seconds)
+        try:
+            sleeper(interval_seconds)
+        except KeyboardInterrupt:
+            print("Live demo stopped safely by user.", flush=True)
+            return

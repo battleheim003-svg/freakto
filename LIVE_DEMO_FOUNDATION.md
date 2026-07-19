@@ -27,12 +27,18 @@ python -X utf8 live_demo.py --once
 Run continuously every 15 seconds:
 
 ```bat
-python -X utf8 live_demo.py --symbol BTC/USDT --exchange okx --interval 15
+python -X utf8 live_demo.py --symbol BTC/USDT --exchange auto --interval 15
 ```
 
 Stop with `Ctrl+C`. The default `should_execute_trade()` always returns `HOLD`,
 so these commands do not create simulated orders until a validated Freakto
 decision adapter is added.
+
+`--exchange auto` tries the project's public-provider order: KuCoin, Kraken,
+Bybit, then OKX. If a specific primary is supplied (for example `--exchange
+okx`), it is tried first and the remaining providers are retained as fallbacks.
+When all providers fail, the warning includes each provider's original CCXT
+error so DNS, timeout, geo-blocking, and symbol errors can be distinguished.
 
 ## Files
 
