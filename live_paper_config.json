@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "initial_balance_usdt": 10000.0,
+  "timeframe": "4h",
+  "data_dir": "data/market_replay",
+  "state_roots": {
+    "shadow": "logs/live_demo_shadow",
+    "paper": "logs/live_demo_paper"
+  },
+  "risk": {
+    "core_risk_pct": 0.50,
+    "growth_risk_pct": 0.35,
+    "meme_risk_pct": 0.20,
+    "maximum_open_risk_pct": 2.0,
+    "maximum_concurrent_positions": 4,
+    "maximum_concurrent_meme_positions": 1,
+    "daily_loss_limit_pct": 2.0,
+    "emergency_drawdown_pct": 10.0,
+    "maximum_symbol_exposure_pct": 20.0
+  },
+  "execution": {
+    "fee_bps": 10.0,
+    "slippage_bps": 5.0,
+    "maximum_spread_bps": 35.0,
+    "minimum_rr": 1.20,
+    "minimum_confidence": 50,
+    "allowed_recommendations": ["ELITE", "ACTIONABLE"]
+  },
+  "rollout": {
+    "core": "SHADOW",
+    "growth": "LOCKED_UNTIL_10_CORE_CLOSED",
+    "meme": "LOCKED_UNTIL_20_TOTAL_CLOSED"
+  },
+  "shadow_gate": {
+    "minimum_days": 7,
+    "minimum_unique_decisions": 20,
+    "minimum_complete_4h_candles": 30,
+    "maximum_duplicate_executions": 0,
+    "maximum_open_candle_decisions": 0,
+    "maximum_state_corruptions": 0,
+    "maximum_unhandled_crashes": 0,
+    "minimum_provider_freshness_pct": 95.0
+  },
+  "notifications": {
+    "telegram_events": ["ENTRY", "EXIT", "STOP", "TARGET", "DAILY_LOSS_LIMIT", "CIRCUIT_BREAKER", "RUNTIME_FAILURE"]
+  }
+}

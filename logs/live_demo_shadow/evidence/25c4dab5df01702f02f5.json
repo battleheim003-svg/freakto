@@ -1,0 +1,33 @@
+{
+  "decision_id": "25c4dab5df01702f02f5",
+  "timestamp_utc": "2026-07-19T17:57:14.988316+00:00",
+  "candle_timestamp": "2026-07-19 12:00:00",
+  "symbol": "AVAX/USDT",
+  "group": "core",
+  "action": "HOLD",
+  "entry": 6.460000000000001,
+  "stop": 6.56,
+  "targets": [
+    6.36,
+    6.29,
+    6.22
+  ],
+  "score": 53,
+  "confidence": 52,
+  "recommendation": "MONITOR",
+  "first_rr": 1.0,
+  "regime": "SIDEWAYS",
+  "mtf_direction": "SHORT",
+  "mtf_consensus": 50,
+  "expected_r": -0.19123,
+  "calibration_status": "ECONOMIC_CALIBRATION_RESEARCH_ONLY",
+  "evidence": {
+    "opportunity_score": 51.45,
+    "trade_quality": "Avoid",
+    "notes": [
+      "MTF هم‌راستا است",
+      "Thesis: Bearish Thesis",
+      "Historical economics: p=37.1%, E[R]=-0.191, n=4103, status=ECONOMIC_CALIBRATION_RESEARCH_ONLY"
+    ]
+  }
+}

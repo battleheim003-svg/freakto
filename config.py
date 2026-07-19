@@ -79,12 +79,11 @@ PAPER_TRADING_TAKER_FEE = float(os.getenv("PAPER_TRADING_TAKER_FEE", "0.0015"))
 # ========== API KEYS ==========
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
-TELEGRAM_OUTPUT_MODE = os.getenv("TELEGRAM_OUTPUT_MODE", "NORMAL").strip().upper()
-TELEGRAM_SEND_NO_TRADE = _get_bool("TELEGRAM_SEND_NO_TRADE", False)
-TELEGRAM_DAILY_SUMMARY = _get_bool("TELEGRAM_DAILY_SUMMARY", True)
-TELEGRAM_DAILY_SUMMARY_HOUR_UTC = int(os.getenv("TELEGRAM_DAILY_SUMMARY_HOUR_UTC", "20"))
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+GAPGPT_API_KEY = os.getenv("GAPGPT_API_KEY", "").strip() or OPENAI_API_KEY
+GAPGPT_BASE_URL = os.getenv("GAPGPT_BASE_URL", "").strip() or "https://api.gapgpt.app/v1"
+GAPGPT_MODEL = os.getenv("GAPGPT_MODEL", "").strip() or OPENAI_MODEL
 COINALYZE_API_KEY = os.getenv("COINALYZE_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 

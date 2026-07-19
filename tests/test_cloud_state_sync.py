@@ -21,6 +21,20 @@ def test_pack_and_restore_selected_state(tmp_path: Path):
     assert (restored / "logs/paper_cycle/last_cycle.json").exists()
 
 
+def test_shadow_and_live_paper_state_are_persisted_separately(tmp_path: Path):
+    root = tmp_path / "root"
+    (root / "logs/live_demo_shadow").mkdir(parents=True)
+    (root / "logs/live_demo_paper").mkdir(parents=True)
+    (root / "logs/live_demo_shadow/runtime_state.json").write_text('{"mode":"shadow"}', encoding="utf-8")
+    (root / "logs/live_demo_paper/runtime_state.json").write_text('{"mode":"paper"}', encoding="utf-8")
+    archive = tmp_path / "state.tar.gz"
+    manifest = tmp_path / "manifest.json"
+    result = create_state_archive(root, archive, manifest)
+    names = {item["relative_path"] for item in result["files"]}
+    assert "logs/live_demo_shadow/runtime_state.json" in names
+    assert "logs/live_demo_paper/runtime_state.json" in names
+
+
 def test_restore_rejects_traversal_archive(tmp_path: Path):
     import io
     import tarfile

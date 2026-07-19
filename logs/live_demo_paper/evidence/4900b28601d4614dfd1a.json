@@ -1,0 +1,37 @@
+{
+  "decision_id": "4900b28601d4614dfd1a",
+  "timestamp_utc": "2026-07-19T18:11:50.025206+00:00",
+  "candle_timestamp": "2026-07-19 12:00:00",
+  "symbol": "BTC/USDT",
+  "group": "core",
+  "action": "BUY",
+  "entry": 64550.0,
+  "stop": 63982.0,
+  "targets": [
+    65069.0,
+    65464.0,
+    65859.0
+  ],
+  "score": 78,
+  "confidence": 55,
+  "recommendation": "MONITOR",
+  "first_rr": 0.91,
+  "regime": "TRENDING_BULL",
+  "mtf_direction": "LONG",
+  "mtf_consensus": 85,
+  "expected_r": -0.090456,
+  "calibration_status": "ECONOMIC_CALIBRATION_RESEARCH_ONLY",
+  "evidence": {
+    "opportunity_score": 92.2,
+    "trade_quality": "Avoid",
+    "notes": [
+      "Trade Guard: WATCHLIST -> MONITOR",
+      "Trade Guard reason: R:R برای Watchlist کافی نیست: 0.91",
+      "Trade Guard reason: Trade Quality برابر Avoid است",
+      "ارزش زیرنظر گرفتن دارد",
+      "MTF هم‌راستا است",
+      "Thesis: Bullish Thesis",
+      "Historical economics: p=39.8%, E[R]=-0.090, n=1183, status=ECONOMIC_CALIBRATION_RESEARCH_ONLY"
+    ]
+  }
+}

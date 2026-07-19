@@ -1,0 +1,26 @@
+{
+  "started_at_utc": "2026-07-19T18:10:42.217717+00:00",
+  "processed_decisions": [
+    "4900b28601d4614dfd1a"
+  ],
+  "observed_candles": [
+    "BTC/USDT|2026-07-19 12:00:00"
+  ],
+  "managed_positions": {},
+  "daily": {
+    "date": "2026-07-19",
+    "start_equity": 10000.0
+  },
+  "metrics": {
+    "unique_decisions": 1,
+    "duplicate_executions": 0,
+    "open_candle_decisions": 0,
+    "complete_4h_candles": 1,
+    "state_corruptions": 0,
+    "unhandled_crashes": 0,
+    "provider_checks": 1,
+    "provider_fresh": 1,
+    "closed_trades": 0,
+    "core_closed_trades": 0
+  }
+}
