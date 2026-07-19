@@ -18,6 +18,7 @@ from typing import Callable, Mapping, Protocol, Sequence
 
 
 DEFAULT_PUBLIC_EXCHANGES = ("kucoin", "kraken", "bybit", "okx")
+ORDER_BOOK_LIMITS = {"kucoin": 20}
 
 
 def utc_now() -> str:
@@ -78,7 +79,7 @@ class CcxtPublicMarketData:
             for attempt in range(self.retries + 1):
                 try:
                     ticker = exchange.fetch_ticker(symbol)
-                    book = exchange.fetch_order_book(symbol, limit=5)
+                    book = exchange.fetch_order_book(symbol, limit=ORDER_BOOK_LIMITS.get(exchange_id, 5))
                     bids = book.get("bids") or []
                     asks = book.get("asks") or []
                     last = float(ticker.get("last") or ticker.get("close"))
@@ -96,6 +97,10 @@ class CcxtPublicMarketData:
                     )
                 except Exception as exc:
                     detail = " ".join(str(exc).split())
+                    if "403 Forbidden" in detail:
+                        detail = detail.split("403 Forbidden", 1)[0] + "403 Forbidden (provider blocked this IP/region)"
+                    elif len(detail) > 320:
+                        detail = detail[:317] + "..."
                     errors.append(f"{exchange_id}[{attempt + 1}]: {type(exc).__name__}: {detail}")
                     if attempt < self.retries:
                         time.sleep(min(4.0, 2.0**attempt))
@@ -299,6 +304,60 @@ def run_live_loop(
             return
         except Exception as exc:
             print(f"Live demo cycle warning: {type(exc).__name__}: {exc}", flush=True)
+        if once:
+            return
+        try:
+            sleeper(interval_seconds)
+        except KeyboardInterrupt:
+            print("Live demo stopped safely by user.", flush=True)
+            return
+
+
+def run_live_universe_loop(
+    symbols: Sequence[str],
+    market_data: MarketDataSource,
+    broker: MockBroker,
+    decision_fn: DecisionFunction,
+    *,
+    interval_seconds: float = 15.0,
+    once: bool = False,
+    sleeper: Callable[[float], None] = time.sleep,
+) -> None:
+    """Scan every symbol once per cycle, then wait once for the next cycle."""
+    interval_seconds = _positive_number(interval_seconds, "interval_seconds")
+    selected = tuple(dict.fromkeys(str(symbol).upper().strip() for symbol in symbols if str(symbol).strip()))
+    if not selected:
+        raise ValueError("at least one symbol is required")
+    while True:
+        successes = 0
+        for symbol in selected:
+            try:
+                snapshot = market_data.fetch_snapshot(symbol)
+                action, amount = decision_fn(snapshot, broker)
+                action = str(action).upper().strip()
+                fill = None
+                if action == "BUY":
+                    fill = broker.buy_market(symbol, amount, snapshot)
+                elif action == "SELL":
+                    fill = broker.sell_market(symbol, amount, snapshot)
+                elif action != "HOLD":
+                    raise ValueError(f"unsupported decision action: {action}")
+                equity = broker.equity({symbol: snapshot.last})
+                print(
+                    f"{snapshot.timestamp_utc} | {symbol} last={snapshot.last:.8f} "
+                    f"bid={snapshot.bid:.8f} ask={snapshot.ask:.8f} provider={snapshot.provider} "
+                    f"action={action} equity=${equity:,.2f}",
+                    flush=True,
+                )
+                if fill:
+                    print(f"SIMULATED {fill.side} amount={fill.amount:.8f} price={fill.execution_price:.8f}", flush=True)
+                successes += 1
+            except KeyboardInterrupt:
+                print("Live demo stopped safely by user.", flush=True)
+                return
+            except Exception as exc:
+                print(f"Live demo symbol warning [{symbol}]: {type(exc).__name__}: {exc}", flush=True)
+        print(f"Universe cycle complete: {successes}/{len(selected)} symbols available", flush=True)
         if once:
             return
         try:

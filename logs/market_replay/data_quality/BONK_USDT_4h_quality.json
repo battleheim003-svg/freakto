@@ -1,7 +1,7 @@
 {
-  "symbol": "ETH/USDT",
+  "symbol": "BONK/USDT",
   "timeframe": "4h",
-  "provider": "kucoin",
+  "provider": "bybit",
   "requested_start_utc": "2023-07-19T16:00:00+00:00",
   "requested_end_utc": "2026-07-19T16:00:00+00:00",
   "actual_start_utc": "2023-07-19T16:00:00+00:00",

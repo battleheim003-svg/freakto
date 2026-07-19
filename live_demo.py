@@ -8,8 +8,9 @@ from engine.live_demo import (
     CcxtPublicMarketData,
     MarketSnapshot,
     MockBroker,
-    run_live_loop,
+    run_live_universe_loop,
 )
+from engine.live_demo_universe import load_universe, select_symbols
 
 
 def should_execute_trade(_market_data: MarketSnapshot, _broker: MockBroker) -> tuple[str, float]:
@@ -24,6 +25,9 @@ def should_execute_trade(_market_data: MarketSnapshot, _broker: MockBroker) -> t
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run the Freakto public-data-only live paper demo")
     parser.add_argument("--symbol", default="BTC/USDT")
+    parser.add_argument("--symbols", default="", help="Comma-separated explicit symbol list")
+    parser.add_argument("--groups", default="", help="Universe groups: core,growth,meme or all")
+    parser.add_argument("--universe-file", default="live_demo_universe.json")
     parser.add_argument("--exchange", default="auto", help="Primary exchange or 'auto' for project fallback order")
     parser.add_argument("--interval", type=float, default=15.0)
     parser.add_argument("--balance", type=float, default=10_000.0)
@@ -31,6 +35,15 @@ def main() -> int:
     parser.add_argument("--slippage-bps", type=float, default=5.0)
     parser.add_argument("--once", action="store_true", help="Fetch one snapshot and exit")
     args = parser.parse_args()
+
+    universe = load_universe(args.universe_file)
+    if args.symbols:
+        symbols = select_symbols(universe, explicit_symbols=args.symbols.split(","))
+    elif args.groups:
+        requested_groups = ("core", "growth", "meme") if args.groups.lower() == "all" else args.groups.split(",")
+        symbols = select_symbols(universe, groups=requested_groups)
+    else:
+        symbols = (args.symbol.upper(),)
 
     if args.exchange.lower() == "auto":
         exchanges = DEFAULT_PUBLIC_EXCHANGES
@@ -46,8 +59,9 @@ def main() -> int:
     )
     print("Freakto Live Demo | PAPER ONLY | no exchange credentials or real orders", flush=True)
     print(f"Public provider order: {', '.join(exchanges)}", flush=True)
-    run_live_loop(
-        args.symbol,
+    print(f"Symbols ({len(symbols)}): {', '.join(symbols)}", flush=True)
+    run_live_universe_loop(
+        symbols,
         market_data,
         broker,
         should_execute_trade,

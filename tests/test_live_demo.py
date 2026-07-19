@@ -131,6 +131,43 @@ def test_public_data_failure_contains_provider_root_causes(monkeypatch):
         source.fetch_snapshot("BTC/USDT")
 
 
+def test_kucoin_uses_supported_order_book_depth(monkeypatch):
+    observed = {}
+
+    class KucoinExchange:
+        def __init__(self, _options):
+            pass
+
+        def fetch_ticker(self, _symbol):
+            return {"last": 100, "bid": 99, "ask": 101}
+
+        def fetch_order_book(self, _symbol, limit=None):
+            observed["limit"] = limit
+            return {"bids": [[99, 2]], "asks": [[101, 3]]}
+
+    monkeypatch.setitem(sys.modules, "ccxt", SimpleNamespace(kucoin=KucoinExchange))
+    result = CcxtPublicMarketData("kucoin", retries=0).fetch_snapshot("BTC/USDT")
+    assert result.provider == "kucoin"
+    assert observed["limit"] == 20
+
+
+def test_403_html_is_reduced_to_safe_readable_diagnostic(monkeypatch):
+    class BlockedExchange:
+        def __init__(self, _options):
+            pass
+
+        def fetch_ticker(self, _symbol):
+            raise RuntimeError("GET endpoint 403 Forbidden " + "<html>blocked</html>" * 500)
+
+    monkeypatch.setitem(sys.modules, "ccxt", SimpleNamespace(blocked=BlockedExchange))
+    source = CcxtPublicMarketData("blocked", retries=0)
+    with pytest.raises(RuntimeError) as captured:
+        source.fetch_snapshot("BTC/USDT")
+    message = str(captured.value)
+    assert "403 Forbidden (provider blocked this IP/region)" in message
+    assert len(message) < 250
+
+
 def test_ctrl_c_during_wait_exits_without_traceback(tmp_path, capsys):
     item = broker(tmp_path)
 
