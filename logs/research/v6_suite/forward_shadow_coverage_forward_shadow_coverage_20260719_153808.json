@@ -1,0 +1,289 @@
+{
+  "run_id": "forward_shadow_coverage_20260719_153808",
+  "generated_utc": "2026-07-19T15:38:08.160255+00:00",
+  "status": "FORWARD_PROMISING_BACKTEST_CONFLICTS_FOUND",
+  "version": "v6.3.1",
+  "horizon": "24h",
+  "min_samples": 30,
+  "decision_rows": 89,
+  "directional_decisions": 42,
+  "evaluation_rows": 88,
+  "complete_evaluations": 27,
+  "shadow_signal_rows": 28,
+  "evaluated_shadow_rows": 27,
+  "forward_regime_counts": [
+    {
+      "regime": "TRENDING_BULL",
+      "rows": 52,
+      "share_pct": 58.43,
+      "directional_rows": 35,
+      "direct_engine_rows": 0,
+      "proxy_or_text_rows": 0
+    },
+    {
+      "regime": "UNKNOWN",
+      "rows": 28,
+      "share_pct": 31.46,
+      "directional_rows": 6,
+      "direct_engine_rows": 0,
+      "proxy_or_text_rows": 0
+    },
+    {
+      "regime": "TRENDING_BEAR",
+      "rows": 8,
+      "share_pct": 8.99,
+      "directional_rows": 1,
+      "direct_engine_rows": 0,
+      "proxy_or_text_rows": 0
+    },
+    {
+      "regime": "SIDEWAYS",
+      "rows": 1,
+      "share_pct": 1.12,
+      "directional_rows": 0,
+      "direct_engine_rows": 0,
+      "proxy_or_text_rows": 0
+    }
+  ],
+  "shadow_gate_coverage": [
+    {
+      "gate": "STRUCTURE_SCORE_GE_10",
+      "family": "review_backtest_candidate",
+      "signals": 19,
+      "evaluated": 18,
+      "avg_return_pct": 0.5927,
+      "win_rate": 88.89,
+      "dominant_regime": "TRENDING_BULL",
+      "regime_count": 14
+    },
+    {
+      "gate": "HISTORICAL_EDGE_SCORE_GE_1",
+      "family": "primary_backtest_candidate",
+      "signals": 8,
+      "evaluated": 8,
+      "avg_return_pct": -1.2246,
+      "win_rate": 12.5,
+      "dominant_regime": "TRENDING_BULL",
+      "regime_count": 8
+    },
+    {
+      "gate": "RISK_MEDIUM",
+      "family": "primary_backtest_candidate",
+      "signals": 1,
+      "evaluated": 1,
+      "avg_return_pct": 0.5361,
+      "win_rate": 100.0,
+      "dominant_regime": "TRENDING_BULL",
+      "regime_count": 1
+    }
+  ],
+  "shadow_regime_coverage": [
+    {
+      "regime": "TRENDING_BULL",
+      "shadow_signals": 23,
+      "evaluated": 23,
+      "avg_return_pct": 0.1351,
+      "win_rate": 69.57,
+      "distinct_gates": 3
+    },
+    {
+      "regime": "UNKNOWN",
+      "shadow_signals": 5,
+      "evaluated": 4,
+      "avg_return_pct": -0.4248,
+      "win_rate": 50.0,
+      "distinct_gates": 1
+    }
+  ],
+  "bull_forward_probes": [
+    {
+      "probe": "BULL_STRUCTURE_SCORE_GE_10",
+      "filters": {
+        "regime_label": "TRENDING_BULL",
+        "structure_score_min": 10
+      },
+      "verdict": "FORWARD_PROMISING_LOW_SAMPLE_BACKTEST_CONFLICT",
+      "forward_data_source": "shadow_ledger_sync",
+      "shadow_gate_source": "STRUCTURE_SCORE_GE_10",
+      "shadow_rows_seen": 14,
+      "forward_samples": 14,
+      "forward_avg_pct": 0.8834,
+      "forward_win_rate": 100.0,
+      "forward_t1_rate": 100.0,
+      "forward_stop_rate": 85.71,
+      "forward_mfe_mae": 2.522,
+      "backtest_samples": 0,
+      "backtest_net_avg_pct": 0.0,
+      "backtest_win_rate": 0.0,
+      "backtest_t1_rate": 0.0,
+      "backtest_stop_rate": 0.0,
+      "backtest_mfe_mae": 0.0
+    },
+    {
+      "probe": "BULL_STRUCTURE_SCORE_GE_10_LONG",
+      "filters": {
+        "regime_label": "TRENDING_BULL",
+        "structure_score_min": 10,
+        "side": "LONG"
+      },
+      "verdict": "FORWARD_PROMISING_LOW_SAMPLE_BACKTEST_CONFLICT",
+      "forward_data_source": "shadow_ledger_sync",
+      "shadow_gate_source": "STRUCTURE_SCORE_GE_10",
+      "shadow_rows_seen": 14,
+      "forward_samples": 14,
+      "forward_avg_pct": 0.8834,
+      "forward_win_rate": 100.0,
+      "forward_t1_rate": 100.0,
+      "forward_stop_rate": 85.71,
+      "forward_mfe_mae": 2.522,
+      "backtest_samples": 0,
+      "backtest_net_avg_pct": 0.0,
+      "backtest_win_rate": 0.0,
+      "backtest_t1_rate": 0.0,
+      "backtest_stop_rate": 0.0,
+      "backtest_mfe_mae": 0.0
+    },
+    {
+      "probe": "BULL_RISK_MEDIUM",
+      "filters": {
+        "regime_label": "TRENDING_BULL",
+        "risk_medium": true
+      },
+      "verdict": "FORWARD_PROMISING_LOW_SAMPLE_BACKTEST_CONFLICT",
+      "forward_data_source": "shadow_ledger_sync",
+      "shadow_gate_source": "RISK_MEDIUM",
+      "shadow_rows_seen": 1,
+      "forward_samples": 1,
+      "forward_avg_pct": 0.5361,
+      "forward_win_rate": 100.0,
+      "forward_t1_rate": 100.0,
+      "forward_stop_rate": 100.0,
+      "forward_mfe_mae": 0.794,
+      "backtest_samples": 0,
+      "backtest_net_avg_pct": 0.0,
+      "backtest_win_rate": 0.0,
+      "backtest_t1_rate": 0.0,
+      "backtest_stop_rate": 0.0,
+      "backtest_mfe_mae": 0.0
+    },
+    {
+      "probe": "BULL_VOLUME_SCORE_GE_10",
+      "filters": {
+        "regime_label": "TRENDING_BULL",
+        "volume_score_min": 10
+      },
+      "verdict": "NO_FORWARD_SAMPLE",
+      "forward_data_source": "decision_evaluations",
+      "shadow_gate_source": "VOLUME_SCORE_GE_10",
+      "shadow_rows_seen": 0,
+      "forward_samples": 0,
+      "forward_avg_pct": 0.0,
+      "forward_win_rate": 0.0,
+      "forward_t1_rate": 0.0,
+      "forward_stop_rate": 0.0,
+      "forward_mfe_mae": 0.0,
+      "backtest_samples": 0,
+      "backtest_net_avg_pct": 0.0,
+      "backtest_win_rate": 0.0,
+      "backtest_t1_rate": 0.0,
+      "backtest_stop_rate": 0.0,
+      "backtest_mfe_mae": 0.0
+    },
+    {
+      "probe": "BULL_SCORE_GE_80",
+      "filters": {
+        "regime_label": "TRENDING_BULL",
+        "score_min": 80
+      },
+      "verdict": "NO_FORWARD_SAMPLE",
+      "forward_data_source": "decision_evaluations",
+      "shadow_gate_source": "SCORE_GE_80",
+      "shadow_rows_seen": 0,
+      "forward_samples": 0,
+      "forward_avg_pct": 0.0,
+      "forward_win_rate": 0.0,
+      "forward_t1_rate": 0.0,
+      "forward_stop_rate": 0.0,
+      "forward_mfe_mae": 0.0,
+      "backtest_samples": 0,
+      "backtest_net_avg_pct": 0.0,
+      "backtest_win_rate": 0.0,
+      "backtest_t1_rate": 0.0,
+      "backtest_stop_rate": 0.0,
+      "backtest_mfe_mae": 0.0
+    },
+    {
+      "probe": "BULL_BNB_LONG_SCORE_GE_60",
+      "filters": {
+        "regime_label": "TRENDING_BULL",
+        "symbol": "BNB/USDT",
+        "side": "LONG",
+        "score_min": 60
+      },
+      "verdict": "NO_FORWARD_SAMPLE",
+      "forward_data_source": "decision_evaluations",
+      "shadow_gate_source": "BNB_LONG_SCORE_GE_60",
+      "shadow_rows_seen": 0,
+      "forward_samples": 0,
+      "forward_avg_pct": 0.0,
+      "forward_win_rate": 0.0,
+      "forward_t1_rate": 0.0,
+      "forward_stop_rate": 0.0,
+      "forward_mfe_mae": 0.0,
+      "backtest_samples": 0,
+      "backtest_net_avg_pct": 0.0,
+      "backtest_win_rate": 0.0,
+      "backtest_t1_rate": 0.0,
+      "backtest_stop_rate": 0.0,
+      "backtest_mfe_mae": 0.0
+    }
+  ],
+  "bear_zero_signal_diagnostics": [
+    {
+      "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM",
+      "cause": "TRENDING_BEAR_EXISTS_BUT_NO_RISK_MEDIUM",
+      "matching_decisions": 0,
+      "trend_bear_decisions": 1,
+      "existing_shadow_signals": 0
+    },
+    {
+      "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT",
+      "cause": "TRENDING_BEAR_EXISTS_BUT_NO_RISK_MEDIUM",
+      "matching_decisions": 0,
+      "trend_bear_decisions": 1,
+      "existing_shadow_signals": 0
+    },
+    {
+      "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10",
+      "cause": "TRENDING_BEAR_EXISTS_BUT_STRUCTURE_LT_10",
+      "matching_decisions": 0,
+      "trend_bear_decisions": 1,
+      "existing_shadow_signals": 0
+    },
+    {
+      "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT",
+      "cause": "TRENDING_BEAR_EXISTS_BUT_STRUCTURE_LT_10",
+      "matching_decisions": 0,
+      "trend_bear_decisions": 1,
+      "existing_shadow_signals": 0
+    }
+  ],
+  "contradictions": [
+    "BULL_STRUCTURE_SCORE_GE_10: Forward avg=0.8834% با n=14 اما Backtest net=0.0% است.",
+    "BULL_STRUCTURE_SCORE_GE_10_LONG: Forward avg=0.8834% با n=14 اما Backtest net=0.0% است.",
+    "BULL_RISK_MEDIUM: Forward avg=0.5361% با n=1 اما Backtest net=0.0% است."
+  ],
+  "blockers": [
+    "Shadow evaluated samples کمتر از 30 است: 27"
+  ],
+  "recommendations": [
+    "فعال‌ترین Bull probe فعلی: BULL_STRUCTURE_SCORE_GE_10 | forward n=14 | avg=0.8834% | verdict=FORWARD_PROMISING_LOW_SAMPLE_BACKTEST_CONFLICT.",
+    "Bull probe فقط مشاهده‌ای است؛ تا وقتی Backtest/Forward هر دو robust نشوند، به Shadow Candidate ارتقا نده.",
+    "برای تصمیم‌گیری بعدی، STRUCTURE_SCORE_GE_10 را جداگانه به تفکیک regime در Forward دنبال کن."
+  ],
+  "warnings": [
+    "این ماژول فقط coverage و probe تحقیقاتی می‌سازد؛ هیچ Paper/Live فعال نمی‌کند.",
+    "Bull probeها کاندید قطعی نیستند؛ v6.3.1 اگر لازم باشد از Shadow Ledger برای همگام‌سازی ارزیابی‌ها استفاده می‌کند.",
+    "برچسب‌های legacy/proxy regime برای تحقیق‌اند؛ Forward جدید DIRECT_ENGINE ارزش بیشتری دارد."
+  ]
+}
