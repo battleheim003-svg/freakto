@@ -1,16 +1,14 @@
 name: Freakto Forward Test Collector
 
 on:
-  # Runs every 4 hours. GitHub schedules are not exact to the second,
-  # but this is enough for Freakto forward-test collection on 4h candles.
-  schedule:
-    - cron: "17 */4 * * *"
+  # Legacy collector is manual-only. The canonical four-hour schedule lives in
+  # freakto-paper-cloud.yml so the two paper pipelines cannot run in parallel.
   workflow_dispatch:
     inputs:
       send_telegram:
         description: "Send Telegram report"
         required: true
-        default: "true"
+        default: "false"
         type: choice
         options:
           - "true"
@@ -85,17 +83,17 @@ jobs:
           python -X utf8 forward_test_dashboard.py --status
 
       - name: Run Freakto forward cycle with Telegram
-        if: ${{ github.event_name == 'schedule' || inputs.send_telegram == 'true' }}
+        if: ${{ inputs.send_telegram == 'true' }}
         run: |
           python -X utf8 forward_test_dashboard.py --cycle --validate --continue-on-error --send
 
       - name: Run Freakto forward cycle without Telegram
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.send_telegram == 'false' }}
+        if: ${{ inputs.send_telegram == 'false' }}
         run: |
           python -X utf8 forward_test_dashboard.py --cycle --validate --continue-on-error
 
       - name: Run validation suite explicitly
-        if: ${{ always() && (github.event_name == 'schedule' || inputs.run_validation == 'true') }}
+        if: ${{ always() && inputs.run_validation == 'true' }}
         run: |
           python -X utf8 validation_suite_dashboard.py || true
 
@@ -187,6 +185,6 @@ jobs:
             history/*.db
 
       - name: Push logs to data-logs branch
-        if: ${{ always() && (github.event_name == 'schedule' || inputs.commit_logs == 'true') }}
+        if: ${{ always() && inputs.commit_logs == 'true' }}
         run: |
           python -X utf8 scripts/github_actions_push_logs.py

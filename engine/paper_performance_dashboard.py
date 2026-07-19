@@ -26,12 +26,15 @@ class PaperPerformanceSummary:
     max_drawdown_r: float
     best_trade_r: float
     worst_trade_r: float
+    initial_balance_usd: float
+    current_balance_usd: float
+    total_pnl_usd: float
+    total_return_pct: float
+    risk_per_trade_pct: float
+    max_drawdown_usd: float
+    max_drawdown_pct: float
     regime_count: int
     status: str
-    average_win_r: float = 0.0
-    average_loss_r: float = 0.0
-    pnl_excluding_best_trade_r: float = 0.0
-    pnl_excluding_best_symbol_r: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -120,18 +123,47 @@ def _profit_factor(values: pd.Series) -> float:
     return gains / losses
 
 
-def build_equity_curve(ledger: pd.DataFrame) -> pd.DataFrame:
+def build_equity_curve(
+    ledger: pd.DataFrame,
+    initial_balance: float = 10_000.0,
+    risk_pct: float = 1.0,
+) -> pd.DataFrame:
+    if initial_balance <= 0:
+        raise ValueError("initial_balance must be greater than zero")
+    if not 0 < risk_pct <= 100:
+        raise ValueError("risk_pct must be greater than zero and at most 100")
+    dollar_columns = ["opening_balance_usd", "risk_amount_usd", "pnl_usd", "balance_usd", "running_peak_usd", "drawdown_usd", "drawdown_pct"]
     if ledger.empty:
-        return pd.DataFrame(columns=["sequence", "paper_trade_id", "entry_time", "exit_time", "symbol", "side", "regime", "net_r", "cumulative_r", "running_peak_r", "drawdown_r"])
+        return pd.DataFrame(columns=["sequence", "paper_trade_id", "entry_time", "exit_time", "symbol", "side", "regime", "net_r", "cumulative_r", "running_peak_r", "drawdown_r", *dollar_columns])
     closed = ledger[ledger["closed"]].copy()
     if closed.empty:
-        return pd.DataFrame(columns=["sequence", "paper_trade_id", "entry_time", "exit_time", "symbol", "side", "regime", "net_r", "cumulative_r", "running_peak_r", "drawdown_r"])
+        return pd.DataFrame(columns=["sequence", "paper_trade_id", "entry_time", "exit_time", "symbol", "side", "regime", "net_r", "cumulative_r", "running_peak_r", "drawdown_r", *dollar_columns])
     closed["__order_time"] = closed["exit_time_normalized"].fillna(closed["entry_time_normalized"])
     closed = closed.sort_values(["__order_time", "paper_trade_id"], kind="stable").reset_index(drop=True)
     closed["sequence"] = range(1, len(closed) + 1)
     closed["cumulative_r"] = closed["net_r"].cumsum()
     closed["running_peak_r"] = closed["cumulative_r"].cummax().clip(lower=0.0)
     closed["drawdown_r"] = closed["cumulative_r"] - closed["running_peak_r"]
+    balances = []
+    opening_balances = []
+    risk_amounts = []
+    pnl_values = []
+    balance = float(initial_balance)
+    for net_r in closed["net_r"]:
+        opening_balances.append(balance)
+        risk_amount = balance * float(risk_pct) / 100.0
+        pnl = risk_amount * float(net_r)
+        balance += pnl
+        risk_amounts.append(risk_amount)
+        pnl_values.append(pnl)
+        balances.append(balance)
+    closed["opening_balance_usd"] = opening_balances
+    closed["risk_amount_usd"] = risk_amounts
+    closed["pnl_usd"] = pnl_values
+    closed["balance_usd"] = balances
+    closed["running_peak_usd"] = closed["balance_usd"].cummax().clip(lower=float(initial_balance))
+    closed["drawdown_usd"] = closed["balance_usd"] - closed["running_peak_usd"]
+    closed["drawdown_pct"] = closed["drawdown_usd"] / closed["running_peak_usd"] * 100.0
     return pd.DataFrame(
         {
             "sequence": closed["sequence"],
@@ -145,6 +177,7 @@ def build_equity_curve(ledger: pd.DataFrame) -> pd.DataFrame:
             "cumulative_r": closed["cumulative_r"],
             "running_peak_r": closed["running_peak_r"],
             "drawdown_r": closed["drawdown_r"],
+            **{name: closed[name] for name in dollar_columns},
         }
     )
 
@@ -178,16 +211,16 @@ def build_regime_performance(ledger: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows, columns=columns).sort_values(["closed", "signals"], ascending=[False, False], kind="stable")
 
 
-def summarize_performance(ledger: pd.DataFrame) -> PaperPerformanceSummary:
+def summarize_performance(ledger: pd.DataFrame, initial_balance: float = 10_000.0, risk_pct: float = 1.0) -> PaperPerformanceSummary:
     now = datetime.now(timezone.utc).isoformat()
     if ledger.empty:
-        return PaperPerformanceSummary(now, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, "NO_PAPER_TRADES")
+        return PaperPerformanceSummary(now, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, initial_balance, initial_balance, 0.0, 0.0, risk_pct, 0.0, 0.0, 0, "NO_PAPER_TRADES")
     closed = ledger[ledger["closed"]].copy()
     values = closed["net_r"]
     wins = int((values > 0).sum())
     losses = int((values < 0).sum())
-    curve = build_equity_curve(ledger)
-    by_symbol = closed.groupby("symbol_normalized")["net_r"].sum() if len(closed) else pd.Series(dtype=float)
+    curve = build_equity_curve(ledger, initial_balance, risk_pct)
+    current_balance = float(curve["balance_usd"].iloc[-1]) if not curve.empty else float(initial_balance)
     return PaperPerformanceSummary(
         generated_at_utc=now,
         total_signals=int(len(ledger)),
@@ -203,12 +236,15 @@ def summarize_performance(ledger: pd.DataFrame) -> PaperPerformanceSummary:
         max_drawdown_r=round(abs(float(curve["drawdown_r"].min())), 6) if not curve.empty else 0.0,
         best_trade_r=round(float(values.max()), 6) if len(closed) else 0.0,
         worst_trade_r=round(float(values.min()), 6) if len(closed) else 0.0,
+        initial_balance_usd=round(float(initial_balance), 2),
+        current_balance_usd=round(current_balance, 2),
+        total_pnl_usd=round(current_balance - float(initial_balance), 2),
+        total_return_pct=round((current_balance / float(initial_balance) - 1.0) * 100.0, 4),
+        risk_per_trade_pct=round(float(risk_pct), 4),
+        max_drawdown_usd=round(abs(float(curve["drawdown_usd"].min())), 2) if not curve.empty else 0.0,
+        max_drawdown_pct=round(abs(float(curve["drawdown_pct"].min())), 4) if not curve.empty else 0.0,
         regime_count=int(ledger["regime_normalized"].nunique(dropna=True)),
         status="COMPLETE" if len(closed) else "COLLECTING_OPEN_TRADES",
-        average_win_r=round(float(values[values > 0].mean()), 6) if wins else 0.0,
-        average_loss_r=round(float(values[values < 0].mean()), 6) if losses else 0.0,
-        pnl_excluding_best_trade_r=round(float(values.sum() - values.max()), 6) if len(values) else 0.0,
-        pnl_excluding_best_symbol_r=round(float(values.sum() - by_symbol.max()), 6) if len(by_symbol) else 0.0,
     )
 
 
@@ -230,6 +266,13 @@ def render_markdown(summary: PaperPerformanceSummary, regimes: pd.DataFrame, equ
         f"- Cumulative return: **{summary.cumulative_r:.4f}R**",
         f"- Max drawdown: **{summary.max_drawdown_r:.4f}R**",
         f"- Best / Worst: **{summary.best_trade_r:.4f}R / {summary.worst_trade_r:.4f}R**",
+        "",
+        "## Virtual account (compounded, closed trades only)",
+        f"- Initial balance: **${summary.initial_balance_usd:,.2f}**",
+        f"- Current balance: **${summary.current_balance_usd:,.2f}**",
+        f"- Total P&L: **${summary.total_pnl_usd:,.2f} ({summary.total_return_pct:.2f}%)**",
+        f"- Risk per trade: **{summary.risk_per_trade_pct:.2f}% of current balance**",
+        f"- Max drawdown: **${summary.max_drawdown_usd:,.2f} ({summary.max_drawdown_pct:.2f}%)**",
         "",
         "## Regime performance",
         "",
@@ -262,8 +305,6 @@ def write_outputs(
         "markdown": output / "paper_performance_dashboard.md",
         "ledger": output / "paper_performance_ledger.csv",
         "regimes": output / "paper_performance_by_regime.csv",
-        "symbols": output / "paper_performance_by_symbol.csv",
-        "events": output / "paper_performance_by_event.csv",
         "equity_csv": output / "paper_equity_curve.csv",
         "equity_png": output / "paper_equity_curve.png",
     }
@@ -271,15 +312,6 @@ def write_outputs(
     paths["markdown"].write_text(render_markdown(summary, regimes, equity), encoding="utf-8")
     ledger.to_csv(paths["ledger"], index=False, encoding="utf-8-sig")
     regimes.to_csv(paths["regimes"], index=False, encoding="utf-8-sig")
-    def grouped(column: str, label: str) -> pd.DataFrame:
-        if ledger.empty or column not in ledger: return pd.DataFrame(columns=[label, "closed", "wins", "losses", "profit_factor", "expectancy_r", "cumulative_r"])
-        rows = []
-        for name, group in ledger[ledger["closed"]].groupby(column, dropna=False):
-            values = group["net_r"]; rows.append({label: str(name), "closed": len(group), "wins": int((values > 0).sum()),
-                "losses": int((values < 0).sum()), "profit_factor": _profit_factor(values), "expectancy_r": float(values.mean()), "cumulative_r": float(values.sum())})
-        return pd.DataFrame(rows)
-    grouped("symbol_normalized", "symbol").to_csv(paths["symbols"], index=False, encoding="utf-8-sig")
-    grouped("regime_normalized", "event").to_csv(paths["events"], index=False, encoding="utf-8-sig")
     equity.to_csv(paths["equity_csv"], index=False, encoding="utf-8-sig")
     if make_plot:
         try:
@@ -311,10 +343,12 @@ def build_dashboard(
     output_dir: str | Path = "logs/paper_performance",
     *,
     make_plot: bool = True,
+    initial_balance: float = 10_000.0,
+    risk_pct: float = 1.0,
 ) -> tuple[PaperPerformanceSummary, pd.DataFrame, pd.DataFrame, pd.DataFrame, Dict[str, str]]:
     ledger = merge_paper_ledger(_read_csv(trades_path), _read_csv(evaluations_path))
-    summary = summarize_performance(ledger)
+    summary = summarize_performance(ledger, initial_balance, risk_pct)
     regimes = build_regime_performance(ledger)
-    equity = build_equity_curve(ledger)
+    equity = build_equity_curve(ledger, initial_balance, risk_pct)
     outputs = write_outputs(summary, ledger, regimes, equity, output_dir, make_plot=make_plot)
     return summary, ledger, regimes, equity, outputs

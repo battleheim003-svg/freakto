@@ -1,0 +1,1 @@
+﻿sequence,paper_trade_id,entry_time,exit_time,symbol,side,regime,net_r,cumulative_r,running_peak_r,drawdown_r,opening_balance_usd,risk_amount_usd,pnl_usd,balance_usd,running_peak_usd,drawdown_usd,drawdown_pct

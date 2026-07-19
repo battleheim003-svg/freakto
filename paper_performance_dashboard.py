@@ -23,6 +23,11 @@ def _format(summary, outputs) -> str:
         f"Cumulative R        : {summary.cumulative_r:.4f}R",
         f"Max Drawdown        : {summary.max_drawdown_r:.4f}R",
         f"Best / Worst        : {summary.best_trade_r:.4f}R / {summary.worst_trade_r:.4f}R",
+        f"Initial Balance     : ${summary.initial_balance_usd:,.2f}",
+        f"Current Balance     : ${summary.current_balance_usd:,.2f}",
+        f"Total P&L           : ${summary.total_pnl_usd:,.2f} ({summary.total_return_pct:.2f}%)",
+        f"Risk / Trade        : {summary.risk_per_trade_pct:.2f}% (compounded)",
+        f"Max Drawdown USD    : ${summary.max_drawdown_usd:,.2f} ({summary.max_drawdown_pct:.2f}%)",
         f"Regimes             : {summary.regime_count}",
         f"Dashboard           : {outputs.get('markdown', '')}",
         f"Equity Curve        : {outputs.get('equity_png', '')}",
@@ -37,6 +42,8 @@ def main() -> int:
     parser.add_argument("--trades", default="logs/paper_trades.csv")
     parser.add_argument("--evaluations", default="logs/paper_trade_evaluations.csv")
     parser.add_argument("--output-dir", default="logs/paper_performance")
+    parser.add_argument("--balance", type=float, default=10_000.0, help="Initial virtual account balance in USD")
+    parser.add_argument("--risk-pct", type=float, default=1.0, help="Percent of current balance risked per closed trade")
     parser.add_argument("--no-plot", action="store_true")
     parser.add_argument("--send", action="store_true", help="Send compact summary to Telegram")
     args = parser.parse_args()
@@ -46,6 +53,8 @@ def main() -> int:
         args.evaluations,
         args.output_dir,
         make_plot=not args.no_plot,
+        initial_balance=args.balance,
+        risk_pct=args.risk_pct,
     )
     text = _format(summary, outputs)
     print(text)

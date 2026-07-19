@@ -46,6 +46,32 @@ def test_equity_curve_uses_chronological_closed_trades_only():
     assert curve["drawdown_r"].tolist() == [0.0, -1.0]
 
 
+def test_virtual_account_compounds_closed_trades_and_ignores_open_rows():
+    ledger = merge_paper_ledger(*sample_frames())
+    curve = build_equity_curve(ledger, initial_balance=10_000.0, risk_pct=1.0)
+    assert curve["paper_trade_id"].tolist() == ["a", "b"]
+    assert curve["risk_amount_usd"].round(2).tolist() == [100.0, 102.0]
+    assert curve["pnl_usd"].round(2).tolist() == [200.0, -102.0]
+    assert curve["balance_usd"].round(2).tolist() == [10_200.0, 10_098.0]
+    summary = summarize_performance(ledger, initial_balance=10_000.0, risk_pct=1.0)
+    assert summary.current_balance_usd == 10_098.0
+    assert summary.total_pnl_usd == 98.0
+    assert summary.total_return_pct == 0.98
+    assert summary.max_drawdown_usd == 102.0
+    assert summary.max_drawdown_pct == 1.0
+
+
+def test_virtual_account_rejects_unsafe_configuration():
+    ledger = merge_paper_ledger(*sample_frames())
+    for balance, risk_pct in ((0, 1), (10_000, 0), (10_000, 101)):
+        try:
+            build_equity_curve(ledger, initial_balance=balance, risk_pct=risk_pct)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("invalid virtual account configuration must fail closed")
+
+
 def test_regime_performance_is_joined_from_trade_metadata():
     ledger = merge_paper_ledger(*sample_frames())
     regimes = build_regime_performance(ledger)
