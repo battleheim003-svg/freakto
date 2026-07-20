@@ -8,7 +8,10 @@
     "20d1c1de622f96a7dc1a",
     "25c4dab5df01702f02f5",
     "30e15abab57b54c4056e",
-    "ead21fedac9fe0811354"
+    "ead21fedac9fe0811354",
+    "62c12c925d56e962994d",
+    "d4e4d80e409d463ff47c",
+    "c2a300f21f3e3ac35f62"
   ],
   "observed_candles": [
     "BTC/USDT|2026-07-19 12:00:00",
@@ -18,7 +21,9 @@
     "LINK/USDT|2026-07-19 12:00:00",
     "AVAX/USDT|2026-07-19 12:00:00",
     "BCH/USDT|2026-07-19 12:00:00",
-    "XRP/USDT|2026-07-19 12:00:00"
+    "XRP/USDT|2026-07-19 12:00:00",
+    "DOT/USDT|2026-07-19 12:00:00",
+    "LTC/USDT|2026-07-19 12:00:00"
   ],
   "managed_positions": {},
   "daily": {
@@ -26,14 +31,14 @@
     "start_equity": 10000.0
   },
   "metrics": {
-    "unique_decisions": 8,
+    "unique_decisions": 11,
     "duplicate_executions": 0,
     "open_candle_decisions": 0,
-    "complete_4h_candles": 8,
+    "complete_4h_candles": 10,
     "state_corruptions": 0,
-    "unhandled_crashes": 4,
-    "provider_checks": 13,
-    "provider_fresh": 13,
+    "unhandled_crashes": 18,
+    "provider_checks": 54,
+    "provider_fresh": 54,
     "closed_trades": 0,
     "core_closed_trades": 0
   }

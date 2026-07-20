@@ -9,24 +9,13 @@ Commands:
     python paper_trading_dashboard.py --evaluate
     python paper_trading_dashboard.py --scan --evaluate
     python paper_trading_dashboard.py --send
+    python paper_trading_dashboard.py --web
 """
 
 import argparse
+import subprocess
 import sys
 from pathlib import Path
-
-from telegram_notifier import send_telegram_message
-from engine.paper_trading import (
-    PAPER_TRADES_FILE,
-    PAPER_EVALUATIONS_FILE,
-    evaluate_paper_trades,
-    format_paper_evaluation_summary,
-    format_paper_record_result,
-    record_paper_trades_from_portfolio,
-    summarize_paper_evaluations,
-)
-from engine.paper_trade_readiness import run_paper_trade_preflight
-
 
 def _safe_print(text: str) -> None:
     encoding = sys.stdout.encoding or "utf-8"
@@ -34,6 +23,8 @@ def _safe_print(text: str) -> None:
 
 
 def _existing_status_text() -> str:
+    from engine.paper_trading import PAPER_EVALUATIONS_FILE, PAPER_TRADES_FILE, summarize_paper_evaluations
+
     summary = summarize_paper_evaluations()
     lines = []
     lines.append("=" * 110)
@@ -62,11 +53,25 @@ def main():
     parser.add_argument("--evaluate", action="store_true", help="Evaluate existing paper trades.")
     parser.add_argument("--preflight", action="store_true", help="Check whether new paper observations may be recorded.")
     parser.add_argument("--send", action="store_true", help="Send summary to Telegram.")
+    parser.add_argument("--web", action="store_true", help="Open the local Shadow/Paper web dashboard.")
     args = parser.parse_args()
 
     outputs = []
 
+    if args.web:
+        dashboard = Path(__file__).resolve().with_name("live_paper_web_dashboard.py")
+        return subprocess.call([sys.executable, "-m", "streamlit", "run", str(dashboard)])
+
+    from engine.paper_trading import (
+        evaluate_paper_trades,
+        format_paper_evaluation_summary,
+        format_paper_record_result,
+        record_paper_trades_from_portfolio,
+    )
+
     if args.preflight:
+        from engine.paper_trade_readiness import run_paper_trade_preflight
+
         preflight = run_paper_trade_preflight()
         lines = [
             f"Paper preflight: {preflight.status}",
@@ -97,13 +102,17 @@ def main():
         _safe_print(text)
         outputs.append(text)
 
-    if not args.scan and not args.evaluate and not args.preflight:
+    if not args.scan and not args.evaluate and not args.preflight and not args.web:
         text = _existing_status_text()
         _safe_print(text)
         outputs.append(text)
 
     if args.send:
+        from telegram_notifier import send_telegram_message
+
         send_telegram_message("\n\n".join(outputs))
+
+    return 0
 
 
 if __name__ == "__main__":
