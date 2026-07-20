@@ -1,0 +1,39 @@
+==============================================================================================================
+🧭 Freakto Narrative/Decision Conflict Scoring v7.1.0
+==============================================================================================================
+Status                 : NARRATIVE_DECISION_CONFLICT
+Run ID                 : narrative_decision_20260720_234203
+Symbol / TF            : BTC/USDT | 4h
+Decision ID            : c3cd14aaf48bfe86
+Decision Side/Score    : LONG | 52
+Decision Actionability : 0
+
+Narrative Context:
+- Label                : MIXED_NARRATIVE_CONFLICT
+- Direction            : MIXED_OR_NEUTRAL
+- Confidence           : LOW
+- Theme                : MACRO_POLICY
+- Narrative Score      : -2.2234
+- Event Risk           : HIGH
+- Tech/Event Conflict  : MEDIUM
+
+Decision Impact:
+- Alignment            : MIXED_OR_NEUTRAL_NARRATIVE
+- Conflict Score       : 69/100
+- Score Adjustment     : -22
+- Adjusted Score       : 30/100
+- Action Override      : DOWNGRADE_OR_WAIT
+- Verdict              : DOWNGRADE_CONFIDENCE_RESEARCH_ONLY
+- Notes                : Narrative جهت روشن ندارد یا mixed است؛ تصمیم باید محتاط‌تر تفسیر شود. | خود narrative برچسب conflict/mixed دارد. | Event risk بالاست؛ حتی narrative هم‌جهت هم باید با احتیاط دیده شود. | قدرت net narrative پایین است؛ حمایت روایی ضعیف است.
+
+Recommendations:
+→ اگر conflict بالا باشد، تصمیم فقط Watchlist/Research بماند تا Forward outcome تأیید شود.
+→ برای ارتقا به Gate، narrative_adjustment باید با outcomeهای بعدی در decision_evaluations.csv validate شود.
+
+Warnings:
+⚠️ Narrative/Decision Conflict Scoring فقط research-level است و هیچ Paper/Live فعال نمی‌کند.
+⚠️ این امتیاز نباید به‌تنهایی باعث ورود شود؛ فقط برای کاهش/افزایش احتیاط در Forward Research است.
+==============================================================================================================
+🧭 Narrative/decision JSON ذخیره شد: logs/narrative/narrative_decision_narrative_decision_20260720_234203.json
+📝 Narrative/decision report ذخیره شد: logs/narrative/narrative_decision_report_narrative_decision_20260720_234203.md
+🧾 Narrative/decision observations ledger ذخیره شد: logs/narrative/narrative_decision_observations.csv

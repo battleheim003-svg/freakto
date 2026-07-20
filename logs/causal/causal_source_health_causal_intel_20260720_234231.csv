@@ -1,0 +1,16 @@
+﻿source_id,status,tier,category,direction,event_risk,error
+auto_events,OK,TIER_1_OFFICIAL_MACRO,news_event,NEUTRAL,HIGH,
+auto_events,OK,TIER_1_OFFICIAL_MACRO,news_event,BEARISH,HIGH,
+auto_events,OK,TIER_1_OFFICIAL_MACRO,news_event,BEARISH,HIGH,
+auto_events,OK,TIER_1_OFFICIAL_REGULATOR,news_event,BULLISH,HIGH,
+auto_events,OK,TIER_1_OFFICIAL_MACRO,news_event,NEUTRAL,HIGH,
+auto_events,OK,TIER_1_OFFICIAL_MACRO,news_event,NEUTRAL,HIGH,
+auto_events,OK,TIER_1_OFFICIAL_MACRO,news_event,NEUTRAL,HIGH,
+auto_events,OK,TIER_1_OFFICIAL_MACRO,news_event,NEUTRAL,HIGH,
+coingecko_global,OK,TIER_2_MARKET_AGGREGATOR,market_aggregate,NEUTRAL,LOW,
+defillama_tvl,OK,TIER_1_PROTOCOL_AGGREGATOR,defi_liquidity,BULLISH,LOW,
+defillama_stablecoins,OK,TIER_1_PROTOCOL_AGGREGATOR,stablecoin_liquidity,NEUTRAL,LOW,
+binance_futures_open_interest,FAILED,TIER_1_OFFICIAL_EXCHANGE,derivatives,NEUTRAL,LOW,HTTPError: HTTP Error 451: 
+binance_futures_premium_funding,FAILED,TIER_1_OFFICIAL_EXCHANGE,derivatives,NEUTRAL,LOW,HTTPError: HTTP Error 451: 
+fred_macro,SKIPPED_NO_KEY,TIER_1_OFFICIAL_MACRO,macro,NEUTRAL,LOW,
+alternative_fng,OK,TIER_3_SENTIMENT,sentiment,NEUTRAL,LOW,
