@@ -1,0 +1,989 @@
+{
+  "run_id": "shadow_gate_20260720_112454",
+  "generated_utc": "2026-07-20T11:24:54.112655+00:00",
+  "status": "SHADOW_COLLECTING_FORWARD_DATA",
+  "horizon": "24h",
+  "min_samples": 30,
+  "decisions": 92,
+  "directional_decisions": 42,
+  "shadow_signals": 28,
+  "evaluated_shadow_samples": 28,
+  "pending_shadow_samples": 0,
+  "gates_tracked": 11,
+  "confirmed_candidates": 0,
+  "building_candidates": 11,
+  "rejected_candidates": 0,
+  "top_gates": [
+    {
+      "gate": "STRUCTURE_SCORE_GE_10",
+      "family": "review_backtest_candidate",
+      "priority": 4,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 19,
+      "evaluated_samples": 19,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.5264,
+      "median_return_pct": 0.7856,
+      "win_rate": 84.21,
+      "target_1_hit_rate": 73.68,
+      "stop_hit_rate": 63.16,
+      "mfe_mean_pct": 3.862,
+      "mae_mean_pct": -2.1338,
+      "mfe_mae_ratio": 1.81,
+      "best_return_pct": 1.7343,
+      "worst_return_pct": -1.9251,
+      "latest_signal_utc": "2026-07-19T11:44:23.301232+00:00",
+      "latest_candle_timestamp": "2026-07-19 04:00:00",
+      "description": "مثبت ولی نیازمند review: structure_score >= 10.",
+      "warnings": [
+        "Forward evaluated samples کمتر از حداقل 30 است: 19"
+      ],
+      "filters": {
+        "structure_score_min": 10
+      }
+    },
+    {
+      "gate": "HISTORICAL_EDGE_SCORE_GE_1",
+      "family": "primary_backtest_candidate",
+      "priority": 3,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 8,
+      "evaluated_samples": 8,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": -1.2246,
+      "median_return_pct": -0.6676,
+      "win_rate": 12.5,
+      "target_1_hit_rate": 100.0,
+      "stop_hit_rate": 100.0,
+      "mfe_mean_pct": 2.3753,
+      "mae_mean_pct": -3.6141,
+      "mfe_mae_ratio": 0.657,
+      "best_return_pct": 0.5361,
+      "worst_return_pct": -3.2625,
+      "latest_signal_utc": "2026-07-12T07:52:15.639123+00:00",
+      "latest_candle_timestamp": "2026-07-12 00:00:00",
+      "description": "Backtest candidate با stop کمتر: historical_edge_score >= 1.",
+      "warnings": [
+        "Forward evaluated samples کمتر از حداقل 30 است: 8"
+      ],
+      "filters": {
+        "historical_edge_score_min": 1
+      }
+    },
+    {
+      "gate": "RISK_MEDIUM",
+      "family": "primary_backtest_candidate",
+      "priority": 2,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 1,
+      "evaluated_samples": 1,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.5361,
+      "median_return_pct": 0.5361,
+      "win_rate": 100.0,
+      "target_1_hit_rate": 100.0,
+      "stop_hit_rate": 100.0,
+      "mfe_mean_pct": 2.6083,
+      "mae_mean_pct": -3.2845,
+      "mfe_mae_ratio": 0.794,
+      "best_return_pct": 0.5361,
+      "worst_return_pct": 0.5361,
+      "latest_signal_utc": "2026-07-10T18:10:47.369248+00:00",
+      "latest_candle_timestamp": "2026-07-10 16:00:00",
+      "description": "Backtest candidate با sample بیشتر: risk_label = Medium.",
+      "warnings": [
+        "Forward evaluated samples کمتر از حداقل 30 است: 1"
+      ],
+      "filters": {
+        "risk_normalized_in": [
+          "MEDIUM"
+        ]
+      }
+    },
+    {
+      "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM",
+      "family": "regime_gate_matrix_candidate",
+      "priority": 0,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "regime_label_in": [
+          "TRENDING_BEAR"
+        ],
+        "risk_normalized_in": [
+          "MEDIUM"
+        ]
+      }
+    },
+    {
+      "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT",
+      "family": "regime_gate_matrix_candidate",
+      "priority": 0,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium + SHORT.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "regime_label_in": [
+          "TRENDING_BEAR"
+        ],
+        "risk_normalized_in": [
+          "MEDIUM"
+        ],
+        "side_in": [
+          "SHORT"
+        ]
+      }
+    },
+    {
+      "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10",
+      "family": "regime_gate_matrix_candidate",
+      "priority": 0,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "regime_label_in": [
+          "TRENDING_BEAR"
+        ],
+        "structure_score_min": 10
+      }
+    },
+    {
+      "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT",
+      "family": "regime_gate_matrix_candidate",
+      "priority": 0,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10 + SHORT.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "regime_label_in": [
+          "TRENDING_BEAR"
+        ],
+        "structure_score_min": 10,
+        "side_in": [
+          "SHORT"
+        ]
+      }
+    },
+    {
+      "gate": "VOLUME_SCORE_GE_10",
+      "family": "primary_backtest_candidate",
+      "priority": 1,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "Backtest candidate قوی: volume_score >= 10.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "volume_score_min": 10
+      }
+    },
+    {
+      "gate": "SCORE_GE_80",
+      "family": "small_sample_positive",
+      "priority": 5,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "مثبت کم‌نمونه: score >= 80؛ فقط watchlist تحقیقاتی.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "score_min": 80
+      }
+    },
+    {
+      "gate": "DOGE_SHORT_WATCH",
+      "family": "symbol_side_watch",
+      "priority": 6,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "مثبت کم‌نمونه: DOGE/USDT SHORT.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "symbol_in": [
+          "DOGE/USDT"
+        ],
+        "side_in": [
+          "SHORT"
+        ]
+      }
+    }
+  ],
+  "gate_metrics": [
+    {
+      "gate": "STRUCTURE_SCORE_GE_10",
+      "family": "review_backtest_candidate",
+      "priority": 4,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 19,
+      "evaluated_samples": 19,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.5264,
+      "median_return_pct": 0.7856,
+      "win_rate": 84.21,
+      "target_1_hit_rate": 73.68,
+      "stop_hit_rate": 63.16,
+      "mfe_mean_pct": 3.862,
+      "mae_mean_pct": -2.1338,
+      "mfe_mae_ratio": 1.81,
+      "best_return_pct": 1.7343,
+      "worst_return_pct": -1.9251,
+      "latest_signal_utc": "2026-07-19T11:44:23.301232+00:00",
+      "latest_candle_timestamp": "2026-07-19 04:00:00",
+      "description": "مثبت ولی نیازمند review: structure_score >= 10.",
+      "warnings": [
+        "Forward evaluated samples کمتر از حداقل 30 است: 19"
+      ],
+      "filters": {
+        "structure_score_min": 10
+      }
+    },
+    {
+      "gate": "HISTORICAL_EDGE_SCORE_GE_1",
+      "family": "primary_backtest_candidate",
+      "priority": 3,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 8,
+      "evaluated_samples": 8,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": -1.2246,
+      "median_return_pct": -0.6676,
+      "win_rate": 12.5,
+      "target_1_hit_rate": 100.0,
+      "stop_hit_rate": 100.0,
+      "mfe_mean_pct": 2.3753,
+      "mae_mean_pct": -3.6141,
+      "mfe_mae_ratio": 0.657,
+      "best_return_pct": 0.5361,
+      "worst_return_pct": -3.2625,
+      "latest_signal_utc": "2026-07-12T07:52:15.639123+00:00",
+      "latest_candle_timestamp": "2026-07-12 00:00:00",
+      "description": "Backtest candidate با stop کمتر: historical_edge_score >= 1.",
+      "warnings": [
+        "Forward evaluated samples کمتر از حداقل 30 است: 8"
+      ],
+      "filters": {
+        "historical_edge_score_min": 1
+      }
+    },
+    {
+      "gate": "RISK_MEDIUM",
+      "family": "primary_backtest_candidate",
+      "priority": 2,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 1,
+      "evaluated_samples": 1,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.5361,
+      "median_return_pct": 0.5361,
+      "win_rate": 100.0,
+      "target_1_hit_rate": 100.0,
+      "stop_hit_rate": 100.0,
+      "mfe_mean_pct": 2.6083,
+      "mae_mean_pct": -3.2845,
+      "mfe_mae_ratio": 0.794,
+      "best_return_pct": 0.5361,
+      "worst_return_pct": 0.5361,
+      "latest_signal_utc": "2026-07-10T18:10:47.369248+00:00",
+      "latest_candle_timestamp": "2026-07-10 16:00:00",
+      "description": "Backtest candidate با sample بیشتر: risk_label = Medium.",
+      "warnings": [
+        "Forward evaluated samples کمتر از حداقل 30 است: 1"
+      ],
+      "filters": {
+        "risk_normalized_in": [
+          "MEDIUM"
+        ]
+      }
+    },
+    {
+      "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM",
+      "family": "regime_gate_matrix_candidate",
+      "priority": 0,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "regime_label_in": [
+          "TRENDING_BEAR"
+        ],
+        "risk_normalized_in": [
+          "MEDIUM"
+        ]
+      }
+    },
+    {
+      "gate": "REGIME_TRENDING_BEAR__RISK_MEDIUM__SHORT",
+      "family": "regime_gate_matrix_candidate",
+      "priority": 0,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "v6.1 regime proposal: TRENDING_BEAR + risk_label = Medium + SHORT.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "regime_label_in": [
+          "TRENDING_BEAR"
+        ],
+        "risk_normalized_in": [
+          "MEDIUM"
+        ],
+        "side_in": [
+          "SHORT"
+        ]
+      }
+    },
+    {
+      "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10",
+      "family": "regime_gate_matrix_candidate",
+      "priority": 0,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "regime_label_in": [
+          "TRENDING_BEAR"
+        ],
+        "structure_score_min": 10
+      }
+    },
+    {
+      "gate": "REGIME_TRENDING_BEAR__STRUCTURE_SCORE_GE_10__SHORT",
+      "family": "regime_gate_matrix_candidate",
+      "priority": 0,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "v6.1 regime proposal: TRENDING_BEAR + structure_score >= 10 + SHORT.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "regime_label_in": [
+          "TRENDING_BEAR"
+        ],
+        "structure_score_min": 10,
+        "side_in": [
+          "SHORT"
+        ]
+      }
+    },
+    {
+      "gate": "VOLUME_SCORE_GE_10",
+      "family": "primary_backtest_candidate",
+      "priority": 1,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "Backtest candidate قوی: volume_score >= 10.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "volume_score_min": 10
+      }
+    },
+    {
+      "gate": "SCORE_GE_80",
+      "family": "small_sample_positive",
+      "priority": 5,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "مثبت کم‌نمونه: score >= 80؛ فقط watchlist تحقیقاتی.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "score_min": 80
+      }
+    },
+    {
+      "gate": "DOGE_SHORT_WATCH",
+      "family": "symbol_side_watch",
+      "priority": 6,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "مثبت کم‌نمونه: DOGE/USDT SHORT.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "symbol_in": [
+          "DOGE/USDT"
+        ],
+        "side_in": [
+          "SHORT"
+        ]
+      }
+    },
+    {
+      "gate": "BNB_LONG_SCORE_GE_60",
+      "family": "symbol_side_watch",
+      "priority": 7,
+      "verdict": "SHADOW_BUILDING",
+      "total_signals": 0,
+      "evaluated_samples": 0,
+      "pending_samples": 0,
+      "partial_samples": 0,
+      "avg_return_pct": 0.0,
+      "median_return_pct": 0.0,
+      "win_rate": 0.0,
+      "target_1_hit_rate": 0.0,
+      "stop_hit_rate": 0.0,
+      "mfe_mean_pct": 0.0,
+      "mae_mean_pct": 0.0,
+      "mfe_mae_ratio": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "latest_signal_utc": "",
+      "latest_candle_timestamp": "",
+      "description": "مثبت کم‌نمونه: BNB/USDT LONG + score>=60.",
+      "warnings": [
+        "هنوز هیچ تصمیم Forward این gate را پاس نکرده است."
+      ],
+      "filters": {
+        "symbol_in": [
+          "BNB/USDT"
+        ],
+        "side_in": [
+          "LONG"
+        ],
+        "score_min": 60
+      }
+    }
+  ],
+  "recent_signals": [
+    {
+      "gate_name": "STRUCTURE_SCORE_GE_10",
+      "gate_family": "review_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-03T21:45:51.573056+00:00",
+      "candle_timestamp": "2026-07-03 20:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 70,
+      "selected_return_pct": 0.8199,
+      "actionability": "WATCHLIST",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "STRUCTURE_SCORE_GE_10",
+      "gate_family": "review_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-03T21:58:23.468112+00:00",
+      "candle_timestamp": "2026-07-03 20:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 72,
+      "selected_return_pct": 0.6401,
+      "actionability": "WATCHLIST",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "STRUCTURE_SCORE_GE_10",
+      "gate_family": "review_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-03T22:05:21.173468+00:00",
+      "candle_timestamp": "2026-07-03 20:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 70,
+      "selected_return_pct": 0.7874,
+      "actionability": "WATCHLIST",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "STRUCTURE_SCORE_GE_10",
+      "gate_family": "review_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-03T22:05:39.693647+00:00",
+      "candle_timestamp": "2026-07-03 20:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 70,
+      "selected_return_pct": 0.8457,
+      "actionability": "WATCHLIST",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "STRUCTURE_SCORE_GE_10",
+      "gate_family": "review_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-03T22:09:19.852309+00:00",
+      "candle_timestamp": "2026-07-03 20:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 70,
+      "selected_return_pct": 0.8086,
+      "actionability": "WATCHLIST",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "STRUCTURE_SCORE_GE_10",
+      "gate_family": "review_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-03T22:12:37.322247+00:00",
+      "candle_timestamp": "2026-07-03 20:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 70,
+      "selected_return_pct": 0.8479,
+      "actionability": "WATCHLIST",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+      "gate_family": "primary_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-07T12:50:45.844155+00:00",
+      "candle_timestamp": "2026-07-07 12:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 49,
+      "selected_return_pct": -2.8398,
+      "actionability": "NOT_ACTIONABLE",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+      "gate_family": "primary_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-07T15:40:48.725757+00:00",
+      "candle_timestamp": "2026-07-07 12:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 66,
+      "selected_return_pct": -3.2625,
+      "actionability": "WATCHLIST",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+      "gate_family": "primary_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-10T11:28:34.883694+00:00",
+      "candle_timestamp": "2026-07-10 08:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 75,
+      "selected_return_pct": -0.3281,
+      "actionability": "WATCHLIST",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "RISK_MEDIUM",
+      "gate_family": "primary_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-10T18:10:47.369248+00:00",
+      "candle_timestamp": "2026-07-10 16:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 47,
+      "selected_return_pct": 0.5361,
+      "actionability": "NOT_ACTIONABLE",
+      "risk_label": "Medium",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+      "gate_family": "primary_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-10T18:10:47.369248+00:00",
+      "candle_timestamp": "2026-07-10 16:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 47,
+      "selected_return_pct": 0.5361,
+      "actionability": "NOT_ACTIONABLE",
+      "risk_label": "Medium",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+      "gate_family": "primary_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-11T07:25:53.492975+00:00",
+      "candle_timestamp": "2026-07-11 04:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 62,
+      "selected_return_pct": -0.5226,
+      "actionability": "WATCHLIST",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+      "gate_family": "primary_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-11T15:36:24.789259+00:00",
+      "candle_timestamp": "2026-07-11 12:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 72,
+      "selected_return_pct": -0.3786,
+      "actionability": "WATCHLIST",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+      "gate_family": "primary_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-11T20:10:21.313545+00:00",
+      "candle_timestamp": "2026-07-11 20:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 67,
+      "selected_return_pct": -0.8127,
+      "actionability": "WATCHLIST",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "HISTORICAL_EDGE_SCORE_GE_1",
+      "gate_family": "primary_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-12T07:52:15.639123+00:00",
+      "candle_timestamp": "2026-07-12 00:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 73,
+      "selected_return_pct": -2.1886,
+      "actionability": "WATCHLIST",
+      "risk_label": "Low",
+      "regime_label": "TRENDING_BULL"
+    },
+    {
+      "gate_name": "STRUCTURE_SCORE_GE_10",
+      "gate_family": "review_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-13T11:45:14.491743+00:00",
+      "candle_timestamp": "2026-07-13 04:00:00",
+      "symbol": "BTC/USDT",
+      "side": "SHORT",
+      "score": 57,
+      "selected_return_pct": 0.6924,
+      "actionability": "0",
+      "risk_label": "nan",
+      "regime_label": "UNKNOWN"
+    },
+    {
+      "gate_name": "STRUCTURE_SCORE_GE_10",
+      "gate_family": "review_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-15T20:18:41.724046+00:00",
+      "candle_timestamp": "2026-07-15 16:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 69,
+      "selected_return_pct": -1.0821,
+      "actionability": "0",
+      "risk_label": "nan",
+      "regime_label": "UNKNOWN"
+    },
+    {
+      "gate_name": "STRUCTURE_SCORE_GE_10",
+      "gate_family": "review_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-16T19:52:45.414462+00:00",
+      "candle_timestamp": "2026-07-16 12:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 57,
+      "selected_return_pct": -1.9251,
+      "actionability": "0",
+      "risk_label": "nan",
+      "regime_label": "UNKNOWN"
+    },
+    {
+      "gate_name": "STRUCTURE_SCORE_GE_10",
+      "gate_family": "review_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-17T23:12:47.282260+00:00",
+      "candle_timestamp": "2026-07-17 16:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 52,
+      "selected_return_pct": 0.6156,
+      "actionability": "0",
+      "risk_label": "nan",
+      "regime_label": "UNKNOWN"
+    },
+    {
+      "gate_name": "STRUCTURE_SCORE_GE_10",
+      "gate_family": "review_backtest_candidate",
+      "shadow_status": "EVALUATED",
+      "decision_logged_at_utc": "2026-07-19T11:44:23.301232+00:00",
+      "candle_timestamp": "2026-07-19 04:00:00",
+      "symbol": "BTC/USDT",
+      "side": "LONG",
+      "score": 70,
+      "selected_return_pct": -0.6667,
+      "actionability": "0",
+      "risk_label": "nan",
+      "regime_label": "UNKNOWN"
+    }
+  ],
+  "blockers": [
+    "کل نمونه‌های ارزیابی‌شده Shadow کمتر از 30 است: 28"
+  ],
+  "recommendations": [
+    "Shadow هنوز در حال ساخت داده است؛ فعال‌ترین gate: STRUCTURE_SCORE_GE_10 | signals=19, evaluated=19.",
+    "برای هر gate حداقل 30 نمونه Forward کامل لازم است.",
+    "Regime Shadow gateهای v6.1 فعال شده‌اند، اما هنوز هیچ تصمیم Forward آن‌ها را پاس نکرده است.",
+    "سه gate پایه که باید زیر نظر بمانند: VOLUME_SCORE_GE_10، RISK_MEDIUM، HISTORICAL_EDGE_SCORE_GE_1."
+  ],
+  "warnings": [
+    "Shadow Gate هیچ Paper Trade و هیچ سفارش واقعی ایجاد نمی‌کند؛ فقط برچسب تحقیقاتی می‌زند.",
+    "Gateهای پایه از Backtest و Gateهای Regime از v6.1 Regime-Gate Matrix آمده‌اند و باید در Forward مستقل تأیید شوند.",
+    "تا وقتی هر gate، مخصوصاً gateهای Regime، حداقل 30 نمونه Forward کامل ندارد، نتیجه آماری قابل اتکا نیست."
+  ]
+}
