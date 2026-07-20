@@ -7,7 +7,10 @@ import time
 
 from engine.live_demo import CcxtPublicMarketData, DEFAULT_PUBLIC_EXCHANGES
 from engine.live_demo_universe import load_universe, select_symbols
-from engine.live_paper_runtime import LivePaperRuntime, RuntimeLock, load_runtime_config, shadow_gate_status
+from engine.live_paper_runtime import (
+    LivePaperRuntime, RuntimeAlreadyRunningError, RuntimeLock,
+    load_runtime_config, shadow_gate_status,
+)
 
 
 def main() -> int:
@@ -41,26 +44,34 @@ def main() -> int:
     if args.interval <= 0:
         parser.error("--interval must be positive")
     results = []
-    with RuntimeLock(runtime.root / "runtime.lock"):
-        while True:
-            results = []
-            runtime.manage_exits()
-            for symbol in symbols:
-                try: results.append(runtime.process_symbol(symbol))
-                except Exception as exc:
-                    runtime.store.state["metrics"]["unhandled_crashes"] += 1
-                    runtime.store.save()
-                    result = {"symbol": symbol, "status": "RUNTIME_FAILURE", "error": f"{type(exc).__name__}: {exc}"}
-                    results.append(result)
-                    if send_telegram_message: send_telegram_message(f"Freakto live-paper runtime failure\n{symbol}\n{result['error']}")
-            print(json.dumps({"mode": args.mode, "paper_execution_authorized": runtime._execution_authorized(), "results": results}, ensure_ascii=False, indent=2, default=str), flush=True)
-            if not args.loop:
-                break
-            try:
+    try:
+        with RuntimeLock(runtime.root / "runtime.lock"):
+            while True:
+                results = []
+                runtime.manage_exits()
+                for symbol in symbols:
+                    try:
+                        results.append(runtime.process_symbol(symbol))
+                    except Exception as exc:
+                        runtime.store.record_handled_symbol_failure(symbol, exc)
+                        result = {"symbol": symbol, "status": "HANDLED_SYMBOL_FAILURE", "error": f"{type(exc).__name__}: {exc}"}
+                        results.append(result)
+                        if send_telegram_message:
+                            send_telegram_message(f"Freakto live-paper symbol failure (handled)\n{symbol}\n{result['error']}")
+                print(json.dumps({"mode": args.mode, "paper_execution_authorized": runtime._execution_authorized(), "results": results}, ensure_ascii=False, indent=2, default=str), flush=True)
+                if not args.loop:
+                    break
                 time.sleep(args.interval)
-            except KeyboardInterrupt:
-                print("Freakto live-paper runtime stopped safely.")
-                break
+    except KeyboardInterrupt:
+        print("Freakto live-paper runtime stopped safely.")
+    except RuntimeAlreadyRunningError as exc:
+        print(f"Freakto live-paper worker is already running: {exc}")
+        return 2
+    except Exception as exc:
+        runtime.store.record_unhandled_crash(exc)
+        if send_telegram_message:
+            send_telegram_message(f"Freakto live-paper UNHANDLED runtime crash\n{type(exc).__name__}: {exc}")
+        raise
     return 0
 
 

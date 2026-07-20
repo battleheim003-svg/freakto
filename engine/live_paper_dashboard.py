@@ -132,6 +132,7 @@ def pdf_report(data: DashboardData) -> bytes:
             f"Freakto {data.mode.upper()} report", f"Gate passed: {data.gate.get('passed', False)}",
             f"Elapsed days: {data.gate.get('days', 0)}", f"Provider freshness: {data.gate.get('provider_freshness_pct', 0)}%",
             f"Unique decisions: {metrics.get('unique_decisions', 0)}", f"Complete 4h candles: {metrics.get('complete_4h_candles', 0)}",
+            f"Handled symbol failures: {metrics.get('handled_symbol_failures', 0)}",
             f"Unhandled crashes: {metrics.get('unhandled_crashes', 0)}", f"Fills: {len(data.fills)}",
         ]
         axis.text(0.05, 0.95, "\n".join(lines), va="top", fontsize=14, linespacing=1.6)

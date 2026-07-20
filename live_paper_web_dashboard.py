@@ -118,13 +118,14 @@ def main() -> None:
     mode = st.radio("Data view", ["shadow", "paper"], horizontal=True)
     data = _data(mode)
     metrics = data.state.get("metrics", {})
-    cols = st.columns(6)
+    cols = st.columns(7)
     values = [
         ("Gate", "PASSED" if data.gate.get("passed") else "PENDING"),
         ("Elapsed", f"{data.gate.get('days', 0):.2f} days"),
         ("Unique decisions", metrics.get("unique_decisions", 0)),
         ("Complete 4h candles", metrics.get("complete_4h_candles", 0)),
         ("Fresh providers", f"{data.gate.get('provider_freshness_pct', 0):.1f}%"),
+        ("Handled failures", metrics.get("handled_symbol_failures", 0)),
         ("Unhandled crashes", metrics.get("unhandled_crashes", 0)),
     ]
     for column, (label, value) in zip(cols, values):

@@ -36,10 +36,17 @@
     "open_candle_decisions": 0,
     "complete_4h_candles": 10,
     "state_corruptions": 0,
-    "unhandled_crashes": 18,
+    "unhandled_crashes": 0,
     "provider_checks": 54,
     "provider_fresh": 54,
     "closed_trades": 0,
-    "core_closed_trades": 0
+    "core_closed_trades": 0,
+    "handled_symbol_failures": 18
+  },
+  "metrics_schema_version": 2,
+  "failure_metric_migration": {
+    "migrated_at_utc": "2026-07-20T13:34:16.343069+00:00",
+    "legacy_unhandled_reclassified": 18,
+    "reason": "legacy counter was incremented only inside handled per-symbol exception path"
   }
 }

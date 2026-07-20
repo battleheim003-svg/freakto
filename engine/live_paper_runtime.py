@@ -185,7 +185,63 @@ class RuntimeStore:
         self.intents_file = self.root / "intents.csv"
         self.events_file = self.root / "events.csv"
         self.evidence_dir = self.root / "evidence"
-        self.state = _read_json(self.state_file, {"started_at_utc": _utc_now().isoformat(), "processed_decisions": [], "observed_candles": [], "managed_positions": {}, "daily": {"date": _utc_now().date().isoformat(), "start_equity": 10000.0}, "metrics": {"unique_decisions": 0, "duplicate_executions": 0, "open_candle_decisions": 0, "complete_4h_candles": 0, "state_corruptions": 0, "unhandled_crashes": 0, "provider_checks": 0, "provider_fresh": 0, "closed_trades": 0, "core_closed_trades": 0}})
+        self.state = _read_json(self.state_file, {
+            "metrics_schema_version": 2,
+            "started_at_utc": _utc_now().isoformat(),
+            "processed_decisions": [],
+            "observed_candles": [],
+            "managed_positions": {},
+            "daily": {"date": _utc_now().date().isoformat(), "start_equity": 10000.0},
+            "metrics": {
+                "unique_decisions": 0, "duplicate_executions": 0,
+                "open_candle_decisions": 0, "complete_4h_candles": 0,
+                "state_corruptions": 0, "handled_symbol_failures": 0,
+                "unhandled_crashes": 0, "provider_checks": 0,
+                "provider_fresh": 0, "closed_trades": 0,
+                "core_closed_trades": 0,
+            },
+        })
+
+    def migrate_legacy_failure_metrics(self) -> int:
+        """Reclassify legacy per-symbol exceptions that were caught by the loop.
+
+        Version 1 incremented ``unhandled_crashes`` inside an ``except`` block,
+        so every historical value in that field was, by definition, handled.
+        The migration is idempotent and keeps an explicit audit record.
+        """
+        if int(self.state.get("metrics_schema_version", 1)) >= 2:
+            return 0
+        metrics = self.state.setdefault("metrics", {})
+        migrated = max(0, int(metrics.get("unhandled_crashes", 0)))
+        metrics["handled_symbol_failures"] = int(metrics.get("handled_symbol_failures", 0)) + migrated
+        metrics["unhandled_crashes"] = 0
+        self.state["metrics_schema_version"] = 2
+        self.state["failure_metric_migration"] = {
+            "migrated_at_utc": _utc_now().isoformat(),
+            "legacy_unhandled_reclassified": migrated,
+            "reason": "legacy counter was incremented only inside handled per-symbol exception path",
+        }
+        self.save()
+        return migrated
+
+    def record_handled_symbol_failure(self, symbol: str, exc: BaseException) -> None:
+        metrics = self.state.setdefault("metrics", {})
+        metrics["handled_symbol_failures"] = int(metrics.get("handled_symbol_failures", 0)) + 1
+        self.state["last_handled_symbol_failure"] = {
+            "timestamp_utc": _utc_now().isoformat(),
+            "symbol": symbol,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+        self.save()
+
+    def record_unhandled_crash(self, exc: BaseException) -> None:
+        metrics = self.state.setdefault("metrics", {})
+        metrics["unhandled_crashes"] = int(metrics.get("unhandled_crashes", 0)) + 1
+        self.state["last_unhandled_crash"] = {
+            "timestamp_utc": _utc_now().isoformat(),
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+        self.save()
 
     def save(self) -> None:
         _atomic_json(self.state_file, self.state)
@@ -203,6 +259,10 @@ class RuntimeStore:
         self.save()
 
 
+class RuntimeAlreadyRunningError(RuntimeError):
+    """Raised when a second worker attempts to use the same state root."""
+
+
 class RuntimeLock:
     """Single-process lock; stale locks can be removed only with explicit CLI recovery."""
     def __init__(self, path: str | Path):
@@ -214,7 +274,7 @@ class RuntimeLock:
         try:
             descriptor = os.open(str(self.path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except FileExistsError as exc:
-            raise RuntimeError(f"runtime lock already exists: {self.path}") from exc
+            raise RuntimeAlreadyRunningError(f"runtime lock already exists: {self.path}") from exc
         with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
             handle.write(json.dumps({"pid": os.getpid(), "created_at_utc": _utc_now().isoformat()}))
         self.acquired = True
@@ -241,7 +301,7 @@ def shadow_gate_status(store: RuntimeStore, config: RuntimeConfig) -> dict:
         "duplicates": int(metrics["duplicate_executions"]) <= int(gate["maximum_duplicate_executions"]),
         "open_candles": int(metrics["open_candle_decisions"]) <= int(gate["maximum_open_candle_decisions"]),
         "state": int(metrics["state_corruptions"]) <= int(gate["maximum_state_corruptions"]),
-        "crashes": int(metrics["unhandled_crashes"]) <= int(gate["maximum_unhandled_crashes"]),
+        "crashes": int(metrics.get("unhandled_crashes", 0)) <= int(gate["maximum_unhandled_crashes"]),
         "provider_freshness": freshness >= float(gate["minimum_provider_freshness_pct"]),
     }
     return {"passed": all(checks.values()), "days": round(days, 3), "provider_freshness_pct": round(freshness, 2), "checks": checks, "metrics": metrics}
@@ -254,6 +314,7 @@ class LivePaperRuntime:
         if self.mode not in {"shadow", "paper"}: raise ValueError("mode must be shadow or paper")
         self.root = Path(config.state_roots[self.mode])
         self.store = RuntimeStore(self.root)
+        self.store.migrate_legacy_failure_metrics()
         self.broker = MockBroker(market_data, initial_balance=config.initial_balance_usdt, fee_bps=config.execution["fee_bps"], slippage_bps=config.execution["slippage_bps"], state_path=self.root / "account_state.json", trade_log_path=self.root / "fills.csv")
         self.analyzer = analyzer or self._default_analyzer
         self.notifier = notifier
@@ -267,6 +328,7 @@ class LivePaperRuntime:
         flag = os.getenv("LIVE_DEMO_EXECUTION_ENABLED", "false").lower() in {"1", "true", "yes"}
         if self.mode != "paper" or not flag: return False
         shadow = RuntimeStore(self.config.state_roots["shadow"])
+        shadow.migrate_legacy_failure_metrics()
         return bool(shadow_gate_status(shadow, self.config)["passed"])
 
     def process_symbol(self, symbol: str) -> dict:
@@ -324,7 +386,16 @@ class LivePaperRuntime:
     def manage_exits(self) -> list[dict]:
         events = []
         for symbol, managed in list(self.store.state["managed_positions"].items()):
-            snapshot = self.market_data.fetch_snapshot(symbol)
+            try:
+                snapshot = self.market_data.fetch_snapshot(symbol)
+            except Exception as exc:
+                self.store.record_handled_symbol_failure(symbol, exc)
+                events.append({
+                    "timestamp_utc": _utc_now().isoformat(), "symbol": symbol,
+                    "event": "HANDLED_EXIT_CHECK_FAILURE",
+                    "error": f"{type(exc).__name__}: {exc}",
+                })
+                continue
             reason = ""
             if snapshot.bid <= float(managed["stop"]): reason = "STOP"
             else:

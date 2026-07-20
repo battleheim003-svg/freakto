@@ -31,3 +31,9 @@ Do not delete `logs/live_demo_shadow/runtime_state.json`; it carries the gate hi
 - Excel workbook and PDF snapshot downloads
 
 Cash-flow attribution is not claimed as realized P&L while positions remain open. The virtual equity curve remains the account-level performance source.
+
+## Failure metrics
+
+- `handled_symbol_failures` counts provider/network failures that were contained to one symbol; these remain visible for reliability analysis but do not fail the zero-crash gate.
+- `unhandled_crashes` is reserved for unexpected process-level failures and remains a strict gate blocker.
+- On the first runtime start after this change, legacy values are reclassified once because the previous implementation incremented `unhandled_crashes` from inside its handled per-symbol exception block. The migration is recorded in `failure_metric_migration` and does not reset elapsed time, decisions, candles, or provider evidence.

@@ -72,6 +72,41 @@ def test_shadow_gate_is_fail_closed_until_every_condition_passes(tmp_path):
     assert shadow_gate_status(store, cfg)["passed"]
 
 
+def test_legacy_handled_failures_are_migrated_without_blocking_gate(tmp_path):
+    cfg = config(tmp_path)
+    store = RuntimeStore(tmp_path / "shadow")
+    store.state.pop("metrics_schema_version", None)
+    store.state["started_at_utc"] = (datetime.now(timezone.utc) - timedelta(days=8)).isoformat()
+    store.state["metrics"].update(
+        unique_decisions=20, complete_4h_candles=30,
+        provider_checks=100, provider_fresh=100, unhandled_crashes=18,
+    )
+    store.save()
+
+    runtime = LivePaperRuntime(cfg, universe(), FakeMarket(), mode="shadow", analyzer=lambda _symbol: item())
+
+    assert runtime.store.state["metrics_schema_version"] == 2
+    assert runtime.store.state["metrics"]["handled_symbol_failures"] == 18
+    assert runtime.store.state["metrics"]["unhandled_crashes"] == 0
+    assert runtime.store.state["failure_metric_migration"]["legacy_unhandled_reclassified"] == 18
+    assert shadow_gate_status(runtime.store, cfg)["passed"] is True
+
+
+def test_handled_symbol_failure_does_not_increment_unhandled_crashes(tmp_path):
+    store = RuntimeStore(tmp_path / "shadow")
+    store.record_handled_symbol_failure("DOT/USDT", RuntimeError("provider timeout"))
+    assert store.state["metrics"]["handled_symbol_failures"] == 1
+    assert store.state["metrics"]["unhandled_crashes"] == 0
+    assert store.state["last_handled_symbol_failure"]["symbol"] == "DOT/USDT"
+
+
+def test_actual_unhandled_crash_remains_gate_blocker(tmp_path):
+    cfg = config(tmp_path)
+    store = RuntimeStore(tmp_path / "shadow")
+    store.record_unhandled_crash(ValueError("broken invariant"))
+    assert shadow_gate_status(store, cfg)["checks"]["crashes"] is False
+
+
 def test_shadow_and_paper_state_roots_are_distinct(tmp_path):
     cfg = config(tmp_path)
     assert cfg.state_roots["shadow"] != cfg.state_roots["paper"]
