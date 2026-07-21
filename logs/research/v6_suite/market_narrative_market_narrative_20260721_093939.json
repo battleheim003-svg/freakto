@@ -1,0 +1,140 @@
+{
+  "run_id": "market_narrative_20260721_093939",
+  "generated_utc": "2026-07-21T09:39:39.588561+00:00",
+  "version": "v7.2.0",
+  "status": "MARKET_NARRATIVE_WEAK_EVIDENCE",
+  "symbol": "BTC/USDT",
+  "timeframe": "4h",
+  "lookback_hours": 168,
+  "auto_events_loaded": 20,
+  "manual_events_loaded": 2,
+  "accepted_events": 3,
+  "noise_filtered_events": 0,
+  "narrative_label": "MACRO_POLICY_DOMINANT",
+  "narrative_confidence": "LOW",
+  "net_direction_score": -2.0953,
+  "dominant_direction": "MIXED_OR_NEUTRAL",
+  "dominant_theme": "MACRO_POLICY",
+  "event_risk": "HIGH",
+  "technical_event_conflict": "LOW",
+  "narrative_summary": "Narrative=MACRO_POLICY_DOMINANT; direction=MIXED_OR_NEUTRAL; theme=MACRO_POLICY; net_score=-2.0953; risk=HIGH. محرک اصلی فعلی از federal_reserve_press است: Agencies issue joint statement on handling of highly sensitive information during bank examinations",
+  "evidence_strength": 0.5042,
+  "evidence_grade": "LOW",
+  "causal_claim_status": "WEAK_HYPOTHESIS",
+  "independent_source_count": 2,
+  "directional_agreement": 0.5,
+  "driver_count": 3,
+  "top_drivers": [
+    {
+      "theme": "MACRO_POLICY",
+      "title": "Agencies issue joint statement on handling of highly sensitive information during bank examinations",
+      "source_id": "federal_reserve_press",
+      "source_tier": "TIER_1_OFFICIAL_MACRO",
+      "direction": "BEARISH",
+      "impact": "HIGH",
+      "confidence": "HIGH",
+      "evidence_relevance": 0.35,
+      "weight": -2.0707,
+      "timestamp_utc": "2026-07-16T18:00:00+00:00",
+      "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/bcreg20260716a.htm",
+      "event_type": "macro",
+      "event_quality": "SIGNIFICANT_EVENT"
+    },
+    {
+      "theme": "MACRO_POLICY",
+      "title": "Federal Reserve Board issues enforcement action with former chief lending officer of Heritage State Bank",
+      "source_id": "federal_reserve_press",
+      "source_tier": "TIER_1_OFFICIAL_MACRO",
+      "direction": "BEARISH",
+      "impact": "HIGH",
+      "confidence": "HIGH",
+      "evidence_relevance": 0.35,
+      "weight": -2.034,
+      "timestamp_utc": "2026-07-16T15:00:00+00:00",
+      "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/enforcement20260716a.htm",
+      "event_type": "macro",
+      "event_quality": "ACTIONABLE_EVENT_CONTEXT"
+    },
+    {
+      "theme": "REGULATORY_RISK",
+      "title": "SEC Proposes New E-Delivery Approach to Make Information More Readily Accessible and Useful for Investors",
+      "source_id": "sec_press_releases",
+      "source_tier": "TIER_1_OFFICIAL_REGULATOR",
+      "direction": "BULLISH",
+      "impact": "HIGH",
+      "confidence": "HIGH",
+      "evidence_relevance": 0.35,
+      "weight": 2.0094,
+      "timestamp_utc": "2026-07-16T12:57:00+00:00",
+      "source_url": "https://www.sec.gov/newsroom/press-releases/2026-67-sec-proposes-new-e-delivery-approach-make-information-more-readily-accessible-useful-investors",
+      "event_type": "regulatory",
+      "event_quality": "ACTIONABLE_EVENT_CONTEXT"
+    }
+  ],
+  "theme_scores": [
+    {
+      "theme": "MACRO_POLICY",
+      "score": -4.1047,
+      "drivers": 2,
+      "bullish": 0,
+      "bearish": 2,
+      "abs_score": 4.1047
+    },
+    {
+      "theme": "REGULATORY_RISK",
+      "score": 2.0094,
+      "drivers": 1,
+      "bullish": 1,
+      "bearish": 0,
+      "abs_score": 2.0094
+    }
+  ],
+  "contradictions": [],
+  "alternative_explanations": [
+    "Competing theme: REGULATORY_RISK score=2.0094",
+    "The move may be explained by broad market beta or liquidity rather than the named event.",
+    "The observed event and price move may be correlated without a causal relationship."
+  ],
+  "evidence_limitations": [
+    "Directional evidence agreement is only 50%.",
+    "Average source reliability is below the high-quality threshold.",
+    "Evidence strength measures support, not causal identification."
+  ],
+  "latest_causal_context": {
+    "run_id": "causal_intel_20260721_093937",
+    "generated_utc": "2026-07-21T09:39:39.221359+00:00",
+    "version": "v7.2.0",
+    "status": "CAUSAL_CONTEXT_PARTIAL_SOURCES",
+    "symbol": "BTC/USDT",
+    "timeframe": "4h",
+    "collect_live": "True",
+    "primary_cause": "MULTI_SOURCE_EVENT_CONSENSUS",
+    "cause_confidence": "LOW",
+    "catalyst_score": "69",
+    "event_risk": "HIGH",
+    "technical_event_conflict": "LOW",
+    "causal_alignment": "ALIGNED_WITH_CAUSAL_CONTEXT",
+    "causal_verdict": "CAUSAL_HYPOTHESIS_WEAK_EVIDENCE",
+    "source_count": "15",
+    "successful_sources": "12",
+    "trusted_successful_sources": "11",
+    "manual_events_loaded": "0",
+    "auto_events_loaded": "8",
+    "evidence_strength": "0.5291",
+    "evidence_grade": "LOW",
+    "causal_claim_status": "WEAK_HYPOTHESIS",
+    "independent_source_count": "7",
+    "directional_agreement": "0.6"
+  },
+  "blockers": [],
+  "warnings": [
+    "Market Narrative فقط روایت پژوهشی می‌سازد؛ سیگنال خرید/فروش مستقل نیست.",
+    "اگر event sourceها نویز HTML/marketing بدهند، v7 آن‌ها را فیلتر می‌کند اما همچنان باید source health بررسی شود.",
+    "Narrative wording is hypothesis-only because evidence strength is insufficient."
+  ],
+  "recommendations": [
+    "automatic_event_collector_dashboard.py --compact باید قبل از market_narrative_dashboard.py اجرا شود.",
+    "اگر Narrative و Technical conflict بالا باشد، تصمیم فقط Research/Watchlist بماند.",
+    "برای ارتقا به Gate، narrative باید در Forward با outcomeهای بعدی validate شود."
+  ]
+}
