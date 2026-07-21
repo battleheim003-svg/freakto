@@ -1,0 +1,31 @@
+==============================================================================================================
+🧪 Freakto Root Cause Forward Validation v8.1.0
+==============================================================================================================
+Status                 : ROOT_CAUSE_FORWARD_MIXED_OR_WEAK
+Run ID                 : root_cause_forward_20260721_170241
+Evaluations File       : logs/decision_evaluations.csv
+Rows / Complete        : 95 / 93
+Root Cause Rows        : 44
+Evaluated Cells        : 129
+Eligible Causes        : 1
+Research Candidates    : 0
+Promising Low Sample   : 0
+Min Samples / Deadzone : 10 / 0.0%
+
+Top Root-Cause Forward Results:
+- MACRO_POLICY_PRESSURE | BEARISH | n24=42 hit24=54.76% avg24=-0.1719% | n12=43 hit12=53.49% | score=10.8077 | WEAK_OR_NEGATIVE_FORWARD_EVIDENCE
+
+Recommendations:
+→ ابتدا decision_evaluator.py را اجرا کن تا market_return_after_* برای تصمیم‌ها ساخته شود.
+→ Root Causeهایی که hit-rate پایدار و sample کافی دارند بعداً می‌توانند وارد Root-Cause Gate Simulator شوند.
+→ تا قبل از sample کافی، نتیجه فقط Research/Shadow بماند و Paper/Live فعال نشود.
+
+Warnings:
+⚠️ Root Cause Forward Validation فقط رابطه علت‌های پژوهشی با outcome بعدی را می‌سنجد؛ سیگنال خرید/فروش نیست.
+⚠️ این validation باید چند هفته/ماه sample جمع کند تا قابل اتکا شود.
+==============================================================================================================
+🧪 Root cause forward JSON ذخیره شد: logs/root_cause/root_cause_forward_validation_root_cause_forward_20260721_170241.json
+📝 Root cause forward report ذخیره شد: logs/root_cause/root_cause_forward_validation_report_root_cause_forward_20260721_170241.md
+📊 Root cause forward summary CSV ذخیره شد: logs/root_cause/root_cause_forward_summary_root_cause_forward_20260721_170241.csv
+📄 Root cause forward rows CSV ذخیره شد: logs/root_cause/root_cause_forward_rows_root_cause_forward_20260721_170241.csv
+🧾 Root cause forward observations ledger ذخیره شد: logs/root_cause/root_cause_forward_validation_observations.csv
