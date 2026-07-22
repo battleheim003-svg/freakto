@@ -146,10 +146,21 @@ Implemented by the Control Center job manager, detached worker, bilingual Jobs
 page, runtime audit trail, and verification documented in
 `docs/refactor/PHASE_11_OPERATIONS.md`.
 
+## Phase 12 — Controlled end-to-end operational dry run
+
+Status: **complete (2026-07-22)**
+
+- Execute the full background Quick Start against real local data and providers.
+- Distinguish operational defects from intentional research/readiness blockers.
+- Resolve reproducible environment/provider regressions without weakening gates.
+- Persist repeatable machine-verifiable evidence.
+
+All eleven steps completed under job `quick-20260722-155513-1c84cf`; details,
+metrics, the Replay CSV warning fix, and rollback procedure are recorded in
+`docs/refactor/PHASE_12_E2E_DRY_RUN.md`.
+
 ## Remaining delivery phases
 
-- Phase 12: execute a controlled end-to-end operational dry run and resolve
-  environment/provider failures.
 - Phase 13: run the frozen 60-day Paper evidence campaign.
 - Phase 14: automate evidence aggregation and independent review packaging.
 - Phase 15: build a signed, one-click Windows installation and recovery bundle.

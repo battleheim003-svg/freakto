@@ -286,7 +286,7 @@ def _context_file_frame(path: str) -> pd.DataFrame:
     file_path = Path(path)
     if not file_path.exists():
         return pd.DataFrame()
-    frame = pd.read_csv(file_path)
+    frame = pd.read_csv(file_path, low_memory=False)
     timestamp_column = "timestamp_utc" if "timestamp_utc" in frame.columns else "timestamp" if "timestamp" in frame.columns else ""
     if not timestamp_column:
         raise ValueError("historical context file needs timestamp_utc or timestamp")
@@ -1161,7 +1161,7 @@ def load_market_replay_status(path: Path | str = CUMULATIVE_REPLAY_FILE) -> Mark
             metric_horizon_candles=6, timeframe="4h"
         )
     try:
-        frame = pd.read_csv(file_path, encoding="utf-8-sig")
+        frame = pd.read_csv(file_path, encoding="utf-8-sig", low_memory=False)
     except Exception:
         frame = pd.DataFrame()
     results: List[ReplaySymbolResult] = []
