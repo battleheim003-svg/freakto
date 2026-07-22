@@ -159,9 +159,22 @@ All eleven steps completed under job `quick-20260722-155513-1c84cf`; details,
 metrics, the Replay CSV warning fix, and rollback procedure are recorded in
 `docs/refactor/PHASE_12_E2E_DRY_RUN.md`.
 
+## Phase 13 — Frozen Paper evidence campaign
+
+Status: **active (started 2026-07-22)**
+
+- Freeze the approved Paper contract and record its SHA-256 identity.
+- Persist campaign progress and reconcile it with the live worker heartbeat.
+- Run the zero-capital orchestrator through a restart-safe Windows task.
+- Require both 60 real elapsed days and at least 200 closed Paper trades.
+
+Campaign `paper-20260722-161631` is running with its earliest time threshold at
+`2026-09-20T16:16:31.350645+00:00`. Implementation, recovery, verification, and
+rollback details are recorded in `docs/refactor/PHASE_13_PAPER_CAMPAIGN.md`.
+
 ## Remaining delivery phases
 
-- Phase 13: run the frozen 60-day Paper evidence campaign.
+- Phase 13: collect 60 real days and at least 200 closed Paper trades.
 - Phase 14: automate evidence aggregation and independent review packaging.
 - Phase 15: build a signed, one-click Windows installation and recovery bundle.
 

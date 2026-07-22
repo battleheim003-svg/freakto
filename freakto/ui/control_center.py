@@ -6,6 +6,8 @@ import html
 
 import streamlit as st
 
+from freakto.paper.campaign import ACTIVE as CAMPAIGN_ACTIVE
+from freakto.paper.campaign import campaign_status, start_campaign, stop_campaign
 from freakto.ui.control_center_state import (
     ROOT,
     collect_snapshot,
@@ -42,6 +44,10 @@ TEXT = {
         "safe_stop": "توقف ایمن", "stop_confirm": "توقف Paper و ثبت operator stop را تأیید می‌کنم", "disarm": "توقف Paper",
         "strategy_note": "Strategy Paper فقط پس از عبور readiness فعال می‌شود و همچنان صفرسرمایه است.",
         "strategy_confirm": "درخواست Strategy Paper را تأیید می‌کنم", "arm_strategy": "فعال‌سازی Strategy Paper",
+        "campaign_title": "کمپین واقعی ۶۰روزه", "campaign_status": "وضعیت کمپین", "campaign_days": "روز سپری‌شده",
+        "campaign_trades": "معاملات بسته", "campaign_cycles": "چرخه‌ها", "campaign_target": "پایان هدف",
+        "campaign_start": "شروع / ادامه کمپین", "campaign_stop": "توقف امن کمپین", "campaign_started": "کمپین پس‌زمینه فعال شد.",
+        "campaign_stop_requested": "درخواست توقف ثبت شد و پس از مرحله جاری اعمال می‌شود.", "campaign_confirm": "قرارداد ۶۰روزه و اجرای صفرسرمایه را تأیید می‌کنم.",
         "reports_title": "گزارش‌ها و خروجی‌ها", "paper_report": "گزارش Paper", "research_report": "گزارش Research",
         "forward_report": "وضعیت Forward", "artifacts": "خروجی‌های Runtime", "no_artifacts": "هنوز خروجی JSON ثبت نشده",
         "golive_title": "گیت آمادگی نهایی", "remaining": "مانع باقی مانده", "manual_only": "تمام گیت‌ها عبور کرده‌اند؛ فقط بررسی دستی مستقل مجاز است.",
@@ -81,6 +87,10 @@ TEXT = {
         "safe_stop": "Safe stop", "stop_confirm": "I confirm Paper disarm and operator-stop recording", "disarm": "Disarm Paper",
         "strategy_note": "Strategy Paper requires readiness and still remains zero-capital.",
         "strategy_confirm": "I confirm the Strategy Paper request", "arm_strategy": "Arm Strategy Paper",
+        "campaign_title": "Real 60-day campaign", "campaign_status": "Campaign status", "campaign_days": "Elapsed days",
+        "campaign_trades": "Closed trades", "campaign_cycles": "Cycles", "campaign_target": "Target end",
+        "campaign_start": "Start / resume campaign", "campaign_stop": "Safely stop campaign", "campaign_started": "Background campaign started.",
+        "campaign_stop_requested": "Stop requested and will apply after the current step.", "campaign_confirm": "I confirm the 60-day zero-capital campaign contract.",
         "reports_title": "Reports and outputs", "paper_report": "Paper report", "research_report": "Research report",
         "forward_report": "Forward status", "artifacts": "Runtime artifacts", "no_artifacts": "No JSON artifacts yet",
         "golive_title": "Final readiness gate", "remaining": "blockers remaining", "manual_only": "All gates passed; independent manual review is the only permitted next step.",
@@ -243,6 +253,24 @@ elif page == "paper":
     st.warning(tr("strategy_note"))
     strategy_ok = st.checkbox(tr("strategy_confirm"), key="strategy-confirm")
     execute(tr("arm_strategy"), ["paper", "arm-strategy"], key="paper-strategy", disabled=not strategy_ok)
+    st.divider()
+    st.markdown("### " + tr("campaign_title"))
+    campaign = campaign_status()
+    campaign_cols = st.columns(4)
+    with campaign_cols[0]: metric_card(tr("campaign_status"), str(campaign.get("status")), str(campaign.get("campaign_id") or "—"), "good" if campaign.get("status") == "RUNNING" else "")
+    with campaign_cols[1]: metric_card(tr("campaign_days"), f"{float(campaign.get('elapsed_days', 0)):.2f} / {campaign.get('minimum_days', 60)}", "")
+    with campaign_cols[2]: metric_card(tr("campaign_trades"), f"{campaign.get('closed_trades', 0)} / {campaign.get('minimum_closed_trades', 200)}", "")
+    with campaign_cols[3]: metric_card(tr("campaign_cycles"), str(campaign.get("cycles", 0)), str(campaign.get("target_end_utc") or "—"))
+    campaign_confirm = st.checkbox(tr("campaign_confirm"), key="campaign-confirm")
+    campaign_buttons = st.columns(2)
+    with campaign_buttons[0]:
+        if st.button(tr("campaign_start"), key="campaign-start", use_container_width=True, type="primary", disabled=not campaign_confirm or campaign.get("status") in CAMPAIGN_ACTIVE):
+            try:
+                start_campaign(); st.success(tr("campaign_started")); st.rerun()
+            except RuntimeError as exc: st.error(str(exc))
+    with campaign_buttons[1]:
+        if st.button(tr("campaign_stop"), key="campaign-stop", use_container_width=True, disabled=campaign.get("status") not in {"STARTING", "RUNNING"}):
+            stop_campaign(); st.warning(tr("campaign_stop_requested")); st.rerun()
 
 elif page == "reports":
     st.subheader(tr("reports_title"))

@@ -617,6 +617,9 @@ class PaperResearchOrchestrator:
         if self.config.run_immediately:
             self.run_cycle()
         while not self.stop_requested:
+            if (self.output_dir / "campaign_stop.flag").exists():
+                self.request_stop()
+                break
             now = self.now_fn()
             scheduled = next_candle_run(
                 now,
@@ -642,6 +645,8 @@ class PaperResearchOrchestrator:
                 chunk = min(30.0, remaining)
                 self.sleeper(chunk)
                 remaining -= chunk
+                if (self.output_dir / "campaign_stop.flag").exists():
+                    self.request_stop()
             if not self.stop_requested:
                 self.run_cycle()
         self._write_json_atomic(
