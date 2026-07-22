@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ctypes
 import json
 import os
 import subprocess
@@ -41,10 +42,40 @@ def read_state(path: Path) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
+def _windows_pid_alive(pid: int) -> bool:
+    """Query a Windows process without relying on unsupported signal 0."""
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel32.OpenProcess.argtypes = [ctypes.c_uint32, ctypes.c_int, ctypes.c_uint32]
+    kernel32.OpenProcess.restype = ctypes.c_void_p
+    kernel32.WaitForSingleObject.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
+    kernel32.WaitForSingleObject.restype = ctypes.c_uint32
+    kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
+    kernel32.CloseHandle.restype = ctypes.c_int
+    synchronize = 0x00100000
+    wait_timeout = 0x00000102
+    handle = kernel32.OpenProcess(synchronize, False, pid)
+    if not handle:
+        # Access denied means a process exists but cannot be queried. Treating it
+        # as alive is the safe choice because it prevents a concurrent job.
+        return ctypes.get_last_error() == 5
+    try:
+        return kernel32.WaitForSingleObject(handle, 0) == wait_timeout
+    finally:
+        kernel32.CloseHandle(handle)
+
+
 def _pid_alive(pid: Any) -> bool:
     try:
-        os.kill(int(pid), 0)
-    except (OSError, TypeError, ValueError):
+        process_id = int(pid)
+    except (TypeError, ValueError):
+        return False
+    if process_id <= 0:
+        return False
+    if os.name == "nt":
+        return _windows_pid_alive(process_id)
+    try:
+        os.kill(process_id, 0)
+    except OSError:
         return False
     return True
 

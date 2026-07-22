@@ -6,6 +6,7 @@ from pathlib import Path
 from streamlit.testing.v1 import AppTest
 
 from freakto.ui import control_center_state as state
+from freakto.ui import job_manager
 
 
 ROOT = Path(__file__).parents[1]
@@ -125,3 +126,20 @@ def test_dashboard_renders_navigation_without_exception():
     app.checkbox[0].check().run()
     quick_button = next(button for button in app.button if button.label.startswith("▶"))
     assert quick_button.disabled is False
+
+
+def test_quick_start_click_launches_background_job_without_ui_exception(monkeypatch):
+    launched = {}
+
+    def fake_start(*, full):
+        launched["full"] = full
+        return {"job_id": "quick-ui-test", "status": "QUEUED"}
+
+    monkeypatch.setattr(job_manager, "start_quick_job", fake_start)
+    monkeypatch.setattr(job_manager, "list_jobs", lambda: [])
+    app = AppTest.from_file(str(ROOT / "freakto_control_center.py"), default_timeout=20).run()
+    app.checkbox[0].check().run()
+    next(button for button in app.button if button.label.startswith("▶")).click().run()
+    assert not app.exception
+    assert launched == {"full": True}
+    assert any("quick-ui-test" in info.value for info in app.info)

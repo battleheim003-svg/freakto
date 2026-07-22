@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from pathlib import Path
+import os
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -113,6 +114,18 @@ def test_second_active_job_is_rejected(monkeypatch, tmp_path):
     prepare_job(tmp_path, state)
     with pytest.raises(RuntimeError, match="Active job"):
         job_manager.start_quick_job(full=True, root=tmp_path)
+
+
+def test_pid_probe_handles_invalid_values_without_oserror():
+    assert job_manager._pid_alive(None) is False
+    assert job_manager._pid_alive(-1) is False
+    assert job_manager._pid_alive(os.getpid()) is True
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows regression")
+def test_windows_pid_probe_does_not_use_signal_zero(monkeypatch):
+    monkeypatch.setattr(job_manager.os, "kill", lambda *args: pytest.fail("os.kill must not be used on Windows"))
+    assert job_manager._pid_alive(os.getpid()) is True
 
 
 def test_worker_module_runs_in_a_real_child_process_and_honors_cancel(tmp_path):

@@ -34,6 +34,11 @@ If a worker process disappears, the next dashboard refresh reconciles its state
 to `INTERRUPTED`. Worker-launch failure is recorded as `FAILED` instead of
 leaving a permanently queued job.
 
+Windows liveness checks use `OpenProcess` plus a zero-timeout wait. POSIX
+signal-zero probing is deliberately not used on Windows because Python can
+raise an internal `OSError` while Streamlit is reconciling stale jobs. Access
+denial is treated as alive, which safely prevents concurrent execution.
+
 ## Verification
 
 - worker success including accepted review-only Go-live exit code 2;
@@ -43,7 +48,7 @@ leaving a permanently queued job.
 - rejection of a second concurrent job;
 - real child-process worker smoke test;
 - bilingual Streamlit navigation and background-job controls;
-- complete regression suite: 378 tests passed.
+- complete regression suite: 381 tests passed.
 
 ## Rollback
 
