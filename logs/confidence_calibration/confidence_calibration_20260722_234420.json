@@ -1,0 +1,176 @@
+{
+  "created_utc": "2026-07-22T23:44:19.973422+00:00",
+  "source": "decision_evaluations",
+  "sample_count": 97,
+  "overall_directional_win_rate": 61.86,
+  "overall_target_1_hit_rate": 36.08,
+  "mean_calibration_error": 20.94,
+  "confidence_quality": "CALIBRATION_WEAK",
+  "label_buckets": [
+    {
+      "bucket": "Low",
+      "sample_count": 33,
+      "predicted_confidence": 25.0,
+      "directional_win_rate": 63.64,
+      "target_1_hit_rate": 21.21,
+      "avg_return_pct": 0.7646,
+      "calibration_gap": 38.64,
+      "target_gap": -3.79,
+      "verdict": "UNDER_CONFIDENT",
+      "notes": [
+        "عملکرد واقعی بالاتر از confidence داخلی بوده است."
+      ]
+    },
+    {
+      "bucket": "nan",
+      "sample_count": 36,
+      "predicted_confidence": 50.0,
+      "directional_win_rate": 55.56,
+      "target_1_hit_rate": 0.0,
+      "avg_return_pct": 0.3987,
+      "calibration_gap": 5.56,
+      "target_gap": -50.0,
+      "verdict": "WELL_CALIBRATED_DIRECTIONAL",
+      "notes": [
+        "Directional Win با confidence داخلی نزدیک است.",
+        "Target 1 Hit نسبت به confidence پایین‌تر است؛ برای اهداف قیمتی محافظه‌کار باشید."
+      ]
+    },
+    {
+      "bucket": "Medium",
+      "sample_count": 17,
+      "predicted_confidence": 55.0,
+      "directional_win_rate": 64.71,
+      "target_1_hit_rate": 100.0,
+      "avg_return_pct": 0.178,
+      "calibration_gap": 9.71,
+      "target_gap": 45.0,
+      "verdict": "WELL_CALIBRATED_DIRECTIONAL",
+      "notes": [
+        "Directional Win با confidence داخلی نزدیک است."
+      ]
+    },
+    {
+      "bucket": "Medium-High",
+      "sample_count": 11,
+      "predicted_confidence": 67.5,
+      "directional_win_rate": 72.73,
+      "target_1_hit_rate": 100.0,
+      "avg_return_pct": 0.2421,
+      "calibration_gap": 5.23,
+      "target_gap": 32.5,
+      "verdict": "WELL_CALIBRATED_DIRECTIONAL",
+      "notes": [
+        "Directional Win با confidence داخلی نزدیک است."
+      ]
+    }
+  ],
+  "score_buckets": [
+    {
+      "bucket": "score_10_19",
+      "sample_count": 5,
+      "predicted_confidence": 14.5,
+      "directional_win_rate": 60.0,
+      "target_1_hit_rate": 0.0,
+      "avg_return_pct": 0.6296,
+      "calibration_gap": 45.5,
+      "target_gap": -14.5,
+      "verdict": "LOW_SAMPLE",
+      "notes": [
+        "نمونه کمتر از 10 است؛ Calibration فقط برای رصد است."
+      ]
+    },
+    {
+      "bucket": "score_20_29",
+      "sample_count": 11,
+      "predicted_confidence": 24.5,
+      "directional_win_rate": 63.64,
+      "target_1_hit_rate": 0.0,
+      "avg_return_pct": 0.8805,
+      "calibration_gap": 39.14,
+      "target_gap": -24.5,
+      "verdict": "UNDER_CONFIDENT",
+      "notes": [
+        "عملکرد واقعی بالاتر از confidence داخلی بوده است.",
+        "Target 1 Hit نسبت به confidence پایین‌تر است؛ برای اهداف قیمتی محافظه‌کار باشید."
+      ]
+    },
+    {
+      "bucket": "score_30_39",
+      "sample_count": 26,
+      "predicted_confidence": 34.5,
+      "directional_win_rate": 65.38,
+      "target_1_hit_rate": 0.0,
+      "avg_return_pct": 0.7527,
+      "calibration_gap": 30.88,
+      "target_gap": -34.5,
+      "verdict": "UNDER_CONFIDENT",
+      "notes": [
+        "عملکرد واقعی بالاتر از confidence داخلی بوده است.",
+        "Target 1 Hit نسبت به confidence پایین‌تر است؛ برای اهداف قیمتی محافظه‌کار باشید."
+      ]
+    },
+    {
+      "bucket": "score_40_49",
+      "sample_count": 15,
+      "predicted_confidence": 44.5,
+      "directional_win_rate": 53.33,
+      "target_1_hit_rate": 33.33,
+      "avg_return_pct": 0.37,
+      "calibration_gap": 8.83,
+      "target_gap": -11.17,
+      "verdict": "WELL_CALIBRATED_DIRECTIONAL",
+      "notes": [
+        "Directional Win با confidence داخلی نزدیک است."
+      ]
+    },
+    {
+      "bucket": "score_50_59",
+      "sample_count": 12,
+      "predicted_confidence": 54.5,
+      "directional_win_rate": 83.33,
+      "target_1_hit_rate": 58.33,
+      "avg_return_pct": 0.6977,
+      "calibration_gap": 28.83,
+      "target_gap": 3.83,
+      "verdict": "UNDER_CONFIDENT",
+      "notes": [
+        "عملکرد واقعی بالاتر از confidence داخلی بوده است."
+      ]
+    },
+    {
+      "bucket": "score_60_69",
+      "sample_count": 16,
+      "predicted_confidence": 64.5,
+      "directional_win_rate": 43.75,
+      "target_1_hit_rate": 75.0,
+      "avg_return_pct": -0.1904,
+      "calibration_gap": -20.75,
+      "target_gap": 10.5,
+      "verdict": "OVER_CONFIDENT",
+      "notes": [
+        "confidence داخلی از عملکرد واقعی بالاتر بوده است."
+      ]
+    },
+    {
+      "bucket": "score_70_79",
+      "sample_count": 12,
+      "predicted_confidence": 74.5,
+      "directional_win_rate": 66.67,
+      "target_1_hit_rate": 91.67,
+      "avg_return_pct": 0.1664,
+      "calibration_gap": -7.83,
+      "target_gap": 17.17,
+      "verdict": "WELL_CALIBRATED_DIRECTIONAL",
+      "notes": [
+        "Directional Win با confidence داخلی نزدیک است."
+      ]
+    }
+  ],
+  "notes": [],
+  "warnings": [],
+  "blockers": [
+    "Confidence داخلی با outcome واقعی فاصله زیادی دارد.",
+    "برای استفاده عملی، حداقل 100 ارزیابی لازم است: 97/100"
+  ]
+}
