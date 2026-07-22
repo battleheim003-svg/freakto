@@ -69,71 +69,10 @@ jobs:
         run: |
           python -X utf8 forward_test_dashboard.py --status --send
 
-      - name: Build GitHub Actions health summary
+      - name: Run explicitly optional health diagnostics
         if: always()
         run: |
-          python -X utf8 scripts/github_actions_health_summary.py || true
-
-      - name: Run v6 pipeline health monitor
-        if: always()
-        run: |
-          python -X utf8 pipeline_health_dashboard.py || true
-
-      - name: Run v6.1 regime-gate matrix
-        if: always()
-        run: |
-          python -X utf8 regime_gate_matrix_dashboard.py --compact || true
-
-      - name: Run v6.2.1 forward regime label check
-        if: always()
-        run: |
-          python -X utf8 forward_regime_label_dashboard.py --compact --dry-run || true
-
-      - name: Run v6.2 regime shadow gate activator
-        if: always()
-        run: |
-          python -X utf8 regime_shadow_gate_dashboard.py --compact || true
-
-      - name: Run v6.3 forward shadow coverage probe
-        if: always()
-        run: |
-          python -X utf8 forward_shadow_coverage_dashboard.py --compact || true
-
-      - name: Run v6.4 causal/event intelligence
-        if: always()
-        run: |
-          python -X utf8 automatic_event_collector_dashboard.py --compact --no-fetch || true
-          python -X utf8 causal_intelligence_dashboard.py --compact || true
-
-      - name: Run v7 market narrative engine
-        if: always()
-        run: |
-          python -X utf8 market_narrative_dashboard.py --compact || true
-
-      - name: Run v7.1 narrative decision conflict scoring
-        if: always()
-        run: |
-          python -X utf8 narrative_decision_dashboard.py --compact || true
-
-      - name: Run v8 root cause discovery
-        if: always()
-        run: |
-          python -X utf8 root_cause_dashboard.py --compact || true
-
-      - name: Run v8.1 root cause forward validation
-        if: always()
-        run: |
-          python -X utf8 root_cause_forward_validation_dashboard.py --compact || true
-
-      - name: Run v8.2 root cause sample tracker
-        if: always()
-        run: |
-          python -X utf8 root_cause_sample_dashboard.py --compact || true
-
-      - name: Run v9 evidence graph engine
-        if: always()
-        run: |
-          python -X utf8 evidence_graph_dashboard.py --compact || true
+          python -X utf8 scripts/ci_advisory_suite.py --profile health
 
       - name: Upload health artifacts
         if: always()
@@ -147,6 +86,7 @@ jobs:
             logs/forward_testing/forward_test_status_*.md
             logs/github_actions/*.md
             logs/forward_test_runs.csv
+            logs/ci/**
             logs/research/**/*.json
             logs/research/**/*.md
             logs/research/**/*.csv

@@ -1,9 +1,0 @@
-{
-  "schema_version": 1,
-  "status": "NO_RECOMMENDATION",
-  "validation_status": "FAIL",
-  "approved": false,
-  "created_utc": "2026-07-12T15:56:34.106533+00:00",
-  "dataset_sha256": "111fd022b17d7ad213f1be01ddde31ec33901076d6432b84c00bd8c5d10f2ce8",
-  "reason": "No positive out-of-sample threshold candidate survived the optimization constraints."
-}

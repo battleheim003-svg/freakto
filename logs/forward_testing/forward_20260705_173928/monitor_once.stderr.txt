@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "C:\Users\LEGION\Desktop\Freakto\files\monitor.py", line 522, in <module>
-    main()
-  File "C:\Users\LEGION\Desktop\Freakto\files\monitor.py", line 500, in main
-    print("Freakto \u0634\u0631\u0648\u0639 \u0634\u062f: Market Monitor + Decision Engine v4 + Intelligence Layer")
-  File "C:\Users\LEGION\AppData\Local\Programs\Python\Python310\lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-UnicodeEncodeError: 'charmap' codec can't encode characters in position 8-11: character maps to <undefined>

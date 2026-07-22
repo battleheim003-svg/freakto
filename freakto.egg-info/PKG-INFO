@@ -1,0 +1,170 @@
+Metadata-Version: 2.4
+Name: freakto
+Version: 10.3.0
+Summary: Crypto research, replay, forward-validation, and paper-trading platform
+Author: Freakto contributors
+License: Proprietary
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: ccxt==4.3.40
+Requires-Dist: pandas==2.2.2
+Requires-Dist: numpy==1.26.4
+Requires-Dist: scikit-learn==1.5.0
+Requires-Dist: ta==0.11.0
+Requires-Dist: requests==2.32.3
+Requires-Dist: schedule==1.2.2
+Requires-Dist: joblib==1.4.2
+Requires-Dist: matplotlib==3.9.0
+Requires-Dist: openpyxl==3.1.5
+Requires-Dist: streamlit==1.36.0
+
+# Freakto — Crypto Research & Decision Intelligence Platform
+
+راهنمای canonical معاملات آزمایشی و بدون سرمایه واقعی در [docs/paper/README.md](docs/paper/README.md) قرار دارد. شروع محلی: `start_paper_trading.bat`.
+
+فهرست مستندات و فرمان‌های عملیاتی canonical در [docs/README.md](docs/README.md)
+و [docs/OPERATIONS.md](docs/OPERATIONS.md) قرار دارد.
+
+## Paper-trade readiness (v10.3)
+
+The research and paper paths now use explicit version contracts, an Experiment
+Registry, one-shot TEST hold-outs, causal closed-candle features, next-bar replay
+execution and dynamic costs. Run `freakto paper preflight`
+before recording a new paper observation. See
+`PAPER_TRADE_READINESS_RUNBOOK.md` for the full protocol and current results.
+
+Freakto یک سیستم پژوهشی برای تحلیل بازار کریپتو، ساخت تصمیم، ارزیابی تاریخی، Forward Test، Paper Trading و تحلیل علت‌های حرکت بازار است.
+
+هدف پروژه تولید سیگنال کور نیست. هر تصمیم باید از چند لایه عبور کند:
+
+```text
+Market Data
+→ Technical Features
+→ Decision Engine
+→ Regime / Risk / Actionability
+→ Event & Narrative Intelligence
+→ Root Cause & Evidence Graph
+→ Historical Replay / Forward Validation
+→ Shadow / Paper Review
+```
+
+## وضعیت ایمنی
+
+- اجرای خودکار Live order در پروژه فعال نیست.
+- Backtest و Market Replay جای Forward Test و Paper Trading را نمی‌گیرند.
+- هیچ نتیجه‌ای سود را تضمین نمی‌کند.
+- ورود به پول واقعی فقط بعد از داده‌ی کافی تاریخی، Forward و Paper قابل بررسی است.
+
+## قابلیت‌های اصلی
+
+- دریافت OHLCV از چند صرافی با fallback؛
+- Decision Engine برای LONG، SHORT و NEUTRAL؛
+- Trend، Momentum، Volume، Structure، Risk و Regime scoring؛
+- Portfolio Scanner و Multi-Timeframe analysis؛
+- Historical Backtest، Walk-Forward و Gate Simulator؛
+- Market Replay چندساله و کندل‌به‌کندل با کنترل Lookahead؛
+- Forward Test و Decision Evaluation؛
+- Shadow Gates و Regime-specific validation؛
+- Paper Trading جدا از Live؛
+- Automatic Event Collector، Market Narrative و Causal Intelligence؛
+- Root Cause Discovery، Root Cause Forward Validation و Sample Tracking؛
+- Evidence Graph برای اتصال منبع شواهد به علت و Outcome؛
+- Research Suite، Validation Suite و Live Readiness checks؛
+- GitHub Actions برای جمع‌آوری Forward data و اجرای Workflowهای تحقیقاتی.
+
+## نصب
+
+پایتون 3.10 یا بالاتر:
+
+```cmd
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+برای توسعه و اجرای تست‌ها و بررسی‌های کیفیت:
+
+```cmd
+pip install -r requirements-dev.txt
+pip install --no-deps -e .
+python -m pytest -q
+python -m ruff check engine/__init__.py engine/common.py engine/model_contract.py engine/market_data_contract.py freakto/__init__.py freakto/core freakto/providers freakto/research freakto/paper freakto/cli.py tests/conftest.py tests/test_architecture_boundaries.py
+python -m mypy
+```
+
+تنظیمات canonical پروژه، Pytest، Ruff و Mypy در `pyproject.toml` قرار دارد.
+تست‌ها با markerهای `unit`، `integration`، `slow`، `network`، `replay` و
+`paper` قابل تفکیک هستند؛ برای مثال `python -m pytest -m paper -q`.
+
+فایل `.env` حاوی Token و API Key است و نباید روی GitHub قرار بگیرد.
+
+## اجرای روزمره‌ی پایه
+
+یک تصمیم جدید:
+
+```cmd
+python -X utf8 monitor.py --once
+```
+
+اسکن پورتفو در حالت Paper Gate:
+
+```cmd
+python -X utf8 portfolio_scanner.py --paper
+```
+
+چرخه Forward:
+
+```cmd
+python -X utf8 forward_test_dashboard.py --cycle --validate --continue-on-error
+```
+
+Research Suite:
+
+```cmd
+python -X utf8 freakto_research_suite_dashboard.py
+```
+
+## Market Replay v10
+
+وضعیت داده‌های محلی:
+
+```cmd
+freakto data status --compact
+```
+
+ساخت سه سال داده و Replay:
+
+```cmd
+freakto replay full --symbols BTC/USDT,ETH/USDT,SOL/USDT --timeframe 4h --years 3 --step 1
+```
+
+راهنمای کامل:
+
+```text
+MARKET_REPLAY_RUNBOOK.md
+```
+
+## مسیرهای مهم
+
+```text
+engine/                         موتورهای تحلیل و اعتبارسنجی
+logs/                           خروجی‌های Research/Forward/Paper
+history/                        پایگاه‌های داده محلی
+scripts/                        ابزارهای GitHub Actions و عملیات
+.github/workflows/              Workflowهای خودکار
+data/market_replay/             Cache تاریخی تولیدشده در v10
+data/manual_events.csv          رویدادهای curated اختیاری
+```
+
+## وضعیت فعلی پروژه
+
+Freakto در فاز **Research, Historical Replay, Forward Validation و Paper Evaluation** است. وجود ماژول‌های پیشرفته به معنی آماده‌بودن Live نیست؛ کیفیت نهایی به تعداد نمونه، ثبات در دوره‌های مختلف بازار، هزینه‌ی معامله و نتیجه‌ی Forward/Paper بستگی دارد.
+
+
+## Replay Score Calibration (v10.2)
+
+```cmd
+python -X utf8 replay_score_calibration_dashboard.py --compact
+```
+
+This research-only lab checks score monotonicity, component-feature attribution, interactions and symbol/regime/side stability without changing Paper or Live settings.

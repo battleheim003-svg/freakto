@@ -8,8 +8,13 @@ on:
 permissions:
   contents: read
 
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
 jobs:
-  test:
+  quality:
+    name: Quality and architecture
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,11 +22,66 @@ jobs:
         with:
           python-version: "3.10"
           cache: pip
-      - run: python -m pip install -r requirements.txt pytest
-      - run: python -m pytest -q
-      - run: python -m compileall -q .
+          cache-dependency-path: requirements-dev.txt
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m pip install --no-deps -e .
+      - name: Ruff controlled scope
+        run: python -m ruff check engine/__init__.py engine/common.py engine/model_contract.py engine/market_data_contract.py freakto/__init__.py freakto/core freakto/providers freakto/research freakto/paper freakto/cli.py scripts/ci_component_runner.py scripts/migrate_runtime_state.py tests/conftest.py tests/test_architecture_boundaries.py tests/test_ci_component_runner.py tests/test_runtime_storage.py
+      - name: Mypy controlled scope
+        run: python -m mypy
+      - name: Compile source only
+        run: python -m compileall -q engine freakto scripts tests
+      - name: Validate GitHub workflow YAML
+        run: python scripts/validate_workflows.py
+      - name: Validate UTF-8 and mojibake policy
+        run: python scripts/validate_text_encoding.py
+      - name: Architecture contracts
+        run: python -m pytest -q tests/test_architecture_boundaries.py tests/test_cli_contract.py tests/test_runtime_storage.py tests/test_ci_component_runner.py
       - name: Secret pattern check
         shell: bash
         run: |
           ! git grep -nE 'BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|sk-[A-Za-z0-9]{24,}' -- ':!*.md'
 
+  tests:
+    name: Tests (${{ matrix.suite }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: fast
+            expression: not slow
+          - suite: slow
+            expression: slow
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m pip install --no-deps -e .
+      - run: python -m pytest -q -m "${{ matrix.expression }}"
+
+  safety-contracts:
+    name: Safety contract (${{ matrix.suite }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: paper
+            expression: paper and not slow
+          - suite: replay
+            expression: replay and not slow
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m pip install --no-deps -e .
+      - run: python -m pytest -q -m "${{ matrix.expression }}"

@@ -1,0 +1,292 @@
+from typing import List, Tuple
+import pandas as pd
+
+from .common import ScoreComponent, safe_float
+from .trend import score_trend
+from .momentum import score_momentum
+from .volume import score_volume
+from .structure import score_structure
+from .risk import score_risk, risk_label
+from .regime import detect_market_regime
+from .adaptive import score_adaptive_adjustment
+from .historical_edge import score_historical_edge
+from .score import OpportunityV2, confidence_label, _zones
+from .calibration_mapper import ScoreCalibrator, evaluate_edge_gate
+
+
+class DecisionEngine:
+    def __init__(
+        self,
+        min_side_score: int = 50,
+        calibrator=None,
+        *,
+        allow_learning_overrides: bool = True,
+        allow_historical_edge: bool = True,
+    ):
+        """Create a decision engine with explicit research-safety controls.
+
+        ``allow_learning_overrides`` and ``allow_historical_edge`` default to
+        ``True`` to preserve the normal monitor/forward behaviour. Historical
+        replay passes both flags as ``False`` so persisted state cannot leak
+        into a causal replay run.
+        """
+        self.min_side_score = min_side_score
+        self.calibrator = calibrator or ScoreCalibrator()
+        self.allow_learning_overrides = bool(allow_learning_overrides)
+        self.allow_historical_edge = bool(allow_historical_edge)
+
+    def analyze(self, df: pd.DataFrame, symbol: str, timeframe: str) -> OpportunityV2:
+        required = [
+            "close",
+            "sma_10",
+            "sma_30",
+            "ema_10",
+            "rsi_14",
+            "macd_diff",
+            "atr_pct",
+        ]
+
+        clean = df.dropna(subset=required)
+
+        if len(clean) < 35:
+            return OpportunityV2(
+                symbol=symbol,
+                timeframe=timeframe,
+                side="NEUTRAL",
+                score=0,
+                confidence_label="Low",
+                risk_label="Unknown",
+                entry_zone="نامشخص",
+                stop_zone="نامشخص",
+                warnings=["داده کافی برای تحلیل وجود ندارد."],
+            )
+
+        row = clean.iloc[-1]
+        prev_row = clean.iloc[-2]
+        recent_df = clean.tail(80)
+
+        latest_timestamp = self._get_latest_timestamp(clean)
+        regime = detect_market_regime(recent_df)
+
+        long_score, long_components = self._analyze_side(
+            prev_row=prev_row,
+            row=row,
+            recent_df=recent_df,
+            side="LONG",
+            regime=regime,
+            symbol=symbol,
+            timeframe=timeframe,
+            latest_timestamp=latest_timestamp,
+        )
+
+        short_score, short_components = self._analyze_side(
+            prev_row=prev_row,
+            row=row,
+            recent_df=recent_df,
+            side="SHORT",
+            regime=regime,
+            symbol=symbol,
+            timeframe=timeframe,
+            latest_timestamp=latest_timestamp,
+        )
+
+        side, score, components = self._select_side(
+            long_score=long_score,
+            long_components=long_components,
+            short_score=short_score,
+            short_components=short_components,
+        )
+
+        reasons, warnings = self._collect_explanations(components)
+
+        calibration = self.calibrator.map_score(score)
+        edge_gate = evaluate_edge_gate(calibration)
+
+        if side == "NEUTRAL":
+            reasons = ["هیچ سمت بازار به اندازه کافی هم‌راستا نیست."]
+            warnings.append(
+                "در این وضعیت بهتر است فقط بازار مانیتور شود، نه اینکه فرصت فرض شود."
+            )
+
+        entry_zone, stop_zone, targets = _zones(row, side)
+
+        risk_component = next(
+            (component for component in components if component.name == "Risk Penalty"),
+            ScoreComponent("Risk Penalty", 0, 25),
+        )
+
+        return OpportunityV2(
+            symbol=symbol,
+            timeframe=timeframe,
+            side=side,
+            score=score,
+            confidence_label=confidence_label(score),
+            risk_label=risk_label(risk_component),
+            entry_zone=entry_zone,
+            stop_zone=stop_zone,
+            targets=targets,
+            reasons=reasons,
+            warnings=warnings,
+            components=components,
+            raw={
+                "close": safe_float(row.get("close")),
+                "timestamp": str(latest_timestamp),
+                "long_score": long_score,
+                "short_score": short_score,
+                "raw_score": score,
+                "calibrated_score": calibration.calibrated_score,
+                "calibrated_probability": calibration.calibrated_probability,
+                "calibration_sample_count": calibration.sample_count,
+                "calibration_status": calibration.status,
+                "calibration_source": calibration.source,
+                "calibration_reason": calibration.reason,
+                "edge_gate_passed": edge_gate.passed,
+                "expected_edge": edge_gate.expected_edge,
+                "edge_gate_failures": list(edge_gate.failures),
+                "allow_learning_overrides": self.allow_learning_overrides,
+                "allow_historical_edge": self.allow_historical_edge,
+                "replay_safe": not (
+                    self.allow_learning_overrides or self.allow_historical_edge
+                ),
+                "regime_label": regime.label,
+                "regime_confidence": regime.confidence,
+                "regime_adjustment": regime.adjustment,
+                "regime_reasons": regime.reasons,
+                "regime_warnings": regime.warnings,
+                "engine": "DecisionEngine",
+            },
+        )
+
+    def _get_latest_timestamp(self, df: pd.DataFrame):
+        if "timestamp" in df.columns:
+            return df.iloc[-1]["timestamp"]
+
+        return df.index[-1]
+
+    def _regime_component(self, side: str, regime) -> ScoreComponent:
+        points = 0
+        reasons = []
+        warnings = []
+
+        if regime.label == "TRENDING_BULL":
+            if side == "LONG":
+                points = 5
+                reasons.append("Market Regime صعودی است و Bias لانگ را تأیید می‌کند.")
+            elif side == "SHORT":
+                points = -8
+                warnings.append("Market Regime صعودی است و با Bias شورت تضاد دارد.")
+
+        elif regime.label == "TRENDING_BEAR":
+            if side == "SHORT":
+                points = 5
+                reasons.append("Market Regime نزولی است و Bias شورت را تأیید می‌کند.")
+            elif side == "LONG":
+                points = -8
+                warnings.append("Market Regime نزولی است و با Bias لانگ تضاد دارد.")
+
+        elif regime.label == "SIDEWAYS":
+            points = -5
+            warnings.append("Market Regime رنج/خنثی است؛ کیفیت سیگنال‌های جهت‌دار کمتر می‌شود.")
+
+        elif regime.label == "VOLATILE":
+            points = -4
+            warnings.append("Market Regime پرنوسان است؛ ریسک شکست فیک و نوسان شدید بیشتر است.")
+
+        elif regime.label == "QUIET":
+            points = -2
+            warnings.append("Market Regime کم‌نوسان است؛ حرکت ممکن است هنوز انرژی کافی نداشته باشد.")
+
+        else:
+            warnings.append("Market Regime با اطمینان کافی تشخیص داده نشد.")
+
+        return ScoreComponent(
+            name="Regime Adjustment",
+            points=points,
+            max_points=10,
+            reasons=reasons,
+            warnings=warnings,
+        )
+
+    def _analyze_side(
+        self,
+        prev_row,
+        row,
+        recent_df,
+        side: str,
+        regime,
+        symbol: str,
+        timeframe: str,
+        latest_timestamp,
+    ) -> Tuple[int, List[ScoreComponent]]:
+        components = [
+            score_trend(row, side),
+            score_momentum(prev_row, row, side),
+            score_volume(row, recent_df, side),
+            score_structure(row, recent_df, side),
+            self._regime_component(side, regime),
+            score_risk(row, side),
+        ]
+
+        adaptive_adjustment = score_adaptive_adjustment(
+            components=components,
+            regime=regime,
+            side=side,
+        )
+
+        components.append(adaptive_adjustment)
+
+        base_score = max(0, min(100, int(sum(component.points for component in components))))
+
+        if self.allow_historical_edge:
+            historical_edge = score_historical_edge(
+                symbol=symbol,
+                timeframe=timeframe,
+                side=side,
+                components=components,
+                base_score=base_score,
+                current_timestamp=str(latest_timestamp),
+            )
+        else:
+            historical_edge = ScoreComponent(
+                name="Historical Edge",
+                points=0,
+                max_points=12,
+                warnings=[
+                    "Historical Edge در حالت Replay غیرفعال است تا داده پایدار گذشته وارد تصمیم نشود."
+                ],
+            )
+
+        components.append(historical_edge)
+
+        total = sum(component.points for component in components)
+        final_score = max(0, min(100, int(total)))
+
+        return final_score, components
+
+    def _select_side(
+        self,
+        long_score: int,
+        long_components: List[ScoreComponent],
+        short_score: int,
+        short_components: List[ScoreComponent],
+    ):
+        if long_score >= short_score and long_score >= self.min_side_score:
+            return "LONG", long_score, long_components
+
+        if short_score > long_score and short_score >= self.min_side_score:
+            return "SHORT", short_score, short_components
+
+        if long_score >= short_score:
+            return "NEUTRAL", long_score, long_components
+
+        return "NEUTRAL", short_score, short_components
+
+    def _collect_explanations(self, components: List[ScoreComponent]):
+        reasons = []
+        warnings = []
+
+        for component in components:
+            reasons.extend(component.reasons)
+            warnings.extend(component.warnings)
+
+        return reasons, warnings

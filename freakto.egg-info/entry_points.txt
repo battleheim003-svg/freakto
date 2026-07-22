@@ -1,0 +1,2 @@
+[console_scripts]
+freakto = freakto.cli:main

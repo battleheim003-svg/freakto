@@ -1,4 +1,0 @@
-﻿run_id,started_utc,finished_utc,duration_seconds,mode,ok,task_count,failed_tasks,report_file
-forward_20260705_173928,2026-07-05T17:39:28.376869+00:00,2026-07-05T17:39:33.438320+00:00,5.06,EXECUTE,False,5,monitor_once;portfolio_scan_paper_gate;decision_evaluator;paper_trade_evaluator;validation_suite,logs\forward_testing\forward_20260705_173928_report.md
-forward_20260705_174742,2026-07-05T17:47:42.971646+00:00,2026-07-05T17:50:29.349041+00:00,166.38,EXECUTE,False,5,decision_evaluator,logs\forward_testing\forward_20260705_174742_report.md
-forward_20260705_175826,2026-07-05T17:58:26.845133+00:00,2026-07-05T18:01:31.805102+00:00,184.96,EXECUTE,True,6,,logs\forward_testing\forward_20260705_175826_report.md

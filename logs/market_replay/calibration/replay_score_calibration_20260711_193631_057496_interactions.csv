@@ -1,4 +1,0 @@
-﻿interaction,feature_1,feature_1_threshold,feature_2,feature_2_threshold,train_samples,train_avg_net_pct,train_profit_factor,validation_samples,validation_avg_net_pct,validation_profit_factor,test_samples,test_win_rate_pct,test_avg_net_pct,test_profit_factor,robustness_floor_pct,verdict
-decision_aligned_score>=67.0 & volume_score>=9.0,decision_aligned_score,67.0,volume_score,9.0,1365,-0.244051,0.8445,512,-0.075824,0.9499,539,32.84,-0.945818,0.4348,-0.945818,REJECT_TEST_NET_NON_POSITIVE
-decision_aligned_score>=67.0 & structure_score>=8.0,decision_aligned_score,67.0,structure_score,8.0,957,-0.229832,0.8562,396,-0.103048,0.9333,358,31.01,-0.981523,0.4032,-0.981523,REJECT_TEST_NET_NON_POSITIVE
-volume_score>=9.0 & structure_score>=8.0,volume_score,9.0,structure_score,8.0,749,-0.225035,0.8795,282,-0.16193,0.8994,265,33.21,-1.338639,0.3866,-1.338639,REJECT_TEST_NET_NON_POSITIVE

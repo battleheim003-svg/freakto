@@ -1,12 +1,25 @@
 # Freakto — Crypto Research & Decision Intelligence Platform
 
+## Local control center
+
+Run `run_control_center.bat` on Windows for a unified dashboard covering Data,
+Replay, Paper Trading, reports, and Go-live readiness. It is local and
+fail-closed: real orders and real-capital allocation remain disabled.
+The interface supports Persian/English and includes a confirmed Smart Quick
+Start workflow that runs the safe project lifecycle in order.
+Quick Start runs as a persistent background job with progress, history, logs,
+cooperative cancellation, and retry in the bilingual Jobs page.
+
 راهنمای canonical معاملات آزمایشی و بدون سرمایه واقعی در [docs/paper/README.md](docs/paper/README.md) قرار دارد. شروع محلی: `start_paper_trading.bat`.
+
+فهرست مستندات و فرمان‌های عملیاتی canonical در [docs/README.md](docs/README.md)
+و [docs/OPERATIONS.md](docs/OPERATIONS.md) قرار دارد.
 
 ## Paper-trade readiness (v10.3)
 
 The research and paper paths now use explicit version contracts, an Experiment
 Registry, one-shot TEST hold-outs, causal closed-candle features, next-bar replay
-execution and dynamic costs. Run `python paper_trading_dashboard.py --preflight`
+execution and dynamic costs. Run `freakto paper preflight`
 before recording a new paper observation. See
 `PAPER_TRADE_READINESS_RUNBOOK.md` for the full protocol and current results.
 
@@ -59,6 +72,20 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+برای توسعه و اجرای تست‌ها و بررسی‌های کیفیت:
+
+```cmd
+pip install -r requirements-dev.txt
+pip install --no-deps -e .
+python -m pytest -q
+python -m ruff check engine/__init__.py engine/common.py engine/model_contract.py engine/market_data_contract.py freakto/__init__.py freakto/core freakto/providers freakto/research freakto/paper freakto/cli.py tests/conftest.py tests/test_architecture_boundaries.py
+python -m mypy
+```
+
+تنظیمات canonical پروژه، Pytest، Ruff و Mypy در `pyproject.toml` قرار دارد.
+تست‌ها با markerهای `unit`، `integration`، `slow`، `network`، `replay` و
+`paper` قابل تفکیک هستند؛ برای مثال `python -m pytest -m paper -q`.
+
 فایل `.env` حاوی Token و API Key است و نباید روی GitHub قرار بگیرد.
 
 ## اجرای روزمره‌ی پایه
@@ -92,13 +119,13 @@ python -X utf8 freakto_research_suite_dashboard.py
 وضعیت داده‌های محلی:
 
 ```cmd
-python -X utf8 market_replay_dashboard.py --status --compact
+freakto data status --compact
 ```
 
 ساخت سه سال داده و Replay:
 
 ```cmd
-python -X utf8 market_replay_dashboard.py --full --symbols BTC/USDT,ETH/USDT,SOL/USDT --timeframe 4h --years 3 --step 1
+freakto replay full --symbols BTC/USDT,ETH/USDT,SOL/USDT --timeframe 4h --years 3 --step 1
 ```
 
 راهنمای کامل:

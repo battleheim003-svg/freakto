@@ -1,0 +1,44 @@
+{
+  "policy_version": "paper-go-live-v1",
+  "frozen_contract": {
+    "strategy": "EVENT_COST_GATED",
+    "feature_set_version": "technical-causal-v1",
+    "model_version": "heuristic-score-v4",
+    "calibration_version": "replay-calibration-v2",
+    "execution_model_version": "vol-liquidity-cost-v1",
+    "split_protocol_version": "chronological-60-20-20-v1",
+    "symbols": ["BTC/USDT", "ETH/USDT", "SOL/USDT", "BNB/USDT", "XRP/USDT", "DOGE/USDT"],
+    "timeframe": "4h",
+    "closed_candles_only": true,
+    "decision_at_bar_close": true,
+    "fill_at_next_bar_open": true,
+    "daily_loss_limit_r": 3.0
+  },
+  "evaluation_window": {
+    "window_id": "",
+    "started_utc": "",
+    "ended_utc": "",
+    "data_fingerprint": ""
+  },
+  "metrics": {
+    "closed_trades": 0,
+    "observation_days": 0,
+    "after_cost_expectancy_r": 0.0,
+    "expectancy_ci95_lower_r": 0.0,
+    "profit_factor": 0.0,
+    "max_drawdown_r": 0.0,
+    "regimes": []
+  },
+  "operations": {
+    "cycle_success_rate": 0.0,
+    "data_freshness_rate": 0.0,
+    "critical_incidents": 0
+  },
+  "kill_switch": {
+    "operator_stop_tested": false,
+    "stale_data_stop_tested": false,
+    "loss_limit_stop_tested": false,
+    "restart_fail_closed_tested": false
+  },
+  "approvals": []
+}

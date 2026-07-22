@@ -89,10 +89,13 @@ jobs:
           mkdir -p .cloud-state
           if git ls-remote --exit-code --heads origin paper-state >/dev/null 2>&1; then
             git fetch --depth=1 origin paper-state
-            git show FETCH_HEAD:cloud_state.tar.gz > .cloud-state/cloud_state.tar.gz || true
-            if [ -s .cloud-state/cloud_state.tar.gz ]; then
-              python cloud_state_sync.py restore --root . --archive .cloud-state/cloud_state.tar.gz
+            if ! git cat-file -e FETCH_HEAD:cloud_state.tar.gz; then
+              echo "paper-state exists but cloud_state.tar.gz is missing" >&2
+              exit 1
             fi
+            git show FETCH_HEAD:cloud_state.tar.gz > .cloud-state/cloud_state.tar.gz
+            test -s .cloud-state/cloud_state.tar.gz
+            python cloud_state_sync.py restore --root . --archive .cloud-state/cloud_state.tar.gz
           else
             echo "No paper-state branch exists yet; starting with an empty cloud state."
           fi
@@ -105,7 +108,7 @@ jobs:
       - name: Run one paper research cycle
         id: cycle
         run: |
-          python -X utf8 github_cloud_runner.py
+          python -X utf8 -m freakto.paper.cloud_runner
 
       - name: Pack persistent paper state
         if: always()
@@ -167,7 +170,9 @@ jobs:
               git checkout -B paper-state FETCH_HEAD
             else
               git checkout --orphan paper-state
-              git rm -rf . >/dev/null 2>&1 || true
+              if [ -n "$(git ls-files)" ]; then
+                git rm -rf . >/dev/null
+              fi
             fi
 
             # Copy only after the branch working tree is ready. This prevents

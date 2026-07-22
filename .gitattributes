@@ -1,0 +1,30 @@
+# Canonical source/document text uses UTF-8 and LF on every platform.
+.gitattributes text eol=lf
+.editorconfig text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+*.sh text eol=lf
+
+# Windows launchers remain native CRLF while their text is UTF-8 compatible.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary and archive formats must never be newline-normalized.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.xlsx binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+*.gz binary
+*.joblib binary

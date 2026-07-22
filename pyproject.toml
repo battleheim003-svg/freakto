@@ -1,0 +1,87 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "freakto"
+version = "10.3.0"
+description = "Crypto research, replay, forward-validation, and paper-trading platform"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary" }
+authors = [{ name = "Freakto contributors" }]
+dynamic = ["dependencies"]
+
+[project.scripts]
+freakto = "freakto.cli:main"
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["engine*", "freakto*"]
+exclude = ["tests*", "archive*"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = ["-ra", "--strict-markers"]
+markers = [
+  "unit: fast and hermetic tests with no external services",
+  "integration: tests spanning multiple Freakto components or filesystem state",
+  "slow: tests unsuitable for the fast local feedback loop",
+  "network: tests that require access to an external network service",
+  "replay: historical replay and causality validation tests",
+  "paper: paper-trading, shadow, and fail-closed safety tests",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+extend-exclude = [
+  ".venv",
+  "archive",
+  "data",
+  "history",
+  "logs",
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["engine", "freakto"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["F841"]
+
+[tool.mypy]
+python_version = "3.10"
+files = [
+  "engine/__init__.py",
+  "engine/common.py",
+  "engine/model_contract.py",
+  "engine/market_data_contract.py",
+  "freakto/__init__.py",
+  "freakto/core",
+  "freakto/providers",
+  "freakto/research/__init__.py",
+  "freakto/research/commands.py",
+]
+exclude = ["archive/", "data/", "history/", "logs/", ".venv/"]
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unreachable = true
+show_error_codes = true
+pretty = true
+ignore_missing_imports = true
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = ["pandas.*", "matplotlib.*", "sklearn.*", "streamlit.*", "ccxt.*"]
+ignore_missing_imports = true

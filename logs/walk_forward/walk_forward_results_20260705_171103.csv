@@ -1,5 +1,0 @@
-﻿strategy,train_samples,test_samples,train_avg24,test_avg24,train_target_1_hit_rate,test_target_1_hit_rate,train_directional_win_rate,test_directional_win_rate,stability_gap,verdict,notes
-All complete decisions,11,6,1.2437,0.6863,72.73,50.0,100.0,100.0,0.5574,STABLE_POSITIVE,هم train و هم test مثبت‌اند؛ نشانه اولیه پایداری دیده می‌شود.
-Score >= 65,7,4,0.8021,0.6891,57.14,50.0,100.0,100.0,0.113,LOW_SAMPLE,نمونه train/test کم است؛ نتیجه فقط برای رصد است.
-Score >= 55,10,5,1.0828,0.6619,70.0,40.0,100.0,100.0,0.4209,TEST_POSITIVE_MIXED,test مثبت است اما train/نمونه‌ها نیاز به بررسی بیشتر دارند.
-WATCHLIST or better,10,5,1.0828,0.6619,70.0,40.0,100.0,100.0,0.4209,TEST_POSITIVE_MIXED,test مثبت است اما train/نمونه‌ها نیاز به بررسی بیشتر دارند.

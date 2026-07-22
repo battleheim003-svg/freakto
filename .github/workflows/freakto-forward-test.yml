@@ -85,87 +85,22 @@ jobs:
       - name: Run Freakto forward cycle with Telegram
         if: ${{ inputs.send_telegram == 'true' }}
         run: |
-          python -X utf8 forward_test_dashboard.py --cycle --validate --continue-on-error --send
+          python -X utf8 forward_test_dashboard.py --cycle --validate --stop-on-error --send
 
       - name: Run Freakto forward cycle without Telegram
         if: ${{ inputs.send_telegram == 'false' }}
         run: |
-          python -X utf8 forward_test_dashboard.py --cycle --validate --continue-on-error
+          python -X utf8 forward_test_dashboard.py --cycle --validate --stop-on-error
 
       - name: Run validation suite explicitly
         if: ${{ always() && inputs.run_validation == 'true' }}
         run: |
-          python -X utf8 validation_suite_dashboard.py || true
+          python -X utf8 scripts/ci_component_runner.py --name validation-suite --policy optional -- python -X utf8 validation_suite_dashboard.py
 
-      - name: Build GitHub Actions health summary
+      - name: Run explicitly optional diagnostics
         if: always()
         run: |
-          python -X utf8 scripts/github_actions_health_summary.py || true
-
-      - name: Run v6 pipeline health monitor
-        if: always()
-        run: |
-          python -X utf8 pipeline_health_dashboard.py || true
-
-      - name: Run v6.1 regime-gate matrix
-        if: always()
-        run: |
-          python -X utf8 regime_gate_matrix_dashboard.py --compact || true
-
-      - name: Run v6.2.1 forward regime label injection
-        if: always()
-        run: |
-          python -X utf8 forward_regime_label_dashboard.py --compact || true
-
-      - name: Run v6.2 regime shadow gate activator
-        if: always()
-        run: |
-          python -X utf8 regime_shadow_gate_dashboard.py --compact || true
-
-      - name: Run v6.3 forward shadow coverage probe
-        if: always()
-        run: |
-          python -X utf8 forward_shadow_coverage_dashboard.py --compact || true
-
-      - name: Run v6.5 automatic event collector
-        if: always()
-        run: |
-          python -X utf8 automatic_event_collector_dashboard.py --compact || true
-
-      - name: Run v6.4 causal/event intelligence
-        if: always()
-        run: |
-          python -X utf8 causal_intelligence_dashboard.py --compact || true
-
-      - name: Run v7 market narrative engine
-        if: always()
-        run: |
-          python -X utf8 market_narrative_dashboard.py --compact || true
-
-      - name: Run v7.1 narrative decision conflict scoring
-        if: always()
-        run: |
-          python -X utf8 narrative_decision_dashboard.py --compact || true
-
-      - name: Run v8 root cause discovery
-        if: always()
-        run: |
-          python -X utf8 root_cause_dashboard.py --compact || true
-
-      - name: Run v8.1 root cause forward validation
-        if: always()
-        run: |
-          python -X utf8 root_cause_forward_validation_dashboard.py --compact || true
-
-      - name: Run v8.2 root cause sample tracker
-        if: always()
-        run: |
-          python -X utf8 root_cause_sample_dashboard.py --compact || true
-
-      - name: Run v9 evidence graph engine
-        if: always()
-        run: |
-          python -X utf8 evidence_graph_dashboard.py --compact || true
+          python -X utf8 scripts/ci_advisory_suite.py --profile forward
 
       - name: Upload logs as workflow artifact
         if: always()
@@ -180,6 +115,7 @@ jobs:
             logs/**/*.md
             logs/**/*.txt
             logs/**/*.log
+            logs/ci/**
             logs/research/**/*.db
             logs/research_dashboard/**/*.html
             history/*.db

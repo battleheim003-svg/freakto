@@ -1,5 +1,9 @@
 # Freakto Forward Test Runbook — v5.1.1
 
+> Canonical read-only status: `freakto report forward`. See
+> [`docs/OPERATIONS.md`](docs/OPERATIONS.md). Legacy cycle commands below remain
+> specialist compatibility paths and are governed by required CI policies.
+
 این Runbook برای اجرای امن چرخه Forward Test در ویندوز است. این چرخه هیچ سفارش واقعی ارسال نمی‌کند.
 
 ## وضعیت فعلی

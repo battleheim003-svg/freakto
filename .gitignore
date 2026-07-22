@@ -14,6 +14,11 @@ venv/
 live_enriched_data_log.csv
 paper_trading_log.json
 *.joblib
+/logs/**
+!/logs/.gitkeep
+/history/**
+!/history/.gitkeep
+/.freakto-runtime/
 
 # OS / editor
 .DS_Store

@@ -1,4 +1,0 @@
-﻿fold,error,positive,no_overlap,train_end_utc,test_start_utc,test_end_utc,threshold,threshold_eligible,sample_count,coverage,win_rate,expectancy,median_return,profit_factor,total_return,max_drawdown,average_win,average_loss
-1,insufficient cost-gated train events,False,True,,,,,,,,,,,,,,,
-2,,False,True,2023-11-24T08:00:00+00:00,2023-12-02T16:00:00+00:00,2025-03-02T12:00:00+00:00,,False,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-3,,True,True,2025-03-02T12:00:00+00:00,2025-03-11T00:00:00+00:00,2026-07-04T12:00:00+00:00,0.5,True,61.0,0.08367626886145405,0.45901639344262296,7.625602615836643,-0.963891,4.6721432246932615,465.1617595660352,-34.02639960522691,21.13695920845854,-3.838578735478899

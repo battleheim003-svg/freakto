@@ -1,5 +1,9 @@
 # Freakto v10.0 — Historical Data & Market Replay Runbook
 
+> Canonical command surface: `freakto data ...` and `freakto replay ...`. See
+> [`docs/OPERATIONS.md`](docs/OPERATIONS.md). Direct dashboard commands below
+> are retained compatibility paths.
+
 ## هدف
 
 Market Replay نسخه‌ی v10 برای حل ضعف داده‌ی تاریخی ساخته شده است. این بخش دو کار جدا انجام می‌دهد:

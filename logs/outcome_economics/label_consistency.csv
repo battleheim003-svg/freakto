@@ -1,7 +1,0 @@
-diagnostic,count,rate,note
-RECORDED_WIN_DISAGREES_WITH_CANONICAL_NET_SIGN,0,0.0,The persisted win flag should equal the sign of canonical net return.
-OUTCOME_LABEL_DISAGREES_WITH_CANONICAL_NET_SIGN,0,0.0,"Outcome WIN/LOSS should be derived from canonical net return, not target-hit alone."
-TARGET_1_HIT_BUT_CANONICAL_NET_LOSS,3800,0.268097,A target touch does not guarantee a profitable fixed-horizon outcome.
-STOP_HIT_BUT_CANONICAL_NET_WIN,1126,0.079441,A stop touch may coexist with a later positive fixed-horizon close.
-TARGET_1_AND_STOP_BOTH_HIT_WITHIN_RECORDED_PATH,3547,0.250247,Both levels were touched; first-touch order matters.
-SAME_CANDLE_STOP_TARGET_AMBIGUITY,137,0.009666,OHLC bars cannot resolve same-candle stop/target order without lower-timeframe data.

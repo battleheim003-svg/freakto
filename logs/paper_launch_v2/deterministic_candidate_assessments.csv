@@ -1,5 +1,0 @@
-﻿strategy,eligible,holdout_sample_count,holdout_expectancy_pct,holdout_profit_factor,holdout_ci_low_pct,holdout_ci_high_pct,valid_walk_forward_folds,positive_walk_forward_folds,positive_walk_forward_fraction,blockers
-EVENT_COST_GATED,True,166,6.238894808587898,4.031458689299746,1.2928329142269817,14.092357997415888,4,4,1.0,()
-EVENT_BREAKOUT_CONFIRMATION_COST_GATED,True,100,5.546244109029337,3.857599162717181,1.398539773627716,12.40496238436634,4,3,0.75,()
-EVENT_VOLATILITY_EXPANSION_COST_GATED,False,56,6.9780100645494185,3.927889371843997,4.6040585749145695,20.172464062438408,4,3,0.75,"('Holdout samples 56 < 100.',)"
-EVENT_REGIME_TRANSITION_COST_GATED,False,10,9.026356370789,7.408684199790234,9.026356370789,9.026356370789,0,0,0.0,"('Holdout samples 10 < 100.', 'Valid walk-forward folds 0 < 3.', 'Walk-forward positive-fold fraction is insufficient.')"

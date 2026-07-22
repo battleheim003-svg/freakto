@@ -1,5 +1,9 @@
 # Paper-trade readiness protocol (v10.3)
 
+> Canonical command surface: `freakto paper ...`. See
+> [`docs/OPERATIONS.md`](docs/OPERATIONS.md). This runbook defines the deeper
+> readiness protocol and does not replace the fail-closed CLI contract.
+
 This release makes the paper-trade path fail closed. "Ready" means the system
 is safe to collect forward observations; it does not mean that the strategy has
 a positive edge or is approved for live trading.
@@ -54,3 +58,11 @@ to create a genuinely new hold-out instead of reusing TEST.
 The current hypothesis is not promoted. Paper mode is suitable only for
 collecting honest forward evidence and validating operations.
 
+## Formal go-live review gate
+
+Phase 10 adds `freakto paper go-live-check`. Its frozen contract, numerical
+thresholds, evidence format, kill-switch drills, and rollback rules are defined
+in [`docs/refactor/PHASE_10_GO_LIVE.md`](docs/refactor/PHASE_10_GO_LIVE.md).
+Passing that check does not authorize orders: live orders, real capital, and
+allocation remain disabled and require a separate independently approved
+implementation phase.
