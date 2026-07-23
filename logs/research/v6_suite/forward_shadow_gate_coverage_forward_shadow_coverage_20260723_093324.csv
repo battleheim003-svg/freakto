@@ -1,0 +1,4 @@
+﻿gate,family,signals,evaluated,avg_return_pct,win_rate,dominant_regime,regime_count
+STRUCTURE_SCORE_GE_10,review_backtest_candidate,24,23,0.4228,73.91,TRENDING_BULL,14
+HISTORICAL_EDGE_SCORE_GE_1,primary_backtest_candidate,8,8,-1.2246,12.5,TRENDING_BULL,8
+RISK_MEDIUM,primary_backtest_candidate,1,1,0.5361,100.0,TRENDING_BULL,1

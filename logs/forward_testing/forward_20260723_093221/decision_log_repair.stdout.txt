@@ -1,0 +1,10 @@
+==============================================================================================================
+🛠️ Freakto Decision Log Repair v7.1.0
+==============================================================================================================
+File       : logs/decisions.csv
+Rows       : 101
+Old columns: 78
+Backup     : logs/decisions.csv.bak_v512
+New columns: 78
+OK: decisions.csv repaired/migrated with v7.1.0 regime + causal/event/narrative metadata columns.
+==============================================================================================================

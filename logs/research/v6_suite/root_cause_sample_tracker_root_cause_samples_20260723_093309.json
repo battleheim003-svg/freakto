@@ -1,0 +1,56 @@
+{
+  "run_id": "root_cause_samples_20260723_093309",
+  "generated_utc": "2026-07-23T09:33:09.907716+00:00",
+  "version": "v8.2.0",
+  "status": "ROOT_CAUSE_SAMPLE_TARGET_REACHED_MIXED",
+  "evaluations_file": "logs/decision_evaluations.csv",
+  "evaluation_rows": 100,
+  "complete_rows": 98,
+  "root_cause_rows": 49,
+  "evaluated_cells": 145,
+  "unique_root_causes": 1,
+  "min_cells": 10,
+  "research_cells": 30,
+  "candidate_cells": 90,
+  "estimated_more_root_cause_decisions_for_min": 0,
+  "estimated_more_root_cause_decisions_for_research": 0,
+  "estimated_more_root_cause_decisions_for_candidate": 0,
+  "validation_status": "ROOT_CAUSE_FORWARD_MIXED_OR_WEAK",
+  "validation_candidates": 0,
+  "validation_promising_low_sample": 0,
+  "buckets": [
+    {
+      "root_cause_primary": "MACRO_POLICY_PRESSURE",
+      "root_cause_direction": "BEARISH",
+      "decision_rows": 49,
+      "evaluated_cells": 145,
+      "samples_4h": 49,
+      "hit_rate_4h": 53.06,
+      "avg_signed_return_4h_pct": -0.0227,
+      "samples_12h": 49,
+      "hit_rate_12h": 55.1,
+      "avg_signed_return_12h_pct": -0.006,
+      "samples_24h": 47,
+      "hit_rate_24h": 57.45,
+      "avg_signed_return_24h_pct": -0.1347,
+      "avg_probability_pct": 56.1792,
+      "evidence_quality_mode": "HIGH",
+      "confidence_mode": "MEDIUM",
+      "maturity_level": "CANDIDATE_SAMPLE_READY",
+      "sample_gap_to_min": 0,
+      "sample_gap_to_research": 0,
+      "sample_gap_to_candidate": 0,
+      "provisional_verdict": "WEAK_OR_NEGATIVE_PROVISIONAL"
+    }
+  ],
+  "blockers": [],
+  "warnings": [
+    "Root Cause Sample Tracker فقط بلوغ نمونه‌ها را می‌سنجد؛ Paper/Live فعال نمی‌کند.",
+    "Promotion واقعی فقط بعد از Forward validation پایدار و sample کافی مجاز است."
+  ],
+  "recommendations": [
+    "چرخه Forward را هر 4 ساعت یا با GitHub Actions اجرا کن تا Root Cause rows بیشتر شود.",
+    "پس از هر root_cause_dashboard.py، decision_evaluator.py و سپس root_cause_forward_validation_dashboard.py را اجرا کن.",
+    "تا وقتی حداقل 30-50 تصمیم دارای Root Cause جمع نشده، نتیجه فقط Research/Shadow بماند."
+  ]
+}
