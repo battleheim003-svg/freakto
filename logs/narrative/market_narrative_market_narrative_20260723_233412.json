@@ -1,0 +1,118 @@
+{
+  "run_id": "market_narrative_20260723_233412",
+  "generated_utc": "2026-07-23T23:34:12.031658+00:00",
+  "version": "v7.2.0",
+  "status": "MARKET_NARRATIVE_WEAK_EVIDENCE",
+  "symbol": "BTC/USDT",
+  "timeframe": "4h",
+  "lookback_hours": 168,
+  "auto_events_loaded": 14,
+  "manual_events_loaded": 2,
+  "accepted_events": 2,
+  "noise_filtered_events": 0,
+  "narrative_label": "EVENT_CONTEXT_DOMINANT",
+  "narrative_confidence": "LOW",
+  "net_direction_score": 0.5351,
+  "dominant_direction": "MIXED_OR_NEUTRAL",
+  "dominant_theme": "REGULATORY_RISK",
+  "event_risk": "HIGH",
+  "technical_event_conflict": "LOW",
+  "narrative_summary": "Narrative=EVENT_CONTEXT_DOMINANT; direction=MIXED_OR_NEUTRAL; theme=REGULATORY_RISK; net_score=0.5351; risk=HIGH. محرک اصلی فعلی از sec_press_releases است: SEC Announces Roundtable on Preparations for 24-Hour Trading",
+  "evidence_strength": 0.3908,
+  "evidence_grade": "LOW",
+  "causal_claim_status": "WEAK_HYPOTHESIS",
+  "independent_source_count": 1,
+  "directional_agreement": 0.5,
+  "driver_count": 2,
+  "top_drivers": [
+    {
+      "theme": "REGULATORY_RISK",
+      "title": "SEC Announces Roundtable on Preparations for 24-Hour Trading",
+      "source_id": "sec_press_releases",
+      "source_tier": "TIER_1_OFFICIAL_REGULATOR",
+      "direction": "BULLISH",
+      "impact": "HIGH",
+      "confidence": "HIGH",
+      "evidence_relevance": 0.35,
+      "weight": 3.8263,
+      "timestamp_utc": "2026-07-23T15:04:00+00:00",
+      "source_url": "https://www.sec.gov/newsroom/press-releases/2026-69-sec-announces-roundtable-preparations-24-hour-trading",
+      "event_type": "regulatory",
+      "event_quality": "ACTIONABLE_EVENT_CONTEXT"
+    },
+    {
+      "theme": "REGULATORY_RISK",
+      "title": "SEC Announces Departure of Principal Deputy Director of Enforcement Sam Waldon",
+      "source_id": "sec_press_releases",
+      "source_tier": "TIER_1_OFFICIAL_REGULATOR",
+      "direction": "BEARISH",
+      "impact": "HIGH",
+      "confidence": "HIGH",
+      "evidence_relevance": 0.35,
+      "weight": -3.2912,
+      "timestamp_utc": "2026-07-22T13:45:25+00:00",
+      "source_url": "https://www.sec.gov/newsroom/press-releases/2026-68-sec-announces-departure-principal-deputy-director-enforcement-sam-waldon",
+      "event_type": "regulatory",
+      "event_quality": "ACTIONABLE_EVENT_CONTEXT"
+    }
+  ],
+  "theme_scores": [
+    {
+      "theme": "REGULATORY_RISK",
+      "score": 0.5351,
+      "drivers": 2,
+      "bullish": 1,
+      "bearish": 1,
+      "abs_score": 0.5351
+    }
+  ],
+  "contradictions": [],
+  "alternative_explanations": [
+    "The move may be explained by broad market beta or liquidity rather than the named event.",
+    "The observed event and price move may be correlated without a causal relationship.",
+    "An unobserved macro, positioning, or exchange-specific factor may dominate."
+  ],
+  "evidence_limitations": [
+    "Fewer than two independent evidence sources.",
+    "Directional evidence agreement is only 50%.",
+    "Average source reliability is below the high-quality threshold.",
+    "Evidence strength measures support, not causal identification."
+  ],
+  "latest_causal_context": {
+    "run_id": "causal_intel_20260723_233409",
+    "generated_utc": "2026-07-23T23:34:11.581541+00:00",
+    "version": "v7.2.0",
+    "status": "CAUSAL_CONTEXT_PARTIAL_SOURCES",
+    "symbol": "BTC/USDT",
+    "timeframe": "4h",
+    "collect_live": "True",
+    "primary_cause": "STRUCTURE_BREAKOUT_WEAK_VOLUME_CONFIRMATION",
+    "cause_confidence": "LOW",
+    "catalyst_score": "58",
+    "event_risk": "HIGH",
+    "technical_event_conflict": "LOW",
+    "causal_alignment": "ALIGNED_WITH_CAUSAL_CONTEXT",
+    "causal_verdict": "CAUSAL_CONTEXT_NEUTRAL",
+    "source_count": "9",
+    "successful_sources": "6",
+    "trusted_successful_sources": "5",
+    "manual_events_loaded": "0",
+    "auto_events_loaded": "2",
+    "evidence_strength": "0.6424",
+    "evidence_grade": "MEDIUM",
+    "causal_claim_status": "PLAUSIBLE_HYPOTHESIS",
+    "independent_source_count": "5",
+    "directional_agreement": "0.6667"
+  },
+  "blockers": [],
+  "warnings": [
+    "Market Narrative فقط روایت پژوهشی می‌سازد؛ سیگنال خرید/فروش مستقل نیست.",
+    "اگر event sourceها نویز HTML/marketing بدهند، v7 آن‌ها را فیلتر می‌کند اما همچنان باید source health بررسی شود.",
+    "Narrative wording is hypothesis-only because evidence strength is insufficient."
+  ],
+  "recommendations": [
+    "automatic_event_collector_dashboard.py --compact باید قبل از market_narrative_dashboard.py اجرا شود.",
+    "اگر Narrative و Technical conflict بالا باشد، تصمیم فقط Research/Watchlist بماند.",
+    "برای ارتقا به Gate، narrative باید در Forward با outcomeهای بعدی validate شود."
+  ]
+}

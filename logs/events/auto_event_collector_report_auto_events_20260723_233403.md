@@ -1,0 +1,37 @@
+==============================================================================================================
+🗞️ Freakto Automatic Event Collector v7.0.0
+==============================================================================================================
+Status                 : AUTO_EVENTS_COLLECTED_HIGH_IMPACT
+Run ID                 : auto_events_20260723_233403
+Fetch Live / Apply     : True / True
+Lookback Hours         : 168
+Sources OK/Failed      : 6 / 1
+Fetched Items          : 135
+Significant Events     : 2
+New Events Written     : 2
+Total Auto Events      : 14
+High Impact Events     : 2
+Official Tier Events   : 2
+
+Top Events:
+- HIGH | BULLISH | regulatory | sec_press_releases | q=ACTIONABLE_EVENT_CONTEXT | SEC Announces Roundtable on Preparations for 24-Hour Trading
+- HIGH | BEARISH | regulatory | sec_press_releases | q=ACTIONABLE_EVENT_CONTEXT | SEC Announces Departure of Principal Deputy Director of Enforcement Sam Waldon
+
+Source Health:
+- sec_press_releases: OK | items=25 | events=2 | TIER_1_OFFICIAL_REGULATOR
+- sec_litigation_releases: OK | items=25 | events=0 | TIER_1_OFFICIAL_REGULATOR
+- federal_reserve_press: OK | items=20 | events=0 | TIER_1_OFFICIAL_MACRO
+- federal_reserve_speeches: OK | items=15 | events=0 | TIER_1_OFFICIAL_MACRO
+- ethereum_foundation_blog: OK | items=25 | events=0 | TIER_1_OFFICIAL_PROTOCOL
+- coinbase_blog: OK | items=25 | events=0 | TIER_2_OFFICIAL_COMPANY_BLOG
+- binance_announcements: FAILED | items=0 | events=0 | TIER_1_OFFICIAL_EXCHANGE_NEWS | err=https://www.binance.com/bapi/composite/v1/public/cms/article/list/query?type=1&catalogId=48&pageNo=1&pageSize=30 -> HTTPError: HTTP Error 400: Bad Request | https://www.binance.com/en/support/announcement/list/48 -> XMLParseError: no element found: line 1, column 0 | https://www.binance.com/en/support/announcement -> XMLParseError: no element found: line 1, column 0
+
+Recommendations:
+→ رویدادهای high-impact جمع شد؛ causal_intelligence_dashboard.py را اجرا کن تا روی تصمیم‌ها اثر context بررسی شود.
+→ manual_events.csv را فقط برای رویدادهای بسیار مهمی استفاده کن که collector از دست داده یا نیاز به curated override دارند.
+
+Warnings:
+⚠️ Automatic Event Collector فقط داده و tag تحقیقاتی تولید می‌کند؛ Paper/Live فعال نمی‌کند.
+⚠️ Event direction با keyword/rule ساده ساخته می‌شود و باید به عنوان catalyst context دیده شود، نه سیگنال مستقل.
+⚠️ 1 منبع رسمی fail شد؛ v7.0.0 چند fallback را امتحان می‌کند اما شکست source چرخه Forward را متوقف نمی‌کند.
+==============================================================================================================

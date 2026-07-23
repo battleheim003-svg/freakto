@@ -1,0 +1,29 @@
+{
+  "created_utc": "2026-07-23T23:34:33.383087+00:00",
+  "source": "decision_evaluations_fallback",
+  "unit": "pct",
+  "sample_count": 100,
+  "iterations": 2000,
+  "trades_per_run": 100,
+  "initial_equity": 0.0,
+  "median_final": 41.2475,
+  "mean_final": 41.2434,
+  "p05_final": 14.6147,
+  "p95_final": 68.7158,
+  "median_max_drawdown": -7.9779,
+  "p95_max_drawdown": -15.5244,
+  "probability_of_loss_pct": 0.85,
+  "probability_of_ruin_pct": 27.6,
+  "risk_of_ruin_threshold": -10.0,
+  "expected_per_trade": 0.4137,
+  "best_sample": 3.8877,
+  "worst_sample": -3.2625,
+  "risk_quality": "HIGH_RISK",
+  "notes": [],
+  "warnings": [
+    "Paper Trade کافی نبود؛ شبیه‌سازی با decision returns درصدی انجام شد، نه R واقعی."
+  ],
+  "blockers": [
+    "Probability of ruin بالاست: 27.60%"
+  ]
+}
