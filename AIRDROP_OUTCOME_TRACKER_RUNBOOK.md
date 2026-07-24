@@ -24,6 +24,9 @@ python -X utf8 airdrop_backtest_dashboard.py sync
 ```
 
 The sync is idempotent and does not modify `airdrop_radar.db`.
+If that source database does not exist, sync returns `SYNC_BLOCKED` with
+`AIRDROP_RADAR_DATABASE_NOT_FOUND`; it does not emit a traceback or create
+fabricated predictions.
 
 ## Record an observation
 
@@ -44,3 +47,11 @@ python -X utf8 airdrop_backtest_dashboard.py report --min-resolved 30
 `RESEARCH_CANDIDATE` means evidence is incomplete. `PASSED` only means the
 configured minimum resolved sample and observation requirements were met; it
 does not mean the strategy is profitable, safe, or ready for automated action.
+
+## Current evidence snapshot
+
+The 2026-07-24 local audit found no `history/airdrop_radar.db`, therefore no
+prediction snapshots or resolved outcomes could be imported. The outcome
+report correctly remains `RESEARCH_CANDIDATE` with
+`NO_PREDICTION_SNAPSHOTS`. The legacy shadow example is only a placeholder and
+was not accepted as real outcome evidence.

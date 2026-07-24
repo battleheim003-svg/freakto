@@ -6,6 +6,7 @@ from airdrop.outcomes import (
     PredictionSnapshot,
     build_backtest_report,
 )
+from airdrop.outcomes.cli import main
 
 
 def _prediction(identity: str, score: int, predicted_at: str) -> PredictionSnapshot:
@@ -96,3 +97,19 @@ def test_report_passed_means_sample_complete_not_profit_claim(tmp_path):
     assert report.status == "PASSED"
     assert report.resolved_projects == 2
     assert any("not profitability" in note for note in report.notes)
+
+
+def test_sync_missing_source_fails_closed_without_traceback(tmp_path, capsys):
+    code = main(
+        [
+            "--db",
+            str(tmp_path / "outcomes.db"),
+            "sync",
+            "--source-db",
+            str(tmp_path / "missing.db"),
+        ]
+    )
+    assert code == 2
+    output = capsys.readouterr().out
+    assert '"status": "SYNC_BLOCKED"' in output
+    assert "AIRDROP_RADAR_DATABASE_NOT_FOUND" in output

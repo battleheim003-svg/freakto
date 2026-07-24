@@ -48,7 +48,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     tracker = OutcomeTracker(args.db)
     if args.command == "sync":
-        imported = tracker.sync_opportunity_database(args.source_db)
+        try:
+            imported = tracker.sync_opportunity_database(args.source_db)
+        except FileNotFoundError:
+            print(
+                json.dumps(
+                    {
+                        "status": "SYNC_BLOCKED",
+                        "blocker": "AIRDROP_RADAR_DATABASE_NOT_FOUND",
+                        "source_db": str(Path(args.source_db)),
+                    },
+                    indent=2,
+                )
+            )
+            return 2
         print(json.dumps({"status": "SYNCED", "new_snapshots": imported}, indent=2))
         return 0
     if args.command == "record":
