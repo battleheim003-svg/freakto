@@ -13,7 +13,16 @@ from freakto.ui.control_center_state import (
     collect_snapshot,
     run_cli,
 )
-from freakto.ui.job_manager import ACTIVE, TERMINAL, job_log, list_jobs, request_cancel, retry_job, start_quick_job
+from freakto.ui.job_manager import (
+    ACTIVE,
+    TERMINAL,
+    job_log,
+    list_jobs,
+    request_cancel,
+    retry_job,
+    start_quick_job,
+    start_workflow_job,
+)
 
 
 st.set_page_config(page_title="Freakto Control Center", page_icon="⚡", layout="wide")
@@ -107,6 +116,89 @@ TEXT = {
     },
 }
 
+TEXT["fa"].update(
+    {
+        "market": "بازارهای جدید",
+        "forward": "Forward و Shadow",
+        "airdrop": "Airdrop Radar",
+        "cross_asset": "رتبه‌بندی بین‌بازاری",
+        "market_title": "کنترل بازارهای فارکس و طلا",
+        "market_note": "ممیزی داده و Replay در jobهای مستقل اجرا می‌شوند؛ هسته و Decision Engine فقط مصرف‌کننده داده معتبر باقی می‌مانند.",
+        "adapter_manifests": "Manifestهای ممیزی‌شده",
+        "audit_range": "بازه ممیزی UTC",
+        "start_date": "تاریخ شروع",
+        "end_date": "تاریخ پایان انحصاری",
+        "audit_confirm": "اجرای ممیزی EUR/USD و XAU/USD را تأیید می‌کنم",
+        "start_audit": "شروع ممیزی داده بازار",
+        "market_replay_confirm": "Replay تحقیقاتی با هزینه‌های ممیزی‌شده را تأیید می‌کنم",
+        "start_market_replay": "شروع Replay فارکس و طلا",
+        "forward_title": "کنترل Forward و Shadow",
+        "forward_note": "هر چرخه Preflight، Research Arm، یک چرخه مشاهده و گزارش Forward را به‌ترتیب اجرا می‌کند. خروجی blocked یک توقف ایمن است.",
+        "last_forward": "آخرین گزارش Forward",
+        "forward_confirm": "اجرای یک چرخه صفرسرمایه Forward/Shadow را تأیید می‌کنم",
+        "start_forward": "شروع چرخه Forward/Shadow",
+        "airdrop_title": "کنترل Outcomeهای Airdrop",
+        "airdrop_note": "Sync فقط snapshotهای موجود را وارد می‌کند و بدون دیتابیس Radar با وضعیت SYNC_BLOCKED متوقف می‌شود؛ هیچ outcome ساخته نمی‌شود.",
+        "tracker_db": "دیتابیس Outcome",
+        "airdrop_confirm": "Sync و گزارش evidence را تأیید می‌کنم",
+        "start_airdrop": "شروع Sync و گزارش Airdrop",
+        "cross_title": "کنترل رتبه‌بندی Cross-Asset",
+        "cross_note": "فقط CSVهای داخل workspace پذیرفته می‌شوند. Ranker هیچ تصمیم معاملاتی به موتور ارسال نمی‌کند.",
+        "opportunity_csv": "CSV فرصت‌های استانداردشده",
+        "rankings_csv": "CSV رتبه‌بندی‌ها",
+        "outcomes_csv": "CSV outcomeهای مشاهده‌شده",
+        "rank_confirm": "قرارداد داده و اجرای Research-only Rank را تأیید می‌کنم",
+        "start_rank": "شروع رتبه‌بندی",
+        "evaluate_confirm": "ارزیابی causal رتبه‌بندی‌ها را تأیید می‌کنم",
+        "start_evaluate": "شروع ارزیابی تاریخی",
+        "workflow_started": "Job بخش شروع شد",
+        "workflow_blocked": "شروع Job به‌صورت ایمن مسدود شد",
+        "one_at_time": "برای جلوگیری از تداخل فایل‌ها، در هر لحظه فقط یک job پس‌زمینه اجرا می‌شود.",
+        "kind": "بخش",
+    }
+)
+TEXT["en"].update(
+    {
+        "market": "New Markets",
+        "forward": "Forward & Shadow",
+        "airdrop": "Airdrop Radar",
+        "cross_asset": "Cross-Asset Ranking",
+        "market_title": "Forex and gold controls",
+        "market_note": "Data audit and Replay run as isolated jobs; the core and Decision Engine remain unchanged consumers of validated data.",
+        "adapter_manifests": "Audited manifests",
+        "audit_range": "UTC audit range",
+        "start_date": "Start date",
+        "end_date": "Exclusive end date",
+        "audit_confirm": "I confirm the EUR/USD and XAU/USD data audit",
+        "start_audit": "Start market data audit",
+        "market_replay_confirm": "I confirm research Replay with audited cost inputs",
+        "start_market_replay": "Start forex and gold Replay",
+        "forward_title": "Forward and Shadow controls",
+        "forward_note": "Each cycle runs Preflight, Research Arm, one observation cycle, and Forward reporting in order. A blocked result is a safe stop.",
+        "last_forward": "Latest Forward report",
+        "forward_confirm": "I confirm one zero-capital Forward/Shadow cycle",
+        "start_forward": "Start Forward/Shadow cycle",
+        "airdrop_title": "Airdrop outcome controls",
+        "airdrop_note": "Sync imports existing snapshots only and returns SYNC_BLOCKED without a Radar database; it never fabricates outcomes.",
+        "tracker_db": "Outcome database",
+        "airdrop_confirm": "I confirm evidence sync and reporting",
+        "start_airdrop": "Start Airdrop sync and report",
+        "cross_title": "Cross-Asset ranker controls",
+        "cross_note": "Only CSV files inside the workspace are accepted. The ranker never emits a Decision Engine action.",
+        "opportunity_csv": "Standardized opportunities CSV",
+        "rankings_csv": "Rankings CSV",
+        "outcomes_csv": "Observed outcomes CSV",
+        "rank_confirm": "I confirm the data contract and research-only ranking run",
+        "start_rank": "Start ranking",
+        "evaluate_confirm": "I confirm causal ranking evaluation",
+        "start_evaluate": "Start historical evaluation",
+        "workflow_started": "Section job started",
+        "workflow_blocked": "Job launch was safely blocked",
+        "one_at_time": "Only one background job runs at a time to prevent artifact conflicts.",
+        "kind": "Area",
+    }
+)
+
 
 def tr(key: str) -> str:
     return TEXT[st.session_state.get("language", "fa")][key]
@@ -161,6 +253,31 @@ def execute(label: str, arguments: list[str], *, key: str, primary: bool = False
         st.session_state["snapshot"] = collect_snapshot()
 
 
+def start_section_job(
+    label: str,
+    kind: str,
+    *,
+    key: str,
+    options: dict | None = None,
+    disabled: bool = False,
+) -> None:
+    if st.button(
+        label,
+        key=key,
+        type="primary",
+        use_container_width=True,
+        disabled=disabled,
+    ):
+        try:
+            job = start_workflow_job(kind, options=options)
+            st.session_state["job_notice"] = (
+                f"{tr('workflow_started')}: {job['job_id']}"
+            )
+            st.success(st.session_state["job_notice"])
+        except (RuntimeError, ValueError) as exc:
+            st.error(f"{tr('workflow_blocked')}: {exc}")
+
+
 def show_last_result() -> None:
     result = st.session_state.get("last_result")
     if result is None:
@@ -182,7 +299,19 @@ st.session_state["language"] = "fa" if language_label == "فارسی" else "en"
 rtl = st.session_state["language"] == "fa"
 inject_style(rtl)
 
-pages = ["overview", "data", "paper", "reports", "golive", "jobs", "guide"]
+pages = [
+    "overview",
+    "data",
+    "market",
+    "forward",
+    "airdrop",
+    "cross_asset",
+    "paper",
+    "reports",
+    "golive",
+    "jobs",
+    "guide",
+]
 page_labels = [tr(item) for item in pages]
 st.sidebar.markdown("## ⚡ FREAKTO")
 selected = st.sidebar.radio(tr("nav"), page_labels)
@@ -235,6 +364,150 @@ elif page == "data":
         execute(tr("build"), ["data", "build"], key="data-build", disabled=not build_ok)
         replay_ok = st.checkbox(tr("replay_confirm"), key="replay-confirm")
         execute(tr("replay_run"), ["replay", "run", "--compact"], key="replay-run", disabled=not replay_ok)
+
+elif page == "market":
+    st.subheader(tr("market_title"))
+    st.caption(tr("market_note"))
+    st.info(tr("one_at_time"))
+    market = snapshot["workflows"]
+    cards = st.columns(3)
+    with cards[0]:
+        metric_card(
+            tr("adapter_manifests"),
+            str(market["market_adapter_manifests"]),
+            "EUR/USD + XAU/USD",
+        )
+    with cards[1]:
+        metric_card("Paper", "OFF", "research_only=true", "good")
+    with cards[2]:
+        metric_card("Live", "OFF", "not available", "good")
+    st.markdown("#### " + tr("audit_range"))
+    dates = st.columns(2)
+    with dates[0]:
+        audit_start = st.text_input(
+            tr("start_date"),
+            value="2023-01-01",
+            key="market-audit-start",
+        )
+    with dates[1]:
+        audit_end = st.text_input(
+            tr("end_date"),
+            value="2026-01-01",
+            key="market-audit-end",
+        )
+    audit_ok = st.checkbox(tr("audit_confirm"), key="market-audit-confirm")
+    start_section_job(
+        tr("start_audit"),
+        "MARKET_DATA_AUDIT",
+        key="market-audit-start-button",
+        options={"start": audit_start, "end": audit_end},
+        disabled=not audit_ok,
+    )
+    st.divider()
+    replay_ok = st.checkbox(
+        tr("market_replay_confirm"),
+        key="market-replay-confirm",
+    )
+    start_section_job(
+        tr("start_market_replay"),
+        "MARKET_REPLAY",
+        key="market-replay-start-button",
+        disabled=not replay_ok,
+    )
+
+elif page == "forward":
+    st.subheader(tr("forward_title"))
+    st.caption(tr("forward_note"))
+    st.info(tr("one_at_time"))
+    forward_cols = st.columns(3)
+    with forward_cols[0]:
+        metric_card(
+            tr("last_forward"),
+            "COLLECTING",
+            snapshot["workflows"]["forward_latest_utc"] or "—",
+        )
+    with forward_cols[1]:
+        metric_card("Paper", "OFF", "gate-controlled", "good")
+    with forward_cols[2]:
+        metric_card("Live", "OFF", "manual authorization absent", "good")
+    execute(
+        tr("forward_report"),
+        ["report", "forward"],
+        key="forward-section-status",
+    )
+    forward_ok = st.checkbox(tr("forward_confirm"), key="forward-cycle-confirm")
+    start_section_job(
+        tr("start_forward"),
+        "FORWARD_SHADOW_CYCLE",
+        key="forward-cycle-start",
+        disabled=not forward_ok,
+    )
+
+elif page == "airdrop":
+    st.subheader(tr("airdrop_title"))
+    st.caption(tr("airdrop_note"))
+    st.info(tr("one_at_time"))
+    airdrop_cols = st.columns(3)
+    with airdrop_cols[0]:
+        metric_card(
+            tr("tracker_db"),
+            "READY" if snapshot["workflows"]["airdrop_tracker_exists"] else "EMPTY",
+            str(ROOT / "history" / "airdrop_outcomes.db"),
+        )
+    with airdrop_cols[1]:
+        metric_card("Wallet automation", "OFF", "not available", "good")
+    with airdrop_cols[2]:
+        metric_card("Claim automation", "OFF", "not available", "good")
+    airdrop_ok = st.checkbox(tr("airdrop_confirm"), key="airdrop-confirm")
+    start_section_job(
+        tr("start_airdrop"),
+        "AIRDROP_OUTCOMES",
+        key="airdrop-start",
+        disabled=not airdrop_ok,
+    )
+
+elif page == "cross_asset":
+    st.subheader(tr("cross_title"))
+    st.caption(tr("cross_note"))
+    st.info(tr("one_at_time"))
+    opportunity_path = st.text_input(
+        tr("opportunity_csv"),
+        value="data/cross_asset/opportunities.csv",
+        key="cross-opportunity-input",
+    )
+    rank_ok = st.checkbox(tr("rank_confirm"), key="cross-rank-confirm")
+    start_section_job(
+        tr("start_rank"),
+        "CROSS_ASSET_RANK",
+        key="cross-rank-start",
+        options={"input": opportunity_path},
+        disabled=not rank_ok,
+    )
+    st.divider()
+    paths = st.columns(2)
+    with paths[0]:
+        rankings_path = st.text_input(
+            tr("rankings_csv"),
+            value="data/cross_asset/rankings.csv",
+            key="cross-rankings-input",
+        )
+    with paths[1]:
+        outcomes_path = st.text_input(
+            tr("outcomes_csv"),
+            value="data/cross_asset/outcomes.csv",
+            key="cross-outcomes-input",
+        )
+    evaluate_ok = st.checkbox(
+        tr("evaluate_confirm"),
+        key="cross-evaluate-confirm",
+    )
+    start_section_job(
+        tr("start_evaluate"),
+        "CROSS_ASSET_EVALUATE",
+        key="cross-evaluate-start",
+        options={"rankings": rankings_path, "outcomes": outcomes_path},
+        disabled=not evaluate_ok,
+    )
 
 elif page == "paper":
     st.subheader(tr("paper_title"))
@@ -300,7 +573,16 @@ elif page == "jobs":
         for job in jobs:
             total = int(job.get("total_steps") or 0)
             done = int(job.get("completed_steps") or 0)
-            table.append({tr("job_id"): job.get("job_id"), tr("job_status"): job.get("status"), tr("progress"): f"{done}/{total}", tr("current_step"): job.get("current_step") or "—", tr("created"): job.get("created_utc")})
+            table.append(
+                {
+                    tr("job_id"): job.get("job_id"),
+                    tr("kind"): job.get("kind"),
+                    tr("job_status"): job.get("status"),
+                    tr("progress"): f"{done}/{total}",
+                    tr("current_step"): job.get("current_step") or "—",
+                    tr("created"): job.get("created_utc"),
+                }
+            )
         st.dataframe(table, use_container_width=True, hide_index=True)
         identifiers = [job["job_id"] for job in jobs]
         selected_id = st.selectbox(tr("select_job"), identifiers)

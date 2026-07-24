@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from streamlit.testing.v1 import AppTest
 
 from freakto.ui import control_center_state as state
@@ -53,9 +54,36 @@ def test_command_runner_forces_safe_environment(monkeypatch, tmp_path):
     assert called["kwargs"]["env"]["REAL_CAPITAL_ENABLED"] == "false"
 
 
+def test_script_runner_is_allowlisted_and_forces_safe_environment(monkeypatch, tmp_path):
+    called = {}
+    (tmp_path / "airdrop_backtest_dashboard.py").write_text("# test", encoding="utf-8")
+
+    class Completed:
+        returncode = 0
+        stdout = "ok"
+        stderr = ""
+
+    def fake_run(command, **kwargs):
+        called.update(command=command, kwargs=kwargs)
+        return Completed()
+
+    monkeypatch.setattr(state.subprocess, "run", fake_run)
+    result = state.run_script(
+        ["airdrop_backtest_dashboard.py", "report"],
+        root=tmp_path,
+    )
+    assert result.ok
+    assert called["kwargs"]["env"]["LIVE_TRADING_ENABLED"] == "false"
+    assert called["kwargs"]["env"]["REAL_CAPITAL_ENABLED"] == "false"
+    with pytest.raises(ValueError, match="allowlisted"):
+        state.run_script(["not_allowed.py"], root=tmp_path)
+
+
 def test_control_center_exposes_every_management_area():
     source = (ROOT / "freakto" / "ui" / "control_center.py").read_text(encoding="utf-8")
     for label in ("نمای کلی", "داده و Replay", "Paper Trading", "گزارش‌ها", "Go-live", "اجراها و لاگ‌ها", "راهنمای اجرا"):
+        assert label in source
+    for label in ("بازارهای جدید", "Forward و Shadow", "Airdrop Radar", "رتبه‌بندی بین‌بازاری"):
         assert label in source
     assert '"en": {' in source
     assert '"fa": {' in source
@@ -89,6 +117,29 @@ def test_quick_start_can_skip_long_running_bootstrap_steps():
     assert keys[-1] == "go_live_check"
 
 
+def test_section_workflows_are_fixed_research_only_plans(tmp_path):
+    market = state.workflow_plan(
+        "MARKET_DATA_AUDIT",
+        {"start": "2023-01-01", "end": "2026-01-01"},
+        root=tmp_path,
+    )
+    replay = state.workflow_plan("MARKET_REPLAY", root=tmp_path)
+    forward = state.workflow_plan("FORWARD_SHADOW_CYCLE", root=tmp_path)
+    airdrop = state.workflow_plan("AIRDROP_OUTCOMES", root=tmp_path)
+    assert [step.key for step in market] == ["audit_eur_usd", "audit_xau_usd"]
+    assert market[0].runner == "script"
+    assert "--fixed-execution-costs" in replay[0].arguments
+    assert forward[0].accepted_exit_codes == (0,)
+    assert airdrop[0].accepted_exit_codes == (0, 2)
+    all_arguments = [
+        argument.lower()
+        for plan in (market, replay, forward, airdrop)
+        for step in plan
+        for argument in step.arguments
+    ]
+    assert "live" not in all_arguments
+
+
 def test_windows_launcher_is_safe_and_repository_relative():
     source = (ROOT / "run_control_center.bat").read_text(encoding="utf-8").lower()
     assert 'cd /d "%~dp0"' in source
@@ -100,20 +151,18 @@ def test_windows_launcher_is_safe_and_repository_relative():
 def test_dashboard_renders_navigation_without_exception():
     app = AppTest.from_file(str(ROOT / "freakto_control_center.py"), default_timeout=20).run()
     assert not app.exception
-    assert app.radio[0].options == [
-        "نمای کلی",
-        "داده و Replay",
-        "Paper Trading",
-        "گزارش‌ها",
-        "Go-live",
-        "اجراها و لاگ‌ها",
-        "راهنمای اجرا",
-    ]
+    assert len(app.radio[0].options) == 11
+    assert "بازارهای جدید" in app.radio[0].options
+    assert "Airdrop Radar" in app.radio[0].options
     app.selectbox[0].set_value("English").run()
     assert not app.exception
     assert app.radio[0].options == [
         "Overview",
         "Data & Replay",
+        "New Markets",
+        "Forward & Shadow",
+        "Airdrop Radar",
+        "Cross-Asset Ranking",
         "Paper Trading",
         "Reports",
         "Go-live",
@@ -126,6 +175,22 @@ def test_dashboard_renders_navigation_without_exception():
     app.checkbox[0].check().run()
     quick_button = next(button for button in app.button if button.label.startswith("▶"))
     assert quick_button.disabled is False
+
+
+def test_each_new_management_page_renders_controls():
+    app = AppTest.from_file(str(ROOT / "freakto_control_center.py"), default_timeout=20).run()
+    app.selectbox[0].set_value("English").run()
+    expected_buttons = {
+        "New Markets": {"Start market data audit", "Start forex and gold Replay"},
+        "Forward & Shadow": {"Start Forward/Shadow cycle"},
+        "Airdrop Radar": {"Start Airdrop sync and report"},
+        "Cross-Asset Ranking": {"Start ranking", "Start historical evaluation"},
+    }
+    for page, labels in expected_buttons.items():
+        app.radio[0].set_value(page).run()
+        assert not app.exception
+        rendered = {button.label for button in app.button}
+        assert labels.issubset(rendered)
 
 
 def test_quick_start_click_launches_background_job_without_ui_exception(monkeypatch):
