@@ -1,0 +1,24 @@
+{
+  "schema_version": "ohlcv-v1",
+  "asset_class": "gold",
+  "provider": "twelve_data",
+  "symbols": [
+    "XAU/USD"
+  ],
+  "price_basis": "mid",
+  "volume_semantics": "provider_reported_only_missing_is_blocked",
+  "session_calendar": "XAU_PROVIDER_SESSION_AND_DAILY_BREAK_REQUIRE_AUDIT",
+  "execution": {
+    "cost_model_status": "UNVERIFIED",
+    "spread_source": null,
+    "slippage_source": null,
+    "rollover_source": null,
+    "contract_size": null,
+    "account_currency_conversion": null
+  },
+  "safety": {
+    "research_only": true,
+    "paper_enabled": false,
+    "live_enabled": false
+  }
+}
