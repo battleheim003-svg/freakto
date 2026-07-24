@@ -43,3 +43,62 @@ def test_status_rejects_pid_whose_command_is_not_shadow_worker(tmp_path, monkeyp
     controller.metadata_file.write_text('{"pid": 99}', encoding="utf-8")
     monkeypatch.setattr(controller, "_process_command", lambda _pid: "python unrelated.py")
     assert controller.status().running is False
+
+
+def test_status_recovers_running_worker_from_runtime_lock(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "live_paper.py").write_text("# worker", encoding="utf-8")
+    controller = ShadowProcessController(project, "state")
+    controller.state_root.mkdir()
+    controller.metadata_file.write_text('{"pid": 111, "groups": "core", "interval_seconds": 300}', encoding="utf-8")
+    controller.runtime_lock.write_text('{"pid": 222}', encoding="utf-8")
+    monkeypatch.setattr(
+        controller,
+        "_process_command",
+        lambda pid: f"python {controller.script} --mode shadow --loop" if pid == 222 else "",
+    )
+
+    status = controller.status()
+
+    assert status.running is True
+    assert status.pid == 222
+
+
+def test_start_removes_only_stale_runtime_lock(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "live_paper.py").write_text("# worker", encoding="utf-8")
+    controller = ShadowProcessController(project, "state")
+    controller.state_root.mkdir()
+    controller.runtime_lock.write_text('{"pid": 123}', encoding="utf-8")
+    monkeypatch.setattr(
+        controller,
+        "_process_command",
+        lambda pid: f"python {controller.script} --mode shadow --loop" if pid == 43210 else "",
+    )
+    monkeypatch.setattr("engine.shadow_process_controller.subprocess.Popen", lambda *_args, **_kwargs: _FakeProcess())
+
+    status = controller.start()
+
+    assert status.running is True
+    assert not controller.runtime_lock.exists()
+
+
+def test_stop_cleans_lock_after_worker_is_gone(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "live_paper.py").write_text("# worker", encoding="utf-8")
+    controller = ShadowProcessController(project, "state")
+    controller.state_root.mkdir()
+    controller.metadata_file.write_text(
+        '{"pid": 123, "groups": "core", "interval_seconds": 300}',
+        encoding="utf-8",
+    )
+    controller.runtime_lock.write_text('{"pid": 123}', encoding="utf-8")
+    monkeypatch.setattr(controller, "_process_command", lambda _pid: "")
+
+    status = controller.stop()
+
+    assert status.running is False
+    assert not controller.runtime_lock.exists()

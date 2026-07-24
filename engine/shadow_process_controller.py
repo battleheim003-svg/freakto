@@ -41,6 +41,7 @@ class ShadowProcessController:
         root = Path(state_root)
         self.state_root = (self.project_root / root).resolve() if not root.is_absolute() else root.resolve()
         self.metadata_file = self.state_root / "shadow_process.json"
+        self.runtime_lock = self.state_root / "runtime.lock"
         self.log_file = self.state_root / "shadow_worker.log"
         self.script = (self.project_root / "live_paper.py").resolve()
 
@@ -73,14 +74,56 @@ class ShadowProcessController:
             return None
         return pid
 
+    def _lock_metadata(self) -> dict[str, Any]:
+        try:
+            payload = json.loads(self.runtime_lock.read_text(encoding="utf-8"))
+            return payload if isinstance(payload, dict) else {}
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            return {}
+
+    def _running_pid(self, metadata: dict[str, Any] | None = None) -> int | None:
+        metadata = metadata if metadata is not None else self._metadata()
+        candidates = [metadata.get("pid"), self._lock_metadata().get("pid")]
+        for candidate in candidates:
+            try:
+                pid = int(candidate or 0)
+            except (TypeError, ValueError):
+                continue
+            validated = self._validated_process(pid)
+            if validated is not None:
+                return validated
+        return None
+
+    def _remove_stale_runtime_lock(self) -> None:
+        if not self.runtime_lock.exists():
+            return
+        lock_pid = self._lock_metadata().get("pid")
+        try:
+            parsed_pid = int(lock_pid or 0)
+        except (TypeError, ValueError):
+            parsed_pid = 0
+        if self._validated_process(parsed_pid) is not None:
+            raise RuntimeError(f"shadow worker is already running with PID {parsed_pid}")
+        try:
+            self.runtime_lock.unlink()
+        except FileNotFoundError:
+            pass
+
+    def _log_tail(self, maximum_chars: int = 1600) -> str:
+        try:
+            content = self.log_file.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return content[-maximum_chars:].strip()
+
     def status(self) -> ShadowProcessStatus:
         metadata = self._metadata()
-        pid = int(metadata.get("pid", 0) or 0)
-        running = self._validated_process(pid) is not None
+        pid = self._running_pid(metadata)
+        running = pid is not None
         message = "Shadow worker is running" if running else "Shadow worker is stopped"
         return ShadowProcessStatus(
             running=running,
-            pid=pid or None,
+            pid=pid,
             started_at_utc=metadata.get("started_at_utc"),
             stopped_at_utc=metadata.get("stopped_at_utc"),
             groups=str(metadata.get("groups", "core")),
@@ -97,6 +140,7 @@ class ShadowProcessController:
         if current.running:
             return current
         self.state_root.mkdir(parents=True, exist_ok=True)
+        self._remove_stale_runtime_lock()
         command = [
             sys.executable, "-X", "utf8", str(self.script), "--mode", "shadow",
             "--groups", groups, "--loop", "--interval", str(float(interval_seconds)),
@@ -128,11 +172,39 @@ class ShadowProcessController:
             "command": command,
         }
         _atomic_json(self.metadata_file, metadata)
-        return ShadowProcessStatus(True, process.pid, metadata["started_at_utc"], None, groups, float(interval_seconds), "Shadow worker started")
+        deadline = time.monotonic() + 8.0
+        while time.monotonic() < deadline:
+            poll = getattr(process, "poll", None)
+            if callable(poll) and poll() is not None:
+                break
+            lock_pid = self._lock_metadata().get("pid")
+            try:
+                lock_matches = int(lock_pid or 0) == process.pid
+            except (TypeError, ValueError):
+                lock_matches = False
+            if lock_matches and self._validated_process(process.pid) is not None:
+                return ShadowProcessStatus(
+                    True, process.pid, metadata["started_at_utc"], None,
+                    groups, float(interval_seconds), "Shadow worker started",
+                )
+            # Test doubles and unusually slow lock visibility can still prove
+            # liveness through the exact validated command.
+            if not callable(poll) and self._validated_process(process.pid) is not None:
+                return ShadowProcessStatus(
+                    True, process.pid, metadata["started_at_utc"], None,
+                    groups, float(interval_seconds), "Shadow worker started",
+                )
+            time.sleep(0.1)
+        metadata["pid"] = None
+        metadata["stopped_at_utc"] = _utc_now()
+        _atomic_json(self.metadata_file, metadata)
+        detail = self._log_tail()
+        suffix = f"\n{detail}" if detail else ""
+        raise RuntimeError(f"shadow worker failed during startup{suffix}")
 
     def stop(self, timeout_seconds: float = 10.0) -> ShadowProcessStatus:
         metadata = self._metadata()
-        pid = self._validated_process(int(metadata.get("pid", 0) or 0))
+        pid = self._running_pid(metadata)
         if pid is not None:
             if os.name == "nt":
                 subprocess.run(["taskkill", "/PID", str(pid), "/T"], capture_output=True, timeout=timeout_seconds, check=False)
@@ -151,6 +223,10 @@ class ShadowProcessController:
                         os.killpg(os.getpgid(pid), 9)
                     except (ProcessLookupError, PermissionError):
                         pass
+        # Windows termination does not reliably execute RuntimeLock.__exit__.
+        # Remove the lock only after its recorded PID is no longer the exact
+        # validated shadow command, so a real worker's lock is never stolen.
+        self._remove_stale_runtime_lock()
         metadata["stopped_at_utc"] = _utc_now()
         metadata["pid"] = None
         _atomic_json(self.metadata_file, metadata)
