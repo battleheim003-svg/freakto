@@ -78,3 +78,23 @@ freakto replay run --symbols EUR/USD,XAU/USD --timeframe 1d --fee-bps 0.525 --sl
 
 Do not run this as evidence until the cost fields have audited sources and the
 dataset manifest passes review.
+
+## Executed research evidence
+
+The unchanged Replay engine was executed on both persisted datasets with the
+more conservative shared inputs (`fee=0.525 bps/side`,
+`slippage=3.643 bps/side`, fixed execution costs):
+
+```text
+freakto replay run --symbols EUR/USD,XAU/USD --timeframe 1d --start 2023-01-01 --end 2025-12-31 --fee-bps 0.525 --slippage-bps 3.643 --fixed-execution-costs
+```
+
+Run `market_replay_20260724_132330` completed 1,609 rows and passed the strict
+no-lookahead audit. Test average net return was 0.186435% (profit factor
+1.2617); Validation average net return was 0.212079% (profit factor 1.3477).
+This is historical research evidence only.
+
+The current Forward status is still `FORWARD_TEST_COLLECTING` with 1/30
+observed days, 34/100 complete evaluations, and 0/30 closed Paper trades.
+Consequently Shadow/Forward/Paper are not passed, and both Paper and Live flags
+remain false.

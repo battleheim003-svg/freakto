@@ -16,8 +16,12 @@ At least two asset classes must independently provide:
 - calibrated success probability, expected gross return, expected cost, and
   confidence measured on causally separated data.
 
-Forex and gold currently remain `RESEARCH_DATA_ONLY`, so this prerequisite is
-not yet met with real project data.
+EUR/USD and XAU/USD now have schema/session-passed 2023-2025 datasets and a
+causal Replay run. They remain `RESEARCH_DATA_ONLY` because historical
+rollover is not modeled. The score-calibration run found a monotonic research
+signal overall, but produced zero Shadow candidates and does not provide the
+per-row calibrated probabilities required by this ranker. The activation
+prerequisite therefore remains fail-closed.
 
 ## Ranking contract
 
@@ -56,3 +60,19 @@ not a profitability, Paper, or Live approval.
 outcomes append-only in a separate SQLite database. It rejects outcomes without
 a prior ranking, outcomes observed at or before the ranking period, negative
 costs, and missing evidence references.
+
+## Current evidence snapshot
+
+- Market Replay: `market_replay_20260724_132330`
+- Replay status: `REPLAY_RESEARCH_VALIDATED`
+- Rows / directional rows: 1,609 / 725
+- Leakage audit: `PASSED_NO_LOOKAHEAD`
+- Test average net / profit factor: 0.186435% / 1.2617
+- Validation average net / profit factor: 0.212079% / 1.3477
+- Score calibration: `SCORE_MONOTONIC_RESEARCH_SIGNAL`
+- Shadow candidates: 0
+- Forward status: `FORWARD_TEST_COLLECTING`, 1/30 observed days
+
+No synthetic standardized rows were created to make the ranker pass. It should
+start its append-only forward ledger only after two asset classes expose real
+validated probability and expected-return estimates at the same period.
