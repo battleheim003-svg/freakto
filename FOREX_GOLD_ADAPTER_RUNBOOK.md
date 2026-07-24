@@ -18,6 +18,18 @@ Official provider references:
 - `https://twelvedata.com/forex`
 - `https://twelvedata.com/commodities`
 
+## Collection
+
+Set the credential only in the process environment, then fetch an explicit UTC
+range. Omit `--persist` for a read-only provider/contract audit.
+
+```text
+python -X utf8 market_adapter_dashboard.py forex --symbol EUR/USD --timeframe 4h --start 2023-01-01 --end 2026-01-01
+```
+
+Add `--persist` only after reviewing the contract result. Persistence creates a
+new cache and adapter manifest and refuses to replace either file.
+
 ## Safety gates
 
 1. Config must remain `research_only=true`.
@@ -34,6 +46,10 @@ Data-schema compatibility is implemented and unit-tested. Provider history,
 session/DST behavior, volume availability, spreads, rollover, slippage,
 contract sizing, and account-currency conversion still require empirical audits
 before any Forward, Shadow, or Paper gate.
+
+The compatibility audit deliberately reports `RESEARCH_DATA_ONLY` while the
+session calendar or execution-cost model is unverified. Raw weekend/session
+gaps are reported but never filled or deleted.
 
 Once a validated dataset exists, the unchanged replay command can read its
 normal cache path:

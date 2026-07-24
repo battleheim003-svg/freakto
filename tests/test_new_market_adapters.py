@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 from freakto.markets import TwelveDataAdapter, TwelveDataError, persist_replay_dataset
+from freakto.markets.compatibility import audit_replay_compatibility
 from freakto.markets.forex import config as forex_config
 from freakto.markets.gold import config as gold_config
 
@@ -73,6 +74,27 @@ def test_twelve_data_adapter_maps_and_validates_closed_candles():
     assert captured["params"]["apikey"] == "secret"
 
 
+def test_range_fetch_uses_explicit_provider_boundaries_without_outputsize():
+    captured = {}
+
+    def get(url, **kwargs):
+        captured.update(kwargs)
+        return Response(_payload())
+
+    adapter = TwelveDataAdapter("secret", get=get)
+    _, report = adapter.fetch_range(
+        "EUR/USD",
+        "4h",
+        start=datetime(2024, 1, 1, tzinfo=timezone.utc),
+        end=datetime(2024, 1, 2, tzinfo=timezone.utc),
+        now=datetime(2024, 1, 2, tzinfo=timezone.utc),
+    )
+    assert report.ok
+    assert captured["params"]["start_date"] == "2024-01-01T00:00:00"
+    assert captured["params"]["end_date"] == "2024-01-02T00:00:00"
+    assert "outputsize" not in captured["params"]
+
+
 def test_missing_provider_volume_is_blocked_not_fabricated():
     adapter = TwelveDataAdapter("secret", get=lambda *a, **k: Response(_payload(include_volume=False)))
     frame, report = adapter.fetch_validated(
@@ -120,3 +142,18 @@ def test_valid_dataset_is_persisted_in_replay_layout_without_overwrite(tmp_path)
             data_dir=tmp_path,
             now=datetime(2024, 1, 2, tzinfo=timezone.utc),
         )
+
+
+def test_compatibility_stays_research_only_until_session_and_cost_audits_pass():
+    frame = pd.DataFrame(_payload()["values"]).rename(columns={"datetime": "timestamp"})
+    report = audit_replay_compatibility(
+        frame,
+        timeframe="4h",
+        config=forex_config(),
+        min_rows=2,
+    )
+    assert report.schema_ready
+    assert report.status == "RESEARCH_DATA_ONLY"
+    assert not report.evidence_replay_ready
+    assert "EXECUTION_COST_MODEL_UNVERIFIED" in report.blockers
+    assert "SESSION_CALENDAR_UNVERIFIED" in report.blockers

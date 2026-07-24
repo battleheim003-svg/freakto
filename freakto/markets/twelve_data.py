@@ -43,14 +43,15 @@ class TwelveDataAdapter:
         self._timeout = float(timeout)
         self._get = get
 
-    def fetch_ohlcv(
+    def _request(
         self,
         symbol: str,
         timeframe: str,
         *,
         since_ms: int | None = None,
+        end_ms: int | None = None,
         limit: int | None = None,
-    ) -> Sequence[Mapping[str, Any]]:
+    ) -> list[dict[str, Any]]:
         interval = TIMEFRAME_MAP.get(str(timeframe).strip().lower())
         if interval is None:
             raise ValueError(f"Unsupported Twelve Data timeframe: {timeframe}")
@@ -70,6 +71,12 @@ class TwelveDataAdapter:
             params["start_date"] = datetime.fromtimestamp(
                 int(since_ms) / 1000, tz=timezone.utc
             ).strftime("%Y-%m-%dT%H:%M:%S")
+        if end_ms is not None:
+            params["end_date"] = datetime.fromtimestamp(
+                int(end_ms) / 1000, tz=timezone.utc
+            ).strftime("%Y-%m-%dT%H:%M:%S")
+        if since_ms is not None and end_ms is not None and int(since_ms) >= int(end_ms):
+            raise ValueError("Historical start must be earlier than end.")
         if limit is not None:
             if int(limit) < 1 or int(limit) > 5000:
                 raise ValueError("Twelve Data outputsize must be between 1 and 5000.")
@@ -106,6 +113,40 @@ class TwelveDataAdapter:
             )
         return rows
 
+    def fetch_ohlcv(
+        self,
+        symbol: str,
+        timeframe: str,
+        *,
+        since_ms: int | None = None,
+        limit: int | None = None,
+    ) -> Sequence[Mapping[str, Any]]:
+        return self._request(
+            symbol,
+            timeframe,
+            since_ms=since_ms,
+            limit=limit,
+        )
+
+    def fetch_range(
+        self,
+        symbol: str,
+        timeframe: str,
+        *,
+        start: datetime,
+        end: datetime,
+        now: datetime | None = None,
+    ) -> tuple[pd.DataFrame, ContractReport]:
+        start_utc = _utc(start)
+        end_utc = _utc(end)
+        rows = self._request(
+            symbol,
+            timeframe,
+            since_ms=int(start_utc.timestamp() * 1000),
+            end_ms=int(end_utc.timestamp() * 1000),
+        )
+        return _validated_frame(rows, timeframe, now=now)
+
     def fetch_validated(
         self,
         symbol: str,
@@ -121,10 +162,25 @@ class TwelveDataAdapter:
             since_ms=since_ms,
             limit=limit,
         )
-        frame = pd.DataFrame.from_records(rows)
-        if not frame.empty:
-            frame["timestamp"] = pd.to_datetime(frame["timestamp"], utc=True, errors="coerce")
-            for column in ("open", "high", "low", "close", "volume"):
-                frame[column] = pd.to_numeric(frame[column], errors="coerce")
-        report = inspect_ohlcv(frame, timeframe, now=now, require_closed=True)
-        return frame, report
+        return _validated_frame(rows, timeframe, now=now)
+
+
+def _utc(value: datetime) -> datetime:
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
+
+
+def _validated_frame(
+    rows: Sequence[Mapping[str, Any]],
+    timeframe: str,
+    *,
+    now: datetime | None,
+) -> tuple[pd.DataFrame, ContractReport]:
+    frame = pd.DataFrame.from_records(rows)
+    if not frame.empty:
+        frame["timestamp"] = pd.to_datetime(frame["timestamp"], utc=True, errors="coerce")
+        for column in ("open", "high", "low", "close", "volume"):
+            frame[column] = pd.to_numeric(frame[column], errors="coerce")
+    report = inspect_ohlcv(frame, timeframe, now=now, require_closed=True)
+    return frame, report
