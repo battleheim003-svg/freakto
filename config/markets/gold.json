@@ -1,13 +1,13 @@
 {
   "schema_version": "ohlcv-v1",
   "asset_class": "gold",
-  "provider": "twelve_data",
+  "provider": "dukascopy",
   "symbols": [
     "XAU/USD"
   ],
   "price_basis": "mid",
-  "volume_semantics": "provider_reported_only_missing_is_blocked",
-  "session_calendar": "XAU_PROVIDER_SESSION_AND_DAILY_BREAK_REQUIRE_AUDIT",
+  "volume_semantics": "best_bid_plus_best_ask_quote_volume",
+  "session_calendar": "DUKASCOPY_XAU_UTC_DAILY_WITH_ZERO_VOLUME_PLACEHOLDERS_REMOVED_REQUIRES_BREAK_AUDIT",
   "execution": {
     "cost_model_status": "UNVERIFIED",
     "spread_source": null,

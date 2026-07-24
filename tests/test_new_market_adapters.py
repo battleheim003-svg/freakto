@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+import lzma
+import struct
 from datetime import datetime, timezone
 
 import pandas as pd
 import pytest
 
-from freakto.markets import TwelveDataAdapter, TwelveDataError, persist_replay_dataset
+from freakto.markets import (
+    DukascopyAdapter,
+    TwelveDataAdapter,
+    TwelveDataError,
+    persist_replay_dataset,
+)
 from freakto.markets.compatibility import audit_replay_compatibility
 from freakto.markets.forex import config as forex_config
 from freakto.markets.gold import config as gold_config
@@ -20,6 +27,16 @@ class Response:
 
     def json(self):
         return self.payload
+
+
+class BinaryResponse:
+    status_code = 200
+
+    def __init__(self, content):
+        self.content = content
+
+    def raise_for_status(self):
+        return None
 
 
 def _payload(*, include_volume=True):
@@ -121,7 +138,7 @@ def test_valid_dataset_is_persisted_in_replay_layout_without_overwrite(tmp_path)
     frame["timestamp"] = pd.to_datetime(frame["timestamp"], utc=True)
     for column in ("open", "high", "low", "close", "volume"):
         frame[column] = pd.to_numeric(frame[column])
-    frame["provider"] = "twelve_data"
+    frame["provider"] = forex_config().provider
     data_path, manifest_path, manifest = persist_replay_dataset(
         frame,
         symbol="EUR/USD",
@@ -157,3 +174,69 @@ def test_compatibility_stays_research_only_until_session_and_cost_audits_pass():
     assert not report.evidence_replay_ready
     assert "EXECUTION_COST_MODEL_UNVERIFIED" in report.blockers
     assert "SESSION_CALENDAR_UNVERIFIED" in report.blockers
+
+
+def _dukascopy_payload(side_offset: int = 0) -> bytes:
+    records = [
+        struct.pack(
+            ">5if",
+            0,
+            110_000 + side_offset,
+            110_100 + side_offset,
+            109_900 + side_offset,
+            110_200 + side_offset,
+            10.0,
+        ),
+        struct.pack(
+            ">5if",
+            86_400,
+            110_100 + side_offset,
+            110_150 + side_offset,
+            110_000 + side_offset,
+            110_250 + side_offset,
+            0.0,
+        ),
+    ]
+    return lzma.compress(b"".join(records))
+
+
+def test_dukascopy_adapter_builds_mid_and_removes_explicit_placeholders():
+    def get(url, **kwargs):
+        offset = 20 if "ASK_" in url else 0
+        return BinaryResponse(_dukascopy_payload(offset))
+
+    adapter = DukascopyAdapter(get=get)
+    frame, report = adapter.fetch_range(
+        "EUR/USD",
+        "1d",
+        start=datetime(2024, 1, 1, tzinfo=timezone.utc),
+        end=datetime(2024, 1, 3, tzinfo=timezone.utc),
+        now=datetime(2024, 1, 4, tzinfo=timezone.utc),
+    )
+    assert report.ok
+    assert len(frame) == 1
+    assert frame.iloc[0]["open"] == pytest.approx(1.1001)
+    assert frame.iloc[0]["volume"] == pytest.approx(20.0)
+    assert frame.attrs["placeholder_rows_removed"] == 1
+    assert frame.iloc[0]["provider"] == "dukascopy"
+
+
+def test_dukascopy_adapter_reuses_raw_cache_without_network(tmp_path):
+    cache = tmp_path / "raw" / "EURUSD"
+    cache.mkdir(parents=True)
+    (cache / "2024_BID.bi5").write_bytes(_dukascopy_payload(0))
+    (cache / "2024_ASK.bi5").write_bytes(_dukascopy_payload(20))
+
+    def no_network(*args, **kwargs):
+        raise AssertionError("Network should not be called for cached years.")
+
+    adapter = DukascopyAdapter(get=no_network, cache_dir=tmp_path / "raw")
+    frame, report = adapter.fetch_range(
+        "EUR/USD",
+        "1d",
+        start=datetime(2024, 1, 1, tzinfo=timezone.utc),
+        end=datetime(2024, 1, 3, tzinfo=timezone.utc),
+        now=datetime(2024, 1, 4, tzinfo=timezone.utc),
+    )
+    assert report.ok
+    assert len(frame) == 1

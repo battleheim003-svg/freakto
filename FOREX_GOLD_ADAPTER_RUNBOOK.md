@@ -7,24 +7,24 @@ Legacy engine changes: none
 
 ## Purpose
 
-The adapter fetches Twelve Data `time_series` records, converts provider fields
-to Freakto `ohlcv-v1`, validates closed UTC candles, and can persist a brand-new
-dataset in the existing replay directory layout. It never overwrites an existing
-dataset.
+The default credential-free adapter downloads Dukascopy annual daily BID and
+ASK candles, constructs MID OHLC, sums the two quote-volume fields, removes
+explicit zero-volume placeholder days, validates closed UTC candles, and can
+persist a brand-new dataset in the existing replay directory layout. It never
+overwrites an existing dataset.
 
 Official provider references:
 
-- `https://twelvedata.com/docs/volume-indicators`
-- `https://twelvedata.com/forex`
-- `https://twelvedata.com/commodities`
+- `https://www.dukascopy.com/swiss/english/marketwatch/historical/`
+- `https://www.dukascopy.com/swiss/english/about/faq/?mob=0`
 
 ## Collection
 
-Set the credential only in the process environment, then fetch an explicit UTC
-range. Omit `--persist` for a read-only provider/contract audit.
+Fetch an explicit UTC range without credentials. Omit `--persist` for a
+read-only provider/contract audit.
 
 ```text
-python -X utf8 market_adapter_dashboard.py forex --symbol EUR/USD --timeframe 4h --start 2023-01-01 --end 2026-01-01
+python -X utf8 market_adapter_dashboard.py forex --symbol EUR/USD --timeframe 1d --start 2023-01-01 --end 2026-01-01
 ```
 
 Add `--persist` only after reviewing the contract result. Persistence creates a
@@ -55,7 +55,7 @@ Once a validated dataset exists, the unchanged replay command can read its
 normal cache path:
 
 ```text
-freakto replay run --symbols EUR/USD --timeframe 4h --fee-bps <audited> --slippage-bps <audited>
+freakto replay run --symbols EUR/USD --timeframe 1d --fee-bps <audited> --slippage-bps <audited>
 ```
 
 Do not run this as evidence until the cost fields have audited sources and the

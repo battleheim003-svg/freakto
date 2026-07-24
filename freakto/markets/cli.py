@@ -10,7 +10,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Sequence
 
-from freakto.markets import TwelveDataAdapter, load_market_config, persist_replay_dataset
+from freakto.markets import (
+    DukascopyAdapter,
+    TwelveDataAdapter,
+    load_market_config,
+    persist_replay_dataset,
+)
 from freakto.markets.compatibility import audit_replay_compatibility
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -33,11 +38,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("asset_class", choices=sorted(CONFIGS))
     parser.add_argument("--symbol", required=True)
-    parser.add_argument("--timeframe", default="4h")
+    parser.add_argument("--timeframe", default="1d")
     parser.add_argument("--start", required=True, help="Inclusive UTC ISO timestamp")
     parser.add_argument("--end", required=True, help="Exclusive audit boundary in UTC")
     parser.add_argument("--api-key-env", default="TWELVE_DATA_API_KEY")
     parser.add_argument("--data-dir", default=str(ROOT / "data" / "market_replay"))
+    parser.add_argument(
+        "--raw-cache-dir",
+        default=str(ROOT / "data" / "market_replay" / ".dukascopy_raw"),
+    )
     parser.add_argument(
         "--persist",
         action="store_true",
@@ -52,13 +61,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     symbol = str(args.symbol).strip().upper()
     if symbol not in config.symbols:
         raise SystemExit(f"Symbol {symbol} is not allowed by {args.asset_class} config.")
-    api_key = os.getenv(args.api_key_env, "").strip()
-    if not api_key:
-        raise SystemExit(f"Missing API key environment variable: {args.api_key_env}")
-
     start = _datetime(args.start)
     end = _datetime(args.end)
-    adapter = TwelveDataAdapter(api_key)
+    if config.provider == "dukascopy":
+        adapter = DukascopyAdapter(cache_dir=args.raw_cache_dir)
+    elif config.provider == "twelve_data":
+        api_key = os.getenv(args.api_key_env, "").strip()
+        if not api_key:
+            raise SystemExit(f"Missing API key environment variable: {args.api_key_env}")
+        adapter = TwelveDataAdapter(api_key)
+    else:
+        raise SystemExit(f"Unsupported configured provider: {config.provider}")
     frame, contract = adapter.fetch_range(
         symbol,
         args.timeframe,
