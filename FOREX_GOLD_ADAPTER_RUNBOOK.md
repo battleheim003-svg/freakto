@@ -34,7 +34,9 @@ new cache and adapter manifest and refuses to replace either file.
 
 1. Config must remain `research_only=true`.
 2. Paper and Live flags must remain false.
-3. Execution cost status remains `UNVERIFIED`.
+3. Execution cost status remains `UNVERIFIED` until historical rollover is
+   represented; observed spread and published commission are audited inputs,
+   not permission to advance the gate.
 4. Missing provider volume is blocked; the adapter does not fabricate it.
 5. Only fully closed, UTC-aligned candles pass.
 6. Existing replay files are never overwritten by the adapter.
@@ -42,20 +44,36 @@ new cache and adapter manifest and refuses to replace either file.
 
 ## Current compatibility status
 
-Data-schema compatibility is implemented and unit-tested. Provider history,
-session/DST behavior, volume availability, spreads, rollover, slippage,
-contract sizing, and account-currency conversion still require empirical audits
-before any Forward, Shadow, or Paper gate.
+The 2023-01-01 through 2025-12-31 BID/ASK archives were audited for EUR/USD and
+XAU/USD. Every absent UTC daily row was represented by an explicit provider
+zero-volume placeholder, and BID/ASK alignment had no unexplained gaps after a
+bad cached download was rejected and reacquired.
 
-The compatibility audit deliberately reports `RESEARCH_DATA_ONLY` while the
-session calendar or execution-cost model is unverified. Raw weekend/session
-gaps are reported but never filled or deleted.
+Observed close-spread audit:
+
+| Symbol | Rows | Placeholder days | Median spread | P95 spread | Suggested slippage/side |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| EUR/USD | 939 | 157 | 0.3644 bps | 5.8273 bps | 3.6421 bps |
+| XAU/USD | 934 | 162 | 1.7725 bps | 5.6955 bps | 3.5597 bps |
+
+Suggested slippage is `1.25 × half of observed P95 full spread`. Published
+worst-tier commissions are represented separately as 0.35 bps/side for FX and
+0.525 bps/side for precious metals. The fee source is the provider's official
+fee schedule:
+`https://www.dukascopy.com/swiss/english/about/fee-schedule/`.
+
+The compatibility audit still deliberately reports `RESEARCH_DATA_ONLY` with
+`ROLLOVER_NOT_MODELED`. Daily positions can cross the provider's overnight
+settlement, whose rates vary by instrument and date. No historical rollover
+series was available in the downloaded candle archive, so the gate remains
+fail-closed. Raw closed-session rows are removed only when the provider marks
+them explicitly with zero volume; no gap is synthesized or filled.
 
 Once a validated dataset exists, the unchanged replay command can read its
 normal cache path:
 
 ```text
-freakto replay run --symbols EUR/USD --timeframe 1d --fee-bps <audited> --slippage-bps <audited>
+freakto replay run --symbols EUR/USD,XAU/USD --timeframe 1d --fee-bps 0.525 --slippage-bps 3.643
 ```
 
 Do not run this as evidence until the cost fields have audited sources and the

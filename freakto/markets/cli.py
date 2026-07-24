@@ -86,6 +86,29 @@ def main(argv: Sequence[str] | None = None) -> int:
     output = {
         "contract": asdict(contract),
         "compatibility": asdict(compatibility),
+        "adapter_audit": {
+            key: value
+            for key, value in frame.attrs.items()
+            if key
+            in {
+                "price_basis",
+                "volume_semantics",
+                "placeholder_rows_removed",
+                "bid_ask_alignment_drops",
+                "session_audit_status",
+                "session_expected_days",
+                "session_placeholder_days",
+                "session_unexplained_gap_count",
+                "session_unexplained_gap_dates",
+                "spread_observations",
+                "spread_close_bps_median",
+                "spread_close_bps_p95",
+                "spread_close_bps_max",
+                "commission_bps_per_side",
+                "cost_audit_status",
+                "suggested_slippage_bps_per_side",
+            }
+        },
         "persisted": False,
         "dataset": None,
         "manifest": None,

@@ -21,6 +21,12 @@ POINT_VALUE = {
     "USD/JPY": 1_000.0,
     "XAU/USD": 1_000.0,
 }
+COMMISSION_BPS_PER_SIDE = {
+    "EUR/USD": 0.35,
+    "GBP/USD": 0.35,
+    "USD/JPY": 0.35,
+    "XAU/USD": 0.525,
+}
 
 
 class DukascopyError(RuntimeError):
@@ -119,6 +125,8 @@ class DukascopyAdapter:
         parts: list[pd.DataFrame] = []
         alignment_drops = 0
         placeholder_rows_removed = 0
+        placeholder_dates: set[pd.Timestamp] = set()
+        spread_samples: list[pd.Series] = []
         last_included = pd.Timestamp(end_utc) - pd.Timedelta(nanoseconds=1)
         for year in range(start_utc.year, int(last_included.year) + 1):
             bid = self._year_side(symbol, year, "BID")
@@ -141,6 +149,15 @@ class DukascopyAdapter:
             part["volume"] = merged["volume_bid"] + merged["volume_ask"]
             placeholders = part["volume"].le(0)
             placeholder_rows_removed += int(placeholders.sum())
+            placeholder_dates.update(
+                pd.to_datetime(part.loc[placeholders, "timestamp"], utc=True).tolist()
+            )
+            mid_close = (merged["close_bid"] + merged["close_ask"]) / 2.0
+            spread_samples.append(
+                ((merged["close_ask"] - merged["close_bid"]) / mid_close * 10_000.0)
+                .loc[~placeholders]
+                .astype(float)
+            )
             parts.append(part.loc[~placeholders].copy())
 
         if parts:
@@ -164,6 +181,58 @@ class DukascopyAdapter:
         frame.attrs["volume_semantics"] = "best_bid_plus_best_ask_quote_volume"
         frame.attrs["placeholder_rows_removed"] = placeholder_rows_removed
         frame.attrs["bid_ask_alignment_drops"] = alignment_drops
+        expected = pd.date_range(
+            start=pd.Timestamp(start_utc).normalize(),
+            end=(pd.Timestamp(end_utc) - pd.Timedelta(nanoseconds=1)).normalize(),
+            freq="1D",
+            tz="UTC",
+        )
+        observed = set(pd.to_datetime(frame["timestamp"], utc=True).dt.normalize())
+        placeholders_in_range = {
+            value.normalize()
+            for value in placeholder_dates
+            if pd.Timestamp(start_utc) <= value < pd.Timestamp(end_utc)
+        }
+        unexplained = sorted(set(expected) - observed - placeholders_in_range)
+        frame.attrs["session_audit_status"] = (
+            "PASSED" if not unexplained and alignment_drops == 0 else "FAILED"
+        )
+        frame.attrs["session_expected_days"] = len(expected)
+        frame.attrs["session_placeholder_days"] = len(placeholders_in_range)
+        frame.attrs["session_unexplained_gap_count"] = len(unexplained)
+        frame.attrs["session_unexplained_gap_dates"] = tuple(
+            value.isoformat() for value in unexplained
+        )
+        spreads = (
+            pd.concat(spread_samples, ignore_index=True)
+            if spread_samples
+            else pd.Series(dtype=float)
+        )
+        spreads = spreads[
+            spreads.notna()
+            & spreads.ge(0)
+            & spreads.replace([float("inf"), float("-inf")], pd.NA).notna()
+        ]
+        canonical_symbol = str(symbol).strip().upper()
+        frame.attrs["spread_observations"] = len(spreads)
+        frame.attrs["spread_close_bps_median"] = (
+            float(spreads.median()) if len(spreads) else None
+        )
+        frame.attrs["spread_close_bps_p95"] = (
+            float(spreads.quantile(0.95)) if len(spreads) else None
+        )
+        frame.attrs["spread_close_bps_max"] = (
+            float(spreads.max()) if len(spreads) else None
+        )
+        frame.attrs["commission_bps_per_side"] = COMMISSION_BPS_PER_SIDE[
+            canonical_symbol
+        ]
+        frame.attrs["cost_audit_status"] = (
+            "AUDITED_EXCLUDING_ROLLOVER" if len(spreads) else "FAILED"
+        )
+        frame.attrs["suggested_slippage_bps_per_side"] = (
+            float(spreads.quantile(0.95) * 0.625) if len(spreads) else None
+        )
         report = inspect_ohlcv(frame, "1d", now=now, require_closed=True)
         return frame, report
 

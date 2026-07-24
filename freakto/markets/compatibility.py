@@ -19,6 +19,8 @@ class CompatibilityReport:
     rows: int
     unexpected_gap_count: int
     zero_volume_rows: int
+    session_audit_status: str
+    cost_audit_status: str
     blockers: tuple[str, ...]
     warnings: tuple[str, ...]
 
@@ -44,9 +46,17 @@ def audit_replay_compatibility(
     ]
     if len(frame) < max(1, int(min_rows)):
         blockers.append(f"INSUFFICIENT_SAMPLE:{len(frame)}<{max(1, int(min_rows))}")
-    if config.cost_model_status != "AUDITED":
+    cost_audit_status = str(
+        frame.attrs.get("cost_audit_status", config.cost_model_status)
+    ).upper()
+    session_audit_status = str(
+        frame.attrs.get("session_audit_status", "UNVERIFIED")
+    ).upper()
+    if cost_audit_status not in {"AUDITED", "AUDITED_EXCLUDING_ROLLOVER"}:
         blockers.append("EXECUTION_COST_MODEL_UNVERIFIED")
-    if "REQUIRE" in config.session_calendar.upper():
+    if cost_audit_status == "AUDITED_EXCLUDING_ROLLOVER":
+        blockers.append("ROLLOVER_NOT_MODELED")
+    if session_audit_status != "PASSED":
         blockers.append("SESSION_CALENDAR_UNVERIFIED")
 
     zero_volume = 0
@@ -63,11 +73,18 @@ def audit_replay_compatibility(
     if timeframe_ms and "timestamp" in frame:
         timestamps = pd.to_datetime(frame["timestamp"], utc=True, errors="coerce")
         diffs = timestamps.sort_values().diff().dropna().dt.total_seconds().mul(1000)
-        gap_count = int((diffs > timeframe_ms).sum())
+        raw_gap_count = int((diffs > timeframe_ms).sum())
+        gap_count = (
+            int(frame.attrs.get("session_unexplained_gap_count", raw_gap_count))
+            if session_audit_status == "PASSED"
+            else raw_gap_count
+        )
         if gap_count:
             warnings.append(
                 f"RAW_TIME_GAPS:{gap_count}:classify_with_audited_session_calendar"
             )
+        elif raw_gap_count:
+            warnings.append(f"SESSION_GAPS_EXPLAINED:{raw_gap_count}")
 
     schema_ready = contract.ok
     evidence_ready = schema_ready and not blockers
@@ -79,6 +96,8 @@ def audit_replay_compatibility(
         rows=len(frame),
         unexpected_gap_count=gap_count,
         zero_volume_rows=zero_volume,
+        session_audit_status=session_audit_status,
+        cost_audit_status=cost_audit_status,
         blockers=tuple(dict.fromkeys(blockers)),
         warnings=tuple(dict.fromkeys(warnings)),
     )

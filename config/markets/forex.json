@@ -9,12 +9,13 @@
   ],
   "price_basis": "mid",
   "volume_semantics": "best_bid_plus_best_ask_quote_volume",
-  "session_calendar": "DUKASCOPY_UTC_DAILY_WITH_ZERO_VOLUME_PLACEHOLDERS_REMOVED_REQUIRES_BREAK_AUDIT",
+  "session_calendar": "DUKASCOPY_UTC_DAILY_EXPLICIT_PLACEHOLDERS_AUDITED_2023_2025",
   "execution": {
     "cost_model_status": "UNVERIFIED",
-    "spread_source": null,
-    "slippage_source": null,
-    "rollover_source": null,
+    "spread_source": "DUKASCOPY_BID_ASK_DAILY_CLOSE_2023_2025",
+    "slippage_source": "1.25_X_HALF_OF_OBSERVED_P95_DAILY_CLOSE_SPREAD",
+    "commission_source": "https://www.dukascopy.com/swiss/english/about/fee-schedule/",
+    "rollover_source": "https://www.dukascopy.com/swiss/english/forex/mt4-accounts/",
     "account_currency_conversion": null
   },
   "safety": {

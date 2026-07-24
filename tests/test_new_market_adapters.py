@@ -218,7 +218,24 @@ def test_dukascopy_adapter_builds_mid_and_removes_explicit_placeholders():
     assert frame.iloc[0]["open"] == pytest.approx(1.1001)
     assert frame.iloc[0]["volume"] == pytest.approx(20.0)
     assert frame.attrs["placeholder_rows_removed"] == 1
+    assert frame.attrs["session_audit_status"] == "PASSED"
+    assert frame.attrs["session_unexplained_gap_count"] == 0
+    assert frame.attrs["cost_audit_status"] == "AUDITED_EXCLUDING_ROLLOVER"
+    assert frame.attrs["spread_close_bps_p95"] > 0
+    assert frame.attrs["suggested_slippage_bps_per_side"] > 0
     assert frame.iloc[0]["provider"] == "dukascopy"
+
+    compatibility = audit_replay_compatibility(
+        frame,
+        timeframe="1d",
+        config=forex_config(),
+        min_rows=1,
+    )
+    assert compatibility.session_audit_status == "PASSED"
+    assert compatibility.cost_audit_status == "AUDITED_EXCLUDING_ROLLOVER"
+    assert "SESSION_CALENDAR_UNVERIFIED" not in compatibility.blockers
+    assert "EXECUTION_COST_MODEL_UNVERIFIED" not in compatibility.blockers
+    assert "ROLLOVER_NOT_MODELED" in compatibility.blockers
 
 
 def test_dukascopy_adapter_reuses_raw_cache_without_network(tmp_path):

@@ -32,6 +32,14 @@ class DatasetManifest:
     last_timestamp_utc: str
     data_sha256: str
     created_utc: str
+    session_audit_status: str = "UNVERIFIED"
+    session_placeholder_days: int = 0
+    session_unexplained_gap_count: int = 0
+    cost_audit_status: str = "UNVERIFIED"
+    spread_close_bps_median: float | None = None
+    spread_close_bps_p95: float | None = None
+    commission_bps_per_side: float | None = None
+    suggested_slippage_bps_per_side: float | None = None
     research_only: bool = True
 
 
@@ -94,6 +102,18 @@ def persist_replay_dataset(
         last_timestamp_utc=report.last_timestamp_utc or "",
         data_sha256=hashlib.sha256(raw).hexdigest(),
         created_utc=(now or datetime.now(timezone.utc)).astimezone(timezone.utc).isoformat(),
+        session_audit_status=str(frame.attrs.get("session_audit_status", "UNVERIFIED")),
+        session_placeholder_days=int(frame.attrs.get("session_placeholder_days", 0)),
+        session_unexplained_gap_count=int(
+            frame.attrs.get("session_unexplained_gap_count", 0)
+        ),
+        cost_audit_status=str(frame.attrs.get("cost_audit_status", "UNVERIFIED")),
+        spread_close_bps_median=frame.attrs.get("spread_close_bps_median"),
+        spread_close_bps_p95=frame.attrs.get("spread_close_bps_p95"),
+        commission_bps_per_side=frame.attrs.get("commission_bps_per_side"),
+        suggested_slippage_bps_per_side=frame.attrs.get(
+            "suggested_slippage_bps_per_side"
+        ),
     )
 
     root.mkdir(parents=True, exist_ok=True)
