@@ -108,6 +108,55 @@ def test_start_job_is_detached_and_forces_safe_environment(monkeypatch, tmp_path
     assert "freakto.ui.control_center_worker" in called["command"]
 
 
+def test_market_workflow_job_is_validated_and_persisted(monkeypatch, tmp_path):
+    called = {}
+
+    class Process:
+        pid = 8765
+
+    monkeypatch.setattr(
+        job_manager.subprocess,
+        "Popen",
+        lambda command, **kwargs: called.update(command=command, kwargs=kwargs) or Process(),
+    )
+    state = job_manager.start_workflow_job(
+        "MARKET_DATA_AUDIT",
+        options={"start": "2023-01-01", "end": "2026-01-01"},
+        root=tmp_path,
+    )
+    assert state["kind"] == "MARKET_DATA_AUDIT"
+    assert state["options"]["start"] == "2023-01-01"
+    assert state["pid"] == 8765
+    assert called["kwargs"]["env"]["LIVE_TRADING_ENABLED"] == "false"
+
+
+def test_cross_asset_inputs_cannot_escape_workspace(tmp_path):
+    with pytest.raises(ValueError, match="workspace"):
+        job_manager.start_workflow_job(
+            "CROSS_ASSET_RANK",
+            options={"input": str(tmp_path.parent / "outside.csv")},
+            root=tmp_path,
+        )
+
+
+def test_worker_dispatches_allowlisted_script_steps(monkeypatch, tmp_path):
+    state = initial_state(job_id="airdrop-1")
+    state.update(kind="AIRDROP_OUTCOMES", options={})
+    path = prepare_job(tmp_path, state)
+    called = []
+
+    def fake_script(arguments, **kwargs):
+        called.append(tuple(arguments))
+        code = 2 if arguments[-1] == "sync" else 0
+        return CommandResult(("python", *arguments), code, "ok", "")
+
+    monkeypatch.setattr(worker, "run_script", fake_script)
+    monkeypatch.setattr(worker, "run_cli", lambda *args, **kwargs: pytest.fail("must use script runner"))
+    assert worker.run_job(path, tmp_path) == 0
+    assert called[0][-1] == "sync"
+    assert called[1][-2:] == ("--min-resolved", "30")
+
+
 def test_second_active_job_is_rejected(monkeypatch, tmp_path):
     state = initial_state()
     state.update(status="QUEUED")

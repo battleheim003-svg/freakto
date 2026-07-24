@@ -6,7 +6,12 @@ import argparse
 import os
 from pathlib import Path
 
-from freakto.ui.control_center_state import quick_start_plan, run_cli
+from freakto.ui.control_center_state import (
+    quick_start_plan,
+    run_cli,
+    run_script,
+    workflow_plan,
+)
 from freakto.ui.job_manager import read_state, utc_now, write_state
 
 
@@ -26,7 +31,17 @@ def _append_log(path: Path, heading: str, stdout: str, stderr: str) -> None:
 def run_job(state_path: Path, root: Path) -> int:
     directory = state_path.parent
     state = read_state(state_path)
-    plan = quick_start_plan(include_data_build=bool(state.get("full")), include_replay=bool(state.get("full")))
+    if state.get("kind") == "QUICK_START":
+        plan = quick_start_plan(
+            include_data_build=bool(state.get("full")),
+            include_replay=bool(state.get("full")),
+        )
+    else:
+        plan = workflow_plan(
+            str(state.get("kind")),
+            dict(state.get("options") or {}),
+            root=root,
+        )
     state.update(
         status="RUNNING",
         pid=os.getpid(),
@@ -43,14 +58,24 @@ def run_job(state_path: Path, root: Path) -> int:
                 return 3
             state.update(current_step=step.key, heartbeat_utc=utc_now())
             write_state(state_path, state)
-            result = run_cli(step.arguments, root=root, timeout=3600 if step.long_running else 900)
+            runner = run_script if step.runner == "script" else run_cli
+            result = runner(
+                step.arguments,
+                root=root,
+                timeout=3600 if step.long_running else 900,
+            )
             accepted = result.exit_code in step.accepted_exit_codes
-            _append_log(directory / "pipeline.log", f"{index}/{len(plan)} freakto {' '.join(step.arguments)} [exit={result.exit_code}]", result.stdout, result.stderr)
+            label = (
+                "python " + " ".join(step.arguments)
+                if step.runner == "script"
+                else "freakto " + " ".join(step.arguments)
+            )
+            _append_log(directory / "pipeline.log", f"{index}/{len(plan)} {label} [exit={result.exit_code}]", result.stdout, result.stderr)
             state["steps"].append(
                 {
                     "index": index,
                     "key": step.key,
-                    "command": "freakto " + " ".join(step.arguments),
+                    "command": label,
                     "exit_code": result.exit_code,
                     "accepted": accepted,
                     "completed_utc": utc_now(),

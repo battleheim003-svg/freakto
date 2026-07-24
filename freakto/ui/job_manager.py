@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from freakto.ui.control_center_state import ROOT
+from freakto.ui.control_center_state import ROOT, WORKFLOW_KINDS, workflow_plan
 
 
 ACTIVE = {"QUEUED", "RUNNING", "CANCEL_REQUESTED"}
@@ -96,19 +96,28 @@ def list_jobs(root: Path = ROOT) -> list[dict[str, Any]]:
     return sorted((job for job in jobs if job), key=lambda row: row.get("created_utc", ""), reverse=True)
 
 
-def start_quick_job(*, full: bool, root: Path = ROOT) -> dict[str, Any]:
+def _start_job(
+    *,
+    kind: str,
+    full: bool = False,
+    options: dict[str, Any] | None = None,
+    root: Path = ROOT,
+) -> dict[str, Any]:
     active = [job for job in list_jobs(root) if job.get("status") in ACTIVE]
     if active:
         raise RuntimeError(f"Active job already exists: {active[0].get('job_id')}")
-    job_id = f"quick-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:6]}"
+    canonical = str(kind).strip().upper()
+    prefix = canonical.lower().replace("_", "-")
+    job_id = f"{prefix}-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:6]}"
     directory = jobs_dir(root) / job_id
     state_path = directory / "state.json"
     state = {
         "schema_version": 1,
         "job_id": job_id,
-        "kind": "QUICK_START",
+        "kind": canonical,
         "status": "QUEUED",
         "full": bool(full),
+        "options": dict(options or {}),
         "created_utc": utc_now(),
         "started_utc": None,
         "ended_utc": None,
@@ -145,6 +154,23 @@ def start_quick_job(*, full: bool, root: Path = ROOT) -> dict[str, Any]:
     return latest
 
 
+def start_quick_job(*, full: bool, root: Path = ROOT) -> dict[str, Any]:
+    return _start_job(kind="QUICK_START", full=full, root=root)
+
+
+def start_workflow_job(
+    kind: str,
+    *,
+    options: dict[str, Any] | None = None,
+    root: Path = ROOT,
+) -> dict[str, Any]:
+    canonical = str(kind).strip().upper()
+    if canonical not in WORKFLOW_KINDS:
+        raise ValueError(f"Unsupported workflow: {canonical}")
+    workflow_plan(canonical, options, root=root)
+    return _start_job(kind=canonical, options=options, root=root)
+
+
 def request_cancel(job_id: str, *, root: Path = ROOT) -> dict[str, Any]:
     directory = jobs_dir(root) / job_id
     state_path = directory / "state.json"
@@ -161,7 +187,13 @@ def retry_job(job_id: str, *, root: Path = ROOT) -> dict[str, Any]:
     state = reconcile(jobs_dir(root) / job_id / "state.json")
     if not state or state.get("status") not in TERMINAL:
         raise ValueError("Only a terminal job can be retried")
-    return start_quick_job(full=bool(state.get("full")), root=root)
+    if state.get("kind") == "QUICK_START":
+        return start_quick_job(full=bool(state.get("full")), root=root)
+    return start_workflow_job(
+        str(state.get("kind")),
+        options=dict(state.get("options") or {}),
+        root=root,
+    )
 
 
 def job_log(job_id: str, *, root: Path = ROOT, limit: int = 12000) -> str:
