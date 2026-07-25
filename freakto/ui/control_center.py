@@ -1,18 +1,23 @@
-"""Bilingual unified Streamlit control center for Freakto."""
+"""Professional, bilingual, zero-capital Streamlit control center for Freakto."""
 
 from __future__ import annotations
 
 import html
+from datetime import datetime, timezone
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from freakto.paper.campaign import ACTIVE as CAMPAIGN_ACTIVE
 from freakto.paper.campaign import campaign_status, start_campaign, stop_campaign
-from freakto.ui.control_center_state import (
-    ROOT,
-    collect_snapshot,
-    run_cli,
+from freakto.ui.automation import (
+    ensure_scheduler_running,
+    list_automations,
+    run_automation_now,
+    scheduler_status,
+    set_automation,
 )
+from freakto.ui.control_center_state import ROOT, collect_snapshot, quick_start_plan, run_cli, workflow_plan
 from freakto.ui.job_manager import (
     ACTIVE,
     TERMINAL,
@@ -29,246 +34,184 @@ st.set_page_config(page_title="Freakto Control Center", page_icon="⚡", layout=
 
 TEXT = {
     "fa": {
-        "language": "زبان / Language", "nav": "مرکز مدیریت", "overview": "نمای کلی",
-        "data": "داده و Replay", "paper": "Paper Trading", "reports": "گزارش‌ها",
-        "golive": "Go-live", "jobs": "اجراها و لاگ‌ها", "guide": "راهنمای اجرا", "refresh": "بروزرسانی وضعیت",
-        "safe": "سرمایه واقعی صفر — حالت ایمن", "safe_note": "هیچ عملیات واقعی صرافی از این پنل قابل فعال‌سازی نیست.",
-        "title": "مرکز کنترل Freakto", "subtitle": "مدیریت یکپارچه پژوهش، بازپخش، Paper و آمادگی عملیاتی",
-        "capital": "وضعیت سرمایه", "zero": "ایمن / صفر", "datasets": "دیتاست‌های بازار",
-        "paper_mode": "حالت Paper", "review": "بررسی Go-live", "blocked": "مسدود",
-        "reviewable": "قابل بررسی", "no_data": "هنوز دیتایی پیدا نشد", "armed": "فعال",
-        "disarmed": "متوقف", "quick_title": "شروع سریع هوشمند", "quick_desc": "این دکمه مسیر کامل را به‌ترتیب اجرا می‌کند؛ روی اولین خطای واقعی متوقف می‌شود و نتیجه هر مرحله را نگه می‌دارد.",
-        "full_pipeline": "ساخت/بروزرسانی داده و اجرای Replay کامل هم انجام شود", "confirm_quick": "تأیید می‌کنم این فرآیند ممکن است طولانی باشد و فقط Paper/Research اجرا می‌کند.",
-        "quick_button": "شروع مسیر کامل", "quick_running": "در حال اجرای مسیر امن…", "step": "مرحله",
-        "command": "فرمان", "result": "نتیجه", "success": "موفق", "stopped": "متوقف شد",
-        "safe_block": "مسدود ایمن", "pending": "در انتظار", "quick_done": "مسیر تا آخرین مرحله مجاز اجرا شد.",
-        "quick_failed": "مسیر در این مرحله متوقف شد؛ خروجی را بررسی کن.", "recommended": "ترتیب: Data → Replay → Preflight → Arm Research → Cycle → Reports → Go-live check",
-        "data_title": "داده و بازپخش تاریخی", "data_note": "فرمان‌های وضعیت read-only هستند. عملیات ساخت و Replay ممکن است زمان‌بر باشند.",
-        "data_files": "فایل‌های دیتای بازار", "data_status": "وضعیت داده", "replay_status": "وضعیت Replay",
-        "heavy": "عملیات سنگین", "build_confirm": "ساخت داده به اینترنت و زمان نیاز دارد", "build": "ساخت / بروزرسانی داده",
-        "replay_confirm": "اجرای Replay روی دیتای موجود را تأیید می‌کنم", "replay_run": "اجرای Replay",
-        "paper_title": "Paper Trading — بدون سرمایه واقعی", "live_orders": "سفارش واقعی", "off": "خاموش",
-        "unavailable": "از این داشبورد قابل فعال‌سازی نیست", "allocation": "تخصیص سرمایه", "preflight": "بررسی اولیه",
-        "arm_research": "فعال‌سازی Research", "one_cycle": "اجرای یک چرخه", "status": "نمایش وضعیت",
-        "safe_stop": "توقف ایمن", "stop_confirm": "توقف Paper و ثبت operator stop را تأیید می‌کنم", "disarm": "توقف Paper",
-        "strategy_note": "Strategy Paper فقط پس از عبور readiness فعال می‌شود و همچنان صفرسرمایه است.",
-        "strategy_confirm": "درخواست Strategy Paper را تأیید می‌کنم", "arm_strategy": "فعال‌سازی Strategy Paper",
-        "campaign_title": "کمپین واقعی ۶۰روزه", "campaign_status": "وضعیت کمپین", "campaign_days": "روز سپری‌شده",
-        "campaign_trades": "معاملات بسته", "campaign_cycles": "چرخه‌ها", "campaign_target": "پایان هدف",
-        "campaign_start": "شروع / ادامه کمپین", "campaign_stop": "توقف امن کمپین", "campaign_started": "کمپین پس‌زمینه فعال شد.",
-        "campaign_stop_requested": "درخواست توقف ثبت شد و پس از مرحله جاری اعمال می‌شود.", "campaign_confirm": "قرارداد ۶۰روزه و اجرای صفرسرمایه را تأیید می‌کنم.",
-        "reports_title": "گزارش‌ها و خروجی‌ها", "paper_report": "گزارش Paper", "research_report": "گزارش Research",
-        "forward_report": "وضعیت Forward", "artifacts": "خروجی‌های Runtime", "no_artifacts": "هنوز خروجی JSON ثبت نشده",
-        "golive_title": "گیت آمادگی نهایی", "remaining": "مانع باقی مانده", "manual_only": "تمام گیت‌ها عبور کرده‌اند؛ فقط بررسی دستی مستقل مجاز است.",
-        "never_live": "عبور از این گیت هرگز سفارش واقعی را فعال نمی‌کند.", "gate": "گیت", "current": "مقدار فعلی", "required": "حد لازم",
-        "rerun_golive": "اجرای دوباره Go-live check", "guide_title": "نقشه ساده اجرای پروژه",
-        "guide_body": "**۱. داده:** cache را بررسی و تکمیل کن.\n\n**۲. Replay:** استراتژی را روی تاریخ با قوانین causal اجرا کن.\n\n**۳. Preflight:** آمادگی محیط Paper را بسنج.\n\n**۴. Arm Research:** مشاهده‌های واقعی بازار را بدون سفارش ثبت کن.\n\n**۵. Cycle و Reports:** چرخه را اجرا و نتایج را ارزیابی کن.\n\n**۶. Go-live:** پس از حداقل ۶۰ روز و ۲۰۰ معامله، evidence را بررسی کن.\n\n**قانون طلایی:** «قابل بررسی» هم مجوز معامله واقعی نیست.",
-        "running": "در حال اجرا", "exit_ok": "فرمان با موفقیت تمام شد", "exit_blocked": "فرمان طبق قرارداد ایمنی مسدود شد",
-        "exit_failed": "اجرای فرمان ناموفق بود", "last_output": "آخرین خروجی فرمان",
-        "job_started": "اجرای پس‌زمینه شروع شد", "job_exists": "یک اجرای فعال از قبل وجود دارد", "jobs_title": "مدیریت اجراهای پس‌زمینه",
-        "jobs_note": "Quick Start در پس‌زمینه ادامه می‌یابد؛ بستن مرورگر آن را متوقف نمی‌کند.", "no_jobs": "هنوز اجرایی ثبت نشده است.",
-        "job_id": "شناسه اجرا", "job_status": "وضعیت", "progress": "پیشرفت", "created": "زمان ایجاد", "current_step": "مرحله فعلی",
-        "select_job": "انتخاب اجرا", "cancel": "لغو پس از مرحله فعلی", "retry": "اجرای دوباره", "log": "لاگ اجرا",
-        "cancelled_requested": "درخواست لغو ثبت شد؛ پس از پایان مرحله جاری متوقف می‌شود.", "retried": "اجرای مجدد شروع شد.",
+        "operations": "مرکز عملیات", "workflows": "فرآیندها", "reports": "گزارش‌ها", "settings": "تنظیمات و اتوماسیون",
+        "refresh": "بروزرسانی", "safe": "صفرسرمایه · Live خاموش", "safe_note": "این پنل فقط Research و Paper اجرا می‌کند و امکان ارسال سفارش واقعی ندارد.",
+        "ops_title": "مرکز عملیات Freakto", "ops_sub": "همه‌چیز مهم در یک نگاه؛ وضعیت، پیشرفت، مانع و اقدام بعدی",
+        "system_health": "سلامت سیستم", "data": "داده", "paper": "Paper", "go_live": "آمادگی نهایی", "automations": "اتوماسیون‌ها",
+        "ready": "آماده", "blocked": "مسدود", "enabled": "فعال", "disabled": "خاموش", "live_off": "LIVE ORDERS: OFF",
+        "active_operation": "عملیات فعال", "no_active": "هیچ عملیاتی در حال اجرا نیست", "idle_note": "سیستم آماده شروع یک فرآیند جدید است.",
+        "current_step": "مرحله جاری", "next_step": "مرحله بعد", "started": "شروع", "elapsed": "زمان سپری‌شده", "progress": "پیشرفت",
+        "cancel": "توقف پس از مرحله جاری", "refresh_status": "بروزرسانی وضعیت", "auto_refresh": "بروزرسانی خودکار هنگام اجرا",
+        "pipeline": "مسیر کامل", "pipeline_help": "داده → Replay → Preflight → Research Paper → Reports → بررسی آمادگی",
+        "start_full": "شروع مسیر کامل", "full_confirm": "تأیید می‌کنم مسیر فقط Research/Paper است و ممکن است زمان‌بر باشد.",
+        "include_build": "ساخت داده و Replay کامل انجام شود", "attention": "نیازمند توجه", "next_action": "اقدام پیشنهادی",
+        "latest_result": "آخرین نتیجه", "view_details": "مشاهده جزئیات", "recent_activity": "فعالیت اخیر", "no_history": "هنوز سابقه‌ای ثبت نشده است.",
+        "workflows_title": "فرآیندهای مستقل", "workflows_sub": "هر بخش را جدا اجرا و مدیریت کن؛ هم‌زمان فقط یک Job فعال است.",
+        "data_markets": "داده و بازارها", "validation_paper": "اعتبارسنجی و Paper", "research": "پژوهش‌های جانبی",
+        "data_replay": "ساخت داده و Replay", "data_replay_desc": "وضعیت داده، بروزرسانی cache، بررسی و اجرای Replay فشرده.",
+        "market_audit": "ممیزی فارکس و طلا", "market_audit_desc": "ساخت OHLCV استاندارد برای EUR/USD و XAU/USD و ثبت Manifest.",
+        "market_replay": "Replay فارکس و طلا", "market_replay_desc": "Replay تحقیقاتی با هزینه‌های ثابت ممیزی‌شده و Leakage Audit.",
+        "forward_cycle": "چرخه Forward و Shadow", "forward_desc": "Preflight، Research Arm، چرخه Paper و گزارش Forward به‌ترتیب.",
+        "airdrop": "Airdrop Outcomes", "airdrop_desc": "همگام‌سازی نتایج واقعی و تولید گزارش کیفیت پیش‌بینی‌ها.",
+        "cross_asset": "رتبه‌بندی بین‌بازاری", "cross_desc": "رتبه‌بندی Research-only و ارزیابی تاریخی فایل‌های CSV داخل پروژه.",
+        "start": "شروع", "running": "در حال اجرا", "unavailable_active": "یک Job دیگر فعال است", "advanced": "تنظیمات پیشرفته",
+        "start_date": "شروع بازه", "end_date": "پایان بازه", "rank_input": "فایل فرصت‌ها", "rankings_input": "فایل رتبه‌بندی", "outcomes_input": "فایل نتایج",
+        "rank": "اجرای رتبه‌بندی", "evaluate": "ارزیابی تاریخی", "paper_controls": "کنترل مستقیم Paper", "preflight": "Preflight", "paper_status": "وضعیت Paper",
+        "arm_research": "فعال‌سازی Research", "one_cycle": "یک چرخه Paper", "disarm": "توقف Paper", "confirm_sensitive": "این اقدام صفرسرمایه را تأیید می‌کنم.",
+        "campaign": "کمپین ۶۰روزه Paper", "campaign_start": "شروع / ادامه کمپین", "campaign_stop": "توقف امن کمپین", "days": "روز", "trades": "معامله بسته", "cycles": "چرخه",
+        "reports_title": "گزارش و تاریخچه", "reports_sub": "نتیجه روشن هر اجرا، مراحل موفق، نقطه توقف، Blockerها و لاگ کامل.",
+        "refresh_reports": "تولید همه گزارش‌ها", "readiness": "گزارش آمادگی", "blockers": "موانع", "gates": "گیت‌ها", "job_history": "تاریخچه Jobها",
+        "select_job": "انتخاب Job", "retry": "اجرای مجدد", "log": "لاگ فنی", "step_results": "نتیجه مراحل", "result": "نتیجه", "duration": "مدت", "current": "مقدار فعلی", "required": "حد لازم", "schedules": "زمان‌بندی",
+        "settings_title": "تنظیمات و اتوماسیون", "settings_sub": "زمان‌بندی‌های محلی، قرارداد ایمنی و تنظیمات فنی در یک فضای جدا.",
+        "scheduler": "Scheduler محلی", "scheduler_running": "فعال و مستقل از مرورگر", "scheduler_stopped": "متوقف", "interval": "فاصله اجرا (ساعت)",
+        "next_run": "اجرای بعدی", "last_run": "آخرین اجرا", "save": "ذخیره زمان‌بندی", "run_now": "همین حالا اجرا کن", "automation_note": "Scheduler در پس‌زمینه اجرا می‌شود؛ بستن داشبورد زمان‌بندی‌های فعال را متوقف نمی‌کند.",
+        "safety_contract": "قرارداد ایمنی", "safety_body": "سرمایه واقعی صفر است، متغیرهای Live به اجبار خاموش‌اند و عبور از Go-live check فقط گزارش تولید می‌کند.",
+        "technical": "اطلاعات فنی", "runtime_path": "مسیر Runtime", "guide": "راهنمای ساده", "guide_body": "۱) داده را آماده کن. ۲) Replay را بسنج. ۳) Forward/Paper را جمع‌آوری کن. ۴) گزارش و Blockerها را بررسی کن. ۵) تصمیم Live فقط خارج از این داشبورد و با تأیید مستقل ممکن است.",
+        "saved": "ذخیره شد", "job_started": "Job شروع شد", "job_blocked": "شروع Job مسدود شد", "cancel_requested": "درخواست توقف ثبت شد.",
     },
     "en": {
-        "language": "Language / زبان", "nav": "Management center", "overview": "Overview",
-        "data": "Data & Replay", "paper": "Paper Trading", "reports": "Reports",
-        "golive": "Go-live", "jobs": "Jobs & logs", "guide": "Run guide", "refresh": "Refresh status",
-        "safe": "ZERO REAL CAPITAL — SAFE MODE", "safe_note": "Real exchange execution cannot be enabled from this panel.",
-        "title": "Freakto Control Center", "subtitle": "Unified research, replay, Paper, and operational-readiness management",
-        "capital": "Capital status", "zero": "Safe / zero", "datasets": "Market datasets",
-        "paper_mode": "Paper mode", "review": "Go-live review", "blocked": "Blocked",
-        "reviewable": "Reviewable", "no_data": "No market data found", "armed": "Armed",
-        "disarmed": "Disarmed", "quick_title": "Smart quick start", "quick_desc": "Runs the complete workflow in order, stops on the first real failure, and preserves every step result.",
-        "full_pipeline": "Also build/update data and run the full Replay", "confirm_quick": "I understand this can take a long time and remains Research/Paper only.",
-        "quick_button": "Start complete workflow", "quick_running": "Running safe workflow…", "step": "Step",
-        "command": "Command", "result": "Result", "success": "Passed", "stopped": "Stopped",
-        "safe_block": "Safe block", "pending": "Pending", "quick_done": "Workflow reached the final permitted step.",
-        "quick_failed": "Workflow stopped here; inspect the output below.", "recommended": "Order: Data → Replay → Preflight → Arm Research → Cycle → Reports → Go-live check",
-        "data_title": "Historical data and Replay", "data_note": "Status commands are read-only. Data builds and Replay can take significant time.",
-        "data_files": "Market data files", "data_status": "Data status", "replay_status": "Replay status",
-        "heavy": "Long-running operations", "build_confirm": "I understand data building needs network access and time", "build": "Build / update data",
-        "replay_confirm": "I confirm Replay should run on cached data", "replay_run": "Run Replay",
-        "paper_title": "Paper Trading — zero real capital", "live_orders": "Live orders", "off": "OFF",
-        "unavailable": "Cannot be enabled from this dashboard", "allocation": "Capital allocation", "preflight": "Preflight",
-        "arm_research": "Arm Research", "one_cycle": "Run one cycle", "status": "Show status",
-        "safe_stop": "Safe stop", "stop_confirm": "I confirm Paper disarm and operator-stop recording", "disarm": "Disarm Paper",
-        "strategy_note": "Strategy Paper requires readiness and still remains zero-capital.",
-        "strategy_confirm": "I confirm the Strategy Paper request", "arm_strategy": "Arm Strategy Paper",
-        "campaign_title": "Real 60-day campaign", "campaign_status": "Campaign status", "campaign_days": "Elapsed days",
-        "campaign_trades": "Closed trades", "campaign_cycles": "Cycles", "campaign_target": "Target end",
-        "campaign_start": "Start / resume campaign", "campaign_stop": "Safely stop campaign", "campaign_started": "Background campaign started.",
-        "campaign_stop_requested": "Stop requested and will apply after the current step.", "campaign_confirm": "I confirm the 60-day zero-capital campaign contract.",
-        "reports_title": "Reports and outputs", "paper_report": "Paper report", "research_report": "Research report",
-        "forward_report": "Forward status", "artifacts": "Runtime artifacts", "no_artifacts": "No JSON artifacts yet",
-        "golive_title": "Final readiness gate", "remaining": "blockers remaining", "manual_only": "All gates passed; independent manual review is the only permitted next step.",
-        "never_live": "Passing this gate never enables real orders.", "gate": "Gate", "current": "Current", "required": "Required",
-        "rerun_golive": "Run Go-live check again", "guide_title": "Simple project run map",
-        "guide_body": "**1. Data:** inspect and complete the cache.\n\n**2. Replay:** run the strategy historically under causal rules.\n\n**3. Preflight:** verify the Paper environment.\n\n**4. Arm Research:** collect live observations without orders.\n\n**5. Cycle and Reports:** run a cycle and evaluate results.\n\n**6. Go-live:** after at least 60 days and 200 trades, evaluate evidence.\n\n**Golden rule:** Reviewable never means authorized for live trading.",
-        "running": "Running", "exit_ok": "Command completed successfully", "exit_blocked": "Command was safely blocked by policy",
-        "exit_failed": "Command failed", "last_output": "Latest command output",
-        "job_started": "Background job started", "job_exists": "Another job is already active", "jobs_title": "Background job manager",
-        "jobs_note": "Quick Start continues in the background; closing the browser does not stop it.", "no_jobs": "No jobs recorded yet.",
-        "job_id": "Job ID", "job_status": "Status", "progress": "Progress", "created": "Created", "current_step": "Current step",
-        "select_job": "Select job", "cancel": "Cancel after current step", "retry": "Retry job", "log": "Job log",
-        "cancelled_requested": "Cancellation requested; the job will stop after its current step.", "retried": "Retry started.",
+        "operations": "Operations", "workflows": "Workflows", "reports": "Reports", "settings": "Settings & Automation",
+        "refresh": "Refresh", "safe": "ZERO CAPITAL · LIVE OFF", "safe_note": "This panel runs Research and Paper only; real orders are unavailable.",
+        "ops_title": "Freakto Operations Center", "ops_sub": "Status, progress, blockers, and the next action in one clear view",
+        "system_health": "System health", "data": "Data", "paper": "Paper", "go_live": "Final readiness", "automations": "Automations",
+        "ready": "Ready", "blocked": "Blocked", "enabled": "Enabled", "disabled": "Off", "live_off": "LIVE ORDERS: OFF",
+        "active_operation": "Active operation", "no_active": "No operation is running", "idle_note": "The system is ready to start a new workflow.",
+        "current_step": "Current step", "next_step": "Next step", "started": "Started", "elapsed": "Elapsed", "progress": "Progress",
+        "cancel": "Stop after current step", "refresh_status": "Refresh status", "auto_refresh": "Auto-refresh while running",
+        "pipeline": "Complete workflow", "pipeline_help": "Data → Replay → Preflight → Research Paper → Reports → Readiness review",
+        "start_full": "Start complete workflow", "full_confirm": "I confirm this is Research/Paper only and may take a long time.",
+        "include_build": "Build data and run full Replay", "attention": "Needs attention", "next_action": "Recommended next action",
+        "latest_result": "Latest result", "view_details": "View details", "recent_activity": "Recent activity", "no_history": "No history has been recorded yet.",
+        "workflows_title": "Independent workflows", "workflows_sub": "Run and manage each area separately; only one job can be active at a time.",
+        "data_markets": "Data & Markets", "validation_paper": "Validation & Paper", "research": "Supporting Research",
+        "data_replay": "Data build & Replay", "data_replay_desc": "Check data, update the cache, validate, and run compact Replay.",
+        "market_audit": "Forex & gold audit", "market_audit_desc": "Build contract-compatible OHLCV for EUR/USD and XAU/USD.",
+        "market_replay": "Forex & gold Replay", "market_replay_desc": "Research Replay with audited fixed costs and leakage checks.",
+        "forward_cycle": "Forward & Shadow cycle", "forward_desc": "Preflight, Research arm, Paper cycle, and Forward report in order.",
+        "airdrop": "Airdrop Outcomes", "airdrop_desc": "Synchronize resolved outcomes and report prediction quality.",
+        "cross_asset": "Cross-asset ranking", "cross_desc": "Research-only ranking and historical evaluation of workspace CSV files.",
+        "start": "Start", "running": "Running", "unavailable_active": "Another job is active", "advanced": "Advanced settings",
+        "start_date": "Start date", "end_date": "End date", "rank_input": "Opportunity file", "rankings_input": "Rankings file", "outcomes_input": "Outcomes file",
+        "rank": "Run ranking", "evaluate": "Historical evaluation", "paper_controls": "Direct Paper controls", "preflight": "Preflight", "paper_status": "Paper status",
+        "arm_research": "Arm Research", "one_cycle": "One Paper cycle", "disarm": "Disarm Paper", "confirm_sensitive": "I confirm this zero-capital action.",
+        "campaign": "60-day Paper campaign", "campaign_start": "Start / resume campaign", "campaign_stop": "Safely stop campaign", "days": "Days", "trades": "Closed trades", "cycles": "Cycles",
+        "reports_title": "Reports & history", "reports_sub": "A clear result for every run: passed steps, stop point, blockers, and full logs.",
+        "refresh_reports": "Generate all reports", "readiness": "Readiness report", "blockers": "Blockers", "gates": "Gates", "job_history": "Job history",
+        "select_job": "Select job", "retry": "Retry", "log": "Technical log", "step_results": "Step results", "result": "Result", "duration": "Duration", "current": "Current", "required": "Required", "schedules": "schedules",
+        "settings_title": "Settings & Automation", "settings_sub": "Local schedules, the safety contract, and technical settings in one separate area.",
+        "scheduler": "Local scheduler", "scheduler_running": "Running independently of the browser", "scheduler_stopped": "Stopped", "interval": "Interval (hours)",
+        "next_run": "Next run", "last_run": "Last run", "save": "Save schedule", "run_now": "Run now", "automation_note": "The scheduler runs in the background; closing the dashboard does not stop enabled schedules.",
+        "safety_contract": "Safety contract", "safety_body": "Real capital is zero, Live flags are forced off, and Go-live check only creates a report.",
+        "technical": "Technical information", "runtime_path": "Runtime path", "guide": "Simple guide", "guide_body": "1) Prepare data. 2) validate Replay. 3) collect Forward/Paper evidence. 4) review reports and blockers. 5) Live decisions remain outside this dashboard and require independent approval.",
+        "saved": "Saved", "job_started": "Job started", "job_blocked": "Job launch blocked", "cancel_requested": "Stop request recorded.",
     },
 }
 
-TEXT["fa"].update(
-    {
-        "market": "بازارهای جدید",
-        "forward": "Forward و Shadow",
-        "airdrop": "Airdrop Radar",
-        "cross_asset": "رتبه‌بندی بین‌بازاری",
-        "market_title": "کنترل بازارهای فارکس و طلا",
-        "market_note": "ممیزی داده و Replay در jobهای مستقل اجرا می‌شوند؛ هسته و Decision Engine فقط مصرف‌کننده داده معتبر باقی می‌مانند.",
-        "adapter_manifests": "Manifestهای ممیزی‌شده",
-        "audit_range": "بازه ممیزی UTC",
-        "start_date": "تاریخ شروع",
-        "end_date": "تاریخ پایان انحصاری",
-        "audit_confirm": "اجرای ممیزی EUR/USD و XAU/USD را تأیید می‌کنم",
-        "start_audit": "شروع ممیزی داده بازار",
-        "market_replay_confirm": "Replay تحقیقاتی با هزینه‌های ممیزی‌شده را تأیید می‌کنم",
-        "start_market_replay": "شروع Replay فارکس و طلا",
-        "forward_title": "کنترل Forward و Shadow",
-        "forward_note": "هر چرخه Preflight، Research Arm، یک چرخه مشاهده و گزارش Forward را به‌ترتیب اجرا می‌کند. خروجی blocked یک توقف ایمن است.",
-        "last_forward": "آخرین گزارش Forward",
-        "forward_confirm": "اجرای یک چرخه صفرسرمایه Forward/Shadow را تأیید می‌کنم",
-        "start_forward": "شروع چرخه Forward/Shadow",
-        "airdrop_title": "کنترل Outcomeهای Airdrop",
-        "airdrop_note": "Sync فقط snapshotهای موجود را وارد می‌کند و بدون دیتابیس Radar با وضعیت SYNC_BLOCKED متوقف می‌شود؛ هیچ outcome ساخته نمی‌شود.",
-        "tracker_db": "دیتابیس Outcome",
-        "airdrop_confirm": "Sync و گزارش evidence را تأیید می‌کنم",
-        "start_airdrop": "شروع Sync و گزارش Airdrop",
-        "cross_title": "کنترل رتبه‌بندی Cross-Asset",
-        "cross_note": "فقط CSVهای داخل workspace پذیرفته می‌شوند. Ranker هیچ تصمیم معاملاتی به موتور ارسال نمی‌کند.",
-        "opportunity_csv": "CSV فرصت‌های استانداردشده",
-        "rankings_csv": "CSV رتبه‌بندی‌ها",
-        "outcomes_csv": "CSV outcomeهای مشاهده‌شده",
-        "rank_confirm": "قرارداد داده و اجرای Research-only Rank را تأیید می‌کنم",
-        "start_rank": "شروع رتبه‌بندی",
-        "evaluate_confirm": "ارزیابی causal رتبه‌بندی‌ها را تأیید می‌کنم",
-        "start_evaluate": "شروع ارزیابی تاریخی",
-        "workflow_started": "Job بخش شروع شد",
-        "workflow_blocked": "شروع Job به‌صورت ایمن مسدود شد",
-        "one_at_time": "برای جلوگیری از تداخل فایل‌ها، در هر لحظه فقط یک job پس‌زمینه اجرا می‌شود.",
-        "kind": "بخش",
-    }
-)
-TEXT["en"].update(
-    {
-        "market": "New Markets",
-        "forward": "Forward & Shadow",
-        "airdrop": "Airdrop Radar",
-        "cross_asset": "Cross-Asset Ranking",
-        "market_title": "Forex and gold controls",
-        "market_note": "Data audit and Replay run as isolated jobs; the core and Decision Engine remain unchanged consumers of validated data.",
-        "adapter_manifests": "Audited manifests",
-        "audit_range": "UTC audit range",
-        "start_date": "Start date",
-        "end_date": "Exclusive end date",
-        "audit_confirm": "I confirm the EUR/USD and XAU/USD data audit",
-        "start_audit": "Start market data audit",
-        "market_replay_confirm": "I confirm research Replay with audited cost inputs",
-        "start_market_replay": "Start forex and gold Replay",
-        "forward_title": "Forward and Shadow controls",
-        "forward_note": "Each cycle runs Preflight, Research Arm, one observation cycle, and Forward reporting in order. A blocked result is a safe stop.",
-        "last_forward": "Latest Forward report",
-        "forward_confirm": "I confirm one zero-capital Forward/Shadow cycle",
-        "start_forward": "Start Forward/Shadow cycle",
-        "airdrop_title": "Airdrop outcome controls",
-        "airdrop_note": "Sync imports existing snapshots only and returns SYNC_BLOCKED without a Radar database; it never fabricates outcomes.",
-        "tracker_db": "Outcome database",
-        "airdrop_confirm": "I confirm evidence sync and reporting",
-        "start_airdrop": "Start Airdrop sync and report",
-        "cross_title": "Cross-Asset ranker controls",
-        "cross_note": "Only CSV files inside the workspace are accepted. The ranker never emits a Decision Engine action.",
-        "opportunity_csv": "Standardized opportunities CSV",
-        "rankings_csv": "Rankings CSV",
-        "outcomes_csv": "Observed outcomes CSV",
-        "rank_confirm": "I confirm the data contract and research-only ranking run",
-        "start_rank": "Start ranking",
-        "evaluate_confirm": "I confirm causal ranking evaluation",
-        "start_evaluate": "Start historical evaluation",
-        "workflow_started": "Section job started",
-        "workflow_blocked": "Job launch was safely blocked",
-        "one_at_time": "Only one background job runs at a time to prevent artifact conflicts.",
-        "kind": "Area",
-    }
-)
+KIND_LABELS = {
+    "QUICK_START": ("مسیر کامل", "Complete workflow"), "DATA_REPLAY": ("داده و Replay", "Data & Replay"),
+    "MARKET_DATA_AUDIT": ("ممیزی بازار", "Market audit"), "MARKET_REPLAY": ("Replay بازار", "Market Replay"),
+    "FORWARD_SHADOW_CYCLE": ("Forward و Shadow", "Forward & Shadow"), "AIRDROP_OUTCOMES": ("نتایج Airdrop", "Airdrop outcomes"),
+    "CROSS_ASSET_RANK": ("رتبه‌بندی بین‌بازاری", "Cross-asset rank"), "CROSS_ASSET_EVALUATE": ("ارزیابی بین‌بازاری", "Cross-asset evaluation"),
+    "REPORT_REFRESH": ("بروزرسانی گزارش‌ها", "Report refresh"),
+}
 
-TEXT["fa"].update(
-    {
-        "nav_group": "حوزه کاری",
-        "nav_page": "صفحه",
-        "group_home": "خانه",
-        "group_research": "داده و پژوهش",
-        "group_validation": "اعتبارسنجی",
-        "group_operations": "عملیات صفرسرمایه",
-        "group_system": "سیستم و راهنما",
-        "status_summary": "خلاصه وضعیت",
-        "workflow_map": "مسیر مرحله‌ای",
-        "settings": "تنظیمات",
-        "actions": "عملیات",
-        "advanced": "تنظیمات پیشرفته",
-        "read_only": "بررسی‌های فقط‌خواندنی",
-        "start_job": "اجرای پس‌زمینه",
-        "active_job": "Job فعال",
-        "no_active_job": "هیچ Job فعالی وجود ندارد",
-        "step_collect": "۱. داده",
-        "step_replay": "۲. Replay",
-        "step_forward": "۳. Forward",
-        "step_paper": "۴. Paper",
-        "step_review": "۵. Review",
-        "research_tools": "ابزارهای پژوهش",
-        "validation_tools": "اعتبارسنجی و شواهد",
-        "safe_operations": "عملیات کنترل‌شده",
-        "system_tools": "نظارت و راهنما",
-    }
-)
-TEXT["en"].update(
-    {
-        "nav_group": "Workspace",
-        "nav_page": "Page",
-        "group_home": "Home",
-        "group_research": "Data & Research",
-        "group_validation": "Validation",
-        "group_operations": "Zero-capital Operations",
-        "group_system": "System & Guide",
-        "status_summary": "Status summary",
-        "workflow_map": "Ordered workflow",
-        "settings": "Settings",
-        "actions": "Actions",
-        "advanced": "Advanced settings",
-        "read_only": "Read-only checks",
-        "start_job": "Background execution",
-        "active_job": "Active job",
-        "no_active_job": "No active job",
-        "step_collect": "1. Data",
-        "step_replay": "2. Replay",
-        "step_forward": "3. Forward",
-        "step_paper": "4. Paper",
-        "step_review": "5. Review",
-        "research_tools": "Research tools",
-        "validation_tools": "Validation and evidence",
-        "safe_operations": "Controlled operations",
-        "system_tools": "Monitoring and guide",
-    }
-)
+STEP_LABELS = {
+    "data_status": ("بررسی وضعیت داده", "Check data status"), "data_build": ("ساخت و بروزرسانی داده", "Build and update data"),
+    "replay_status": ("بررسی وضعیت Replay", "Check Replay status"), "replay_run": ("اجرای Replay", "Run Replay"),
+    "paper_preflight": ("بررسی آمادگی Paper", "Paper preflight"), "arm_research": ("فعال‌سازی Research Paper", "Arm Research Paper"),
+    "paper_cycle": ("اجرای چرخه Paper", "Run Paper cycle"), "paper_status": ("بررسی وضعیت Paper", "Check Paper status"),
+    "paper_report": ("تولید گزارش Paper", "Generate Paper report"), "research_report": ("تولید گزارش Research", "Generate Research report"),
+    "forward_report": ("تولید گزارش Forward", "Generate Forward report"), "go_live_check": ("بررسی آمادگی نهایی", "Final readiness check"),
+    "audit_eur_usd": ("ممیزی EUR/USD", "Audit EUR/USD"), "audit_xau_usd": ("ممیزی XAU/USD", "Audit XAU/USD"),
+    "replay_forex_gold": ("Replay فارکس و طلا", "Replay forex and gold"), "airdrop_sync": ("همگام‌سازی Airdrop", "Sync Airdrop"),
+    "airdrop_report": ("گزارش نتایج Airdrop", "Airdrop outcome report"), "cross_asset_rank": ("رتبه‌بندی دارایی‌ها", "Rank assets"),
+    "cross_asset_evaluate": ("ارزیابی تاریخی رتبه‌ها", "Evaluate historical rankings"),
+}
 
-NAV_GROUPS = {
-    "home": ("overview",),
-    "research": ("data", "market", "airdrop", "cross_asset"),
-    "validation": ("forward", "reports"),
-    "operations": ("paper", "golive"),
-    "system": ("jobs", "guide"),
+STATUS_LABELS = {
+    "QUEUED": ("در صف", "Queued"), "RUNNING": ("در حال اجرا", "Running"), "CANCEL_REQUESTED": ("در انتظار توقف", "Stop requested"),
+    "SUCCEEDED": ("موفق", "Succeeded"), "FAILED": ("ناموفق", "Failed"), "CANCELLED": ("لغوشده", "Cancelled"), "INTERRUPTED": ("قطع‌شده", "Interrupted"),
+}
+
+BLOCKER_LABELS = {
+    "policy_version": ("نسخه سیاست Go-live ثبت نشده", "Go-live policy version is missing"),
+    "frozen_contract": ("قرارداد ارزیابی هنوز تثبیت نشده", "The evaluation contract is not frozen"),
+    "evaluation_window_frozen": ("بازه ارزیابی هنوز تثبیت نشده", "The evaluation window is not frozen"),
+    "sample_size": ("حجم نمونه کافی نیست", "The sample size is insufficient"),
+    "observation_days": ("روزهای مشاهده کافی نیست", "There are not enough observation days"),
+    "after_cost_expectancy": ("بازده موردانتظار پس از هزینه کافی نیست", "After-cost expectancy is below the requirement"),
+    "expectancy_confidence": ("اطمینان آماری بازده کافی نیست", "Expectancy confidence is insufficient"),
+    "profit_factor": ("Profit Factor به حد لازم نرسیده", "Profit factor is below the requirement"),
+    "drawdown": ("افت سرمایه از محدوده مجاز خارج است", "Drawdown is outside the permitted range"),
+    "regime_coverage": ("پوشش رژیم‌های بازار کافی نیست", "Market-regime coverage is insufficient"),
+    "regime_stability": ("پایداری عملکرد میان رژیم‌ها کافی نیست", "Performance is not stable across regimes"),
+    "cycle_reliability": ("قابلیت اتکای چرخه‌ها کافی نیست", "Cycle reliability is insufficient"),
+    "data_freshness": ("داده‌ها به‌اندازه کافی تازه نیستند", "Data is not fresh enough"),
+    "critical_incidents": ("رخدادهای بحرانی باید بررسی شوند", "Critical incidents require review"),
+    "kill_switch": ("Kill Switch تأیید نشده", "The kill switch is not verified"),
+    "independent_approvals": ("تأییدهای مستقل کامل نیست", "Independent approvals are incomplete"),
+}
+
+AUTOMATION_LABELS = {
+    "daily_data_replay": (("داده و Replay", "Data & Replay"), ("بروزرسانی داده، اعتبارسنجی cache و اجرای Replay فشرده.", "Build data, validate the cache, and run compact Replay.")),
+    "forward_shadow": (("Forward و Shadow", "Forward & Shadow"), ("اجرای Preflight، Research Arm، یک چرخه Paper و گزارش Forward.", "Run Preflight, Research arm, one Paper cycle, and Forward reports.")),
+    "report_refresh": (("گزارش‌ها", "Reports"), ("بروزرسانی گزارش‌های Paper، Research، Forward و آمادگی نهایی.", "Refresh Paper, Research, Forward, and readiness reports.")),
+    "airdrop_outcomes": (("نتایج Airdrop", "Airdrop outcomes"), ("همگام‌سازی نتایج نهایی‌شده و بازسازی گزارش پژوهشی.", "Synchronize resolved outcomes and rebuild the research report.")),
 }
 
 
-def tr(key: str) -> str:
-    return TEXT[st.session_state.get("language", "fa")][key]
+def t(key: str) -> str:
+    return TEXT[st.session_state.get("language", "fa")].get(key, key)
+
+
+def localized(pair: tuple[str, str] | None, fallback: str = "—") -> str:
+    if not pair:
+        return fallback
+    return pair[0] if st.session_state.get("language", "fa") == "fa" else pair[1]
+
+
+def kind_label(kind: object) -> str:
+    return localized(KIND_LABELS.get(str(kind)), str(kind or "—"))
+
+
+def step_label(step: object) -> str:
+    return localized(STEP_LABELS.get(str(step)), str(step or "—"))
+
+
+def status_label(status: object) -> str:
+    return localized(STATUS_LABELS.get(str(status)), str(status or "—"))
+
+
+def blocker_label(blocker: object) -> str:
+    return localized(BLOCKER_LABELS.get(str(blocker)), str(blocker or "—"))
+
+
+def format_time(value: object) -> str:
+    if not value:
+        return "—"
+    try:
+        parsed = datetime.fromisoformat(str(value))
+        return parsed.astimezone().strftime("%Y-%m-%d  %H:%M")
+    except ValueError:
+        return str(value)
+
+
+def elapsed(job: dict) -> str:
+    if not job.get("started_utc"):
+        return "—"
+    try:
+        start = datetime.fromisoformat(str(job["started_utc"]))
+        end = datetime.fromisoformat(str(job["ended_utc"])) if job.get("ended_utc") else datetime.now(timezone.utc)
+    except ValueError:
+        return "—"
+    seconds = max(0, int((end - start).total_seconds()))
+    hours, remainder = divmod(seconds, 3600)
+    minutes, secs = divmod(remainder, 60)
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+
+
+def esc(value: object) -> str:
+    return html.escape(str(value if value is not None else "—"))
 
 
 def inject_style(rtl: bool) -> None:
@@ -277,457 +220,390 @@ def inject_style(rtl: bool) -> None:
     st.markdown(
         f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Vazirmatn:wght@400;500;600;700;800&display=swap');
-.stApp {{ background: radial-gradient(circle at 80% 0%, #14283c 0, #08111c 35%, #050b12 75%); color:#e8f3fa; }}
-.main .block-container {{ max-width:1320px; padding-top:1rem; padding-bottom:3rem; }}
-[data-testid="stSidebar"] {{ background:linear-gradient(180deg,#0a1723,#07101a); border-right:1px solid #19364a; }}
-[data-testid="stSidebar"] * {{ direction:{direction}; text-align:{align}; }}
-.dashboard {{ direction:{direction}; text-align:{align}; font-family:{'Vazirmatn' if rtl else 'Inter'},sans-serif; }}
-.hero {{ position:relative; overflow:hidden; padding:1.05rem 1.25rem; border:1px solid #24475d; border-radius:18px;
-background:linear-gradient(115deg,rgba(13,42,59,.96),rgba(14,27,44,.96) 55%,rgba(37,25,58,.9)); box-shadow:0 16px 45px rgba(0,0,0,.22); margin-bottom:.9rem; }}
-.hero:after {{ content:''; position:absolute; width:220px; height:220px; border-radius:50%; background:#27d7c51c; top:-150px; right:8%; box-shadow:0 0 70px #27d7c533; }}
-.eyebrow {{ color:#47ddcf; font-size:.74rem; letter-spacing:.16em; font-weight:800; }}
-.hero h1 {{ margin:.25rem 0 .15rem; color:#f5fbff; font-size:1.72rem; }} .hero p {{ margin:0;color:#9bb3c3; font-size:.9rem; }}
-.safe-pill {{ display:inline-flex; margin-top:.85rem; color:#7df5b0; background:#0d3024; border:1px solid #245e45; padding:.32rem .7rem; border-radius:999px; font-weight:700; font-size:.75rem; }}
-.metric-card {{ padding:.85rem .95rem; min-height:104px; border-radius:14px; background:linear-gradient(145deg,#0d1d29,#0a151f); border:1px solid #1b394c; box-shadow:0 9px 25px rgba(0,0,0,.15); }}
-.metric-label {{ color:#7190a3; font-size:.72rem; text-transform:uppercase; letter-spacing:.12em; }}
-.metric-value {{ color:#f4fbff; font-size:1.32rem; font-weight:800; margin:.35rem 0 .2rem; }} .metric-note {{ color:#88a4b5; font-size:.75rem; word-break:break-word; }}
-.good {{ color:#74efaa; }} .bad {{ color:#ff9c9c; }}
-.quick-box {{ padding:1rem 1.1rem; border:1px solid #28596d; border-radius:16px; background:linear-gradient(120deg,#0d2431,#101c2c); margin:.75rem 0; }}
-.quick-box h3 {{ color:#65e4d8; margin:0 0 .25rem; }} .quick-box p {{ color:#96afbf; margin:0; }}
-.workflow-strip {{ display:grid; grid-template-columns:repeat(5,1fr); gap:.5rem; margin:.75rem 0 1rem; }}
-.workflow-step {{ border:1px solid #21455a; background:#0b1924; border-radius:12px; padding:.68rem .55rem; text-align:center; color:#9db8c8; font-size:.76rem; font-weight:700; }}
-.workflow-step.ready {{ border-color:#277861; color:#72e9b0; background:#0c2a22; }}
-.section-kicker {{ color:#45d9ce; font-size:.72rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; margin-bottom:.2rem; }}
-.section-copy {{ color:#89a5b6; font-size:.86rem; margin-bottom:.7rem; }}
-.status-list {{ display:grid; gap:.55rem; }}
-.status-row {{ display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.62rem .72rem; border:1px solid #1c3b4d; border-radius:11px; background:#091722; }}
-.status-row span {{ color:#89a5b6; font-size:.78rem; }}
-.status-row strong {{ color:#eef9ff; font-size:.82rem; text-align:end; overflow-wrap:anywhere; }}
-[data-testid="stVerticalBlockBorderWrapper"] {{ background:linear-gradient(145deg,rgba(12,29,41,.82),rgba(8,20,30,.82)); border-color:#1c3c50 !important; border-radius:16px !important; }}
-[data-testid="stExpander"] {{ border-color:#1d4053 !important; border-radius:12px !important; background:#091722; }}
-[data-testid="stTabs"] [data-baseweb="tab-list"] {{ gap:.35rem; background:#091722; padding:.3rem; border-radius:12px; }}
-[data-testid="stTabs"] [data-baseweb="tab"] {{ border-radius:9px; padding:.55rem .85rem; }}
-div[data-testid="stButton"] button {{ border-radius:12px; border:1px solid #2a566d; min-height:2.7rem; font-weight:700; }}
-div[data-testid="stButton"] button[kind="primary"] {{ background:linear-gradient(90deg,#0c8e88,#176b96); border:0; box-shadow:0 8px 25px #087d7544; }}
-div[data-testid="stDataFrame"] {{ border:1px solid #1d3b4d; border-radius:14px; overflow:hidden; }}
-@media (max-width:900px) {{ .workflow-strip {{ grid-template-columns:1fr; }} .hero h1 {{ font-size:1.35rem; }} }}
+:root {{ --bg:#071018; --panel:#0b1822; --panel2:#0e202d; --line:#1b3949; --text:#eef8fc; --muted:#86a1b1; --accent:#35d4c4; --green:#62e6a2; --amber:#f2c46d; --red:#ff8c91; }}
+.stApp {{ background:radial-gradient(circle at 72% -12%,#12364b 0,transparent 34%),linear-gradient(180deg,#08131c,#060d13); color:var(--text); }}
+.main .block-container {{ max-width:1380px; padding-top:2.25rem; padding-bottom:3rem; }}
+.dashboard {{ direction:{direction}; text-align:{align}; }}
+[data-testid="stSidebar"] {{ background:#08131c; border-inline-end:1px solid #173140; }}
+[data-testid="stSidebar"] [role="radiogroup"] {{ gap:.25rem; }}
+[data-testid="stSidebar"] label {{ padding:.46rem .5rem; border-radius:10px; }}
+.page-head {{ display:flex; justify-content:space-between; align-items:end; gap:1rem; padding:.9rem 0 1.1rem; border-bottom:1px solid var(--line); margin-bottom:1rem; }}
+.page-head h1 {{ color:var(--text); font-size:1.65rem; margin:.18rem 0; }} .page-head p {{ color:var(--muted); margin:0; font-size:.88rem; }}
+.eyebrow {{ color:var(--accent); letter-spacing:.13em; font-weight:800; font-size:.7rem; }}
+.safe-pill {{ display:inline-flex; color:var(--green); background:#0b2a21; border:1px solid #215c45; border-radius:999px; padding:.35rem .7rem; font-size:.73rem; font-weight:800; }}
+.metric-grid {{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.7rem; margin-bottom:1rem; }}
+.metric-card {{ min-height:92px; padding:.8rem .9rem; background:linear-gradient(145deg,#0c1c27,#09151e); border:1px solid var(--line); border-radius:14px; }}
+.metric-card .label {{ color:var(--muted); font-size:.72rem; }} .metric-card .value {{ color:var(--text); font-weight:800; font-size:1.15rem; margin:.32rem 0 .16rem; }} .metric-card .note {{ color:#6f8c9d; font-size:.7rem; overflow-wrap:anywhere; }}
+.metric-card.good .value {{ color:var(--green); }} .metric-card.warn .value {{ color:var(--amber); }} .metric-card.bad .value {{ color:var(--red); }}
+.section-title {{ color:var(--text); font-weight:800; font-size:.94rem; margin-bottom:.18rem; }} .section-copy {{ color:var(--muted); font-size:.79rem; margin-bottom:.7rem; }}
+.active-card {{ background:linear-gradient(120deg,#0d2531,#102334); border:1px solid #286078; border-radius:16px; padding:1rem 1.1rem; }}
+.active-top {{ display:flex; justify-content:space-between; align-items:start; gap:.8rem; }} .active-title {{ color:var(--text); font-size:1.08rem; font-weight:850; }}
+.status-badge {{ display:inline-flex; border-radius:999px; padding:.28rem .58rem; font-size:.7rem; font-weight:800; background:#143547; color:#86deef; }}
+.status-badge.success {{ background:#0c3024; color:var(--green); }} .status-badge.error {{ background:#351a20; color:var(--red); }} .status-badge.warn {{ background:#3b2d17; color:var(--amber); }}
+.job-meta {{ display:grid; grid-template-columns:repeat(3,1fr); gap:.55rem; margin:.85rem 0; }} .job-meta div {{ background:#091722; padding:.6rem .7rem; border-radius:10px; border:1px solid #173747; }} .job-meta span {{ display:block;color:var(--muted);font-size:.68rem; }} .job-meta strong {{ display:block;color:var(--text);font-size:.79rem;margin-top:.18rem; }}
+.timeline {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:.42rem; margin:.7rem 0; }}
+.timeline-step {{ border:1px solid #1b3a4b; border-radius:10px; padding:.55rem; color:#7895a6; background:#091722; font-size:.69rem; min-height:54px; }} .timeline-step.done {{ border-color:#23654e;color:var(--green); }} .timeline-step.current {{ border-color:#2a8ba1;color:#9cecf1;background:#0c2b36; }} .timeline-step.failed {{ border-color:#71343a;color:var(--red); }}
+.notice {{ border-radius:12px; padding:.75rem .85rem; border:1px solid #514725; background:#292411; color:#f1d78c; font-size:.8rem; margin:.55rem 0; }}
+.recommend {{ border-radius:12px; padding:.75rem .85rem; border:1px solid #205846; background:#0b2820; color:#91efbd; font-size:.8rem; margin:.55rem 0; }}
+.status-rows {{ display:grid; gap:.42rem; }} .status-row {{ display:flex; justify-content:space-between; gap:1rem; padding:.52rem .65rem; background:#091722; border:1px solid #173443; border-radius:9px; font-size:.74rem; }} .status-row span {{ color:var(--muted); }} .status-row strong {{ color:var(--text); text-align:end; overflow-wrap:anywhere; }}
+[data-testid="stVerticalBlockBorderWrapper"] {{ background:linear-gradient(145deg,rgba(12,28,39,.92),rgba(8,19,28,.92)); border-color:var(--line)!important; border-radius:15px!important; }}
+[data-testid="stTabs"] [data-baseweb="tab-list"] {{ gap:.3rem;background:#08151e;padding:.3rem;border-radius:11px; }} [data-testid="stTabs"] [data-baseweb="tab"] {{ border-radius:8px;padding:.5rem .75rem; }}
+[data-testid="stExpander"] {{ border-color:var(--line)!important;border-radius:11px!important;background:#08151e; }}
+div[data-testid="stButton"] button {{ border-radius:10px; min-height:2.55rem; font-weight:750; border-color:#28546a; }} div[data-testid="stButton"] button[kind="primary"] {{ background:linear-gradient(90deg,#078b83,#176b96);border:0; }}
+div[data-testid="stDataFrame"] {{ border:1px solid var(--line);border-radius:12px;overflow:hidden; }}
+@media(max-width:900px) {{ .metric-grid{{grid-template-columns:repeat(2,1fr)}} .job-meta{{grid-template-columns:1fr}} .page-head{{display:block}} }}
 </style>
 """,
         unsafe_allow_html=True,
     )
 
 
-def metric_card(label: str, value: str, note: str = "", css: str = "") -> None:
-    st.markdown(
-        f'<div class="metric-card dashboard"><div class="metric-label">{html.escape(label)}</div>'
-        f'<div class="metric-value {css}">{html.escape(value)}</div><div class="metric-note">{html.escape(note)}</div></div>',
-        unsafe_allow_html=True,
-    )
-
-
 def page_header(title: str, subtitle: str, eyebrow: str) -> None:
     st.markdown(
-        f'<div class="hero dashboard"><div class="eyebrow">{html.escape(eyebrow)}</div>'
-        f'<h1>{html.escape(title)}</h1><p>{html.escape(subtitle)}</p></div>',
+        f'<div class="page-head dashboard"><div><div class="eyebrow">{esc(eyebrow)}</div><h1>{esc(title)}</h1><p>{esc(subtitle)}</p></div><span class="safe-pill">● {esc(t("safe"))}</span></div>',
         unsafe_allow_html=True,
     )
 
 
-def workflow_strip() -> None:
-    labels = [tr("step_collect"), tr("step_replay"), tr("step_forward"), tr("step_paper"), tr("step_review")]
-    items = "".join(f'<div class="workflow-step">{html.escape(label)}</div>' for label in labels)
-    st.markdown(f'<div class="workflow-strip dashboard">{items}</div>', unsafe_allow_html=True)
-
-
-def panel_intro(title: str, copy: str) -> None:
-    st.markdown(
-        f'<div class="dashboard"><div class="section-kicker">{html.escape(title)}</div>'
-        f'<div class="section-copy">{html.escape(copy)}</div></div>',
-        unsafe_allow_html=True,
+def metrics(items: list[tuple[str, object, object, str]]) -> None:
+    cards = "".join(
+        f'<div class="metric-card {esc(css)}"><div class="label">{esc(label)}</div><div class="value">{esc(value)}</div><div class="note">{esc(note)}</div></div>'
+        for label, value, note, css in items
     )
+    st.markdown(f'<div class="metric-grid dashboard">{cards}</div>', unsafe_allow_html=True)
 
 
-def status_list(rows: list[tuple[str, str]]) -> None:
-    items = "".join(
-        f'<div class="status-row"><span>{html.escape(label)}</span>'
-        f'<strong>{html.escape(value)}</strong></div>'
-        for label, value in rows
-    )
-    st.markdown(f'<div class="status-list dashboard">{items}</div>', unsafe_allow_html=True)
+def section_intro(title: str, copy: str) -> None:
+    st.markdown(f'<div class="dashboard"><div class="section-title">{esc(title)}</div><div class="section-copy">{esc(copy)}</div></div>', unsafe_allow_html=True)
 
 
-def execute(label: str, arguments: list[str], *, key: str, primary: bool = False, disabled: bool = False) -> None:
-    if st.button(label, key=key, type="primary" if primary else "secondary", use_container_width=True, disabled=disabled):
-        with st.spinner(f"{tr('running')}: freakto {' '.join(arguments)}"):
-            result = run_cli(arguments, timeout=3600 if arguments[:2] in (["data", "build"], ["replay", "run"]) else 900)
+def status_rows(rows: list[tuple[str, object]]) -> None:
+    content = "".join(f'<div class="status-row"><span>{esc(label)}</span><strong>{esc(value)}</strong></div>' for label, value in rows)
+    st.markdown(f'<div class="status-rows dashboard">{content}</div>', unsafe_allow_html=True)
+
+
+def plan_for_job(job: dict) -> tuple:
+    try:
+        if job.get("kind") == "QUICK_START":
+            return quick_start_plan(include_data_build=bool(job.get("full")), include_replay=bool(job.get("full")))
+        return workflow_plan(str(job.get("kind")), dict(job.get("options") or {}))
+    except (ValueError, OSError):
+        return ()
+
+
+def next_step(job: dict) -> str:
+    plan = plan_for_job(job)
+    completed = int(job.get("completed_steps") or 0)
+    return step_label(plan[completed].key) if completed < len(plan) else "—"
+
+
+def render_timeline(job: dict) -> None:
+    plan = plan_for_job(job)
+    completed_keys = {str(item.get("key")) for item in job.get("steps") or [] if item.get("accepted")}
+    failed_keys = {str(item.get("key")) for item in job.get("steps") or [] if not item.get("accepted")}
+    current = str(job.get("current_step") or "")
+    cards = []
+    for index, step in enumerate(plan, start=1):
+        css = "done" if step.key in completed_keys else "failed" if step.key in failed_keys else "current" if step.key == current else ""
+        cards.append(f'<div class="timeline-step {css}">{index}. {esc(step_label(step.key))}</div>')
+    if cards:
+        st.markdown(f'<div class="timeline dashboard">{"".join(cards)}</div>', unsafe_allow_html=True)
+
+
+def start_job(kind: str, *, options: dict | None = None) -> None:
+    try:
+        job = start_workflow_job(kind, options=options)
+        st.session_state["notice"] = f'{t("job_started")}: {job["job_id"]}'
+        st.rerun()
+    except (RuntimeError, ValueError) as exc:
+        st.error(f'{t("job_blocked")}: {exc}')
+
+
+def run_command(label: str, arguments: list[str], *, key: str, disabled: bool = False, primary: bool = False) -> None:
+    if st.button(label, key=key, disabled=disabled, type="primary" if primary else "secondary", use_container_width=True):
+        with st.spinner(t("running")):
+            result = run_cli(arguments, timeout=3600 if "cycle" in arguments else 900)
         st.session_state["last_result"] = result
         st.session_state["snapshot"] = collect_snapshot()
 
 
-def start_section_job(
-    label: str,
-    kind: str,
-    *,
-    key: str,
-    options: dict | None = None,
-    disabled: bool = False,
-) -> None:
-    if st.button(
-        label,
-        key=key,
-        type="primary",
-        use_container_width=True,
-        disabled=disabled,
-    ):
-        try:
-            job = start_workflow_job(kind, options=options)
-            st.session_state["job_notice"] = (
-                f"{tr('workflow_started')}: {job['job_id']}"
-            )
-            st.success(st.session_state["job_notice"])
-        except (RuntimeError, ValueError) as exc:
-            st.error(f"{tr('workflow_blocked')}: {exc}")
-
-
-def show_last_result() -> None:
-    result = st.session_state.get("last_result")
-    if result is None:
+def render_active_job(job: dict | None, *, controls: bool = True) -> None:
+    if not job:
+        st.markdown(f'<div class="active-card dashboard"><div class="active-title">{esc(t("no_active"))}</div><div class="section-copy">{esc(t("idle_note"))}</div></div>', unsafe_allow_html=True)
         return
-    with st.expander(tr("last_output"), expanded=not result.ok):
-        if result.ok: st.success(f"{tr('exit_ok')} — exit {result.exit_code}")
-        elif result.exit_code == 2: st.warning(f"{tr('exit_blocked')} — exit 2")
-        else: st.error(f"{tr('exit_failed')} — exit {result.exit_code}")
-        st.code("freakto " + " ".join(result.command[5:]), language="text")
-        if result.stdout.strip(): st.code(result.stdout.strip(), language="json")
-        if result.stderr.strip(): st.code(result.stderr.strip(), language="text")
+    status = str(job.get("status"))
+    badge_css = "warn" if status == "CANCEL_REQUESTED" else ""
+    st.markdown(
+        f'<div class="active-card dashboard"><div class="active-top"><div><div class="eyebrow">{esc(t("active_operation"))}</div><div class="active-title">{esc(kind_label(job.get("kind")))}</div></div><span class="status-badge {badge_css}">{esc(status_label(status))}</span></div>'
+        f'<div class="job-meta"><div><span>{esc(t("current_step"))}</span><strong>{esc(step_label(job.get("current_step")))}</strong></div><div><span>{esc(t("next_step"))}</span><strong>{esc(next_step(job))}</strong></div><div><span>{esc(t("elapsed"))}</span><strong>{esc(elapsed(job))}</strong></div></div></div>',
+        unsafe_allow_html=True,
+    )
+    total = max(1, int(job.get("total_steps") or 1))
+    done = int(job.get("completed_steps") or 0)
+    st.progress(done / total, text=f'{t("progress")}: {done}/{total} · {step_label(job.get("current_step"))}')
+    render_timeline(job)
+    if controls:
+        buttons = st.columns(2)
+        with buttons[0]:
+            if st.button("↻ " + t("refresh_status"), use_container_width=True, key="active-refresh"):
+                st.session_state["snapshot"] = collect_snapshot(); st.rerun()
+        with buttons[1]:
+            if st.button(t("cancel"), use_container_width=True, key="active-cancel", disabled=status not in ACTIVE):
+                request_cancel(str(job["job_id"])); st.warning(t("cancel_requested")); st.rerun()
 
 
-if "language" not in st.session_state: st.session_state["language"] = "fa"
-if "snapshot" not in st.session_state: st.session_state["snapshot"] = collect_snapshot()
+def workflow_card(title: str, description: str, kind: str, *, key: str, active: bool, options: dict | None = None) -> None:
+    with st.container(border=True):
+        section_intro(title, description)
+        status_rows([(t("system_health"), t("unavailable_active") if active else t("ready")), ("Mode", "Research / Paper")])
+        if st.button(t("start"), key=key, type="primary", use_container_width=True, disabled=active):
+            start_job(kind, options=options)
 
-language_label = st.sidebar.selectbox("Language / زبان", ["فارسی", "English"], index=0 if st.session_state["language"] == "fa" else 1)
+
+def latest_terminal(jobs: list[dict]) -> dict | None:
+    return next((job for job in jobs if job.get("status") in TERMINAL), None)
+
+
+def recommendation(snapshot: dict, jobs: list[dict], active: dict | None) -> str:
+    if active:
+        return f'{t("running")}: {step_label(active.get("current_step"))}. {t("next_step")}: {next_step(active)}.'
+    recent = latest_terminal(jobs)
+    if recent and recent.get("status") in {"FAILED", "INTERRUPTED"}:
+        return f'{kind_label(recent.get("kind"))}: {status_label(recent.get("status"))}. {t("retry")}.'
+    blockers = snapshot["go_live"].get("blockers") or []
+    if blockers:
+        return t("forward_desc")
+    return t("guide_body")
+
+
+if "language" not in st.session_state:
+    st.session_state["language"] = "fa"
+if "snapshot" not in st.session_state:
+    st.session_state["snapshot"] = collect_snapshot()
+
+language_label = st.sidebar.selectbox("زبان / Language", ["فارسی", "English"], index=0 if st.session_state["language"] == "fa" else 1)
 st.session_state["language"] = "fa" if language_label == "فارسی" else "en"
-rtl = st.session_state["language"] == "fa"
-inject_style(rtl)
+inject_style(st.session_state["language"] == "fa")
 
 st.sidebar.markdown("## ⚡ FREAKTO")
-group_keys = list(NAV_GROUPS)
-group_labels = {value: tr(f"group_{value}") for value in group_keys}
-selected_group_label = st.sidebar.radio(
-    tr("nav_group"),
-    [group_labels[value] for value in group_keys],
-    key=f"nav-group-{st.session_state['language']}",
-)
-selected_group = next(
-    value for value, label in group_labels.items() if label == selected_group_label
-)
-page_labels = {value: tr(value) for value in NAV_GROUPS[selected_group]}
-selected_page_label = st.sidebar.radio(
-    tr("nav_page"),
-    [page_labels[value] for value in NAV_GROUPS[selected_group]],
-    key=f"nav-page-{st.session_state['language']}-{selected_group}",
-)
-page = next(value for value, label in page_labels.items() if label == selected_page_label)
-if st.sidebar.button("↻ " + tr("refresh"), use_container_width=True):
+page_keys = ["operations", "workflows", "reports", "settings"]
+page_names = {key: t(key) for key in page_keys}
+requested_page = str(st.query_params.get("page", "operations"))
+requested_index = page_keys.index(requested_page) if requested_page in page_keys else 0
+selected_name = st.sidebar.radio("Workspace", [page_names[key] for key in page_keys], index=requested_index, key=f'nav-{st.session_state["language"]}')
+page = next(key for key, value in page_names.items() if value == selected_name)
+if requested_page != page:
+    st.query_params["page"] = page
+if st.sidebar.button("↻ " + t("refresh"), use_container_width=True):
     st.session_state["snapshot"] = collect_snapshot(); st.rerun()
 st.sidebar.divider()
-st.sidebar.markdown(f"<div class='dashboard'><span class='safe-pill'>● {tr('safe')}</span></div>", unsafe_allow_html=True)
-st.sidebar.caption(tr("safe_note"))
+st.sidebar.markdown(f'<div class="dashboard"><span class="safe-pill">● {esc(t("safe"))}</span></div>', unsafe_allow_html=True)
+st.sidebar.caption(t("safe_note"))
 
 snapshot = st.session_state["snapshot"]
-active_jobs = [job for job in list_jobs() if job.get("status") in ACTIVE]
-if active_jobs:
-    active = active_jobs[0]
-    total = max(1, int(active.get("total_steps") or 1))
-    st.progress(
-        int(active.get("completed_steps") or 0) / total,
-        text=f"{tr('active_job')}: {active.get('kind')} — {active.get('current_step') or tr('pending')}",
-    )
+jobs = list_jobs()
+active = next((job for job in jobs if job.get("status") in ACTIVE), None)
+automations = list_automations()
+enabled_automations = [item for item in automations if item.get("enabled")]
+if enabled_automations and scheduler_status().get("status") != "RUNNING":
+    try:
+        ensure_scheduler_running()
+    except OSError:
+        pass
 
-if page == "overview":
-    page_header(tr("title"), tr("subtitle"), "FREAKTO // CONTROL CENTER")
+notice = st.session_state.pop("notice", None)
+if notice:
+    st.success(str(notice))
+
+if page == "operations":
+    page_header(t("ops_title"), t("ops_sub"), "FREAKTO / OPERATIONS")
     go_live = snapshot["go_live"]
-    cols = st.columns(4)
-    with cols[0]: metric_card(tr("capital"), tr("zero"), "LIVE ORDERS: OFF", "good")
-    with cols[1]: metric_card(tr("datasets"), str(snapshot["data"]["datasets"]), snapshot["data"]["latest_utc"] or tr("no_data"))
-    with cols[2]: metric_card(tr("paper_mode"), str(snapshot["paper"]["mode"]), tr("armed") if snapshot["paper"]["armed"] else tr("disarmed"), "good" if snapshot["paper"]["armed"] else "")
-    with cols[3]: metric_card(tr("review"), tr("blocked") if go_live["status"].startswith("BLOCKED") else tr("reviewable"), f"{len(go_live['blockers'])} blockers", "bad" if go_live["status"].startswith("BLOCKED") else "good")
-
-    panel_intro(tr("workflow_map"), tr("recommended"))
-    workflow_strip()
-    overview_cols = st.columns([1.15, .85])
-    with overview_cols[0]:
-        with st.container(border=True):
-            panel_intro(tr("quick_title"), tr("quick_desc"))
-            full = st.toggle(tr("full_pipeline"), value=True)
-            confirmed = st.checkbox(tr("confirm_quick"))
-            if st.button("▶ " + tr("quick_button"), type="primary", use_container_width=True, disabled=not confirmed):
-                try:
-                    job = start_quick_job(full=full)
-                    st.session_state["job_notice"] = f"{tr('job_started')}: {job['job_id']}"
-                except RuntimeError as exc:
-                    st.session_state["job_notice"] = f"{tr('job_exists')}: {exc}"
-            if st.session_state.get("job_notice"):
-                st.info(st.session_state["job_notice"])
-    with overview_cols[1]:
-        with st.container(border=True):
-            panel_intro(tr("status_summary"), tr("one_at_time"))
-            status_list(
-                [
-                    (tr("active_job"), str(active_jobs[0].get("kind") if active_jobs else tr("no_active_job"))),
-                    (tr("artifacts"), str(snapshot["runtime"]["json_artifacts"])),
-                    (tr("adapter_manifests"), str(snapshot["workflows"]["market_adapter_manifests"])),
-                ]
-            )
-
-elif page == "data":
-    page_header(tr("data_title"), tr("data_note"), tr("research_tools"))
-    status_tab, operations_tab = st.tabs([tr("read_only"), tr("actions")])
-    with status_tab:
-        data_cols = st.columns([1, 1])
-        with data_cols[0]:
-            metric_card(tr("data_files"), str(snapshot["data"]["datasets"]), snapshot["data"]["path"])
-        with data_cols[1]:
+    metrics([
+        (t("system_health"), t("running") if active else t("ready"), t("live_off"), "good"),
+        (t("data"), snapshot["data"]["datasets"], format_time(snapshot["data"]["latest_utc"]), ""),
+        (t("paper"), snapshot["paper"]["mode"], t("enabled") if snapshot["paper"]["armed"] else t("disabled"), "good" if snapshot["paper"]["armed"] else ""),
+        (t("go_live"), t("blocked") if go_live["status"].startswith("BLOCKED") else t("ready"), f'{len(go_live.get("blockers") or [])} {t("blockers")}', "bad" if go_live["status"].startswith("BLOCKED") else "good"),
+    ])
+    main, side = st.columns([1.45, .75])
+    with main:
+        render_active_job(active)
+        if active:
+            auto = st.toggle(t("auto_refresh"), value=True, key="auto-refresh")
+            if auto:
+                components.html("<script>setTimeout(function(){window.parent.location.reload();}, 10000);</script>", height=0)
+        else:
             with st.container(border=True):
-                panel_intro(tr("read_only"), tr("data_note"))
-                check_cols = st.columns(2)
-                with check_cols[0]: execute(tr("data_status"), ["data", "status"], key="data-status", primary=True)
-                with check_cols[1]: execute(tr("replay_status"), ["replay", "status"], key="replay-status")
-    with operations_tab:
-        operation_cols = st.columns(2)
-        with operation_cols[0]:
-            with st.container(border=True):
-                panel_intro(tr("build"), tr("build_confirm"))
-                build_ok = st.checkbox(tr("build_confirm"), key="build-confirm")
-                execute(tr("build"), ["data", "build"], key="data-build", disabled=not build_ok)
-        with operation_cols[1]:
-            with st.container(border=True):
-                panel_intro(tr("replay_run"), tr("replay_confirm"))
-                replay_ok = st.checkbox(tr("replay_confirm"), key="replay-confirm")
-                execute(tr("replay_run"), ["replay", "run", "--compact"], key="replay-run", disabled=not replay_ok)
-
-elif page == "market":
-    page_header(tr("market_title"), tr("market_note"), tr("research_tools"))
-    market = snapshot["workflows"]
-    cards = st.columns(3)
-    with cards[0]:
-        metric_card(
-            tr("adapter_manifests"),
-            str(market["market_adapter_manifests"]),
-            "EUR/USD + XAU/USD",
-        )
-    with cards[1]:
-        metric_card("Paper", "OFF", "research_only=true", "good")
-    with cards[2]:
-        metric_card("Live", "OFF", "not available", "good")
-    audit_tab, replay_tab = st.tabs([tr("start_audit"), tr("start_market_replay")])
-    with audit_tab:
-        with st.container(border=True):
-            panel_intro(tr("audit_range"), tr("market_note"))
-            with st.expander(tr("advanced"), expanded=False):
-                dates = st.columns(2)
-                with dates[0]:
-                    audit_start = st.text_input(tr("start_date"), value="2023-01-01", key="market-audit-start")
-                with dates[1]:
-                    audit_end = st.text_input(tr("end_date"), value="2026-01-01", key="market-audit-end")
-            audit_ok = st.checkbox(tr("audit_confirm"), key="market-audit-confirm")
-            start_section_job(tr("start_audit"), "MARKET_DATA_AUDIT", key="market-audit-start-button", options={"start": audit_start, "end": audit_end}, disabled=not audit_ok)
-    with replay_tab:
-        with st.container(border=True):
-            panel_intro(tr("start_market_replay"), "EUR/USD + XAU/USD · 1d · fixed audited costs")
-            st.code("fee=0.525 bps/side | slippage=3.643 bps/side | strict leakage audit", language="text")
-            replay_ok = st.checkbox(tr("market_replay_confirm"), key="market-replay-confirm")
-            start_section_job(tr("start_market_replay"), "MARKET_REPLAY", key="market-replay-start-button", disabled=not replay_ok)
-
-elif page == "forward":
-    page_header(tr("forward_title"), tr("forward_note"), tr("validation_tools"))
-    forward_cols = st.columns(3)
-    with forward_cols[0]:
-        metric_card(
-            tr("last_forward"),
-            "COLLECTING",
-            snapshot["workflows"]["forward_latest_utc"] or "—",
-        )
-    with forward_cols[1]:
-        metric_card("Paper", "OFF", "gate-controlled", "good")
-    with forward_cols[2]:
-        metric_card("Live", "OFF", "manual authorization absent", "good")
-    forward_panels = st.columns([.8, 1.2])
-    with forward_panels[0]:
-        with st.container(border=True):
-            panel_intro(tr("read_only"), tr("last_forward"))
-            execute(tr("forward_report"), ["report", "forward"], key="forward-section-status")
-    with forward_panels[1]:
-        with st.container(border=True):
-            panel_intro(tr("start_job"), "Preflight → Research Arm → Cycle → Forward report → Status")
-            forward_ok = st.checkbox(tr("forward_confirm"), key="forward-cycle-confirm")
-            start_section_job(tr("start_forward"), "FORWARD_SHADOW_CYCLE", key="forward-cycle-start", disabled=not forward_ok)
-
-elif page == "airdrop":
-    page_header(tr("airdrop_title"), tr("airdrop_note"), tr("research_tools"))
-    airdrop_cols = st.columns(3)
-    with airdrop_cols[0]:
-        metric_card(
-            tr("tracker_db"),
-            "READY" if snapshot["workflows"]["airdrop_tracker_exists"] else "EMPTY",
-            str(ROOT / "history" / "airdrop_outcomes.db"),
-        )
-    with airdrop_cols[1]:
-        metric_card("Wallet automation", "OFF", "not available", "good")
-    with airdrop_cols[2]:
-        metric_card("Claim automation", "OFF", "not available", "good")
-    with st.container(border=True):
-        panel_intro(tr("start_job"), "Prediction sync → Outcome report → Evidence blockers")
-        airdrop_ok = st.checkbox(tr("airdrop_confirm"), key="airdrop-confirm")
-        start_section_job(tr("start_airdrop"), "AIRDROP_OUTCOMES", key="airdrop-start", disabled=not airdrop_ok)
-
-elif page == "cross_asset":
-    page_header(tr("cross_title"), tr("cross_note"), tr("research_tools"))
-    rank_tab, evaluate_tab = st.tabs([tr("start_rank"), tr("start_evaluate")])
-    with rank_tab:
-        with st.container(border=True):
-            panel_intro(tr("settings"), tr("cross_note"))
-            opportunity_path = st.text_input(tr("opportunity_csv"), value="data/cross_asset/opportunities.csv", key="cross-opportunity-input")
-            rank_ok = st.checkbox(tr("rank_confirm"), key="cross-rank-confirm")
-            start_section_job(tr("start_rank"), "CROSS_ASSET_RANK", key="cross-rank-start", options={"input": opportunity_path}, disabled=not rank_ok)
-    with evaluate_tab:
-        with st.container(border=True):
-            panel_intro(tr("settings"), tr("evaluate_confirm"))
-            paths = st.columns(2)
-            with paths[0]:
-                rankings_path = st.text_input(tr("rankings_csv"), value="data/cross_asset/rankings.csv", key="cross-rankings-input")
-            with paths[1]:
-                outcomes_path = st.text_input(tr("outcomes_csv"), value="data/cross_asset/outcomes.csv", key="cross-outcomes-input")
-            evaluate_ok = st.checkbox(tr("evaluate_confirm"), key="cross-evaluate-confirm")
-            start_section_job(tr("start_evaluate"), "CROSS_ASSET_EVALUATE", key="cross-evaluate-start", options={"rankings": rankings_path, "outcomes": outcomes_path}, disabled=not evaluate_ok)
-
-elif page == "paper":
-    page_header(tr("paper_title"), tr("strategy_note"), tr("safe_operations"))
-    c1, c2, c3 = st.columns(3)
-    with c1: metric_card(tr("paper_mode"), str(snapshot["paper"]["mode"]), tr("armed") if snapshot["paper"]["armed"] else tr("disarmed"))
-    with c2: metric_card(tr("live_orders"), tr("off"), tr("unavailable"), "good")
-    with c3: metric_card(tr("allocation"), "0.0%", "FAIL-CLOSED", "good")
-    controls_tab, campaign_tab = st.tabs([tr("actions"), tr("campaign_title")])
-    with controls_tab:
-        with st.container(border=True):
-            panel_intro(tr("read_only"), tr("strategy_note"))
-            actions = st.columns(4)
-            with actions[0]: execute(tr("preflight"), ["paper", "preflight"], key="paper-preflight", primary=True)
-            with actions[1]: execute(tr("arm_research"), ["paper", "arm-research"], key="paper-arm")
-            with actions[2]: execute(tr("one_cycle"), ["paper", "cycle"], key="paper-cycle")
-            with actions[3]: execute(tr("status"), ["paper", "status"], key="paper-status")
-        stop_col, strategy_col = st.columns(2)
-        with stop_col:
-            with st.container(border=True):
-                panel_intro(tr("safe_stop"), tr("stop_confirm"))
-                stop_ok = st.checkbox(tr("stop_confirm"), key="stop-confirm")
-                execute(tr("disarm"), ["paper", "disarm"], key="paper-disarm", disabled=not stop_ok)
-        with strategy_col:
-            with st.container(border=True):
-                panel_intro(tr("arm_strategy"), tr("strategy_note"))
-                strategy_ok = st.checkbox(tr("strategy_confirm"), key="strategy-confirm")
-                execute(tr("arm_strategy"), ["paper", "arm-strategy"], key="paper-strategy", disabled=not strategy_ok)
-    with campaign_tab:
-        campaign = campaign_status()
-        campaign_cols = st.columns(4)
-        with campaign_cols[0]: metric_card(tr("campaign_status"), str(campaign.get("status")), str(campaign.get("campaign_id") or "—"), "good" if campaign.get("status") == "RUNNING" else "")
-        with campaign_cols[1]: metric_card(tr("campaign_days"), f"{float(campaign.get('elapsed_days', 0)):.2f} / {campaign.get('minimum_days', 60)}", "")
-        with campaign_cols[2]: metric_card(tr("campaign_trades"), f"{campaign.get('closed_trades', 0)} / {campaign.get('minimum_closed_trades', 200)}", "")
-        with campaign_cols[3]: metric_card(tr("campaign_cycles"), str(campaign.get("cycles", 0)), str(campaign.get("target_end_utc") or "—"))
-        with st.container(border=True):
-            panel_intro(tr("campaign_title"), tr("campaign_confirm"))
-            campaign_confirm = st.checkbox(tr("campaign_confirm"), key="campaign-confirm")
-            campaign_buttons = st.columns(2)
-            with campaign_buttons[0]:
-                if st.button(tr("campaign_start"), key="campaign-start", use_container_width=True, type="primary", disabled=not campaign_confirm or campaign.get("status") in CAMPAIGN_ACTIVE):
+                section_intro(t("pipeline"), t("pipeline_help"))
+                include_build = st.toggle(t("include_build"), value=True)
+                confirmed = st.checkbox(t("full_confirm"), key="full-confirm")
+                if st.button("▶ " + t("start_full"), type="primary", use_container_width=True, disabled=not confirmed):
                     try:
-                        start_campaign(); st.success(tr("campaign_started")); st.rerun()
+                        job = start_quick_job(full=include_build)
+                        st.session_state["notice"] = f'{t("job_started")}: {job["job_id"]}'
+                        st.rerun()
+                    except RuntimeError as exc:
+                        st.error(f'{t("job_blocked")}: {exc}')
+    with side:
+        with st.container(border=True):
+            section_intro(t("next_action"), t("attention"))
+            st.markdown(f'<div class="recommend dashboard">{esc(recommendation(snapshot, jobs, active))}</div>', unsafe_allow_html=True)
+            blockers = go_live.get("blockers") or []
+            if blockers:
+                st.markdown(f'<div class="notice dashboard">{esc(blocker_label(blockers[0]))}</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            section_intro(t("automations"), t("automation_note"))
+            status_rows([(t("enabled"), len(enabled_automations)), (t("scheduler"), t("scheduler_running") if scheduler_status().get("status") == "RUNNING" else t("scheduler_stopped"))])
+        recent = latest_terminal(jobs)
+        with st.container(border=True):
+            section_intro(t("latest_result"), t("recent_activity"))
+            if recent:
+                status_rows([(kind_label(recent.get("kind")), status_label(recent.get("status"))), (t("duration"), elapsed(recent)), (t("current_step"), step_label((recent.get("steps") or [{}])[-1].get("key")))])
+            else:
+                st.caption(t("no_history"))
+
+elif page == "workflows":
+    page_header(t("workflows_title"), t("workflows_sub"), "FREAKTO / WORKFLOWS")
+    if active:
+        st.info(f'{t("active_operation")}: {kind_label(active.get("kind"))} · {step_label(active.get("current_step"))}')
+    data_tab, validation_tab, research_tab = st.tabs([t("data_markets"), t("validation_paper"), t("research")])
+    with data_tab:
+        cols = st.columns(3)
+        with cols[0]: workflow_card(t("data_replay"), t("data_replay_desc"), "DATA_REPLAY", key="start-data-replay", active=bool(active))
+        with cols[1]: workflow_card(t("market_audit"), t("market_audit_desc"), "MARKET_DATA_AUDIT", key="start-market-audit", active=bool(active), options={"start": "2023-01-01", "end": "2026-01-01"})
+        with cols[2]: workflow_card(t("market_replay"), t("market_replay_desc"), "MARKET_REPLAY", key="start-market-replay", active=bool(active))
+        with st.expander(t("advanced")):
+            date_cols = st.columns(2)
+            with date_cols[0]: audit_start = st.text_input(t("start_date"), "2023-01-01")
+            with date_cols[1]: audit_end = st.text_input(t("end_date"), "2026-01-01")
+            if st.button(t("market_audit") + " · " + t("start"), disabled=bool(active), key="advanced-market-audit"):
+                start_job("MARKET_DATA_AUDIT", options={"start": audit_start, "end": audit_end})
+    with validation_tab:
+        top = st.columns([1.1, .9])
+        with top[0]:
+            workflow_card(t("forward_cycle"), t("forward_desc"), "FORWARD_SHADOW_CYCLE", key="start-forward", active=bool(active))
+        with top[1]:
+            with st.container(border=True):
+                section_intro(t("paper_controls"), t("safe_note"))
+                buttons = st.columns(2)
+                with buttons[0]: run_command(t("preflight"), ["paper", "preflight"], key="paper-preflight")
+                with buttons[1]: run_command(t("paper_status"), ["paper", "status"], key="paper-status")
+                with st.expander(t("advanced")):
+                    confirmed = st.checkbox(t("confirm_sensitive"), key="paper-confirm")
+                    controls = st.columns(3)
+                    with controls[0]: run_command(t("arm_research"), ["paper", "arm-research"], key="paper-arm", disabled=not confirmed)
+                    with controls[1]: run_command(t("one_cycle"), ["paper", "cycle"], key="paper-cycle", disabled=not confirmed)
+                    with controls[2]: run_command(t("disarm"), ["paper", "disarm"], key="paper-disarm", disabled=not confirmed)
+        campaign = campaign_status()
+        with st.container(border=True):
+            section_intro(t("campaign"), t("forward_desc"))
+            metrics([(t("days"), f'{float(campaign.get("elapsed_days", 0)):.2f}/{campaign.get("minimum_days", 60)}', campaign.get("target_end_utc") or "—", ""), (t("trades"), f'{campaign.get("closed_trades", 0)}/{campaign.get("minimum_closed_trades", 200)}', campaign.get("status"), ""), (t("cycles"), campaign.get("cycles", 0), campaign.get("campaign_id") or "—", ""), (t("paper"), snapshot["paper"]["mode"], t("live_off"), "good")])
+            campaign_confirm = st.checkbox(t("confirm_sensitive"), key="campaign-confirm")
+            cbuttons = st.columns(2)
+            with cbuttons[0]:
+                if st.button(t("campaign_start"), type="primary", use_container_width=True, disabled=not campaign_confirm or campaign.get("status") in CAMPAIGN_ACTIVE):
+                    try: start_campaign(); st.rerun()
                     except RuntimeError as exc: st.error(str(exc))
-            with campaign_buttons[1]:
-                if st.button(tr("campaign_stop"), key="campaign-stop", use_container_width=True, disabled=campaign.get("status") not in {"STARTING", "RUNNING"}):
-                    stop_campaign(); st.warning(tr("campaign_stop_requested")); st.rerun()
+            with cbuttons[1]:
+                if st.button(t("campaign_stop"), use_container_width=True, disabled=campaign.get("status") not in {"STARTING", "RUNNING"}):
+                    stop_campaign(); st.rerun()
+    with research_tab:
+        cols = st.columns(2)
+        with cols[0]: workflow_card(t("airdrop"), t("airdrop_desc"), "AIRDROP_OUTCOMES", key="start-airdrop", active=bool(active))
+        with cols[1]:
+            with st.container(border=True):
+                section_intro(t("cross_asset"), t("cross_desc"))
+                rank_file = st.text_input(t("rank_input"), "data/cross_asset/opportunities.csv")
+                if st.button(t("rank"), type="primary", use_container_width=True, disabled=bool(active), key="cross-rank"):
+                    start_job("CROSS_ASSET_RANK", options={"input": rank_file})
+                with st.expander(t("advanced")):
+                    rankings = st.text_input(t("rankings_input"), "data/cross_asset/rankings.csv")
+                    outcomes = st.text_input(t("outcomes_input"), "data/cross_asset/outcomes.csv")
+                    if st.button(t("evaluate"), use_container_width=True, disabled=bool(active), key="cross-evaluate"):
+                        start_job("CROSS_ASSET_EVALUATE", options={"rankings": rankings, "outcomes": outcomes})
 
 elif page == "reports":
-    page_header(tr("reports_title"), tr("data_note"), tr("validation_tools"))
-    cols = st.columns(3)
-    with cols[0]:
-        with st.container(border=True):
-            panel_intro(tr("paper_report"), "Paper performance and evidence")
-            execute(tr("paper_report"), ["report", "paper", "--no-plot"], key="report-paper", primary=True)
-    with cols[1]:
-        with st.container(border=True):
-            panel_intro(tr("research_report"), "Research suite summary")
-            execute(tr("research_report"), ["report", "research"], key="report-research")
-    with cols[2]:
-        with st.container(border=True):
-            panel_intro(tr("forward_report"), "Forward collection and blockers")
-            execute(tr("forward_report"), ["report", "forward"], key="report-forward")
-    metric_card(tr("artifacts"), str(snapshot["runtime"]["json_artifacts"]), snapshot["runtime"]["latest_utc"] or tr("no_artifacts"))
-
-elif page == "golive":
-    page_header(tr("golive_title"), tr("never_live"), tr("safe_operations")); result = snapshot["go_live"]
-    if result["status"].startswith("BLOCKED"): st.error(f"BLOCKED — {len(result['blockers'])} {tr('remaining')}")
-    else: st.success(tr("manual_only"))
-    st.caption(tr("never_live"))
-    rows = [{tr("gate"): gate["name"], tr("result"): "✓" if gate["passed"] else "×", tr("current"): str(gate["actual"]), tr("required"): str(gate["required"])} for gate in result["gates"]]
-    st.dataframe(rows, use_container_width=True, hide_index=True)
-    execute(tr("rerun_golive"), ["paper", "go-live-check"], key="go-live-check", primary=True)
-    st.code(str(ROOT / "logs" / "paper_launch_v2" / "go_live_evidence.json"), language="text")
-
-elif page == "jobs":
-    page_header(tr("jobs_title"), tr("jobs_note"), tr("system_tools"))
-    jobs = list_jobs()
-    if not jobs:
-        st.info(tr("no_jobs"))
-    else:
-        table = []
-        for job in jobs:
-            total = int(job.get("total_steps") or 0)
-            done = int(job.get("completed_steps") or 0)
-            table.append(
-                {
-                    tr("job_id"): job.get("job_id"),
-                    tr("kind"): job.get("kind"),
-                    tr("job_status"): job.get("status"),
-                    tr("progress"): f"{done}/{total}",
-                    tr("current_step"): job.get("current_step") or "—",
-                    tr("created"): job.get("created_utc"),
-                }
-            )
-        st.dataframe(table, use_container_width=True, hide_index=True)
-        identifiers = [job["job_id"] for job in jobs]
-        selected_id = st.selectbox(tr("select_job"), identifiers)
-        selected_job = next(job for job in jobs if job["job_id"] == selected_id)
-        total = max(1, int(selected_job.get("total_steps") or 1))
-        st.progress(int(selected_job.get("completed_steps") or 0) / total, text=f"{selected_job.get('status')} — {selected_job.get('current_step') or '—'}")
-        if selected_job.get("error"): st.error(selected_job["error"])
-        steps = selected_job.get("steps") or []
-        if steps: st.dataframe(steps, use_container_width=True, hide_index=True)
-        buttons = st.columns(3)
-        with buttons[0]:
-            if st.button("↻ " + tr("refresh"), key="jobs-refresh", use_container_width=True): st.rerun()
-        with buttons[1]:
-            if st.button(tr("cancel"), key="job-cancel", use_container_width=True, disabled=selected_job.get("status") not in ACTIVE):
-                request_cancel(selected_id); st.success(tr("cancelled_requested")); st.rerun()
-        with buttons[2]:
-            if st.button(tr("retry"), key="job-retry", use_container_width=True, disabled=selected_job.get("status") not in TERMINAL):
-                retry_job(selected_id); st.success(tr("retried")); st.rerun()
-        log_text = job_log(selected_id)
-        with st.expander(tr("log"), expanded=selected_job.get("status") in {"FAILED", "INTERRUPTED"}):
-            st.code(log_text or "—", language="text")
+    page_header(t("reports_title"), t("reports_sub"), "FREAKTO / REPORTS")
+    go_live = snapshot["go_live"]
+    metrics([(t("recent_activity"), len(jobs), format_time(jobs[0].get("created_utc")) if jobs else "—", ""), (t("blockers"), len(go_live.get("blockers") or []), go_live["status"], "bad" if go_live["status"].startswith("BLOCKED") else "good"), (t("data"), snapshot["data"]["datasets"], format_time(snapshot["data"]["latest_utc"]), ""), (t("paper"), snapshot["paper"]["mode"], format_time(snapshot["paper"]["updated_utc"]), "")])
+    action_cols = st.columns([1, 2])
+    with action_cols[0]:
+        if st.button(t("refresh_reports"), type="primary", use_container_width=True, disabled=bool(active)):
+            start_job("REPORT_REFRESH")
+    with action_cols[1]:
+        blockers = go_live.get("blockers") or []
+        if blockers:
+            st.markdown(f'<div class="notice dashboard"><strong>{esc(t("attention"))}:</strong> {esc(blocker_label(blockers[0]))}</div>', unsafe_allow_html=True)
+        else:
+            st.markdown(f'<div class="recommend dashboard">{esc(t("ready"))}</div>', unsafe_allow_html=True)
+    gate_tab, history_tab = st.tabs([t("readiness"), t("job_history")])
+    with gate_tab:
+        rows = [{t("gates"): blocker_label(gate.get("name")), t("result"): "PASS" if gate.get("passed") else "BLOCKED", t("current"): gate.get("actual"), t("required"): gate.get("required")} for gate in go_live.get("gates") or []]
+        if rows: st.dataframe(rows, use_container_width=True, hide_index=True)
+        with st.expander(t("blockers"), expanded=bool(go_live.get("blockers"))):
+            for blocker in go_live.get("blockers") or []: st.write("• " + blocker_label(blocker))
+    with history_tab:
+        if not jobs:
+            st.info(t("no_history"))
+        else:
+            table = [{"Job": job.get("job_id"), "Workflow": kind_label(job.get("kind")), t("result"): status_label(job.get("status")), t("progress"): f'{job.get("completed_steps", 0)}/{job.get("total_steps", 0)}', t("duration"): elapsed(job), t("started"): format_time(job.get("started_utc") or job.get("created_utc"))} for job in jobs]
+            st.dataframe(table, use_container_width=True, hide_index=True)
+            selected_id = st.selectbox(t("select_job"), [str(job["job_id"]) for job in jobs])
+            selected = next(job for job in jobs if job.get("job_id") == selected_id)
+            render_active_job(selected, controls=False)
+            steps = [{"#": item.get("index"), t("current_step"): step_label(item.get("key")), t("result"): "PASS" if item.get("accepted") else "FAILED", "Exit": item.get("exit_code"), "Time": format_time(item.get("completed_utc"))} for item in selected.get("steps") or []]
+            if steps: st.dataframe(steps, use_container_width=True, hide_index=True)
+            controls = st.columns(2)
+            with controls[0]:
+                if st.button(t("cancel"), use_container_width=True, disabled=selected.get("status") not in ACTIVE, key="report-cancel"):
+                    request_cancel(selected_id); st.rerun()
+            with controls[1]:
+                if st.button(t("retry"), use_container_width=True, disabled=selected.get("status") not in TERMINAL or bool(active), key="report-retry"):
+                    try: retry_job(selected_id); st.rerun()
+                    except (RuntimeError, ValueError) as exc: st.error(str(exc))
+            with st.expander(t("log"), expanded=selected.get("status") in {"FAILED", "INTERRUPTED"}):
+                st.code(job_log(selected_id) or "—", language="text")
 
 else:
-    page_header(tr("guide_title"), tr("safe_note"), tr("system_tools"))
-    guide_map, launch_help = st.columns([1.25, .75])
-    with guide_map:
-        with st.container(border=True):
-            panel_intro(tr("workflow_map"), tr("recommended"))
-            workflow_strip()
-            st.markdown(tr("guide_body"))
-    with launch_help:
-        with st.container(border=True):
-            panel_intro(tr("start_job"), tr("one_at_time"))
+    page_header(t("settings_title"), t("settings_sub"), "FREAKTO / SETTINGS")
+    scheduler = scheduler_status()
+    metrics([(t("scheduler"), t("scheduler_running") if scheduler.get("status") == "RUNNING" else t("scheduler_stopped"), f'PID: {scheduler.get("pid") or "—"}', "good" if scheduler.get("status") == "RUNNING" else ""), (t("automations"), len(enabled_automations), f'{len(automations)} {t("schedules")}', ""), (t("paper"), snapshot["paper"]["mode"], t("live_off"), "good"), (t("system_health"), t("ready"), t("safe"), "good")])
+    automation_tab, safety_tab, technical_tab = st.tabs([t("automations"), t("safety_contract"), t("technical")])
+    with automation_tab:
+        st.info(t("automation_note"))
+        for item in automations:
+            automation_title, automation_copy = AUTOMATION_LABELS[str(item["id"])]
+            with st.container(border=True):
+                columns = st.columns([1.4, .55, .6, .55])
+                with columns[0]:
+                    section_intro(localized(automation_title), localized(automation_copy))
+                    status_rows([(t("last_run"), format_time(item.get("last_started_utc"))), (t("next_run"), format_time(item.get("next_run_utc")))])
+                with columns[1]:
+                    enabled = st.toggle(t("enabled"), value=bool(item.get("enabled")), key=f'automation-enabled-{item["id"]}')
+                with columns[2]:
+                    interval = st.number_input(t("interval"), min_value=1, max_value=720, value=int(item["interval_hours"]), key=f'automation-interval-{item["id"]}')
+                with columns[3]:
+                    if st.button(t("save"), use_container_width=True, key=f'automation-save-{item["id"]}'):
+                        set_automation(str(item["id"]), enabled=enabled, interval_hours=int(interval))
+                        if enabled: ensure_scheduler_running()
+                        st.success(t("saved")); st.rerun()
+                    if st.button(t("run_now"), use_container_width=True, disabled=bool(active), key=f'automation-run-{item["id"]}'):
+                        try: run_automation_now(str(item["id"])); st.rerun()
+                        except (RuntimeError, ValueError) as exc: st.error(str(exc))
+    with safety_tab:
+        st.success(t("safety_body"))
+        status_rows([("LIVE_TRADING_ENABLED", "false"), ("REAL_CAPITAL_ENABLED", "false"), ("Capital allocation", "0.0%"), ("Go-live action", "REPORT ONLY")])
+    with technical_tab:
+        section_intro(t("guide"), t("guide_body"))
+        status_rows([(t("runtime_path"), ROOT / ".freakto-runtime" / "control-center"), ("Data", snapshot["data"]["path"]), ("Artifacts", snapshot["runtime"]["json_artifacts"])])
+        with st.expander(t("technical")):
             st.code(".\\run_control_center.bat", language="powershell")
+            st.code(str(ROOT / "logs" / "paper_launch_v2" / "go_live_evidence.json"), language="text")
 
-show_last_result()
+result = st.session_state.get("last_result")
+if result is not None:
+    with st.expander(t("latest_result"), expanded=not result.ok):
+        if result.ok: st.success(f'PASS · exit {result.exit_code}')
+        elif result.exit_code == 2: st.warning(f'BLOCKED · exit {result.exit_code}')
+        else: st.error(f'FAILED · exit {result.exit_code}')
+        if result.stdout.strip(): st.code(result.stdout[-8000:], language="text")
+        if result.stderr.strip(): st.code(result.stderr[-4000:], language="text")

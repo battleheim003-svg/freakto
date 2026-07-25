@@ -9,6 +9,7 @@ import pytest
 
 from freakto.ui import control_center_worker as worker
 from freakto.ui import job_manager
+from freakto.ui import automation
 from freakto.ui.control_center_state import CommandResult
 
 ROOT = Path(__file__).parents[1]
@@ -128,6 +129,67 @@ def test_market_workflow_job_is_validated_and_persisted(monkeypatch, tmp_path):
     assert state["options"]["start"] == "2023-01-01"
     assert state["pid"] == 8765
     assert called["kwargs"]["env"]["LIVE_TRADING_ENABLED"] == "false"
+
+
+def test_data_and_report_workflows_are_fixed_and_zero_capital(tmp_path):
+    data_plan = worker.workflow_plan("DATA_REPLAY", root=tmp_path)
+    report_plan = worker.workflow_plan("REPORT_REFRESH", root=tmp_path)
+    assert [step.key for step in data_plan] == ["data_status", "data_build", "replay_status", "replay_run"]
+    assert [step.key for step in report_plan] == ["paper_report", "research_report", "forward_report", "go_live_check"]
+    assert all("live" not in step.arguments for step in (*data_plan, *report_plan))
+
+
+def test_automation_schedule_is_persisted_disabled_by_default(tmp_path):
+    items = automation.list_automations(tmp_path)
+    assert items
+    assert all(item["enabled"] is False for item in items)
+    updated = automation.set_automation("forward_shadow", enabled=True, interval_hours=6, root=tmp_path)
+    assert updated["enabled"] is True
+    assert updated["interval_hours"] == 6
+    assert updated["next_run_utc"]
+
+
+def test_due_automation_respects_single_active_job(monkeypatch, tmp_path):
+    automation.set_automation("report_refresh", enabled=True, interval_hours=1, root=tmp_path)
+    config = automation.load_config(tmp_path)
+    config["items"]["report_refresh"]["next_run_utc"] = "2020-01-01T00:00:00+00:00"
+    automation._write_json(automation.config_path(tmp_path), config)
+    monkeypatch.setattr(automation, "list_jobs", lambda root: [{"status": "RUNNING"}])
+    monkeypatch.setattr(automation, "start_workflow_job", lambda *args, **kwargs: pytest.fail("must not launch"))
+    assert automation.run_due_automations(root=tmp_path) is None
+
+
+def test_due_automation_launches_allowlisted_workflow(monkeypatch, tmp_path):
+    automation.set_automation("report_refresh", enabled=True, interval_hours=1, root=tmp_path)
+    config = automation.load_config(tmp_path)
+    config["items"]["report_refresh"]["next_run_utc"] = "2020-01-01T00:00:00+00:00"
+    automation._write_json(automation.config_path(tmp_path), config)
+    monkeypatch.setattr(automation, "list_jobs", lambda root: [])
+    monkeypatch.setattr(automation, "start_workflow_job", lambda kind, root: {"job_id": "auto-1", "kind": kind})
+    job = automation.run_due_automations(root=tmp_path)
+    assert job == {"job_id": "auto-1", "kind": "REPORT_REFRESH"}
+    stored = automation.load_config(tmp_path)["items"]["report_refresh"]
+    assert stored["last_job_id"] == "auto-1"
+
+
+def test_scheduler_launch_is_detached_and_forces_safe_environment(monkeypatch, tmp_path):
+    automation.set_automation("forward_shadow", enabled=True, interval_hours=4, root=tmp_path)
+    called = {}
+
+    class Process:
+        pid = 9911
+
+    monkeypatch.setattr(
+        automation.subprocess,
+        "Popen",
+        lambda command, **kwargs: called.update(command=command, kwargs=kwargs) or Process(),
+    )
+    state = automation.ensure_scheduler_running(tmp_path)
+    assert state["status"] == "RUNNING"
+    assert state["pid"] == 9911
+    assert called["kwargs"]["env"]["LIVE_TRADING_ENABLED"] == "false"
+    assert called["kwargs"]["env"]["REAL_CAPITAL_ENABLED"] == "false"
+    assert "freakto.ui.automation_runner" in called["command"]
 
 
 def test_cross_asset_inputs_cannot_escape_workspace(tmp_path):

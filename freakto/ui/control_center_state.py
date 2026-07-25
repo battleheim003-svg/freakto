@@ -42,6 +42,8 @@ class QuickStep:
 
 
 WORKFLOW_KINDS = (
+    "DATA_REPLAY",
+    "REPORT_REFRESH",
     "MARKET_DATA_AUDIT",
     "MARKET_REPLAY",
     "FORWARD_SHADOW_CYCLE",
@@ -115,6 +117,21 @@ def workflow_plan(
     values = dict(options or {})
     if canonical not in WORKFLOW_KINDS:
         raise ValueError(f"Unsupported control-center workflow: {canonical}")
+
+    if canonical == "DATA_REPLAY":
+        return (
+            QuickStep("data_status", ("data", "status")),
+            QuickStep("data_build", ("data", "build"), long_running=True),
+            QuickStep("replay_status", ("replay", "status")),
+            QuickStep("replay_run", ("replay", "run", "--compact"), long_running=True),
+        )
+    if canonical == "REPORT_REFRESH":
+        return (
+            QuickStep("paper_report", ("report", "paper", "--no-plot"), accepted_exit_codes=(0, 2)),
+            QuickStep("research_report", ("report", "research"), accepted_exit_codes=(0, 2)),
+            QuickStep("forward_report", ("report", "forward"), accepted_exit_codes=(0, 2)),
+            QuickStep("go_live_check", ("paper", "go-live-check"), accepted_exit_codes=(0, 2)),
+        )
 
     if canonical == "MARKET_DATA_AUDIT":
         start = _safe_iso_date(values.get("start"), "2023-01-01")

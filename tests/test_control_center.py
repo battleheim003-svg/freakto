@@ -81,9 +81,9 @@ def test_script_runner_is_allowlisted_and_forces_safe_environment(monkeypatch, t
 
 def test_control_center_exposes_every_management_area():
     source = (ROOT / "freakto" / "ui" / "control_center.py").read_text(encoding="utf-8")
-    for label in ("نمای کلی", "داده و Replay", "Paper Trading", "گزارش‌ها", "Go-live", "اجراها و لاگ‌ها", "راهنمای اجرا"):
+    for label in ("مرکز عملیات", "فرآیندها", "گزارش‌ها", "تنظیمات و اتوماسیون"):
         assert label in source
-    for label in ("بازارهای جدید", "Forward و Shadow", "Airdrop Radar", "رتبه‌بندی بین‌بازاری"):
+    for label in ("ممیزی فارکس و طلا", "چرخه Forward و Shadow", "Airdrop Outcomes", "رتبه‌بندی بین‌بازاری"):
         assert label in source
     assert '"en": {' in source
     assert '"fa": {' in source
@@ -151,18 +151,10 @@ def test_windows_launcher_is_safe_and_repository_relative():
 def test_dashboard_renders_navigation_without_exception():
     app = AppTest.from_file(str(ROOT / "freakto_control_center.py"), default_timeout=20).run()
     assert not app.exception
-    assert app.radio[0].options == ["خانه", "داده و پژوهش", "اعتبارسنجی", "عملیات صفرسرمایه", "سیستم و راهنما"]
-    assert app.radio[1].options == ["نمای کلی"]
+    assert app.radio[0].options == ["مرکز عملیات", "فرآیندها", "گزارش‌ها", "تنظیمات و اتوماسیون"]
     app.selectbox[0].set_value("English").run()
     assert not app.exception
-    assert app.radio[0].options == [
-        "Home",
-        "Data & Research",
-        "Validation",
-        "Zero-capital Operations",
-        "System & Guide",
-    ]
-    assert app.radio[1].options == ["Overview"]
+    assert app.radio[0].options == ["Operations", "Workflows", "Reports", "Settings & Automation"]
     assert "▶ Start complete workflow" in [button.label for button in app.button]
     quick_button = next(button for button in app.button if button.label.startswith("▶"))
     assert quick_button.disabled is True
@@ -171,36 +163,25 @@ def test_dashboard_renders_navigation_without_exception():
     assert quick_button.disabled is False
 
 
-def test_each_new_management_page_renders_controls():
+def test_workflow_workspace_renders_independent_controls():
     app = AppTest.from_file(str(ROOT / "freakto_control_center.py"), default_timeout=20).run()
     app.selectbox[0].set_value("English").run()
-    expected_buttons = {
-        ("Data & Research", "New Markets"): {"Start market data audit", "Start forex and gold Replay"},
-        ("Validation", "Forward & Shadow"): {"Start Forward/Shadow cycle"},
-        ("Data & Research", "Airdrop Radar"): {"Start Airdrop sync and report"},
-        ("Data & Research", "Cross-Asset Ranking"): {"Start ranking", "Start historical evaluation"},
-    }
-    for (group, page), labels in expected_buttons.items():
-        app.radio[0].set_value(group).run()
-        app.radio[1].set_value(page).run()
+    app.radio[0].set_value("Workflows").run()
+    assert not app.exception
+    rendered = {button.label for button in app.button}
+    assert "Start" in rendered
+    assert "Run ranking" in rendered
+    assert "Preflight" in rendered
+    assert "Paper status" in rendered
+
+
+def test_navigation_is_reduced_to_four_clear_workspaces():
+    app = AppTest.from_file(str(ROOT / "freakto_control_center.py"), default_timeout=20).run()
+    app.selectbox[0].set_value("English").run()
+    assert app.radio[0].options == ["Operations", "Workflows", "Reports", "Settings & Automation"]
+    for page in app.radio[0].options:
+        app.radio[0].set_value(page).run()
         assert not app.exception
-        rendered = {button.label for button in app.button}
-        assert labels.issubset(rendered)
-
-
-def test_navigation_keeps_pages_in_five_clear_groups():
-    app = AppTest.from_file(str(ROOT / "freakto_control_center.py"), default_timeout=20).run()
-    app.selectbox[0].set_value("English").run()
-    expected = {
-        "Home": ["Overview"],
-        "Data & Research": ["Data & Replay", "New Markets", "Airdrop Radar", "Cross-Asset Ranking"],
-        "Validation": ["Forward & Shadow", "Reports"],
-        "Zero-capital Operations": ["Paper Trading", "Go-live"],
-        "System & Guide": ["Jobs & logs", "Run guide"],
-    }
-    for group, pages in expected.items():
-        app.radio[0].set_value(group).run()
-        assert app.radio[1].options == pages
 
 
 def test_quick_start_click_launches_background_job_without_ui_exception(monkeypatch):
@@ -217,4 +198,4 @@ def test_quick_start_click_launches_background_job_without_ui_exception(monkeypa
     next(button for button in app.button if button.label.startswith("▶")).click().run()
     assert not app.exception
     assert launched == {"full": True}
-    assert any("quick-ui-test" in info.value for info in app.info)
+    assert any("quick-ui-test" in message.value for message in app.success)

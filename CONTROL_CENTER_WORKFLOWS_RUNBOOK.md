@@ -28,17 +28,37 @@ REAL_CAPITAL_ENABLED=false
 
 ## Sections
 
-Navigation is intentionally two-level instead of one long menu:
+Navigation is intentionally reduced to four stable workspaces:
 
-1. Home;
-2. Data & Research;
-3. Validation;
-4. Zero-capital Operations;
-5. System & Guide.
+1. **Operations** — current job, live progress, current/next step, blockers,
+   recommended action, quick start, and latest result;
+2. **Workflows** — independent Data/Markets, Validation/Paper, and supporting
+   Research controls;
+3. **Reports** — readiness gates, blockers, job history, step results, retry,
+   cancellation, and complete logs;
+4. **Settings & Automation** — persisted schedules, scheduler health, the
+   fail-closed safety contract, and advanced paths.
 
-Each page follows the same visual order: status summary, workflow context,
-settings, confirmed action, then output. Related operations use separate tabs
-and infrequently changed parameters remain inside collapsed advanced panels.
+Primary actions stay visible. Dates, CSV paths, direct Paper controls, and raw
+logs stay inside advanced panels until needed.
+
+## Local automation scheduler
+
+Schedules are persisted under:
+
+```text
+.freakto-runtime/control-center/automation/schedules.json
+```
+
+Enabling the first schedule starts a detached local scheduler. It continues
+after the browser closes, polls due schedules, and launches only fixed,
+allowlisted Research/Paper workflows. It never bypasses the single-active-job
+lock: a due schedule waits while another job is active. Disabling every
+schedule lets the scheduler exit cleanly on its next poll.
+
+Available presets are Data & Replay, Forward & Shadow, report refresh, and
+Airdrop outcome refresh. Every spawned process forces
+`LIVE_TRADING_ENABLED=false` and `REAL_CAPITAL_ENABLED=false`.
 
 ### Data & Replay
 

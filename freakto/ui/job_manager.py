@@ -80,6 +80,11 @@ def _pid_alive(pid: Any) -> bool:
     return True
 
 
+def pid_alive(pid: Any) -> bool:
+    """Public, cross-platform process probe used by UI-side supervisors."""
+    return _pid_alive(pid)
+
+
 def reconcile(path: Path) -> dict[str, Any]:
     state = read_state(path)
     if state.get("status") in {"RUNNING", "CANCEL_REQUESTED"} and not _pid_alive(state.get("pid")):
