@@ -9,6 +9,7 @@ import subprocess
 import pytest
 
 from paper_research_orchestrator import (
+    PaperResearchOrchestrator,
     OrchestratorConfig,
     ProcessLock,
     cycle_commands,
@@ -141,3 +142,59 @@ def test_run_step_returns_failure_without_hiding_it(tmp_path: Path):
     assert result.status == "FAILED"
     assert result.exit_code == 7
     assert result.stderr_tail == ["failed"]
+
+
+def test_maintenance_failure_is_warning_not_hard_cycle_failure(tmp_path: Path, monkeypatch):
+    config = OrchestratorConfig(project_root=str(tmp_path), step_retries=0)
+    orchestrator = PaperResearchOrchestrator(config)
+    monkeypatch.setattr(orchestrator, "_refresh_readiness", lambda: type("Ready", (), {"status": "RESEARCH"})())
+    monkeypatch.setattr(
+        orchestrator,
+        "_ensure_arm",
+        lambda _readiness: {"mode": "RESEARCH", "live_orders_enabled": False},
+    )
+
+    calls = {"count": 0}
+
+    def run_commands(_commands):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            return [_step("paper_scan", "PASSED", 0)]
+        return [_step("historical_incremental_update", "FAILED", 2)]
+
+    monkeypatch.setattr(orchestrator, "_run_commands", run_commands)
+    result = orchestrator.run_cycle(force_maintenance=True)
+
+    assert result.status == "COMPLETE_WITH_MAINTENANCE_WARNINGS"
+    assert result.warnings == ["historical_incremental_update failed with exit code 2."]
+
+
+def test_operational_failure_remains_hard_cycle_failure(tmp_path: Path, monkeypatch):
+    config = OrchestratorConfig(project_root=str(tmp_path), maintenance_enabled=False, step_retries=0)
+    orchestrator = PaperResearchOrchestrator(config)
+    monkeypatch.setattr(orchestrator, "_refresh_readiness", lambda: type("Ready", (), {"status": "RESEARCH"})())
+    monkeypatch.setattr(
+        orchestrator,
+        "_ensure_arm",
+        lambda _readiness: {"mode": "RESEARCH", "live_orders_enabled": False},
+    )
+    monkeypatch.setattr(orchestrator, "_run_commands", lambda _commands: [_step("paper_scan", "FAILED", 2)])
+
+    result = orchestrator.run_cycle()
+
+    assert result.status == "COMPLETE_WITH_STEP_FAILURES"
+
+
+def _step(name: str, status: str, exit_code: int):
+    from paper_research_orchestrator import StepResult
+
+    return StepResult(
+        name=name,
+        command=[name],
+        started_utc="2026-07-26T00:00:00+00:00",
+        finished_utc="2026-07-26T00:00:01+00:00",
+        exit_code=exit_code,
+        attempts=1,
+        status=status,
+        duration_seconds=1.0,
+    )

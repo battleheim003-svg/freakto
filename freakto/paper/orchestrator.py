@@ -36,6 +36,7 @@ from engine.paper_observation_v2 import arm_paper_mode, disarm_paper_mode, load_
 from engine.paper_readiness_v2 import build_paper_launch_readiness, write_paper_readiness_outputs
 
 VERSION = "1.0.0"
+SUCCESS_STATUSES = {"COMPLETE", "COMPLETE_WITH_MAINTENANCE_WARNINGS"}
 DEFAULT_OUTPUT_DIR = Path("logs") / "paper_cycle"
 DEFAULT_PAPER_DIR = Path("logs") / "paper_launch_v2"
 DEFAULT_EVENT_DIR = Path("logs") / "event_opportunity_v2"
@@ -564,18 +565,30 @@ class PaperResearchOrchestrator:
             self.config.maintenance_enabled,
         )
 
-        steps = self._run_commands(cycle_commands(self.config, sys.executable))
+        cycle_steps = self._run_commands(cycle_commands(self.config, sys.executable))
+        maintenance_steps: List[StepResult] = []
         if maintenance:
             self.logger.info("Daily maintenance is due on cycle %s.", self.cycle_number)
-            steps.extend(self._run_commands(maintenance_commands(self.config, sys.executable)))
+            maintenance_steps = self._run_commands(maintenance_commands(self.config, sys.executable))
             # Fresh OOS may change readiness; re-arm only within virtual Paper modes.
             readiness = self._refresh_readiness()
             state = self._ensure_arm(readiness)
 
-        failed = [item for item in steps if item.status != "PASSED"]
+        steps = cycle_steps + maintenance_steps
+        failed_cycle_steps = [item for item in cycle_steps if item.status != "PASSED"]
+        failed_maintenance_steps = [item for item in maintenance_steps if item.status != "PASSED"]
+        failed = failed_cycle_steps + failed_maintenance_steps
         if failed:
             warnings.extend(f"{item.name} failed with exit code {item.exit_code}." for item in failed)
-        status = "COMPLETE" if not failed else "COMPLETE_WITH_STEP_FAILURES"
+        if failed_cycle_steps:
+            status = "COMPLETE_WITH_STEP_FAILURES"
+        elif failed_maintenance_steps:
+            # Historical refresh and Fresh OOS are advisory maintenance. Their
+            # partial results must stay visible in the audit trail, but must not
+            # turn an otherwise valid Paper cycle into a hard workflow failure.
+            status = "COMPLETE_WITH_MAINTENANCE_WARNINGS"
+        else:
+            status = "COMPLETE"
         finished = self.now_fn()
         result = CycleResult(
             cycle_id=cycle_id,
@@ -732,7 +745,7 @@ def main() -> int:
                 return orchestrator.run_loop()
             result = orchestrator.run_cycle(force_maintenance=bool(args.maintenance_now))
             print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
-            return 0 if result.status == "COMPLETE" else 2
+            return 0 if result.status in SUCCESS_STATUSES else 2
     except RuntimeError as exc:
         print(f"Orchestrator blocked: {exc}", file=sys.stderr)
         return 3
