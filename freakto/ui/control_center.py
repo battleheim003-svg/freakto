@@ -199,6 +199,73 @@ TEXT["en"].update(
     }
 )
 
+TEXT["fa"].update(
+    {
+        "nav_group": "حوزه کاری",
+        "nav_page": "صفحه",
+        "group_home": "خانه",
+        "group_research": "داده و پژوهش",
+        "group_validation": "اعتبارسنجی",
+        "group_operations": "عملیات صفرسرمایه",
+        "group_system": "سیستم و راهنما",
+        "status_summary": "خلاصه وضعیت",
+        "workflow_map": "مسیر مرحله‌ای",
+        "settings": "تنظیمات",
+        "actions": "عملیات",
+        "advanced": "تنظیمات پیشرفته",
+        "read_only": "بررسی‌های فقط‌خواندنی",
+        "start_job": "اجرای پس‌زمینه",
+        "active_job": "Job فعال",
+        "no_active_job": "هیچ Job فعالی وجود ندارد",
+        "step_collect": "۱. داده",
+        "step_replay": "۲. Replay",
+        "step_forward": "۳. Forward",
+        "step_paper": "۴. Paper",
+        "step_review": "۵. Review",
+        "research_tools": "ابزارهای پژوهش",
+        "validation_tools": "اعتبارسنجی و شواهد",
+        "safe_operations": "عملیات کنترل‌شده",
+        "system_tools": "نظارت و راهنما",
+    }
+)
+TEXT["en"].update(
+    {
+        "nav_group": "Workspace",
+        "nav_page": "Page",
+        "group_home": "Home",
+        "group_research": "Data & Research",
+        "group_validation": "Validation",
+        "group_operations": "Zero-capital Operations",
+        "group_system": "System & Guide",
+        "status_summary": "Status summary",
+        "workflow_map": "Ordered workflow",
+        "settings": "Settings",
+        "actions": "Actions",
+        "advanced": "Advanced settings",
+        "read_only": "Read-only checks",
+        "start_job": "Background execution",
+        "active_job": "Active job",
+        "no_active_job": "No active job",
+        "step_collect": "1. Data",
+        "step_replay": "2. Replay",
+        "step_forward": "3. Forward",
+        "step_paper": "4. Paper",
+        "step_review": "5. Review",
+        "research_tools": "Research tools",
+        "validation_tools": "Validation and evidence",
+        "safe_operations": "Controlled operations",
+        "system_tools": "Monitoring and guide",
+    }
+)
+
+NAV_GROUPS = {
+    "home": ("overview",),
+    "research": ("data", "market", "airdrop", "cross_asset"),
+    "validation": ("forward", "reports"),
+    "operations": ("paper", "golive"),
+    "system": ("jobs", "guide"),
+}
+
 
 def tr(key: str) -> str:
     return TEXT[st.session_state.get("language", "fa")][key]
@@ -212,25 +279,39 @@ def inject_style(rtl: bool) -> None:
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Vazirmatn:wght@400;500;600;700;800&display=swap');
 .stApp {{ background: radial-gradient(circle at 80% 0%, #14283c 0, #08111c 35%, #050b12 75%); color:#e8f3fa; }}
-.main .block-container {{ max-width:1400px; padding-top:1.6rem; }}
+.main .block-container {{ max-width:1320px; padding-top:1rem; padding-bottom:3rem; }}
 [data-testid="stSidebar"] {{ background:linear-gradient(180deg,#0a1723,#07101a); border-right:1px solid #19364a; }}
 [data-testid="stSidebar"] * {{ direction:{direction}; text-align:{align}; }}
 .dashboard {{ direction:{direction}; text-align:{align}; font-family:{'Vazirmatn' if rtl else 'Inter'},sans-serif; }}
-.hero {{ position:relative; overflow:hidden; padding:1.65rem 1.8rem; border:1px solid #24475d; border-radius:24px;
-background:linear-gradient(115deg,rgba(13,42,59,.96),rgba(14,27,44,.96) 55%,rgba(37,25,58,.9)); box-shadow:0 24px 70px rgba(0,0,0,.28); margin-bottom:1.1rem; }}
-.hero:after {{ content:''; position:absolute; width:280px; height:280px; border-radius:50%; background:#27d7c51c; top:-170px; right:8%; box-shadow:0 0 90px #27d7c544; }}
+.hero {{ position:relative; overflow:hidden; padding:1.05rem 1.25rem; border:1px solid #24475d; border-radius:18px;
+background:linear-gradient(115deg,rgba(13,42,59,.96),rgba(14,27,44,.96) 55%,rgba(37,25,58,.9)); box-shadow:0 16px 45px rgba(0,0,0,.22); margin-bottom:.9rem; }}
+.hero:after {{ content:''; position:absolute; width:220px; height:220px; border-radius:50%; background:#27d7c51c; top:-150px; right:8%; box-shadow:0 0 70px #27d7c533; }}
 .eyebrow {{ color:#47ddcf; font-size:.74rem; letter-spacing:.16em; font-weight:800; }}
-.hero h1 {{ margin:.35rem 0 .25rem; color:#f5fbff; font-size:2.15rem; }} .hero p {{ margin:0;color:#9bb3c3; }}
+.hero h1 {{ margin:.25rem 0 .15rem; color:#f5fbff; font-size:1.72rem; }} .hero p {{ margin:0;color:#9bb3c3; font-size:.9rem; }}
 .safe-pill {{ display:inline-flex; margin-top:.85rem; color:#7df5b0; background:#0d3024; border:1px solid #245e45; padding:.32rem .7rem; border-radius:999px; font-weight:700; font-size:.75rem; }}
-.metric-card {{ padding:1.05rem 1.1rem; min-height:132px; border-radius:18px; background:linear-gradient(145deg,#0d1d29,#0a151f); border:1px solid #1b394c; box-shadow:0 12px 35px rgba(0,0,0,.18); }}
+.metric-card {{ padding:.85rem .95rem; min-height:104px; border-radius:14px; background:linear-gradient(145deg,#0d1d29,#0a151f); border:1px solid #1b394c; box-shadow:0 9px 25px rgba(0,0,0,.15); }}
 .metric-label {{ color:#7190a3; font-size:.72rem; text-transform:uppercase; letter-spacing:.12em; }}
-.metric-value {{ color:#f4fbff; font-size:1.55rem; font-weight:800; margin:.48rem 0 .3rem; }} .metric-note {{ color:#88a4b5; font-size:.78rem; word-break:break-word; }}
+.metric-value {{ color:#f4fbff; font-size:1.32rem; font-weight:800; margin:.35rem 0 .2rem; }} .metric-note {{ color:#88a4b5; font-size:.75rem; word-break:break-word; }}
 .good {{ color:#74efaa; }} .bad {{ color:#ff9c9c; }}
-.quick-box {{ padding:1.25rem 1.35rem; border:1px solid #28596d; border-radius:20px; background:linear-gradient(120deg,#0d2431,#101c2c); margin:1rem 0; }}
+.quick-box {{ padding:1rem 1.1rem; border:1px solid #28596d; border-radius:16px; background:linear-gradient(120deg,#0d2431,#101c2c); margin:.75rem 0; }}
 .quick-box h3 {{ color:#65e4d8; margin:0 0 .25rem; }} .quick-box p {{ color:#96afbf; margin:0; }}
+.workflow-strip {{ display:grid; grid-template-columns:repeat(5,1fr); gap:.5rem; margin:.75rem 0 1rem; }}
+.workflow-step {{ border:1px solid #21455a; background:#0b1924; border-radius:12px; padding:.68rem .55rem; text-align:center; color:#9db8c8; font-size:.76rem; font-weight:700; }}
+.workflow-step.ready {{ border-color:#277861; color:#72e9b0; background:#0c2a22; }}
+.section-kicker {{ color:#45d9ce; font-size:.72rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; margin-bottom:.2rem; }}
+.section-copy {{ color:#89a5b6; font-size:.86rem; margin-bottom:.7rem; }}
+.status-list {{ display:grid; gap:.55rem; }}
+.status-row {{ display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.62rem .72rem; border:1px solid #1c3b4d; border-radius:11px; background:#091722; }}
+.status-row span {{ color:#89a5b6; font-size:.78rem; }}
+.status-row strong {{ color:#eef9ff; font-size:.82rem; text-align:end; overflow-wrap:anywhere; }}
+[data-testid="stVerticalBlockBorderWrapper"] {{ background:linear-gradient(145deg,rgba(12,29,41,.82),rgba(8,20,30,.82)); border-color:#1c3c50 !important; border-radius:16px !important; }}
+[data-testid="stExpander"] {{ border-color:#1d4053 !important; border-radius:12px !important; background:#091722; }}
+[data-testid="stTabs"] [data-baseweb="tab-list"] {{ gap:.35rem; background:#091722; padding:.3rem; border-radius:12px; }}
+[data-testid="stTabs"] [data-baseweb="tab"] {{ border-radius:9px; padding:.55rem .85rem; }}
 div[data-testid="stButton"] button {{ border-radius:12px; border:1px solid #2a566d; min-height:2.7rem; font-weight:700; }}
 div[data-testid="stButton"] button[kind="primary"] {{ background:linear-gradient(90deg,#0c8e88,#176b96); border:0; box-shadow:0 8px 25px #087d7544; }}
 div[data-testid="stDataFrame"] {{ border:1px solid #1d3b4d; border-radius:14px; overflow:hidden; }}
+@media (max-width:900px) {{ .workflow-strip {{ grid-template-columns:1fr; }} .hero h1 {{ font-size:1.35rem; }} }}
 </style>
 """,
         unsafe_allow_html=True,
@@ -243,6 +324,37 @@ def metric_card(label: str, value: str, note: str = "", css: str = "") -> None:
         f'<div class="metric-value {css}">{html.escape(value)}</div><div class="metric-note">{html.escape(note)}</div></div>',
         unsafe_allow_html=True,
     )
+
+
+def page_header(title: str, subtitle: str, eyebrow: str) -> None:
+    st.markdown(
+        f'<div class="hero dashboard"><div class="eyebrow">{html.escape(eyebrow)}</div>'
+        f'<h1>{html.escape(title)}</h1><p>{html.escape(subtitle)}</p></div>',
+        unsafe_allow_html=True,
+    )
+
+
+def workflow_strip() -> None:
+    labels = [tr("step_collect"), tr("step_replay"), tr("step_forward"), tr("step_paper"), tr("step_review")]
+    items = "".join(f'<div class="workflow-step">{html.escape(label)}</div>' for label in labels)
+    st.markdown(f'<div class="workflow-strip dashboard">{items}</div>', unsafe_allow_html=True)
+
+
+def panel_intro(title: str, copy: str) -> None:
+    st.markdown(
+        f'<div class="dashboard"><div class="section-kicker">{html.escape(title)}</div>'
+        f'<div class="section-copy">{html.escape(copy)}</div></div>',
+        unsafe_allow_html=True,
+    )
+
+
+def status_list(rows: list[tuple[str, str]]) -> None:
+    items = "".join(
+        f'<div class="status-row"><span>{html.escape(label)}</span>'
+        f'<strong>{html.escape(value)}</strong></div>'
+        for label, value in rows
+    )
+    st.markdown(f'<div class="status-list dashboard">{items}</div>', unsafe_allow_html=True)
 
 
 def execute(label: str, arguments: list[str], *, key: str, primary: bool = False, disabled: bool = False) -> None:
@@ -299,23 +411,24 @@ st.session_state["language"] = "fa" if language_label == "فارسی" else "en"
 rtl = st.session_state["language"] == "fa"
 inject_style(rtl)
 
-pages = [
-    "overview",
-    "data",
-    "market",
-    "forward",
-    "airdrop",
-    "cross_asset",
-    "paper",
-    "reports",
-    "golive",
-    "jobs",
-    "guide",
-]
-page_labels = [tr(item) for item in pages]
 st.sidebar.markdown("## ⚡ FREAKTO")
-selected = st.sidebar.radio(tr("nav"), page_labels)
-page = pages[page_labels.index(selected)]
+group_keys = list(NAV_GROUPS)
+group_labels = {value: tr(f"group_{value}") for value in group_keys}
+selected_group_label = st.sidebar.radio(
+    tr("nav_group"),
+    [group_labels[value] for value in group_keys],
+    key=f"nav-group-{st.session_state['language']}",
+)
+selected_group = next(
+    value for value, label in group_labels.items() if label == selected_group_label
+)
+page_labels = {value: tr(value) for value in NAV_GROUPS[selected_group]}
+selected_page_label = st.sidebar.radio(
+    tr("nav_page"),
+    [page_labels[value] for value in NAV_GROUPS[selected_group]],
+    key=f"nav-page-{st.session_state['language']}-{selected_group}",
+)
+page = next(value for value, label in page_labels.items() if label == selected_page_label)
 if st.sidebar.button("↻ " + tr("refresh"), use_container_width=True):
     st.session_state["snapshot"] = collect_snapshot(); st.rerun()
 st.sidebar.divider()
@@ -323,9 +436,17 @@ st.sidebar.markdown(f"<div class='dashboard'><span class='safe-pill'>● {tr('sa
 st.sidebar.caption(tr("safe_note"))
 
 snapshot = st.session_state["snapshot"]
-st.markdown(f'<div class="hero dashboard"><div class="eyebrow">FREAKTO // CONTROL CENTER</div><h1>{tr("title")}</h1><p>{tr("subtitle")}</p><span class="safe-pill">● {tr("safe")}</span></div>', unsafe_allow_html=True)
+active_jobs = [job for job in list_jobs() if job.get("status") in ACTIVE]
+if active_jobs:
+    active = active_jobs[0]
+    total = max(1, int(active.get("total_steps") or 1))
+    st.progress(
+        int(active.get("completed_steps") or 0) / total,
+        text=f"{tr('active_job')}: {active.get('kind')} — {active.get('current_step') or tr('pending')}",
+    )
 
 if page == "overview":
+    page_header(tr("title"), tr("subtitle"), "FREAKTO // CONTROL CENTER")
     go_live = snapshot["go_live"]
     cols = st.columns(4)
     with cols[0]: metric_card(tr("capital"), tr("zero"), "LIVE ORDERS: OFF", "good")
@@ -333,42 +454,61 @@ if page == "overview":
     with cols[2]: metric_card(tr("paper_mode"), str(snapshot["paper"]["mode"]), tr("armed") if snapshot["paper"]["armed"] else tr("disarmed"), "good" if snapshot["paper"]["armed"] else "")
     with cols[3]: metric_card(tr("review"), tr("blocked") if go_live["status"].startswith("BLOCKED") else tr("reviewable"), f"{len(go_live['blockers'])} blockers", "bad" if go_live["status"].startswith("BLOCKED") else "good")
 
-    st.markdown(f'<div class="quick-box dashboard"><h3>⚡ {tr("quick_title")}</h3><p>{tr("quick_desc")}</p></div>', unsafe_allow_html=True)
-    full = st.toggle(tr("full_pipeline"), value=True)
-    confirmed = st.checkbox(tr("confirm_quick"))
-    if st.button("▶ " + tr("quick_button"), type="primary", use_container_width=True, disabled=not confirmed):
-        try:
-            job = start_quick_job(full=full)
-            st.session_state["job_notice"] = f"{tr('job_started')}: {job['job_id']}"
-        except RuntimeError as exc:
-            st.session_state["job_notice"] = f"{tr('job_exists')}: {exc}"
-    if st.session_state.get("job_notice"):
-        st.info(st.session_state["job_notice"])
-    active_jobs = [job for job in list_jobs() if job.get("status") in ACTIVE]
-    if active_jobs:
-        active = active_jobs[0]
-        total = max(1, int(active.get("total_steps") or 1))
-        st.progress(int(active.get("completed_steps") or 0) / total, text=f"{active.get('status')} — {active.get('current_step') or tr('pending')}")
-    st.info(tr("recommended"))
+    panel_intro(tr("workflow_map"), tr("recommended"))
+    workflow_strip()
+    overview_cols = st.columns([1.15, .85])
+    with overview_cols[0]:
+        with st.container(border=True):
+            panel_intro(tr("quick_title"), tr("quick_desc"))
+            full = st.toggle(tr("full_pipeline"), value=True)
+            confirmed = st.checkbox(tr("confirm_quick"))
+            if st.button("▶ " + tr("quick_button"), type="primary", use_container_width=True, disabled=not confirmed):
+                try:
+                    job = start_quick_job(full=full)
+                    st.session_state["job_notice"] = f"{tr('job_started')}: {job['job_id']}"
+                except RuntimeError as exc:
+                    st.session_state["job_notice"] = f"{tr('job_exists')}: {exc}"
+            if st.session_state.get("job_notice"):
+                st.info(st.session_state["job_notice"])
+    with overview_cols[1]:
+        with st.container(border=True):
+            panel_intro(tr("status_summary"), tr("one_at_time"))
+            status_list(
+                [
+                    (tr("active_job"), str(active_jobs[0].get("kind") if active_jobs else tr("no_active_job"))),
+                    (tr("artifacts"), str(snapshot["runtime"]["json_artifacts"])),
+                    (tr("adapter_manifests"), str(snapshot["workflows"]["market_adapter_manifests"])),
+                ]
+            )
 
 elif page == "data":
-    st.subheader(tr("data_title")); st.caption(tr("data_note"))
-    c1, c2 = st.columns([1, 1])
-    with c1:
-        metric_card(tr("data_files"), str(snapshot["data"]["datasets"]), snapshot["data"]["path"])
-        execute(tr("data_status"), ["data", "status"], key="data-status", primary=True)
-        execute(tr("replay_status"), ["replay", "status"], key="replay-status")
-    with c2:
-        st.markdown("#### " + tr("heavy"))
-        build_ok = st.checkbox(tr("build_confirm"), key="build-confirm")
-        execute(tr("build"), ["data", "build"], key="data-build", disabled=not build_ok)
-        replay_ok = st.checkbox(tr("replay_confirm"), key="replay-confirm")
-        execute(tr("replay_run"), ["replay", "run", "--compact"], key="replay-run", disabled=not replay_ok)
+    page_header(tr("data_title"), tr("data_note"), tr("research_tools"))
+    status_tab, operations_tab = st.tabs([tr("read_only"), tr("actions")])
+    with status_tab:
+        data_cols = st.columns([1, 1])
+        with data_cols[0]:
+            metric_card(tr("data_files"), str(snapshot["data"]["datasets"]), snapshot["data"]["path"])
+        with data_cols[1]:
+            with st.container(border=True):
+                panel_intro(tr("read_only"), tr("data_note"))
+                check_cols = st.columns(2)
+                with check_cols[0]: execute(tr("data_status"), ["data", "status"], key="data-status", primary=True)
+                with check_cols[1]: execute(tr("replay_status"), ["replay", "status"], key="replay-status")
+    with operations_tab:
+        operation_cols = st.columns(2)
+        with operation_cols[0]:
+            with st.container(border=True):
+                panel_intro(tr("build"), tr("build_confirm"))
+                build_ok = st.checkbox(tr("build_confirm"), key="build-confirm")
+                execute(tr("build"), ["data", "build"], key="data-build", disabled=not build_ok)
+        with operation_cols[1]:
+            with st.container(border=True):
+                panel_intro(tr("replay_run"), tr("replay_confirm"))
+                replay_ok = st.checkbox(tr("replay_confirm"), key="replay-confirm")
+                execute(tr("replay_run"), ["replay", "run", "--compact"], key="replay-run", disabled=not replay_ok)
 
 elif page == "market":
-    st.subheader(tr("market_title"))
-    st.caption(tr("market_note"))
-    st.info(tr("one_at_time"))
+    page_header(tr("market_title"), tr("market_note"), tr("research_tools"))
     market = snapshot["workflows"]
     cards = st.columns(3)
     with cards[0]:
@@ -381,44 +521,27 @@ elif page == "market":
         metric_card("Paper", "OFF", "research_only=true", "good")
     with cards[2]:
         metric_card("Live", "OFF", "not available", "good")
-    st.markdown("#### " + tr("audit_range"))
-    dates = st.columns(2)
-    with dates[0]:
-        audit_start = st.text_input(
-            tr("start_date"),
-            value="2023-01-01",
-            key="market-audit-start",
-        )
-    with dates[1]:
-        audit_end = st.text_input(
-            tr("end_date"),
-            value="2026-01-01",
-            key="market-audit-end",
-        )
-    audit_ok = st.checkbox(tr("audit_confirm"), key="market-audit-confirm")
-    start_section_job(
-        tr("start_audit"),
-        "MARKET_DATA_AUDIT",
-        key="market-audit-start-button",
-        options={"start": audit_start, "end": audit_end},
-        disabled=not audit_ok,
-    )
-    st.divider()
-    replay_ok = st.checkbox(
-        tr("market_replay_confirm"),
-        key="market-replay-confirm",
-    )
-    start_section_job(
-        tr("start_market_replay"),
-        "MARKET_REPLAY",
-        key="market-replay-start-button",
-        disabled=not replay_ok,
-    )
+    audit_tab, replay_tab = st.tabs([tr("start_audit"), tr("start_market_replay")])
+    with audit_tab:
+        with st.container(border=True):
+            panel_intro(tr("audit_range"), tr("market_note"))
+            with st.expander(tr("advanced"), expanded=False):
+                dates = st.columns(2)
+                with dates[0]:
+                    audit_start = st.text_input(tr("start_date"), value="2023-01-01", key="market-audit-start")
+                with dates[1]:
+                    audit_end = st.text_input(tr("end_date"), value="2026-01-01", key="market-audit-end")
+            audit_ok = st.checkbox(tr("audit_confirm"), key="market-audit-confirm")
+            start_section_job(tr("start_audit"), "MARKET_DATA_AUDIT", key="market-audit-start-button", options={"start": audit_start, "end": audit_end}, disabled=not audit_ok)
+    with replay_tab:
+        with st.container(border=True):
+            panel_intro(tr("start_market_replay"), "EUR/USD + XAU/USD · 1d · fixed audited costs")
+            st.code("fee=0.525 bps/side | slippage=3.643 bps/side | strict leakage audit", language="text")
+            replay_ok = st.checkbox(tr("market_replay_confirm"), key="market-replay-confirm")
+            start_section_job(tr("start_market_replay"), "MARKET_REPLAY", key="market-replay-start-button", disabled=not replay_ok)
 
 elif page == "forward":
-    st.subheader(tr("forward_title"))
-    st.caption(tr("forward_note"))
-    st.info(tr("one_at_time"))
+    page_header(tr("forward_title"), tr("forward_note"), tr("validation_tools"))
     forward_cols = st.columns(3)
     with forward_cols[0]:
         metric_card(
@@ -430,23 +553,19 @@ elif page == "forward":
         metric_card("Paper", "OFF", "gate-controlled", "good")
     with forward_cols[2]:
         metric_card("Live", "OFF", "manual authorization absent", "good")
-    execute(
-        tr("forward_report"),
-        ["report", "forward"],
-        key="forward-section-status",
-    )
-    forward_ok = st.checkbox(tr("forward_confirm"), key="forward-cycle-confirm")
-    start_section_job(
-        tr("start_forward"),
-        "FORWARD_SHADOW_CYCLE",
-        key="forward-cycle-start",
-        disabled=not forward_ok,
-    )
+    forward_panels = st.columns([.8, 1.2])
+    with forward_panels[0]:
+        with st.container(border=True):
+            panel_intro(tr("read_only"), tr("last_forward"))
+            execute(tr("forward_report"), ["report", "forward"], key="forward-section-status")
+    with forward_panels[1]:
+        with st.container(border=True):
+            panel_intro(tr("start_job"), "Preflight → Research Arm → Cycle → Forward report → Status")
+            forward_ok = st.checkbox(tr("forward_confirm"), key="forward-cycle-confirm")
+            start_section_job(tr("start_forward"), "FORWARD_SHADOW_CYCLE", key="forward-cycle-start", disabled=not forward_ok)
 
 elif page == "airdrop":
-    st.subheader(tr("airdrop_title"))
-    st.caption(tr("airdrop_note"))
-    st.info(tr("one_at_time"))
+    page_header(tr("airdrop_title"), tr("airdrop_note"), tr("research_tools"))
     airdrop_cols = st.columns(3)
     with airdrop_cols[0]:
         metric_card(
@@ -458,103 +577,96 @@ elif page == "airdrop":
         metric_card("Wallet automation", "OFF", "not available", "good")
     with airdrop_cols[2]:
         metric_card("Claim automation", "OFF", "not available", "good")
-    airdrop_ok = st.checkbox(tr("airdrop_confirm"), key="airdrop-confirm")
-    start_section_job(
-        tr("start_airdrop"),
-        "AIRDROP_OUTCOMES",
-        key="airdrop-start",
-        disabled=not airdrop_ok,
-    )
+    with st.container(border=True):
+        panel_intro(tr("start_job"), "Prediction sync → Outcome report → Evidence blockers")
+        airdrop_ok = st.checkbox(tr("airdrop_confirm"), key="airdrop-confirm")
+        start_section_job(tr("start_airdrop"), "AIRDROP_OUTCOMES", key="airdrop-start", disabled=not airdrop_ok)
 
 elif page == "cross_asset":
-    st.subheader(tr("cross_title"))
-    st.caption(tr("cross_note"))
-    st.info(tr("one_at_time"))
-    opportunity_path = st.text_input(
-        tr("opportunity_csv"),
-        value="data/cross_asset/opportunities.csv",
-        key="cross-opportunity-input",
-    )
-    rank_ok = st.checkbox(tr("rank_confirm"), key="cross-rank-confirm")
-    start_section_job(
-        tr("start_rank"),
-        "CROSS_ASSET_RANK",
-        key="cross-rank-start",
-        options={"input": opportunity_path},
-        disabled=not rank_ok,
-    )
-    st.divider()
-    paths = st.columns(2)
-    with paths[0]:
-        rankings_path = st.text_input(
-            tr("rankings_csv"),
-            value="data/cross_asset/rankings.csv",
-            key="cross-rankings-input",
-        )
-    with paths[1]:
-        outcomes_path = st.text_input(
-            tr("outcomes_csv"),
-            value="data/cross_asset/outcomes.csv",
-            key="cross-outcomes-input",
-        )
-    evaluate_ok = st.checkbox(
-        tr("evaluate_confirm"),
-        key="cross-evaluate-confirm",
-    )
-    start_section_job(
-        tr("start_evaluate"),
-        "CROSS_ASSET_EVALUATE",
-        key="cross-evaluate-start",
-        options={"rankings": rankings_path, "outcomes": outcomes_path},
-        disabled=not evaluate_ok,
-    )
+    page_header(tr("cross_title"), tr("cross_note"), tr("research_tools"))
+    rank_tab, evaluate_tab = st.tabs([tr("start_rank"), tr("start_evaluate")])
+    with rank_tab:
+        with st.container(border=True):
+            panel_intro(tr("settings"), tr("cross_note"))
+            opportunity_path = st.text_input(tr("opportunity_csv"), value="data/cross_asset/opportunities.csv", key="cross-opportunity-input")
+            rank_ok = st.checkbox(tr("rank_confirm"), key="cross-rank-confirm")
+            start_section_job(tr("start_rank"), "CROSS_ASSET_RANK", key="cross-rank-start", options={"input": opportunity_path}, disabled=not rank_ok)
+    with evaluate_tab:
+        with st.container(border=True):
+            panel_intro(tr("settings"), tr("evaluate_confirm"))
+            paths = st.columns(2)
+            with paths[0]:
+                rankings_path = st.text_input(tr("rankings_csv"), value="data/cross_asset/rankings.csv", key="cross-rankings-input")
+            with paths[1]:
+                outcomes_path = st.text_input(tr("outcomes_csv"), value="data/cross_asset/outcomes.csv", key="cross-outcomes-input")
+            evaluate_ok = st.checkbox(tr("evaluate_confirm"), key="cross-evaluate-confirm")
+            start_section_job(tr("start_evaluate"), "CROSS_ASSET_EVALUATE", key="cross-evaluate-start", options={"rankings": rankings_path, "outcomes": outcomes_path}, disabled=not evaluate_ok)
 
 elif page == "paper":
-    st.subheader(tr("paper_title"))
+    page_header(tr("paper_title"), tr("strategy_note"), tr("safe_operations"))
     c1, c2, c3 = st.columns(3)
     with c1: metric_card(tr("paper_mode"), str(snapshot["paper"]["mode"]), tr("armed") if snapshot["paper"]["armed"] else tr("disarmed"))
     with c2: metric_card(tr("live_orders"), tr("off"), tr("unavailable"), "good")
     with c3: metric_card(tr("allocation"), "0.0%", "FAIL-CLOSED", "good")
-    actions = st.columns(4)
-    with actions[0]: execute(tr("preflight"), ["paper", "preflight"], key="paper-preflight", primary=True)
-    with actions[1]: execute(tr("arm_research"), ["paper", "arm-research"], key="paper-arm")
-    with actions[2]: execute(tr("one_cycle"), ["paper", "cycle"], key="paper-cycle")
-    with actions[3]: execute(tr("status"), ["paper", "status"], key="paper-status")
-    st.markdown("#### " + tr("safe_stop"))
-    stop_ok = st.checkbox(tr("stop_confirm"), key="stop-confirm")
-    execute(tr("disarm"), ["paper", "disarm"], key="paper-disarm", disabled=not stop_ok)
-    st.warning(tr("strategy_note"))
-    strategy_ok = st.checkbox(tr("strategy_confirm"), key="strategy-confirm")
-    execute(tr("arm_strategy"), ["paper", "arm-strategy"], key="paper-strategy", disabled=not strategy_ok)
-    st.divider()
-    st.markdown("### " + tr("campaign_title"))
-    campaign = campaign_status()
-    campaign_cols = st.columns(4)
-    with campaign_cols[0]: metric_card(tr("campaign_status"), str(campaign.get("status")), str(campaign.get("campaign_id") or "—"), "good" if campaign.get("status") == "RUNNING" else "")
-    with campaign_cols[1]: metric_card(tr("campaign_days"), f"{float(campaign.get('elapsed_days', 0)):.2f} / {campaign.get('minimum_days', 60)}", "")
-    with campaign_cols[2]: metric_card(tr("campaign_trades"), f"{campaign.get('closed_trades', 0)} / {campaign.get('minimum_closed_trades', 200)}", "")
-    with campaign_cols[3]: metric_card(tr("campaign_cycles"), str(campaign.get("cycles", 0)), str(campaign.get("target_end_utc") or "—"))
-    campaign_confirm = st.checkbox(tr("campaign_confirm"), key="campaign-confirm")
-    campaign_buttons = st.columns(2)
-    with campaign_buttons[0]:
-        if st.button(tr("campaign_start"), key="campaign-start", use_container_width=True, type="primary", disabled=not campaign_confirm or campaign.get("status") in CAMPAIGN_ACTIVE):
-            try:
-                start_campaign(); st.success(tr("campaign_started")); st.rerun()
-            except RuntimeError as exc: st.error(str(exc))
-    with campaign_buttons[1]:
-        if st.button(tr("campaign_stop"), key="campaign-stop", use_container_width=True, disabled=campaign.get("status") not in {"STARTING", "RUNNING"}):
-            stop_campaign(); st.warning(tr("campaign_stop_requested")); st.rerun()
+    controls_tab, campaign_tab = st.tabs([tr("actions"), tr("campaign_title")])
+    with controls_tab:
+        with st.container(border=True):
+            panel_intro(tr("read_only"), tr("strategy_note"))
+            actions = st.columns(4)
+            with actions[0]: execute(tr("preflight"), ["paper", "preflight"], key="paper-preflight", primary=True)
+            with actions[1]: execute(tr("arm_research"), ["paper", "arm-research"], key="paper-arm")
+            with actions[2]: execute(tr("one_cycle"), ["paper", "cycle"], key="paper-cycle")
+            with actions[3]: execute(tr("status"), ["paper", "status"], key="paper-status")
+        stop_col, strategy_col = st.columns(2)
+        with stop_col:
+            with st.container(border=True):
+                panel_intro(tr("safe_stop"), tr("stop_confirm"))
+                stop_ok = st.checkbox(tr("stop_confirm"), key="stop-confirm")
+                execute(tr("disarm"), ["paper", "disarm"], key="paper-disarm", disabled=not stop_ok)
+        with strategy_col:
+            with st.container(border=True):
+                panel_intro(tr("arm_strategy"), tr("strategy_note"))
+                strategy_ok = st.checkbox(tr("strategy_confirm"), key="strategy-confirm")
+                execute(tr("arm_strategy"), ["paper", "arm-strategy"], key="paper-strategy", disabled=not strategy_ok)
+    with campaign_tab:
+        campaign = campaign_status()
+        campaign_cols = st.columns(4)
+        with campaign_cols[0]: metric_card(tr("campaign_status"), str(campaign.get("status")), str(campaign.get("campaign_id") or "—"), "good" if campaign.get("status") == "RUNNING" else "")
+        with campaign_cols[1]: metric_card(tr("campaign_days"), f"{float(campaign.get('elapsed_days', 0)):.2f} / {campaign.get('minimum_days', 60)}", "")
+        with campaign_cols[2]: metric_card(tr("campaign_trades"), f"{campaign.get('closed_trades', 0)} / {campaign.get('minimum_closed_trades', 200)}", "")
+        with campaign_cols[3]: metric_card(tr("campaign_cycles"), str(campaign.get("cycles", 0)), str(campaign.get("target_end_utc") or "—"))
+        with st.container(border=True):
+            panel_intro(tr("campaign_title"), tr("campaign_confirm"))
+            campaign_confirm = st.checkbox(tr("campaign_confirm"), key="campaign-confirm")
+            campaign_buttons = st.columns(2)
+            with campaign_buttons[0]:
+                if st.button(tr("campaign_start"), key="campaign-start", use_container_width=True, type="primary", disabled=not campaign_confirm or campaign.get("status") in CAMPAIGN_ACTIVE):
+                    try:
+                        start_campaign(); st.success(tr("campaign_started")); st.rerun()
+                    except RuntimeError as exc: st.error(str(exc))
+            with campaign_buttons[1]:
+                if st.button(tr("campaign_stop"), key="campaign-stop", use_container_width=True, disabled=campaign.get("status") not in {"STARTING", "RUNNING"}):
+                    stop_campaign(); st.warning(tr("campaign_stop_requested")); st.rerun()
 
 elif page == "reports":
-    st.subheader(tr("reports_title"))
+    page_header(tr("reports_title"), tr("data_note"), tr("validation_tools"))
     cols = st.columns(3)
-    with cols[0]: execute(tr("paper_report"), ["report", "paper", "--no-plot"], key="report-paper", primary=True)
-    with cols[1]: execute(tr("research_report"), ["report", "research"], key="report-research")
-    with cols[2]: execute(tr("forward_report"), ["report", "forward"], key="report-forward")
+    with cols[0]:
+        with st.container(border=True):
+            panel_intro(tr("paper_report"), "Paper performance and evidence")
+            execute(tr("paper_report"), ["report", "paper", "--no-plot"], key="report-paper", primary=True)
+    with cols[1]:
+        with st.container(border=True):
+            panel_intro(tr("research_report"), "Research suite summary")
+            execute(tr("research_report"), ["report", "research"], key="report-research")
+    with cols[2]:
+        with st.container(border=True):
+            panel_intro(tr("forward_report"), "Forward collection and blockers")
+            execute(tr("forward_report"), ["report", "forward"], key="report-forward")
     metric_card(tr("artifacts"), str(snapshot["runtime"]["json_artifacts"]), snapshot["runtime"]["latest_utc"] or tr("no_artifacts"))
 
 elif page == "golive":
-    st.subheader(tr("golive_title")); result = snapshot["go_live"]
+    page_header(tr("golive_title"), tr("never_live"), tr("safe_operations")); result = snapshot["go_live"]
     if result["status"].startswith("BLOCKED"): st.error(f"BLOCKED — {len(result['blockers'])} {tr('remaining')}")
     else: st.success(tr("manual_only"))
     st.caption(tr("never_live"))
@@ -564,7 +676,7 @@ elif page == "golive":
     st.code(str(ROOT / "logs" / "paper_launch_v2" / "go_live_evidence.json"), language="text")
 
 elif page == "jobs":
-    st.subheader(tr("jobs_title")); st.caption(tr("jobs_note"))
+    page_header(tr("jobs_title"), tr("jobs_note"), tr("system_tools"))
     jobs = list_jobs()
     if not jobs:
         st.info(tr("no_jobs"))
@@ -606,6 +718,16 @@ elif page == "jobs":
             st.code(log_text or "—", language="text")
 
 else:
-    st.subheader(tr("guide_title")); st.markdown(tr("guide_body")); st.code(".\\run_control_center.bat", language="powershell")
+    page_header(tr("guide_title"), tr("safe_note"), tr("system_tools"))
+    guide_map, launch_help = st.columns([1.25, .75])
+    with guide_map:
+        with st.container(border=True):
+            panel_intro(tr("workflow_map"), tr("recommended"))
+            workflow_strip()
+            st.markdown(tr("guide_body"))
+    with launch_help:
+        with st.container(border=True):
+            panel_intro(tr("start_job"), tr("one_at_time"))
+            st.code(".\\run_control_center.bat", language="powershell")
 
 show_last_result()

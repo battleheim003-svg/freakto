@@ -28,6 +28,18 @@ REAL_CAPITAL_ENABLED=false
 
 ## Sections
 
+Navigation is intentionally two-level instead of one long menu:
+
+1. Home;
+2. Data & Research;
+3. Validation;
+4. Zero-capital Operations;
+5. System & Guide.
+
+Each page follows the same visual order: status summary, workflow context,
+settings, confirmed action, then output. Related operations use separate tabs
+and infrequently changed parameters remain inside collapsed advanced panels.
+
 ### Data & Replay
 
 Controls the existing crypto data and Replay commands. Long-running actions
