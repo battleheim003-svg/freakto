@@ -83,6 +83,30 @@ Runs one ordered cycle:
 4. Forward report;
 5. Paper status.
 
+### Showcase Paper
+
+Showcase Paper is a separate, visual simulation mode for observing activity
+without waiting for the official Paper evidence gates. When enabled it:
+
+1. reads directional analysis for the configured crypto universe;
+2. opens several isolated simulated Long/Short positions up to the chosen
+   daily and concurrent limits;
+3. marks each open position against current public market prices;
+4. closes on Stop, Target, maximum holding time, or an operator stop;
+5. produces a portrait PNG card for every Open and Close event.
+
+Runtime data is stored only under:
+
+```text
+logs/showcase_paper/
+.freakto-runtime/showcase-paper/
+```
+
+Every record and card is marked `SHOWCASE_PAPER`, zero-real-capital, and
+`official_evidence_eligible=false`. Showcase trades never enter the official
+Paper ledger, 60-day campaign statistics, or Go-live evidence. Display
+leverage is capped at 5x, and all Live environment flags remain forced off.
+
 The job stops immediately if Preflight, arm, or cycle is blocked. A blocked
 gate is not converted into success.
 

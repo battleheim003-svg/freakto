@@ -85,6 +85,10 @@ def test_control_center_exposes_every_management_area():
         assert label in source
     for label in ("ممیزی فارکس و طلا", "چرخه Forward و Shadow", "Airdrop Outcomes", "رتبه‌بندی بین‌بازاری"):
         assert label in source
+    assert "Showcase Paper" in source
+    assert "official_evidence_eligible" in (
+        ROOT / "freakto" / "showcase_paper" / "engine.py"
+    ).read_text(encoding="utf-8")
     assert '"en": {' in source
     assert '"fa": {' in source
 

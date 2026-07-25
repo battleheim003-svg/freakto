@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import html
 from datetime import datetime, timezone
+from pathlib import Path
 
 import streamlit as st
 import streamlit.components.v1 as components
 
 from freakto.paper.campaign import ACTIVE as CAMPAIGN_ACTIVE
 from freakto.paper.campaign import campaign_status, start_campaign, stop_campaign
+from freakto.showcase_paper import list_showcase_trades, showcase_status, start_showcase, stop_showcase
 from freakto.ui.automation import (
     ensure_scheduler_running,
     list_automations,
@@ -59,6 +61,10 @@ TEXT = {
         "rank": "اجرای رتبه‌بندی", "evaluate": "ارزیابی تاریخی", "paper_controls": "کنترل مستقیم Paper", "preflight": "Preflight", "paper_status": "وضعیت Paper",
         "arm_research": "فعال‌سازی Research", "one_cycle": "یک چرخه Paper", "disarm": "توقف Paper", "confirm_sensitive": "این اقدام صفرسرمایه را تأیید می‌کنم.",
         "campaign": "کمپین ۶۰روزه Paper", "campaign_start": "شروع / ادامه کمپین", "campaign_stop": "توقف امن کمپین", "days": "روز", "trades": "معامله بسته", "cycles": "چرخه",
+        "showcase": "Showcase Paper", "showcase_desc": "با روشن‌کردن این حالت چند معامله شبیه‌سازی‌شده باز می‌شود و برای Open/Close کارت تصویری می‌سازد.",
+        "showcase_disclaimer": "این معاملات فقط برای مشاهده رفتار سیستم‌اند و وارد Evidence رسمی Go-live نمی‌شوند.", "daily_limit": "حد معامله روزانه", "scan_interval": "فاصله بررسی (ثانیه)",
+        "holding_minutes": "حداکثر زمان نگهداری (دقیقه)", "leverage": "اهرم نمایشی", "start_showcase": "روشن‌کردن Showcase", "stop_showcase": "خاموش‌کردن و بستن موقعیت‌ها",
+        "open_positions": "موقعیت باز", "showcase_cards": "کارت‌های آخرین معاملات", "download_card": "دانلود کارت", "showcase_started": "Showcase Paper در پس‌زمینه روشن شد.", "showcase_stopping": "درخواست توقف ثبت شد؛ موقعیت‌ها با قیمت جاری بسته می‌شوند.",
         "reports_title": "گزارش و تاریخچه", "reports_sub": "نتیجه روشن هر اجرا، مراحل موفق، نقطه توقف، Blockerها و لاگ کامل.",
         "refresh_reports": "تولید همه گزارش‌ها", "readiness": "گزارش آمادگی", "blockers": "موانع", "gates": "گیت‌ها", "job_history": "تاریخچه Jobها",
         "select_job": "انتخاب Job", "retry": "اجرای مجدد", "log": "لاگ فنی", "step_results": "نتیجه مراحل", "result": "نتیجه", "duration": "مدت", "current": "مقدار فعلی", "required": "حد لازم", "schedules": "زمان‌بندی",
@@ -95,6 +101,10 @@ TEXT = {
         "rank": "Run ranking", "evaluate": "Historical evaluation", "paper_controls": "Direct Paper controls", "preflight": "Preflight", "paper_status": "Paper status",
         "arm_research": "Arm Research", "one_cycle": "One Paper cycle", "disarm": "Disarm Paper", "confirm_sensitive": "I confirm this zero-capital action.",
         "campaign": "60-day Paper campaign", "campaign_start": "Start / resume campaign", "campaign_stop": "Safely stop campaign", "days": "Days", "trades": "Closed trades", "cycles": "Cycles",
+        "showcase": "Showcase Paper", "showcase_desc": "When enabled, this mode opens several simulated trades and creates an image card for every Open/Close.",
+        "showcase_disclaimer": "These trades are for observing system behavior only and never enter official Go-live evidence.", "daily_limit": "Daily trade limit", "scan_interval": "Scan interval (seconds)",
+        "holding_minutes": "Maximum holding time (minutes)", "leverage": "Display leverage", "start_showcase": "Enable Showcase", "stop_showcase": "Disable and close positions",
+        "open_positions": "Open positions", "showcase_cards": "Latest trade cards", "download_card": "Download card", "showcase_started": "Showcase Paper started in the background.", "showcase_stopping": "Stop requested; positions will close at current prices.",
         "reports_title": "Reports & history", "reports_sub": "A clear result for every run: passed steps, stop point, blockers, and full logs.",
         "refresh_reports": "Generate all reports", "readiness": "Readiness report", "blockers": "Blockers", "gates": "Gates", "job_history": "Job history",
         "select_job": "Select job", "retry": "Retry", "log": "Technical log", "step_results": "Step results", "result": "Result", "duration": "Duration", "current": "Current", "required": "Required", "schedules": "schedules",
@@ -131,6 +141,7 @@ STEP_LABELS = {
 STATUS_LABELS = {
     "QUEUED": ("در صف", "Queued"), "RUNNING": ("در حال اجرا", "Running"), "CANCEL_REQUESTED": ("در انتظار توقف", "Stop requested"),
     "SUCCEEDED": ("موفق", "Succeeded"), "FAILED": ("ناموفق", "Failed"), "CANCELLED": ("لغوشده", "Cancelled"), "INTERRUPTED": ("قطع‌شده", "Interrupted"),
+    "STARTING": ("در حال شروع", "Starting"), "STOP_REQUESTED": ("در انتظار توقف", "Stop requested"), "STOPPED": ("خاموش", "Stopped"),
 }
 
 BLOCKER_LABELS = {
@@ -405,6 +416,8 @@ jobs = list_jobs()
 active = next((job for job in jobs if job.get("status") in ACTIVE), None)
 automations = list_automations()
 enabled_automations = [item for item in automations if item.get("enabled")]
+showcase = showcase_status()
+showcase_trades = list_showcase_trades()
 if enabled_automations and scheduler_status().get("status") != "RUNNING":
     try:
         ensure_scheduler_running()
@@ -424,6 +437,20 @@ if page == "operations":
         (t("paper"), snapshot["paper"]["mode"], t("enabled") if snapshot["paper"]["armed"] else t("disabled"), "good" if snapshot["paper"]["armed"] else ""),
         (t("go_live"), t("blocked") if go_live["status"].startswith("BLOCKED") else t("ready"), f'{len(go_live.get("blockers") or [])} {t("blockers")}', "bad" if go_live["status"].startswith("BLOCKED") else "good"),
     ])
+    if showcase.get("status") in {"STARTING", "RUNNING", "STOP_REQUESTED"}:
+        with st.container(border=True):
+            section_intro(t("showcase"), t("showcase_disclaimer"))
+            status_rows([
+                (t("system_health"), status_label(showcase.get("status"))),
+                (t("open_positions"), showcase.get("open_trades", 0)),
+                (t("trades"), showcase.get("closed_trades", 0)),
+                (t("started"), format_time(showcase.get("started_utc"))),
+            ])
+            if st.button(t("stop_showcase"), use_container_width=True, key="ops-stop-showcase", disabled=showcase.get("status") == "STOP_REQUESTED"):
+                try:
+                    stop_showcase(); st.warning(t("showcase_stopping")); st.rerun()
+                except ValueError as exc:
+                    st.error(str(exc))
     main, side = st.columns([1.45, .75])
     with main:
         render_active_job(active)
@@ -478,6 +505,60 @@ elif page == "workflows":
             if st.button(t("market_audit") + " · " + t("start"), disabled=bool(active), key="advanced-market-audit"):
                 start_job("MARKET_DATA_AUDIT", options={"start": audit_start, "end": audit_end})
     with validation_tab:
+        with st.container(border=True):
+            section_intro(t("showcase"), t("showcase_desc"))
+            st.warning(t("showcase_disclaimer"))
+            showcase_active = showcase.get("status") in {"STARTING", "RUNNING", "STOP_REQUESTED"}
+            showcase_settings = dict(showcase.get("settings") or {})
+            settings_cols = st.columns(4)
+            with settings_cols[0]:
+                daily_limit = st.number_input(t("daily_limit"), min_value=1, max_value=30, value=int(showcase_settings.get("daily_trade_limit", 6)), disabled=showcase_active)
+            with settings_cols[1]:
+                scan_interval = st.number_input(t("scan_interval"), min_value=60, max_value=3600, value=int(showcase_settings.get("scan_interval_seconds", 300)), step=60, disabled=showcase_active)
+            with settings_cols[2]:
+                holding_minutes = st.number_input(t("holding_minutes"), min_value=5, max_value=1440, value=int(showcase_settings.get("maximum_holding_minutes", 60)), step=5, disabled=showcase_active)
+            with settings_cols[3]:
+                leverage = st.number_input(t("leverage"), min_value=1.0, max_value=5.0, value=float(showcase_settings.get("leverage", 1.0)), step=0.5, disabled=showcase_active)
+            showcase_metrics = st.columns(4)
+            showcase_metrics[0].metric(t("system_health"), status_label(showcase.get("status") or "STOPPED"))
+            showcase_metrics[1].metric(t("open_positions"), showcase.get("open_trades", 0))
+            showcase_metrics[2].metric(t("trades"), showcase.get("closed_trades", 0))
+            showcase_metrics[3].metric(t("latest_result"), showcase.get("total_trades", 0))
+            control_cols = st.columns(3)
+            with control_cols[0]:
+                if st.button("▶ " + t("start_showcase"), type="primary", use_container_width=True, disabled=showcase_active):
+                    try:
+                        start_showcase(daily_trade_limit=int(daily_limit), scan_interval_seconds=int(scan_interval), maximum_holding_minutes=int(holding_minutes), leverage=float(leverage))
+                        st.success(t("showcase_started")); st.rerun()
+                    except (RuntimeError, ValueError) as exc:
+                        st.error(str(exc))
+            with control_cols[1]:
+                if st.button(t("stop_showcase"), use_container_width=True, disabled=not showcase_active or showcase.get("status") == "STOP_REQUESTED"):
+                    try:
+                        stop_showcase(); st.warning(t("showcase_stopping")); st.rerun()
+                    except ValueError as exc:
+                        st.error(str(exc))
+            with control_cols[2]:
+                if st.button("↻ " + t("refresh_status"), use_container_width=True, key="showcase-refresh"):
+                    st.rerun()
+            if showcase_active:
+                components.html("<script>setTimeout(function(){window.parent.location.reload();}, 10000);</script>", height=0)
+            card_paths = [Path(str(trade.get("latest_card"))) for trade in showcase_trades[:4] if trade.get("latest_card")]
+            card_paths = [path for path in card_paths if path.is_file()]
+            if card_paths:
+                section_intro(t("showcase_cards"), t("showcase_disclaimer"))
+                card_columns = st.columns(len(card_paths))
+                for card_column, card_path in zip(card_columns, card_paths):
+                    with card_column:
+                        st.image(str(card_path), use_column_width=True)
+                        st.download_button(
+                            t("download_card"),
+                            data=card_path.read_bytes(),
+                            file_name=card_path.name,
+                            mime="image/png",
+                            use_container_width=True,
+                            key=f"download-{card_path.stem}",
+                        )
         top = st.columns([1.1, .9])
         with top[0]:
             workflow_card(t("forward_cycle"), t("forward_desc"), "FORWARD_SHADOW_CYCLE", key="start-forward", active=bool(active))
