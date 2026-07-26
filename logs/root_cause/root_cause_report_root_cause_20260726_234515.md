@@ -1,0 +1,47 @@
+==============================================================================================================
+🧬 Freakto Root Cause Discovery Engine v8.1.0
+==============================================================================================================
+Status                 : ROOT_CAUSE_MIXED_WITH_CONTRADICTIONS
+Run ID                 : root_cause_20260726_234515
+Symbol / TF            : BTC/USDT | 4h
+Lookback Hours         : 168
+Decision Side/Score    : NEUTRAL | 21
+Narrative              : EVENT_CONTEXT_DOMINANT | MIXED_OR_NEUTRAL | REGULATORY_RISK
+Causal Context         : STRUCTURE_BREAKOUT_WEAK_VOLUME_CONFIRMATION | catalyst=70/100
+
+Root Cause:
+- Primary              : REGULATORY_RISK
+- Direction            : BEARISH
+- Confidence           : LOW
+- Probability Share    : 29.23%
+- Evidence Quality     : MEDIUM
+- Verdict              : PROBABLE_CAUSE_BUT_CONFLICTED
+- Summary              : Probable root cause=REGULATORY_RISK; direction=BEARISH; confidence=LOW; share=29.23%. قوی‌ترین evidence از sec_press_releases است: SEC Announces Departure of Principal Deputy Director of Enforcement Sam Waldon | هشدار: شواهد متضاد همزمان وجود دارد.
+- Evidence Total       : 5 | official=2 | event_rows=2
+
+Top Cause Hypotheses:
+- REGULATORY_RISK: p=29.23% | score=14.5969 | dir=BEARISH | evidence=2 | verdict=SUPPORTING_CAUSE
+- TECHNICAL_STRUCTURE_MOMENTUM: p=27.84% | score=13.9 | dir=MIXED_OR_NEUTRAL | evidence=1 | verdict=SUPPORTING_CAUSE
+- LIQUIDITY_VOLUME_FLOW: p=24.83% | score=12.4 | dir=MIXED_OR_NEUTRAL | evidence=1 | verdict=WEAK_SUPPORTING_CAUSE
+- REGULATORY_ACCESS_OR_MODERNIZATION: p=18.09% | score=9.035 | dir=BULLISH | evidence=1 | verdict=WEAK_SUPPORTING_CAUSE
+
+Evidence:
+- TECHNICAL_STRUCTURE_MOMENTUM | NEUTRAL | w=13.9 | decision_engine_features | Decision Engine structure/trend/momentum evidence
+- LIQUIDITY_VOLUME_FLOW | NEUTRAL | w=12.4 | causal_intelligence | Causal context: STRUCTURE_BREAKOUT_WEAK_VOLUME_CONFIRMATION
+- REGULATORY_ACCESS_OR_MODERNIZATION | BULLISH | w=9.035 | sec_press_releases | SEC Announces Roundtable on Preparations for 24-Hour Trading
+- REGULATORY_RISK | BEARISH | w=7.475 | sec_press_releases | SEC Announces Departure of Principal Deputy Director of Enforcement Sam Waldon
+- REGULATORY_RISK | MIXED_OR_NEUTRAL | w=7.1219 | market_narrative | Market narrative theme: REGULATORY_RISK
+
+Contradictions:
+⚠️ علت دوم از نظر وزن به علت اول نزدیک است؛ root cause هنوز تک‌علتی نیست.
+
+Recommendations:
+→ automatic_event_collector، causal_intelligence، market_narrative و narrative_decision را قبل از root_cause اجرا کن.
+→ اگر primary_root_cause چند هفته متوالی با outcome مثبت/منفی همبستگی داشت، بعداً می‌تواند وارد Root-Cause Gate Simulator شود.
+→ برای افزایش دقت، داده‌های derivatives/on-chain/ETF flow را به evidence registry اضافه کن.
+
+Warnings:
+⚠️ Root Cause Discovery احتمالات علّی پژوهشی می‌سازد؛ علت قطعی یا سیگنال خرید/فروش نیست.
+⚠️ این ماژول از outcome/return آینده برای تشخیص علت استفاده نمی‌کند تا leakage ایجاد نشود.
+⚠️ تا وقتی علت‌ها با forward outcomes اعتبارسنجی نشوند، Paper/Live نباید از آن‌ها استفاده کند.
+==============================================================================================================
