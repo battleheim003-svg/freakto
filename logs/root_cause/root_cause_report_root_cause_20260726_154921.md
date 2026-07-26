@@ -1,0 +1,41 @@
+==============================================================================================================
+🧬 Freakto Root Cause Discovery Engine v8.1.0
+==============================================================================================================
+Status                 : ROOT_CAUSE_WEAK_OR_DISTRIBUTED
+Run ID                 : root_cause_20260726_154921
+Symbol / TF            : BTC/USDT | 4h
+Lookback Hours         : 168
+Decision Side/Score    : NEUTRAL | 27
+Narrative              : EVENT_CONTEXT_DOMINANT | MIXED_OR_NEUTRAL | REGULATORY_RISK
+Causal Context         : NO_CLEAR_INTERNAL_CAUSE | catalyst=55/100
+
+Root Cause:
+- Primary              : REGULATORY_RISK
+- Direction            : BEARISH
+- Confidence           : LOW
+- Probability Share    : 61.78%
+- Evidence Quality     : MEDIUM
+- Verdict              : WEAK_OR_DISTRIBUTED_ROOT_CAUSE
+- Summary              : Probable root cause=REGULATORY_RISK; direction=BEARISH; confidence=LOW; share=61.78%. قوی‌ترین evidence از sec_press_releases است: SEC Announces Departure of Principal Deputy Director of Enforcement Sam Waldon
+- Evidence Total       : 4 | official=2 | event_rows=2
+
+Top Cause Hypotheses:
+- REGULATORY_RISK: p=61.78% | score=14.6028 | dir=BEARISH | evidence=2 | verdict=SUPPORTING_CAUSE
+- REGULATORY_ACCESS_OR_MODERNIZATION: p=38.22% | score=9.035 | dir=BULLISH | evidence=1 | verdict=SUPPORTING_CAUSE
+
+Evidence:
+- UNKNOWN_OR_INSUFFICIENT_EVIDENCE | NEUTRAL | w=10.6 | causal_intelligence | Causal context: NO_CLEAR_INTERNAL_CAUSE
+- REGULATORY_ACCESS_OR_MODERNIZATION | BULLISH | w=9.035 | sec_press_releases | SEC Announces Roundtable on Preparations for 24-Hour Trading
+- REGULATORY_RISK | BEARISH | w=7.475 | sec_press_releases | SEC Announces Departure of Principal Deputy Director of Enforcement Sam Waldon
+- REGULATORY_RISK | MIXED_OR_NEUTRAL | w=7.1278 | market_narrative | Market narrative theme: REGULATORY_RISK
+
+Recommendations:
+→ automatic_event_collector، causal_intelligence، market_narrative و narrative_decision را قبل از root_cause اجرا کن.
+→ اگر primary_root_cause چند هفته متوالی با outcome مثبت/منفی همبستگی داشت، بعداً می‌تواند وارد Root-Cause Gate Simulator شود.
+→ برای افزایش دقت، داده‌های derivatives/on-chain/ETF flow را به evidence registry اضافه کن.
+
+Warnings:
+⚠️ Root Cause Discovery احتمالات علّی پژوهشی می‌سازد؛ علت قطعی یا سیگنال خرید/فروش نیست.
+⚠️ این ماژول از outcome/return آینده برای تشخیص علت استفاده نمی‌کند تا leakage ایجاد نشود.
+⚠️ تا وقتی علت‌ها با forward outcomes اعتبارسنجی نشوند، Paper/Live نباید از آن‌ها استفاده کند.
+==============================================================================================================
