@@ -107,6 +107,8 @@ def test_trade_card_is_portrait_and_explicitly_simulated(tmp_path):
     )
     with Image.open(path) as image:
         assert image.size == (WIDTH, HEIGHT)
+        image.load()
+    assert list(tmp_path.glob("*.tmp")) == []
 
 
 def test_showcase_controller_forces_all_live_flags_off(monkeypatch, tmp_path):
@@ -216,6 +218,53 @@ def test_unlimited_session_can_reopen_after_close(tmp_path):
     assert len(engine.mark_and_close()) == 1
     assert len(engine.open_available()) == 1
     assert len(engine.trades) == 2
+
+
+def test_session_profit_guard_waits_for_minimum_trades_then_blocks_new_entries(tmp_path):
+    clock = {"now": datetime(2026, 7, 26, tzinfo=timezone.utc)}
+    settings = ShowcaseSettings(
+        symbols=("BTC/USDT",), daily_trade_limit=0, maximum_open_positions=1,
+        notional_usdt=100, risk_level=100, reentry_cooldown_minutes=0,
+        take_profit_pct=0.5, session_equity_usdt=100,
+        session_profit_target_pct=2.0, session_loss_limit_pct=10.0,
+        minimum_closed_trades_for_profit_stop=3,
+    )
+    market = FakeMarketData({"BTC/USDT": 100})
+    engine = ShowcaseEngine(tmp_path, settings, market, signal, now_fn=lambda: clock["now"])
+    engine.start_session_guard()
+    for index in range(3):
+        market.prices["BTC/USDT"] = 100
+        assert len(engine.open_available()) == 1
+        market.prices["BTC/USDT"] = 102
+        clock["now"] += timedelta(minutes=1)
+        assert len(engine.mark_and_close()) == 1
+        guard = engine.evaluate_session_guard()
+        if index < 2:
+            assert guard["status"] == "ACTIVE"
+    assert guard["status"] == "PROFIT_TARGET_REACHED"
+    assert guard["closed_trades"] == 3
+    assert guard["session_return_pct"] >= 2
+    assert engine.open_available() == []
+    assert engine.state["last_scan"]["rejected"]["PROFIT_TARGET_REACHED"] == 1
+
+
+def test_session_loss_guard_stops_without_minimum_trade_requirement(tmp_path):
+    now = datetime(2026, 7, 26, tzinfo=timezone.utc)
+    settings = ShowcaseSettings(
+        symbols=("BTC/USDT",), maximum_open_positions=1, notional_usdt=100,
+        risk_level=100, reentry_cooldown_minutes=0, session_equity_usdt=100,
+        session_profit_target_pct=3.0, session_loss_limit_pct=1.0,
+        minimum_closed_trades_for_profit_stop=3,
+    )
+    market = FakeMarketData({"BTC/USDT": 100})
+    engine = ShowcaseEngine(tmp_path, settings, market, signal, now_fn=lambda: now)
+    engine.start_session_guard()
+    engine.open_available()
+    market.prices["BTC/USDT"] = 95
+    engine.mark_and_close()
+    guard = engine.evaluate_session_guard()
+    assert guard["status"] == "LOSS_LIMIT_REACHED"
+    assert guard["closed_trades"] == 1
 
 
 def test_live_intraday_mode_uses_full_technical_stack(monkeypatch):

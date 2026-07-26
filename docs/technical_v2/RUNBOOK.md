@@ -66,6 +66,28 @@ drivers, warnings, session win rate, expectancy, attribution, walk-forward stabi
 challenger blockers. Total session trades are unlimited; concurrent exposure remains bounded and
 one open position per symbol prevents accidental duplicate positions.
 
+## Session profit guard
+
+Each Showcase worker run starts with a fresh virtual-equity baseline. The guard calculates:
+
+```text
+session return = (new realised PnL + current unrealised PnL) / virtual session equity
+```
+
+Default profit targets are risk-tier aware:
+
+- Precision: 1.0%
+- Cautious: 1.5%
+- Active test: 2.0%
+- Exploratory: 3.0%
+
+The profit target becomes eligible after at least three trades close, preventing one lucky trade
+from ending the observation session. The loss limit is immediate. When either boundary is touched,
+the worker closes remaining Showcase positions using their last recorded marks, records
+`PROFIT_TARGET_REACHED` or `LOSS_LIMIT_REACHED`, and stops without any live order or remote-price
+wait. Targets, loss limits, and virtual equity can be adjusted in Advanced settings; zero disables
+the corresponding boundary.
+
 ## Causality and data rules
 
 - Live analysis drops the potentially forming last candle. Snapshot pricing may still use the

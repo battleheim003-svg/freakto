@@ -24,6 +24,10 @@ class RiskPolicy:
     analysis_depth: str
     technical_indicators: tuple[str, ...]
     minimum_confluence_pct: int
+    session_profit_target_pct: float
+    session_loss_limit_pct: float
+    session_equity_usdt: float
+    minimum_closed_trades_for_profit_stop: int
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)
@@ -97,6 +101,15 @@ def risk_policy(level: int | float) -> RiskPolicy:
         indicator_count = len(TECHNICAL_STACK)
         depth = "FULL_TECHNICAL_STACK"
 
+    if parsed <= 20:
+        profit_target, loss_limit = 1.0, 0.75
+    elif parsed <= 55:
+        profit_target, loss_limit = 1.5, 1.0
+    elif parsed <= 80:
+        profit_target, loss_limit = 2.0, 1.5
+    else:
+        profit_target, loss_limit = 3.0, 2.0
+
     # Higher tolerance widens admission while keeping bounded virtual exposure.
     return RiskPolicy(
         level=parsed,
@@ -112,6 +125,10 @@ def risk_policy(level: int | float) -> RiskPolicy:
         analysis_depth=depth,
         technical_indicators=TECHNICAL_STACK[:indicator_count],
         minimum_confluence_pct=max(45, round(65 - parsed * 0.2)),
+        session_profit_target_pct=profit_target,
+        session_loss_limit_pct=loss_limit,
+        session_equity_usdt=1_000.0,
+        minimum_closed_trades_for_profit_stop=3,
     )
 
 

@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from freakto.showcase_paper.risk import risk_policy
 from freakto.ui.control_center_state import ROOT
 from freakto.ui.job_manager import pid_alive
 
@@ -60,6 +61,7 @@ def showcase_status(root: Path = ROOT) -> dict[str, Any]:
         last_scan=dict(session.get("last_scan") or {}),
         recent_errors=list(session.get("errors") or [])[-5:],
         risk_policy=dict(session.get("risk_policy") or {}),
+        session_guard=dict(session.get("session_guard") or {}),
     )
     return state
 
@@ -77,6 +79,9 @@ def start_showcase(
     leverage: float = 1.0,
     risk_level: int = 35,
     analysis_depth: int = 100,
+    session_equity_usdt: float = 1_000.0,
+    session_profit_target_pct: float | None = None,
+    session_loss_limit_pct: float | None = None,
     market_mode: str = "LIVE_PUBLIC",
     root: Path = ROOT,
 ) -> dict[str, Any]:
@@ -88,6 +93,13 @@ def start_showcase(
         raise ValueError("risk_level must stay between 0 and 100")
     if not 0 <= int(analysis_depth) <= 100:
         raise ValueError("analysis_depth must stay between 0 and 100")
+    policy = risk_policy(risk_level)
+    profit_target = policy.session_profit_target_pct if session_profit_target_pct is None else float(session_profit_target_pct)
+    loss_limit = policy.session_loss_limit_pct if session_loss_limit_pct is None else float(session_loss_limit_pct)
+    if not 100 <= float(session_equity_usdt) <= 1_000_000:
+        raise ValueError("session_equity_usdt must stay between 100 and 1,000,000")
+    if not 0 <= profit_target <= 20 or not 0 <= loss_limit <= 20:
+        raise ValueError("session profit target and loss limit must stay between 0 and 20 percent")
     if normalized_mode not in {"LIVE_PUBLIC", "ACCELERATED_REPLAY"}:
         raise ValueError("market_mode must be LIVE_PUBLIC or ACCELERATED_REPLAY")
     if not 5 <= int(scan_interval_seconds) <= 3600:
@@ -103,6 +115,9 @@ def start_showcase(
         "--leverage", str(float(leverage)),
         "--risk-level", str(int(risk_level)),
         "--analysis-depth", str(int(analysis_depth)),
+        "--session-equity-usdt", str(float(session_equity_usdt)),
+        "--session-profit-target-pct", str(profit_target),
+        "--session-loss-limit-pct", str(loss_limit),
         "--market-mode", normalized_mode,
     ]
     environment = os.environ.copy()
@@ -120,6 +135,10 @@ def start_showcase(
             "daily_trade_limit": int(daily_trade_limit), "scan_interval_seconds": int(scan_interval_seconds),
             "maximum_holding_minutes": int(maximum_holding_minutes), "leverage": float(leverage),
             "risk_level": int(risk_level), "analysis_depth": int(analysis_depth), "market_mode": normalized_mode,
+            "session_equity_usdt": float(session_equity_usdt),
+            "session_profit_target_pct": profit_target,
+            "session_loss_limit_pct": loss_limit,
+            "minimum_closed_trades_for_profit_stop": policy.minimum_closed_trades_for_profit_stop,
         },
         "error": None,
         "live_orders_enabled": False,

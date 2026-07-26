@@ -53,6 +53,10 @@ class ShowcaseSettings:
     analysis_depth: int = 100
     reentry_cooldown_minutes: int = 30
     market_mode: str = "LIVE_PUBLIC"
+    session_equity_usdt: float = 1_000.0
+    session_profit_target_pct: float = 1.5
+    session_loss_limit_pct: float = 1.0
+    minimum_closed_trades_for_profit_stop: int = 3
 
     def validated(self) -> "ShowcaseSettings":
         if not self.symbols:
@@ -75,6 +79,14 @@ class ShowcaseSettings:
             raise ValueError("reentry_cooldown_minutes must stay between 0 and 1,440")
         if self.market_mode not in {"LIVE_PUBLIC", "ACCELERATED_REPLAY"}:
             raise ValueError("market_mode must be LIVE_PUBLIC or ACCELERATED_REPLAY")
+        if not 100 <= float(self.session_equity_usdt) <= 1_000_000:
+            raise ValueError("session_equity_usdt must stay between 100 and 1,000,000")
+        if not 0 <= float(self.session_profit_target_pct) <= 20:
+            raise ValueError("session_profit_target_pct must stay between 0 and 20")
+        if not 0 <= float(self.session_loss_limit_pct) <= 20:
+            raise ValueError("session_loss_limit_pct must stay between 0 and 20")
+        if not 1 <= int(self.minimum_closed_trades_for_profit_stop) <= 100:
+            raise ValueError("minimum_closed_trades_for_profit_stop must stay between 1 and 100")
         return self
 
 
@@ -122,6 +134,62 @@ class ShowcaseEngine:
     def save(self) -> None:
         self.state["updated_utc"] = self.now_fn().isoformat()
         _atomic_json(self.state_path, self.state)
+
+    def start_session_guard(self) -> dict[str, Any]:
+        closed = [trade for trade in self.trades if trade.get("status") == "CLOSED"]
+        guard = {
+            "status": "ACTIVE",
+            "started_utc": self.now_fn().isoformat(),
+            "session_equity_usdt": float(self.settings.session_equity_usdt),
+            "profit_target_pct": float(self.settings.session_profit_target_pct),
+            "loss_limit_pct": float(self.settings.session_loss_limit_pct),
+            "minimum_closed_trades": int(self.settings.minimum_closed_trades_for_profit_stop),
+            "baseline_realized_pnl_usdt": round(sum(float(trade.get("pnl_usdt", 0) or 0) for trade in closed), 6),
+            "baseline_closed_trades": len(closed),
+            "closed_trades": 0,
+            "realized_pnl_usdt": 0.0,
+            "unrealized_pnl_usdt": 0.0,
+            "session_pnl_usdt": 0.0,
+            "session_return_pct": 0.0,
+            "remaining_to_target_pct": float(self.settings.session_profit_target_pct),
+        }
+        self.state["session_guard"] = guard
+        self.save()
+        return guard
+
+    def evaluate_session_guard(self) -> dict[str, Any]:
+        guard = dict(self.state.get("session_guard") or {})
+        if not guard:
+            guard = self.start_session_guard()
+        closed = [trade for trade in self.trades if trade.get("status") == "CLOSED"]
+        opened = [trade for trade in self.trades if trade.get("status") == "OPEN"]
+        realized = sum(float(trade.get("pnl_usdt", 0) or 0) for trade in closed) - float(guard.get("baseline_realized_pnl_usdt", 0) or 0)
+        unrealized = sum(float(trade.get("pnl_usdt", 0) or 0) for trade in opened)
+        pnl = realized + unrealized
+        equity = max(1.0, float(guard.get("session_equity_usdt", self.settings.session_equity_usdt)))
+        session_return = pnl / equity * 100.0
+        closed_count = max(0, len(closed) - int(guard.get("baseline_closed_trades", 0) or 0))
+        target = float(guard.get("profit_target_pct", self.settings.session_profit_target_pct) or 0)
+        loss_limit = float(guard.get("loss_limit_pct", self.settings.session_loss_limit_pct) or 0)
+        minimum_closed = int(guard.get("minimum_closed_trades", self.settings.minimum_closed_trades_for_profit_stop) or 1)
+        status = str(guard.get("status", "ACTIVE"))
+        if status == "ACTIVE" and loss_limit > 0 and session_return <= -loss_limit:
+            status = "LOSS_LIMIT_REACHED"
+        elif status == "ACTIVE" and target > 0 and closed_count >= minimum_closed and session_return >= target:
+            status = "PROFIT_TARGET_REACHED"
+        guard.update(
+            status=status,
+            closed_trades=closed_count,
+            realized_pnl_usdt=round(realized, 6),
+            unrealized_pnl_usdt=round(unrealized, 6),
+            session_pnl_usdt=round(pnl, 6),
+            session_return_pct=round(session_return, 6),
+            remaining_to_target_pct=round(max(0.0, target - session_return), 6),
+            updated_utc=self.now_fn().isoformat(),
+        )
+        self.state["session_guard"] = guard
+        self.save()
+        return guard
 
     @property
     def trades(self) -> list[dict[str, Any]]:
@@ -196,6 +264,19 @@ class ShowcaseEngine:
 
     def open_available(self) -> list[dict[str, Any]]:
         opened: list[dict[str, Any]] = []
+        guard = dict(self.state.get("session_guard") or {})
+        if guard and guard.get("status") != "ACTIVE":
+            self.state["last_scan"] = {
+                "scanned_utc": self.now_fn().isoformat(),
+                "market_mode": self.settings.market_mode,
+                "evaluated": 0,
+                "accepted": 0,
+                "opened": 0,
+                "rejected": {str(guard.get("status")): len(self.settings.symbols)},
+                "errors": [],
+            }
+            self.save()
+            return opened
         policy = risk_policy(self.settings.risk_level)
         scan = {
             "scanned_utc": self.now_fn().isoformat(),

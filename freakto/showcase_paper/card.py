@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import math
+import os
 import random
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -113,5 +115,10 @@ def render_trade_card(trade: dict[str, Any], output_path: str | Path, *, logo_pa
     risk = int(trade.get("risk_level", 0) or 0)
     draw.text((WIDTH // 2, 1226), f"SIMULATED · RISK TEST {risk}/100 · ZERO REAL CAPITAL", font=_font(19, bold=True), fill="#79e9d5", anchor="mm")
     draw.text((WIDTH // 2, 1253), "NOT GO-LIVE EVIDENCE", font=_font(17, bold=True), fill="#79e9d5", anchor="mm")
-    image.save(path, format="PNG", optimize=True)
+    temporary = path.with_name(f"{path.name}.{os.getpid()}.{uuid.uuid4().hex}.tmp")
+    try:
+        image.save(temporary, format="PNG", optimize=True)
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
     return path

@@ -35,6 +35,7 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
         market_data = live_market
         signal_source = live_market.signal
     engine = ShowcaseEngine(output_dir(root), settings, market_data, signal_source, logo_path=root / "assets" / "freakto-logo.png")
+    engine.start_session_guard()
     try:
         scan_count = 0
         while True:
@@ -44,6 +45,19 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
             engine.mark_and_close(close_all=stop_requested)
             if stop_requested:
                 state.update(status="STOPPED", heartbeat_utc=datetime.now(timezone.utc).isoformat(), ended_utc=datetime.now(timezone.utc).isoformat())
+                write_worker_state(state, root)
+                return 0
+            guard = engine.evaluate_session_guard()
+            if guard.get("status") in {"PROFIT_TARGET_REACHED", "LOSS_LIMIT_REACHED"}:
+                engine.mark_and_close(close_all=True)
+                guard = engine.evaluate_session_guard()
+                state.update(
+                    status=str(guard["status"]),
+                    phase="SESSION_GUARD_STOP",
+                    session_guard=guard,
+                    heartbeat_utc=datetime.now(timezone.utc).isoformat(),
+                    ended_utc=datetime.now(timezone.utc).isoformat(),
+                )
                 write_worker_state(state, root)
                 return 0
             state.update(phase="SCANNING", heartbeat_utc=datetime.now(timezone.utc).isoformat())
@@ -92,6 +106,7 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
                 risk_policy=dict(scan_payload.get("risk_policy") or {}),
                 opened_last_scan=len(opened),
                 replay_progress=replay_market.progress() if replay_market is not None else None,
+                session_guard=engine.evaluate_session_guard(),
             )
             write_worker_state(state, root)
             remaining = max(5, int(scan_interval_seconds))
@@ -114,6 +129,9 @@ def main() -> int:
     parser.add_argument("--leverage", type=float, default=1.0)
     parser.add_argument("--risk-level", type=int, default=35)
     parser.add_argument("--analysis-depth", type=int, default=100)
+    parser.add_argument("--session-equity-usdt", type=float, default=1_000.0)
+    parser.add_argument("--session-profit-target-pct", type=float)
+    parser.add_argument("--session-loss-limit-pct", type=float)
     parser.add_argument("--market-mode", choices=("LIVE_PUBLIC", "ACCELERATED_REPLAY"), default="LIVE_PUBLIC")
     args = parser.parse_args()
     policy = risk_policy(args.risk_level)
@@ -129,6 +147,10 @@ def main() -> int:
         analysis_depth=args.analysis_depth,
         reentry_cooldown_minutes=policy.reentry_cooldown_minutes,
         market_mode=args.market_mode,
+        session_equity_usdt=args.session_equity_usdt,
+        session_profit_target_pct=(policy.session_profit_target_pct if args.session_profit_target_pct is None else args.session_profit_target_pct),
+        session_loss_limit_pct=(policy.session_loss_limit_pct if args.session_loss_limit_pct is None else args.session_loss_limit_pct),
+        minimum_closed_trades_for_profit_stop=policy.minimum_closed_trades_for_profit_stop,
     ).validated()
     return run_worker(args.root.resolve(), settings, scan_interval_seconds=args.scan_interval_seconds)
 

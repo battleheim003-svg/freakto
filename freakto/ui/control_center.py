@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import html
+from io import BytesIO
 from datetime import datetime, timezone
 from pathlib import Path
 
 import streamlit as st
 import streamlit.components.v1 as components
+from PIL import Image, UnidentifiedImageError
 
 from freakto.paper.campaign import ACTIVE as CAMPAIGN_ACTIVE
 from freakto.paper.campaign import campaign_status, start_campaign, stop_campaign
@@ -130,6 +132,11 @@ TEXT["fa"].update({
     "portfolio_risk": "ریسک سبد",
     "promotion_status": "وضعیت Challenger",
     "validation_stability": "پایداری Walk-forward",
+    "session_profit_target": "هدف سود خالص جلسه (%)",
+    "session_loss_limit": "حد زیان جلسه (%)",
+    "session_equity": "سرمایه مجازی جلسه (USDT)",
+    "session_return": "بازده خالص جلسه",
+    "profit_guard": "محافظ سود جلسه",
 })
 TEXT["en"].update({
     "data_quality": "Data quality",
@@ -139,6 +146,11 @@ TEXT["en"].update({
     "portfolio_risk": "Portfolio risk",
     "promotion_status": "Challenger status",
     "validation_stability": "Walk-forward stability",
+    "session_profit_target": "Net session profit target (%)",
+    "session_loss_limit": "Session loss limit (%)",
+    "session_equity": "Virtual session equity (USDT)",
+    "session_return": "Net session return",
+    "profit_guard": "Session profit guard",
 })
 
 KIND_LABELS = {
@@ -586,6 +598,25 @@ elif page == "workflows":
                     holding_minutes = st.number_input(t("holding_minutes"), min_value=1, max_value=1440, value=int(showcase_settings.get("maximum_holding_minutes", preset.maximum_holding_minutes)) if showcase_active else preset.maximum_holding_minutes, step=1, disabled=showcase_active, key=f"showcase-hold-{preset_key}")
                 with settings_cols[2]:
                     leverage = st.number_input(t("leverage"), min_value=1.0, max_value=5.0, value=float(showcase_settings.get("leverage", preset.leverage)) if showcase_active else preset.leverage, step=0.5, disabled=showcase_active, key=f"showcase-leverage-{preset_key}")
+                guard_settings = st.columns(3)
+                with guard_settings[0]:
+                    session_profit_target = st.number_input(
+                        t("session_profit_target"), min_value=0.0, max_value=20.0,
+                        value=float(showcase_settings.get("session_profit_target_pct", policy.session_profit_target_pct)) if showcase_active else float(policy.session_profit_target_pct),
+                        step=0.25, disabled=showcase_active, key=f"showcase-profit-target-{preset_key}",
+                    )
+                with guard_settings[1]:
+                    session_loss_limit = st.number_input(
+                        t("session_loss_limit"), min_value=0.0, max_value=20.0,
+                        value=float(showcase_settings.get("session_loss_limit_pct", policy.session_loss_limit_pct)) if showcase_active else float(policy.session_loss_limit_pct),
+                        step=0.25, disabled=showcase_active, key=f"showcase-loss-limit-{preset_key}",
+                    )
+                with guard_settings[2]:
+                    session_equity = st.number_input(
+                        t("session_equity"), min_value=100.0, max_value=1_000_000.0,
+                        value=float(showcase_settings.get("session_equity_usdt", policy.session_equity_usdt)) if showcase_active else float(policy.session_equity_usdt),
+                        step=100.0, disabled=showcase_active, key=f"showcase-equity-{preset_key}",
+                    )
             showcase_metrics = st.columns(5)
             showcase_metrics[0].metric(t("system_health"), status_label(showcase.get("status") or "STOPPED"))
             showcase_metrics[1].metric(t("open_positions"), showcase.get("open_trades", 0))
@@ -600,6 +631,9 @@ elif page == "workflows":
                             daily_trade_limit=0, scan_interval_seconds=int(scan_interval),
                             maximum_holding_minutes=int(holding_minutes), leverage=float(leverage),
                             risk_level=int(risk_level), analysis_depth=int(analysis_depth), market_mode=str(market_mode),
+                            session_equity_usdt=float(session_equity),
+                            session_profit_target_pct=float(session_profit_target),
+                            session_loss_limit_pct=float(session_loss_limit),
                         )
                         st.success(t("showcase_started")); st.rerun()
                     except (RuntimeError, ValueError) as exc:
@@ -620,6 +654,17 @@ elif page == "workflows":
                 )
                 if showcase_auto_refresh:
                     components.html("<script>setTimeout(function(){window.parent.location.reload();}, 20000);</script>", height=0)
+            session_guard = dict(showcase.get("session_guard") or {})
+            if session_guard:
+                session_return = float(session_guard.get("session_return_pct", 0) or 0)
+                profit_target = float(session_guard.get("profit_target_pct", 0) or 0)
+                progress = min(1.0, max(0.0, session_return / profit_target)) if profit_target > 0 else 0.0
+                st.progress(progress, text=f'{t("profit_guard")} · {t("session_return")}: {session_return:+.3f}% / {profit_target:.2f}%')
+                guard_status = str(session_guard.get("status", "ACTIVE"))
+                if guard_status == "PROFIT_TARGET_REACHED":
+                    st.success(f'{t("profit_guard")}: PROFIT TARGET REACHED')
+                elif guard_status == "LOSS_LIMIT_REACHED":
+                    st.error(f'{t("profit_guard")}: LOSS LIMIT REACHED')
             last_scan = dict(showcase.get("last_scan") or {})
             if last_scan:
                 with st.expander(t("scan_activity"), expanded=bool(last_scan.get("errors"))):
@@ -704,16 +749,24 @@ elif page == "workflows":
                     if promotion.get("blockers"):
                         st.info("Promotion blockers: " + " · ".join(promotion["blockers"]))
             card_paths = [Path(str(trade.get("latest_card"))) for trade in showcase_trades[:4] if trade.get("latest_card")]
-            card_paths = [path for path in card_paths if path.is_file()]
-            if card_paths:
+            card_payloads = []
+            for card_path in card_paths:
+                try:
+                    card_data = card_path.read_bytes()
+                    with Image.open(BytesIO(card_data)) as candidate:
+                        candidate.verify()
+                    card_payloads.append((card_path, card_data))
+                except (OSError, UnidentifiedImageError):
+                    continue
+            if card_payloads:
                 section_intro(t("showcase_cards"), t("showcase_disclaimer"))
-                card_columns = st.columns(len(card_paths))
-                for card_column, card_path in zip(card_columns, card_paths):
+                card_columns = st.columns(len(card_payloads))
+                for card_column, (card_path, card_data) in zip(card_columns, card_payloads):
                     with card_column:
-                        st.image(str(card_path), use_column_width=True)
+                        st.image(card_data, use_column_width=True)
                         st.download_button(
                             t("download_card"),
-                            data=card_path.read_bytes(),
+                            data=card_data,
                             file_name=card_path.name,
                             mime="image/png",
                             use_container_width=True,
