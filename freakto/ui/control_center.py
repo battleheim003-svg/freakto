@@ -479,9 +479,9 @@ if page == "operations":
     with main:
         render_active_job(active)
         if active:
-            auto = st.toggle(t("auto_refresh"), value=True, key="auto-refresh")
+            auto = st.toggle(t("auto_refresh"), value=False, key="auto-refresh")
             if auto:
-                components.html("<script>setTimeout(function(){window.parent.location.reload();}, 10000);</script>", height=0)
+                components.html("<script>setTimeout(function(){window.parent.location.reload();}, 20000);</script>", height=0)
         else:
             with st.container(border=True):
                 section_intro(t("pipeline"), t("pipeline_help"))
@@ -614,7 +614,12 @@ elif page == "workflows":
                 if st.button("↻ " + t("refresh_status"), use_container_width=True, key="showcase-refresh"):
                     st.rerun()
             if showcase_active:
-                components.html("<script>setTimeout(function(){window.parent.location.reload();}, 10000);</script>", height=0)
+                showcase_auto_refresh = st.toggle(
+                    t("auto_refresh"), value=False, key="showcase-auto-refresh",
+                    help="Optional status refresh every 20 seconds. Manual refresh remains available.",
+                )
+                if showcase_auto_refresh:
+                    components.html("<script>setTimeout(function(){window.parent.location.reload();}, 20000);</script>", height=0)
             last_scan = dict(showcase.get("last_scan") or {})
             if last_scan:
                 with st.expander(t("scan_activity"), expanded=bool(last_scan.get("errors"))):

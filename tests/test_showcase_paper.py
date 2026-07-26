@@ -72,6 +72,29 @@ def test_showcase_marks_long_and_short_and_closes_on_target(tmp_path):
     assert all(Path(trade["close_card"]).is_file() for trade in closed)
 
 
+def test_manual_showcase_stop_uses_last_mark_without_waiting_for_market(tmp_path):
+    now = datetime(2026, 7, 26, tzinfo=timezone.utc)
+    market = FakeMarketData({"BTC/USDT": 100})
+    engine = ShowcaseEngine(
+        tmp_path,
+        ShowcaseSettings(symbols=("BTC/USDT",), maximum_open_positions=1),
+        market,
+        signal,
+        now_fn=lambda: now,
+    )
+    engine.open_available()
+
+    def fail_if_fetched(_symbol):
+        raise AssertionError("manual stop must not fetch remote market data")
+
+    market.fetch_snapshot = fail_if_fetched
+    closed = engine.mark_and_close(close_all=True)
+    assert len(closed) == 1
+    assert closed[0]["close_reason"] == "SESSION_STOP"
+    assert closed[0]["exit_price"] == closed[0]["current_price"]
+    assert Path(closed[0]["close_card"]).is_file()
+
+
 def test_trade_card_is_portrait_and_explicitly_simulated(tmp_path):
     path = render_trade_card(
         {

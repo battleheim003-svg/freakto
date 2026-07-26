@@ -96,7 +96,7 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
             write_worker_state(state, root)
             remaining = max(5, int(scan_interval_seconds))
             while remaining > 0 and not (runtime / "stop.requested").exists():
-                chunk = min(2, remaining)
+                chunk = min(0.25, remaining)
                 time.sleep(chunk)
                 remaining -= chunk
     except Exception as exc:

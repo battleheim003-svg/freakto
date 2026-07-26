@@ -350,8 +350,14 @@ class ShowcaseEngine:
             if trade.get("status") != "OPEN":
                 continue
             try:
-                snapshot = self.market_data.fetch_snapshot(str(trade["symbol"]))
-                mark = float(snapshot.bid if trade["side"] == "LONG" else snapshot.ask)
+                if close_all:
+                    # Manual Showcase stop prioritises responsiveness and never waits on
+                    # a remote provider. The last observed Paper mark is explicit in the
+                    # trade record and is sufficient for a SESSION_STOP simulation.
+                    mark = float(trade.get("current_price") or trade["entry_price"])
+                else:
+                    snapshot = self.market_data.fetch_snapshot(str(trade["symbol"]))
+                    mark = float(snapshot.bid if trade["side"] == "LONG" else snapshot.ask)
                 self._update_pnl(trade, mark)
                 opened = datetime.fromisoformat(str(trade["opened_utc"]))
                 held_minutes = max(0.0, (now - opened).total_seconds() / 60.0)
