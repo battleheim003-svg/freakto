@@ -22,11 +22,16 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
     write_worker_state(state, root)
     replay_market = None
     if settings.market_mode == "ACCELERATED_REPLAY":
-        replay_market = AcceleratedReplayMarket(root, settings.symbols, risk_level=settings.risk_level)
+        replay_market = AcceleratedReplayMarket(
+            root, settings.symbols, risk_level=settings.risk_level,
+            analysis_depth=settings.analysis_depth,
+        )
         market_data = replay_market
         signal_source = replay_market.signal
     else:
-        live_market = LiveIntradayTechnicalMarket(risk_level=settings.risk_level)
+        live_market = LiveIntradayTechnicalMarket(
+            risk_level=settings.risk_level, analysis_depth=settings.analysis_depth
+        )
         market_data = live_market
         signal_source = live_market.signal
     engine = ShowcaseEngine(output_dir(root), settings, market_data, signal_source, logo_path=root / "assets" / "freakto-logo.png")
@@ -43,6 +48,14 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
                 return 0
             state.update(phase="SCANNING", heartbeat_utc=datetime.now(timezone.utc).isoformat())
             write_worker_state(state, root)
+            observations = [
+                (float(trade.get("confidence", 0) or 0) / 100.0, float(trade.get("pnl_pct", 0) or 0) > 0)
+                for trade in engine.trades
+                if trade.get("status") == "CLOSED" and trade.get("engine_version") == "technical-v2.0"
+            ]
+            adapter = getattr(market_data, "adapter", None)
+            if adapter is not None and hasattr(adapter, "set_calibration_observations"):
+                adapter.set_calibration_observations(observations)
             opened = engine.open_available()
             scan_count += 1
             if replay_market is not None:
@@ -83,6 +96,7 @@ def main() -> int:
     parser.add_argument("--maximum-holding-minutes", type=int, default=60)
     parser.add_argument("--leverage", type=float, default=1.0)
     parser.add_argument("--risk-level", type=int, default=35)
+    parser.add_argument("--analysis-depth", type=int, default=100)
     parser.add_argument("--market-mode", choices=("LIVE_PUBLIC", "ACCELERATED_REPLAY"), default="LIVE_PUBLIC")
     args = parser.parse_args()
     policy = risk_policy(args.risk_level)
@@ -95,6 +109,7 @@ def main() -> int:
         stop_loss_pct=policy.stop_loss_pct,
         take_profit_pct=policy.take_profit_pct,
         risk_level=policy.level,
+        analysis_depth=args.analysis_depth,
         reentry_cooldown_minutes=policy.reentry_cooldown_minutes,
         market_mode=args.market_mode,
     ).validated()

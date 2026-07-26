@@ -7,8 +7,7 @@ import time
 
 from data_fetcher import fetch_ohlcv
 
-from freakto.showcase_paper.risk import risk_policy
-from freakto.showcase_paper.technical import build_technical_signal
+from freakto.research.adapters.technical_v2_adapter import PublicMultiTimeframeAdapter
 
 
 @dataclass(frozen=True)
@@ -21,30 +20,42 @@ class IntradaySnapshot:
 
 
 class LiveIntradayTechnicalMarket:
-    def __init__(self, *, risk_level: int, timeframe: str = "5m", limit: int = 120):
-        self.policy = risk_policy(risk_level)
+    def __init__(self, *, risk_level: int, analysis_depth: int | None = None, timeframe: str = "5m", limit: int = 140):
+        self.analysis_depth = int(risk_level if analysis_depth is None else analysis_depth)
         self.timeframe = timeframe
         self.limit = max(40, int(limit))
-        self.cache: dict[str, tuple[float, object]] = {}
+        self.cache: dict[tuple[str, str], tuple[float, object]] = {}
+        self.adapter = PublicMultiTimeframeAdapter(
+            self._fetch, risk_level=risk_level, analysis_depth=self.analysis_depth, limit=self.limit
+        )
+
+    def _fetch(self, *, symbol: str, timeframe: str, limit: int):
+        key = (symbol, timeframe)
+        cached = self.cache.get(key)
+        if cached and time.monotonic() - cached[0] < 3.0:
+            return cached[1]
+        frame = fetch_ohlcv(symbol=symbol, timeframe=timeframe, limit=limit)
+        if frame is None or frame.empty or len(frame) < 40:
+            raise RuntimeError(f"No usable {timeframe} public OHLCV for {symbol}")
+        self.cache[key] = (time.monotonic(), frame)
+        return frame
 
     def _frame(self, symbol: str, *, refresh: bool) -> object:
-        cached = self.cache.get(symbol)
+        cached = self.cache.get((symbol, self.timeframe))
         if cached and (not refresh or time.monotonic() - cached[0] < 3.0):
             return cached[1]
-        frame = fetch_ohlcv(symbol=symbol, timeframe=self.timeframe, limit=self.limit)
-        if frame is None or frame.empty or len(frame) < 30:
-            raise RuntimeError(f"No usable {self.timeframe} public OHLCV for {symbol}")
-        self.cache[symbol] = (time.monotonic(), frame)
+        frame = self._fetch(symbol=symbol, timeframe=self.timeframe, limit=self.limit)
         return frame
 
     def signal(self, symbol: str):
-        frame = self._frame(symbol, refresh=True)
-        timestamp = str(frame.iloc[-1].get("timestamp", ""))
-        provider = str(getattr(frame, "attrs", {}).get("provider", "public-ohlcv"))
-        return build_technical_signal(
-            frame.iloc[-30:], self.policy, timestamp=timestamp,
-            regime=f"LIVE_INTRADAY_{self.timeframe.upper()}", provider=provider,
+        frames, provider = self.adapter.fetch_frames(symbol)
+        base = frames[next(iter(frames))]
+        timestamp = str(base.iloc[-2].get("timestamp", "")) if len(base) > 40 else str(base.iloc[-1].get("timestamp", ""))
+        signal = self.adapter.signal(
+            symbol, frames, timestamp=timestamp, provider=provider, drop_forming=True,
         )
+        signal.regime = f"LIVE_INTRADAY_{self.timeframe.upper()}"
+        return signal
 
     def fetch_snapshot(self, symbol: str) -> IntradaySnapshot:
         frame = self._frame(symbol, refresh=True)

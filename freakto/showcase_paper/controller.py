@@ -72,6 +72,7 @@ def start_showcase(
     maximum_holding_minutes: int = 60,
     leverage: float = 1.0,
     risk_level: int = 35,
+    analysis_depth: int = 100,
     market_mode: str = "LIVE_PUBLIC",
     root: Path = ROOT,
 ) -> dict[str, Any]:
@@ -81,6 +82,8 @@ def start_showcase(
     normalized_mode = str(market_mode).upper()
     if not 0 <= int(risk_level) <= 100:
         raise ValueError("risk_level must stay between 0 and 100")
+    if not 0 <= int(analysis_depth) <= 100:
+        raise ValueError("analysis_depth must stay between 0 and 100")
     if normalized_mode not in {"LIVE_PUBLIC", "ACCELERATED_REPLAY"}:
         raise ValueError("market_mode must be LIVE_PUBLIC or ACCELERATED_REPLAY")
     if not 5 <= int(scan_interval_seconds) <= 3600:
@@ -95,6 +98,7 @@ def start_showcase(
         "--maximum-holding-minutes", str(int(maximum_holding_minutes)),
         "--leverage", str(float(leverage)),
         "--risk-level", str(int(risk_level)),
+        "--analysis-depth", str(int(analysis_depth)),
         "--market-mode", normalized_mode,
     ]
     environment = os.environ.copy()
@@ -111,7 +115,7 @@ def start_showcase(
         "settings": {
             "daily_trade_limit": int(daily_trade_limit), "scan_interval_seconds": int(scan_interval_seconds),
             "maximum_holding_minutes": int(maximum_holding_minutes), "leverage": float(leverage),
-            "risk_level": int(risk_level), "market_mode": normalized_mode,
+            "risk_level": int(risk_level), "analysis_depth": int(analysis_depth), "market_mode": normalized_mode,
         },
         "error": None,
         "live_orders_enabled": False,

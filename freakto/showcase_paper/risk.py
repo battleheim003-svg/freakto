@@ -38,6 +38,7 @@ class SessionPreset:
     maximum_holding_minutes: int
     leverage: float
     market_mode: str
+    analysis_depth: int = 100
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)

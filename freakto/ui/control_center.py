@@ -67,7 +67,7 @@ TEXT = {
         "holding_minutes": "حداکثر زمان نگهداری (دقیقه)", "leverage": "اهرم نمایشی", "start_showcase": "روشن‌کردن Showcase", "stop_showcase": "خاموش‌کردن و بستن موقعیت‌ها",
         "open_positions": "موقعیت باز", "showcase_cards": "کارت‌های آخرین معاملات", "download_card": "دانلود کارت", "showcase_started": "Showcase Paper در پس‌زمینه روشن شد.", "showcase_stopping": "درخواست توقف ثبت شد؛ موقعیت‌ها با قیمت جاری بسته می‌شوند.",
         "risk_management": "مدیریت ریسک تست", "risk_level": "ریسک‌پذیری (۰ دقیق تا ۱۰۰ اکتشافی)", "session_style": "نوع جلسه", "precision": "دقیق و محتاط", "balanced": "متعادل", "rapid_test": "تست سریع", "market_mode": "منبع اجرای تست", "live_public": "بازار عمومی زنده", "accelerated_replay": "Replay محلی شتاب‌یافته", "scan_activity": "فعالیت آخرین اسکن", "next_scan": "اسکن بعدی", "accepted_signals": "سیگنال پذیرفته", "rejected_signals": "علت‌های رد", "data_errors": "خطاهای اخیر داده", "risk_policy_note": "این کنترل فقط پذیرش فرصت در Showcase را تغییر می‌دهد و منطق موتور اصلی را دست‌کاری نمی‌کند.",
-        "unlimited_trades": "معاملات session نامحدود", "analysis_depth": "عمق تحلیل", "technical_tools": "ابزار تکنیکال فعال", "confluence": "همگرایی تکنیکال",
+        "unlimited_trades": "معاملات session نامحدود", "analysis_depth": "عمق تحلیل", "analysis_depth_control": "عمق تحلیل فنی (مستقل از ریسک)", "technical_tools": "ابزار تکنیکال فعال", "confluence": "همگرایی تکنیکال", "technical_v2_report": "گزارش Technical Engine v2", "market_regime": "رژیم بازار", "mtf_agreement": "هماهنگی چند تایم‌فریم", "trade_geometry": "هندسه معامله", "calibration_status": "وضعیت کالیبراسیون", "decision_drivers": "دلایل تصمیم", "decision_warnings": "هشدارها", "session_evaluation": "ارزیابی جلسه v2", "expectancy": "بازده موردانتظار", "sample_count": "حجم نمونه",
         "reports_title": "گزارش و تاریخچه", "reports_sub": "نتیجه روشن هر اجرا، مراحل موفق، نقطه توقف، Blockerها و لاگ کامل.",
         "refresh_reports": "تولید همه گزارش‌ها", "readiness": "گزارش آمادگی", "blockers": "موانع", "gates": "گیت‌ها", "job_history": "تاریخچه Jobها",
         "select_job": "انتخاب Job", "retry": "اجرای مجدد", "log": "لاگ فنی", "step_results": "نتیجه مراحل", "result": "نتیجه", "duration": "مدت", "current": "مقدار فعلی", "required": "حد لازم", "schedules": "زمان‌بندی",
@@ -109,7 +109,7 @@ TEXT = {
         "holding_minutes": "Maximum holding time (minutes)", "leverage": "Display leverage", "start_showcase": "Enable Showcase", "stop_showcase": "Disable and close positions",
         "open_positions": "Open positions", "showcase_cards": "Latest trade cards", "download_card": "Download card", "showcase_started": "Showcase Paper started in the background.", "showcase_stopping": "Stop requested; positions will close at current prices.",
         "risk_management": "Test risk management", "risk_level": "Risk tolerance (0 precision to 100 exploratory)", "session_style": "Session style", "precision": "Precision", "balanced": "Balanced", "rapid_test": "Rapid test", "market_mode": "Test execution source", "live_public": "Live public market", "accelerated_replay": "Accelerated local Replay", "scan_activity": "Latest scan activity", "next_scan": "Next scan", "accepted_signals": "Accepted signals", "rejected_signals": "Rejection reasons", "data_errors": "Recent data errors", "risk_policy_note": "This control changes Showcase admission only and never modifies the core engine logic.",
-        "unlimited_trades": "Unlimited session trades", "analysis_depth": "Analysis depth", "technical_tools": "Active technical tools", "confluence": "Technical confluence",
+        "unlimited_trades": "Unlimited session trades", "analysis_depth": "Analysis depth", "analysis_depth_control": "Technical analysis depth (independent of risk)", "technical_tools": "Active technical tools", "confluence": "Technical confluence", "technical_v2_report": "Technical Engine v2 report", "market_regime": "Market regime", "mtf_agreement": "Multi-timeframe agreement", "trade_geometry": "Trade geometry", "calibration_status": "Calibration status", "decision_drivers": "Decision drivers", "decision_warnings": "Warnings", "session_evaluation": "v2 session evaluation", "expectancy": "Expectancy", "sample_count": "Sample size",
         "reports_title": "Reports & history", "reports_sub": "A clear result for every run: passed steps, stop point, blockers, and full logs.",
         "refresh_reports": "Generate all reports", "readiness": "Readiness report", "blockers": "Blockers", "gates": "Gates", "job_history": "Job history",
         "select_job": "Select job", "retry": "Retry", "log": "Technical log", "step_results": "Step results", "result": "Result", "duration": "Duration", "current": "Current", "required": "Required", "schedules": "schedules",
@@ -525,7 +525,7 @@ elif page == "workflows":
                 key="showcase-session-style",
             )
             preset = session_preset(preset_key)
-            primary_settings = st.columns([1.4, 1])
+            primary_settings = st.columns([1, 1, 1])
             with primary_settings[0]:
                 risk_level = st.slider(
                     t("risk_level"), min_value=0, max_value=100,
@@ -533,6 +533,12 @@ elif page == "workflows":
                     step=5, disabled=showcase_active, key=f"showcase-risk-{preset_key}",
                 )
             with primary_settings[1]:
+                analysis_depth = st.slider(
+                    t("analysis_depth_control"), min_value=0, max_value=100,
+                    value=int(showcase_settings.get("analysis_depth", preset.analysis_depth)) if showcase_active else preset.analysis_depth,
+                    step=5, disabled=showcase_active, key=f"showcase-analysis-{preset_key}",
+                )
+            with primary_settings[2]:
                 mode_values = ["ACCELERATED_REPLAY", "LIVE_PUBLIC"]
                 mode_labels = {"ACCELERATED_REPLAY": t("accelerated_replay"), "LIVE_PUBLIC": t("live_public")}
                 selected_mode = str(showcase_settings.get("market_mode", preset.market_mode)) if showcase_active else preset.market_mode
@@ -542,12 +548,17 @@ elif page == "workflows":
                     key=f"showcase-mode-{preset_key}",
                 )
             policy = risk_policy(risk_level)
+            from freakto.technical_v2.service import analysis_profile
+            technical_profile = analysis_profile(analysis_depth)
             st.caption(
-                f'{policy.key} · {policy.analysis_depth} · {len(policy.technical_indicators)} indicators · '
+                f'{policy.key} · {technical_profile["label"]} · Technical Engine v2 · '
                 f'Score ≥ {policy.minimum_score} · Confidence ≥ {policy.minimum_confidence}% · '
                 f'Confluence ≥ {policy.minimum_confluence_pct}%'
             )
-            st.success(f'∞ {t("unlimited_trades")} · {t("technical_tools")}: ' + "، ".join(policy.technical_indicators))
+            st.success(
+                f'∞ {t("unlimited_trades")} · {t("analysis_depth")}: {analysis_depth}/100 · '
+                f'MTF: {", ".join(technical_profile["timeframes"])}'
+            )
             with st.expander(t("advanced")):
                 settings_cols = st.columns(3)
                 with settings_cols[0]:
@@ -569,7 +580,7 @@ elif page == "workflows":
                         start_showcase(
                             daily_trade_limit=0, scan_interval_seconds=int(scan_interval),
                             maximum_holding_minutes=int(holding_minutes), leverage=float(leverage),
-                            risk_level=int(risk_level), market_mode=str(market_mode),
+                            risk_level=int(risk_level), analysis_depth=int(analysis_depth), market_mode=str(market_mode),
                         )
                         st.success(t("showcase_started")); st.rerun()
                     except (RuntimeError, ValueError) as exc:
@@ -605,6 +616,37 @@ elif page == "workflows":
                     errors = list(last_scan.get("errors") or [])
                     if errors:
                         st.error(t("data_errors") + ": " + " | ".join(str(item.get("error")) for item in errors[-3:]))
+            latest_technical = next((trade for trade in showcase_trades if trade.get("technical_v2")), None)
+            if latest_technical:
+                technical = dict(latest_technical.get("technical_v2") or {})
+                with st.expander(t("technical_v2_report"), expanded=True):
+                    report_cols = st.columns(4)
+                    report_cols[0].metric(t("market_regime"), (technical.get("regime") or {}).get("label", "—"))
+                    report_cols[1].metric(t("mtf_agreement"), f'{float(technical.get("timeframe_agreement", 0)):.0%}')
+                    geometry = dict(technical.get("geometry") or {})
+                    report_cols[2].metric(t("trade_geometry"), f'R:R {float(geometry.get("cost_adjusted_reward_risk", 0)):.2f}')
+                    report_cols[3].metric(t("calibration_status"), (technical.get("calibration") or {}).get("status", "—"))
+                    family_rows = list(technical.get("family_scores") or [])
+                    if family_rows:
+                        st.dataframe(
+                            [{"Family": row.get("family"), "Score": row.get("score"), "Weight": row.get("weight"), "Agreement": row.get("agreement")} for row in family_rows],
+                            use_container_width=True, hide_index=True,
+                        )
+                    st.write(t("decision_drivers") + ": " + " · ".join(technical.get("reasons") or ["—"]))
+                    warnings = list(technical.get("warnings") or [])
+                    if warnings:
+                        st.warning(t("decision_warnings") + ": " + " · ".join(warnings))
+                    from freakto.technical_v2.evaluator import evaluate_decisions
+                    closed_v2 = [trade for trade in showcase_trades if trade.get("status") == "CLOSED" and trade.get("technical_v2")]
+                    evaluation = evaluate_decisions(closed_v2)
+                    st.markdown("**" + t("session_evaluation") + "**")
+                    evaluation_cols = st.columns(3)
+                    evaluation_cols[0].metric(t("sample_count"), evaluation.get("samples", 0))
+                    evaluation_cols[1].metric("Win rate", "—" if evaluation.get("win_rate") is None else f'{float(evaluation["win_rate"]):.1%}')
+                    evaluation_cols[2].metric(t("expectancy"), "—" if evaluation.get("expectancy_pct") is None else f'{float(evaluation["expectancy_pct"]):+.3f}%')
+                    attribution = dict(evaluation.get("family_attribution") or {})
+                    if attribution:
+                        st.bar_chart(attribution)
             card_paths = [Path(str(trade.get("latest_card"))) for trade in showcase_trades[:4] if trade.get("latest_card")]
             card_paths = [path for path in card_paths if path.is_file()]
             if card_paths:

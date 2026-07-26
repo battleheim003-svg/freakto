@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -49,6 +50,7 @@ class ShowcaseSettings:
     fee_bps_per_side: float = 10.0
     slippage_bps: float = 5.0
     risk_level: int = 35
+    analysis_depth: int = 100
     reentry_cooldown_minutes: int = 30
     market_mode: str = "LIVE_PUBLIC"
 
@@ -67,6 +69,8 @@ class ShowcaseSettings:
             raise ValueError("stop, target, and holding duration must be positive")
         if not 0 <= int(self.risk_level) <= 100:
             raise ValueError("risk_level must stay between 0 and 100")
+        if not 0 <= int(self.analysis_depth) <= 100:
+            raise ValueError("analysis_depth must stay between 0 and 100")
         if not 0 <= int(self.reentry_cooldown_minutes) <= 1440:
             raise ValueError("reentry_cooldown_minutes must stay between 0 and 1,440")
         if self.market_mode not in {"LIVE_PUBLIC", "ACCELERATED_REPLAY"}:
@@ -149,12 +153,23 @@ class ShowcaseEngine:
             "recommendation": str(getattr(item, "recommendation", "UNRATED")),
             "regime": str(getattr(item, "regime", "UNKNOWN")),
             "analysis_depth": str(getattr(item, "analysis_depth", risk_policy(self.settings.risk_level).analysis_depth)),
+            "analysis_depth_value": int(getattr(item, "analysis_depth_value", self.settings.analysis_depth)),
             "indicators_used": list(getattr(item, "indicators_used", []) or []),
             "indicator_votes": dict(getattr(item, "indicator_votes", {}) or {}),
             "technical_long_votes": int(getattr(item, "technical_long_votes", 0) or 0),
             "technical_short_votes": int(getattr(item, "technical_short_votes", 0) or 0),
             "technical_neutral_votes": int(getattr(item, "technical_neutral_votes", 0) or 0),
             "technical_confluence_pct": getattr(item, "technical_confluence_pct", None),
+            "technical_v2": dict(getattr(item, "technical_v2", {}) or {}),
+            "family_scores": list(getattr(item, "family_scores", []) or []),
+            "timeframe_scores": dict(getattr(item, "timeframe_scores", {}) or {}),
+            "timeframe_agreement": getattr(item, "timeframe_agreement", None),
+            "trade_geometry": dict(getattr(item, "trade_geometry", {}) or {}),
+            "risk_assessment": dict(getattr(item, "risk_assessment", {}) or {}),
+            "calibration": dict(getattr(item, "calibration", {}) or {}),
+            "decision_reasons": list(getattr(item, "decision_reasons", []) or []),
+            "decision_warnings": list(getattr(item, "decision_warnings", []) or []),
+            "engine_version": str(getattr(item, "engine_version", "legacy-showcase")),
         }
         reason = admission_reason(signal, risk_policy(self.settings.risk_level))
         return (signal if reason is None else None), reason
@@ -181,6 +196,7 @@ class ShowcaseEngine:
             "scanned_utc": self.now_fn().isoformat(),
             "risk_policy": policy.to_dict(),
             "market_mode": self.settings.market_mode,
+            "analysis_depth": self.settings.analysis_depth,
             "evaluated": 0,
             "accepted": 0,
             "opened": 0,
@@ -222,10 +238,18 @@ class ShowcaseEngine:
                 base = float(snapshot.ask if side == "LONG" else snapshot.bid)
                 slip = self.settings.slippage_bps / 10_000.0
                 entry = base * (1 + slip if side == "LONG" else 1 - slip)
-                stop_factor = self.settings.stop_loss_pct / 100.0
-                target_factor = self.settings.take_profit_pct / 100.0
-                stop = entry * (1 - stop_factor if side == "LONG" else 1 + stop_factor)
-                target = entry * (1 + target_factor if side == "LONG" else 1 - target_factor)
+                geometry = dict(signal.get("trade_geometry") or {})
+                if geometry.get("stop") and geometry.get("target"):
+                    source_entry = float(geometry.get("entry") or entry)
+                    stop_distance = abs(source_entry - float(geometry["stop"]))
+                    target_distance = abs(float(geometry["target"]) - source_entry)
+                    stop = entry - stop_distance if side == "LONG" else entry + stop_distance
+                    target = entry + target_distance if side == "LONG" else entry - target_distance
+                else:
+                    stop_factor = self.settings.stop_loss_pct / 100.0
+                    target_factor = self.settings.take_profit_pct / 100.0
+                    stop = entry * (1 - stop_factor if side == "LONG" else 1 + stop_factor)
+                    target = entry * (1 + target_factor if side == "LONG" else 1 - target_factor)
                 now = self.now_fn().isoformat()
                 decision_id = hashlib.sha256(f"{signal['source_signal_id']}|{now}".encode()).hexdigest()[:20]
                 trade_id = "showcase-" + hashlib.sha256(f"{decision_id}|{now}".encode()).hexdigest()[:12]
@@ -240,7 +264,17 @@ class ShowcaseEngine:
                     "symbol": symbol,
                     "side": side,
                     "leverage": self.settings.leverage,
-                    "notional_usdt": self.settings.notional_usdt,
+                    "notional_usdt": round(
+                        self.settings.notional_usdt
+                        * float((signal.get("risk_assessment") or {}).get("position_scale", 1.0))
+                        / math.sqrt(
+                            1 + sum(
+                                1 for existing in self.trades
+                                if existing.get("status") == "OPEN" and existing.get("side") == side
+                            )
+                        ),
+                        2,
+                    ),
                     "entry_price": entry,
                     "current_price": float(snapshot.last),
                     "exit_price": None,

@@ -2,6 +2,7 @@
 
 Start with these canonical documents:
 
+- [Technical Engine v2](technical_v2/RUNBOOK.md): isolated multi-timeframe research challenger.
 - [Operations](OPERATIONS.md): supported Data, Replay, Paper, and Report commands.
 - [Paper trading](paper/README.md): zero-capital Paper workflow and safety invariants.
 - [Consolidation roadmap](refactor/ROADMAP.md): architecture and migration phases.

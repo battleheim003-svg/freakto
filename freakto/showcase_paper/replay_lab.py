@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from freakto.showcase_paper.risk import risk_policy
-from freakto.showcase_paper.technical import build_technical_signal
+from freakto.research.adapters.technical_v2_adapter import TechnicalV2FrameAdapter
+from freakto.technical_v2.service import analysis_profile
 
 
 @dataclass(frozen=True)
@@ -26,12 +26,14 @@ class ReplaySnapshot:
 
 
 class AcceleratedReplayMarket:
-    def __init__(self, root: Path, symbols: tuple[str, ...], *, timeframe: str = "4h", risk_level: int = 70):
+    def __init__(self, root: Path, symbols: tuple[str, ...], *, timeframe: str = "4h", risk_level: int = 70, analysis_depth: int | None = None):
         self.root = Path(root)
         self.symbols = symbols
         self.timeframe = timeframe
-        self.policy = risk_policy(risk_level)
+        self.analysis_depth = int(risk_level if analysis_depth is None else analysis_depth)
+        self.adapter = TechnicalV2FrameAdapter(risk_level=risk_level, analysis_depth=self.analysis_depth)
         self.frames: dict[str, pd.DataFrame] = {}
+        self.daily_frames: dict[str, pd.DataFrame] = {}
         self.cursors: dict[str, int] = {}
         for symbol in symbols:
             path = self.root / "data" / "market_replay" / timeframe / f'{symbol.replace("/", "_")}.csv.gz'
@@ -41,8 +43,13 @@ class AcceleratedReplayMarket:
                 raise ValueError(f"Replay dataset is not usable: {path}")
             frame = frame.dropna(subset=list(required)).reset_index(drop=True)
             self.frames[symbol] = frame
+            daily_path = self.root / "data" / "market_replay" / "1d" / f'{symbol.replace("/", "_")}.csv.gz'
+            if daily_path.is_file():
+                daily = pd.read_csv(daily_path).dropna(subset=list(required)).reset_index(drop=True)
+                if len(daily) >= 40:
+                    self.daily_frames[symbol] = daily
             # Keep enough warm-up history and a useful recent test segment.
-            self.cursors[symbol] = max(30, len(frame) - 90)
+            self.cursors[symbol] = min(len(frame) - 1, max(39, len(frame) - 90))
 
     def _row(self, symbol: str):
         frame = self.frames[symbol]
@@ -57,26 +64,31 @@ class AcceleratedReplayMarket:
     def signal(self, symbol: str):
         frame = self.frames[symbol]
         cursor = self.cursors[symbol]
-        window = frame.iloc[max(0, cursor - 29): cursor + 1]
-        return build_technical_signal(
-            window,
-            self.policy,
-            timestamp=str(self._row(symbol)["timestamp"]),
-            regime="ACCELERATED_REPLAY",
-            provider="local-cache",
+        window = frame.iloc[max(0, cursor - 139): cursor + 1]
+        frames = {self.timeframe: window}
+        if symbol in self.daily_frames:
+            current = pd.to_datetime(self._row(symbol)["timestamp"], utc=True)
+            daily = self.daily_frames[symbol]
+            timestamps = pd.to_datetime(daily["timestamp"], utc=True)
+            causal_daily = daily.loc[timestamps <= current].tail(140)
+            if len(causal_daily) >= 40:
+                frames["1d"] = causal_daily
+        signal = self.adapter.signal(
+            symbol, frames, timestamp=str(self._row(symbol)["timestamp"]), provider="local-cache",
         )
+        signal.regime = "ACCELERATED_REPLAY"
+        return signal
 
     def advance(self) -> None:
         for symbol, frame in self.frames.items():
             next_cursor = self.cursors[symbol] + 1
-            self.cursors[symbol] = next_cursor if next_cursor < len(frame) else max(30, len(frame) - 90)
+            self.cursors[symbol] = next_cursor if next_cursor < len(frame) else min(len(frame) - 1, max(39, len(frame) - 90))
 
     def progress(self) -> dict[str, object]:
         return {
             "timeframe": self.timeframe,
             "provider": "accelerated-local-replay",
-            "analysis_depth": self.policy.analysis_depth,
-            "indicators_used": list(self.policy.technical_indicators),
+            "analysis_depth": analysis_profile(self.analysis_depth),
             "cursors": {symbol: int(cursor) for symbol, cursor in self.cursors.items()},
             "timestamps": {symbol: str(self._row(symbol)["timestamp"]) for symbol in self.symbols},
         }
