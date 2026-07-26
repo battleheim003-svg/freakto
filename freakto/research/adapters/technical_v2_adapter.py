@@ -7,6 +7,7 @@ the Decision Engine, Market Replay, Backtest, or decision evaluator.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from math import ceil
 from types import SimpleNamespace
 
 import pandas as pd
@@ -25,15 +26,23 @@ def decision_to_showcase_signal(decision: TechnicalDecision, *, provider: str, a
     long_count = sum(item.direction > 0 for item in decision.evidence)
     short_count = sum(item.direction < 0 for item in decision.evidence)
     neutral_count = len(decision.evidence) - long_count - short_count
-    confluence = round(max(long_count, short_count) / max(1, long_count + short_count) * 100)
+    total_indicators = len(decision.evidence)
+    dominant_count = max(long_count, short_count)
+    directional_count = long_count + short_count
+    participation = round(dominant_count / max(1, total_indicators) * 100)
+    directional_agreement = round(dominant_count / max(1, directional_count) * 100)
+    breadth_minimum = ceil(total_indicators * 0.5)
+    breadth_sufficient = directional_count >= breadth_minimum
+    side = decision.side if long_count != short_count else "NEUTRAL"
+    recommendation = decision.recommendation if breadth_sufficient and side != "NEUTRAL" else "MONITOR"
     profile = analysis_profile(analysis_depth)
     votes = {item.name: "LONG" if item.direction > 0 else "SHORT" if item.direction < 0 else "NEUTRAL" for item in decision.evidence}
     return SimpleNamespace(
-        side=decision.side,
+        side=side,
         decision_timestamp=decision.timestamp,
         score=round(50 + abs(decision.raw_score) * 50),
         confidence=round(decision.confidence * 100),
-        recommendation=decision.recommendation,
+        recommendation=recommendation,
         regime=decision.regime.label,
         provider=provider,
         analysis_depth=str(profile["label"]),
@@ -43,7 +52,12 @@ def decision_to_showcase_signal(decision: TechnicalDecision, *, provider: str, a
         technical_long_votes=long_count,
         technical_short_votes=short_count,
         technical_neutral_votes=neutral_count,
-        technical_confluence_pct=confluence,
+        technical_confluence_pct=participation,
+        technical_participation_pct=participation,
+        directional_agreement_pct=directional_agreement,
+        directional_votes=directional_count,
+        breadth_minimum=breadth_minimum,
+        breadth_sufficient=breadth_sufficient,
         technical_v2=payload,
         family_scores=[item.to_dict() for item in decision.family_scores],
         timeframe_scores=dict(decision.timeframe_scores),

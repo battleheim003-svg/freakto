@@ -71,6 +71,23 @@ def quality_profile(key: str | None) -> QualityProfile:
     return PROFILES[normalized]
 
 
+def runbook_alignment(*, quality_mode: str, risk_level: int, analysis_depth: int) -> dict[str, Any]:
+    reasons = []
+    if str(quality_mode).upper() != "WIN_RATE":
+        reasons.append("QUALITY_MODE_NOT_WIN_RATE")
+    if not 20 <= int(risk_level) <= 35:
+        reasons.append("RISK_OUTSIDE_20_35")
+    if int(analysis_depth) != 100:
+        reasons.append("ANALYSIS_DEPTH_NOT_100")
+    return {
+        "runbook_aligned": not reasons,
+        "quality_mode": str(quality_mode).upper(),
+        "risk_level": int(risk_level),
+        "analysis_depth": int(analysis_depth),
+        "reasons": reasons,
+    }
+
+
 def _eligible_outcomes(trades: Iterable[dict[str, Any]], *, window: int) -> list[dict[str, Any]]:
     rows = [
         trade for trade in trades
@@ -119,7 +136,19 @@ def _dynamic_reason(signal: dict[str, Any], history: list[dict[str, Any]], profi
     side_rows = [row for row in outcomes if row.get("side") == side]
     bucket = outcome_metrics(bucket_rows)
     side_metrics = outcome_metrics(side_rows)
-    diagnostics = {"symbol_side": bucket, "side": side_metrics, "window": profile.dynamic_window}
+    diagnostics = {
+        "symbol_side": bucket,
+        "side": side_metrics,
+        "window": profile.dynamic_window,
+        "maturity": {
+            "bucket_samples": int(bucket["samples"]),
+            "bucket_minimum_samples": profile.bucket_minimum_samples,
+            "bucket_samples_needed": max(0, profile.bucket_minimum_samples - int(bucket["samples"])),
+            "side_samples": int(side_metrics["samples"]),
+            "side_minimum_samples": profile.side_minimum_samples,
+            "side_samples_needed": max(0, profile.side_minimum_samples - int(side_metrics["samples"])),
+        },
+    }
 
     # A sufficiently healthy exact bucket may override a weak global side. This
     # keeps empirically strong exceptions (for example a specific LONG symbol)
@@ -144,9 +173,44 @@ def _dynamic_reason(signal: dict[str, Any], history: list[dict[str, Any]], profi
     return None, diagnostics
 
 
+def maturity_report(
+    trades: Iterable[dict[str, Any]], *, profile_key: str = "WIN_RATE", session_baseline: int = 0,
+) -> dict[str, Any]:
+    profile = quality_profile(profile_key)
+    rows = list(trades)
+    outcomes = _eligible_outcomes(rows, window=profile.dynamic_window)
+    side_rows = {side: [row for row in outcomes if row.get("side") == side] for side in ("LONG", "SHORT")}
+    side = {
+        key: {
+            **outcome_metrics(values),
+            "minimum_samples": profile.side_minimum_samples,
+            "samples_needed": max(0, profile.side_minimum_samples - len(values)),
+            "mature": len(values) >= profile.side_minimum_samples,
+        }
+        for key, values in side_rows.items()
+    }
+    organic_closed = _eligible_outcomes(
+        [trade for trade in rows if trade.get("status") == "CLOSED"][max(0, int(session_baseline)):],
+        window=0,
+    )
+    target = 50
+    return {
+        "profile": profile.key,
+        "session": {
+            "organic_closed_trades": len(organic_closed),
+            "minimum_samples": target,
+            "samples_needed": max(0, target - len(organic_closed)),
+            "mature": len(organic_closed) >= target,
+        },
+        "side": side,
+    }
+
+
 def quality_admission_reason(
     signal: dict[str, Any], history: Iterable[dict[str, Any]], profile: QualityProfile,
 ) -> tuple[str | None, dict[str, Any]]:
+    if signal.get("breadth_sufficient") is False and profile.key != "VOLUME":
+        return "QUALITY_INSUFFICIENT_BREADTH", {}
     recommendation = str(signal.get("recommendation", "UNRATED") or "UNRATED").upper()
     if recommendation not in profile.allowed_recommendations:
         return "QUALITY_RECOMMENDATION_BLOCKED", {}
@@ -160,4 +224,3 @@ def quality_admission_reason(
     if geometry and float(geometry.get("cost_adjusted_reward_risk", 0) or 0) < profile.minimum_cost_adjusted_reward_risk:
         return "QUALITY_REWARD_RISK_BELOW_POLICY", {}
     return _dynamic_reason(signal, list(history), profile)
-

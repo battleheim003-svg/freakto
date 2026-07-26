@@ -2,11 +2,20 @@
 
 from __future__ import annotations
 
+from math import ceil, isfinite
 from types import SimpleNamespace
 
 import pandas as pd
 
 from freakto.showcase_paper.risk import RiskPolicy
+
+
+ATR_GEOMETRY = {
+    "PRECISION": (1.0, 1.5, 48),
+    "CAUTIOUS": (1.2, 1.8, 36),
+    "ACTIVE_TEST": (1.4, 2.1, 30),
+    "EXPLORATORY": (1.6, 2.4, 24),
+}
 
 
 def _vote(condition_long: bool, condition_short: bool) -> str:
@@ -83,13 +92,48 @@ def build_technical_signal(
     long_votes = sum(value == "LONG" for value in votes.values())
     short_votes = sum(value == "SHORT" for value in votes.values())
     neutral_votes = len(votes) - long_votes - short_votes
-    side = "LONG" if long_votes >= short_votes else "SHORT"
+    side = "NEUTRAL" if long_votes == short_votes else "LONG" if long_votes > short_votes else "SHORT"
     dominant = max(long_votes, short_votes)
-    directional = max(1, long_votes + short_votes)
-    confluence = round(dominant / directional * 100)
-    score = round(45 + confluence * 0.45)
-    confidence = round(42 + confluence * 0.48)
-    recommendation = "ACTIONABLE" if score >= 72 else "WATCHLIST" if score >= 60 else "MONITOR"
+    directional_votes = long_votes + short_votes
+    total_indicators = len(votes)
+    participation = round(dominant / max(1, total_indicators) * 100)
+    directional_agreement = round(dominant / max(1, directional_votes) * 100)
+    breadth_minimum = ceil(total_indicators * 0.5)
+    breadth_sufficient = directional_votes >= breadth_minimum
+    # This legacy Showcase signal is not the active Technical-v2 path. Keep its
+    # historical linear score mapping, but feed it the corrected participation
+    # metric and fail closed on insufficient breadth. No guessed recalibration.
+    score = round(45 + participation * 0.45)
+    confidence = round(42 + participation * 0.48)
+    recommendation = (
+        "MONITOR" if not breadth_sufficient or side == "NEUTRAL"
+        else "ACTIONABLE" if score >= 72 else "WATCHLIST" if score >= 60 else "MONITOR"
+    )
+
+    close = pd.to_numeric(window["close"], errors="coerce")
+    high = pd.to_numeric(window["high"], errors="coerce")
+    low = pd.to_numeric(window["low"], errors="coerce")
+    true_range = pd.concat(
+        [(high - low), (high - close.shift()).abs(), (low - close.shift()).abs()], axis=1
+    ).max(axis=1)
+    atr_value = float(true_range.rolling(14).mean().iloc[-1])
+    entry = float(close.iloc[-1])
+    stop_mult, target_mult, expiry_bars = ATR_GEOMETRY[policy.key]
+    if side in {"LONG", "SHORT"} and isfinite(atr_value) and atr_value > max(abs(entry) * 1e-8, 1e-12):
+        stop_distance = atr_value * stop_mult
+        target_distance = atr_value * target_mult
+        geometry = {
+            "entry": entry,
+            "stop": entry - stop_distance if side == "LONG" else entry + stop_distance,
+            "target": entry + target_distance if side == "LONG" else entry - target_distance,
+            "expiry_bars": expiry_bars,
+            "atr_value": atr_value,
+            "stop_atr_multiple": stop_mult,
+            "target_atr_multiple": target_mult,
+            "source": "SHOWCASE_ATR_RESEARCH_V1",
+        }
+    else:
+        geometry = {}
     return SimpleNamespace(
         side=side,
         decision_timestamp=timestamp,
@@ -104,6 +148,12 @@ def build_technical_signal(
         technical_long_votes=long_votes,
         technical_short_votes=short_votes,
         technical_neutral_votes=neutral_votes,
-        technical_confluence_pct=confluence,
+        technical_confluence_pct=participation,
+        technical_participation_pct=participation,
+        directional_agreement_pct=directional_agreement,
+        directional_votes=directional_votes,
+        breadth_minimum=breadth_minimum,
+        breadth_sufficient=breadth_sufficient,
         minimum_confluence_pct=policy.minimum_confluence_pct,
+        trade_geometry=geometry,
     )

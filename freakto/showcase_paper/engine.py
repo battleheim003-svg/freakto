@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from freakto.showcase_paper.card import render_trade_card
-from freakto.showcase_paper.quality import quality_admission_reason, quality_profile
+from freakto.showcase_paper.quality import quality_admission_reason, quality_profile, runbook_alignment
 from freakto.showcase_paper.risk import admission_reason, risk_policy
 
 
@@ -126,13 +126,28 @@ class ShowcaseEngine:
         self.state_path = self.root / "session.json"
         self.cards_dir = self.root / "cards"
         self.state = _read_json(self.state_path, self._initial_state())
+        self.state["settings"] = asdict(self.settings)
+        self.state["runbook_alignment"] = runbook_alignment(
+            quality_mode=self.settings.quality_mode,
+            risk_level=self.settings.risk_level,
+            analysis_depth=self.settings.analysis_depth,
+        )
+        self.state["runbook_aligned"] = bool(self.state["runbook_alignment"]["runbook_aligned"])
 
     def _initial_state(self) -> dict[str, Any]:
+        alignment = runbook_alignment(
+            quality_mode=self.settings.quality_mode,
+            risk_level=self.settings.risk_level,
+            analysis_depth=self.settings.analysis_depth,
+        )
         return {
             "schema_version": 2,
             "mode": "SHOWCASE_PAPER",
             "market_mode": self.settings.market_mode,
             "quality_mode": self.settings.quality_mode,
+            "settings": asdict(self.settings),
+            "runbook_alignment": alignment,
+            "runbook_aligned": bool(alignment["runbook_aligned"]),
             "official_evidence_eligible": False,
             "started_utc": self.now_fn().isoformat(),
             "updated_utc": self.now_fn().isoformat(),
@@ -252,6 +267,11 @@ class ShowcaseEngine:
             "technical_short_votes": int(getattr(item, "technical_short_votes", 0) or 0),
             "technical_neutral_votes": int(getattr(item, "technical_neutral_votes", 0) or 0),
             "technical_confluence_pct": getattr(item, "technical_confluence_pct", None),
+            "technical_participation_pct": getattr(item, "technical_participation_pct", None),
+            "directional_agreement_pct": getattr(item, "directional_agreement_pct", None),
+            "directional_votes": int(getattr(item, "directional_votes", 0) or 0),
+            "breadth_minimum": int(getattr(item, "breadth_minimum", 0) or 0),
+            "breadth_sufficient": bool(getattr(item, "breadth_sufficient", True)),
             "technical_v2": dict(getattr(item, "technical_v2", {}) or {}),
             "family_scores": list(getattr(item, "family_scores", []) or []),
             "timeframe_scores": dict(getattr(item, "timeframe_scores", {}) or {}),
@@ -407,6 +427,7 @@ class ShowcaseEngine:
                     "target_price": target,
                     "initial_stop_price": stop,
                     "break_even_armed": False,
+                    "max_favorable_r": 0.0,
                     "entry_bar_index": getattr(snapshot, "bar_index", None),
                     "last_bar_index": getattr(snapshot, "bar_index", None),
                     "expiry_bars": int(geometry.get("expiry_bars", 0) or 0),
@@ -461,6 +482,25 @@ class ShowcaseEngine:
             pnl_usdt=round(float(trade["notional_usdt"]) * pnl_pct / 100.0, 6),
             updated_utc=self.now_fn().isoformat(),
         )
+
+    @staticmethod
+    def _update_mfe(
+        trade: dict[str, Any], *, mark: float, snapshot: Any | None = None, barrier_resolved: bool = False,
+    ) -> None:
+        entry = float(trade["entry_price"])
+        initial_stop = float(trade.get("initial_stop_price") or trade.get("stop_price") or entry)
+        risk_distance = abs(entry - initial_stop)
+        if risk_distance <= 0:
+            return
+        favourable = float(mark)
+        if snapshot is not None and not barrier_resolved:
+            try:
+                favourable = float(snapshot.high if trade["side"] == "LONG" else snapshot.low)
+            except (AttributeError, TypeError, ValueError):
+                favourable = float(mark)
+        direction = 1.0 if trade["side"] == "LONG" else -1.0
+        favourable_r = direction * (favourable - entry) / risk_distance
+        trade["max_favorable_r"] = round(max(0.0, float(trade.get("max_favorable_r", 0) or 0), favourable_r), 6)
 
     @staticmethod
     def _barrier_fill(trade: dict[str, Any], snapshot: Any) -> tuple[str | None, float | None]:
@@ -539,10 +579,12 @@ class ShowcaseEngine:
                     continue
                 snapshot = self.market_data.fetch_snapshot(str(trade["symbol"]))
                 mark = float(snapshot.bid if trade["side"] == "LONG" else snapshot.ask)
+                self._update_mfe(trade, mark=mark, snapshot=snapshot)
                 self._update_pnl(trade, mark)
                 trade.update(
                     status="CLOSED", exit_price=mark, closed_utc=self.now_fn().isoformat(),
                     close_reason="SIGNAL_INVALIDATED", invalidating_signal_id=signal["source_signal_id"],
+                    mfe_r=float(trade.get("max_favorable_r", 0) or 0),
                 )
                 trade["close_card"] = self._card(trade, "closed")
                 trade["latest_card"] = trade["close_card"]
@@ -569,7 +611,14 @@ class ShowcaseEngine:
                     snapshot = self.market_data.fetch_snapshot(str(trade["symbol"]))
                     mark = float(snapshot.bid if trade["side"] == "LONG" else snapshot.ask)
                 barrier_reason, barrier_mark = (None, None) if close_all else self._barrier_fill(trade, snapshot)
-                self._update_pnl(trade, float(barrier_mark if barrier_mark is not None else mark))
+                resolved_mark = float(barrier_mark if barrier_mark is not None else mark)
+                self._update_mfe(
+                    trade,
+                    mark=resolved_mark,
+                    snapshot=None if close_all else snapshot,
+                    barrier_resolved=barrier_reason is not None,
+                )
+                self._update_pnl(trade, resolved_mark)
                 opened = datetime.fromisoformat(str(trade["opened_utc"]))
                 held_minutes = max(0.0, (now - opened).total_seconds() / 60.0)
                 bar_index = None if close_all else getattr(snapshot, "bar_index", None)
@@ -595,7 +644,10 @@ class ShowcaseEngine:
                 else:
                     reason = None
                 if reason:
-                    trade.update(status="CLOSED", exit_price=float(barrier_mark if barrier_mark is not None else mark), closed_utc=now.isoformat(), close_reason=reason)
+                    trade.update(
+                        status="CLOSED", exit_price=resolved_mark, closed_utc=now.isoformat(),
+                        close_reason=reason, mfe_r=float(trade.get("max_favorable_r", 0) or 0),
+                    )
                     trade["close_card"] = self._card(trade, "closed")
                     trade["latest_card"] = trade["close_card"]
                     closed.append(trade)
