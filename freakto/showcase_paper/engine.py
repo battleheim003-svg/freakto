@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from freakto.showcase_paper.card import render_trade_card
+from freakto.showcase_paper.risk import admission_reason, risk_policy
 
 
 def utc_now() -> datetime:
@@ -44,6 +45,9 @@ class ShowcaseSettings:
     maximum_holding_minutes: int = 60
     fee_bps_per_side: float = 10.0
     slippage_bps: float = 5.0
+    risk_level: int = 35
+    reentry_cooldown_minutes: int = 30
+    market_mode: str = "LIVE_PUBLIC"
 
     def validated(self) -> "ShowcaseSettings":
         if not self.symbols:
@@ -58,6 +62,12 @@ class ShowcaseSettings:
             raise ValueError("showcase leverage must stay between 1x and 5x")
         if self.stop_loss_pct <= 0 or self.take_profit_pct <= 0 or self.maximum_holding_minutes < 1:
             raise ValueError("stop, target, and holding duration must be positive")
+        if not 0 <= int(self.risk_level) <= 100:
+            raise ValueError("risk_level must stay between 0 and 100")
+        if not 0 <= int(self.reentry_cooldown_minutes) <= 1440:
+            raise ValueError("reentry_cooldown_minutes must stay between 0 and 1,440")
+        if self.market_mode not in {"LIVE_PUBLIC", "ACCELERATED_REPLAY"}:
+            raise ValueError("market_mode must be LIVE_PUBLIC or ACCELERATED_REPLAY")
         return self
 
 
@@ -90,14 +100,16 @@ class ShowcaseEngine:
 
     def _initial_state(self) -> dict[str, Any]:
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "mode": "SHOWCASE_PAPER",
+            "market_mode": self.settings.market_mode,
             "official_evidence_eligible": False,
             "started_utc": self.now_fn().isoformat(),
             "updated_utc": self.now_fn().isoformat(),
             "trades": [],
             "seen_decisions": [],
             "errors": [],
+            "last_scan": {},
         }
 
     def save(self) -> None:
@@ -120,16 +132,13 @@ class ShowcaseEngine:
         render_trade_card(trade, path, logo_path=self.logo_path)
         return str(path)
 
-    def _signal(self, symbol: str) -> dict[str, Any] | None:
+    def _signal(self, symbol: str) -> tuple[dict[str, Any] | None, str | None]:
         item = self.signal_source(symbol)
         side = str(getattr(item, "side", "NEUTRAL")).upper()
-        if side not in {"LONG", "SHORT"}:
-            return None
         timestamp = str(getattr(item, "decision_timestamp", "") or self.now_fn().isoformat())
         identity = f"{symbol}|{side}|{timestamp}"
-        decision_id = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:20]
-        return {
-            "decision_id": decision_id,
+        signal = {
+            "source_signal_id": hashlib.sha256(identity.encode("utf-8")).hexdigest()[:20],
             "side": side,
             "signal_timestamp": timestamp,
             "score": int(getattr(item, "score", 0) or 0),
@@ -137,26 +146,64 @@ class ShowcaseEngine:
             "recommendation": str(getattr(item, "recommendation", "UNRATED")),
             "regime": str(getattr(item, "regime", "UNKNOWN")),
         }
+        reason = admission_reason(signal, risk_policy(self.settings.risk_level))
+        return (signal if reason is None else None), reason
+
+    def _reentry_blocked(self, symbol: str) -> bool:
+        cooldown = int(self.settings.reentry_cooldown_minutes)
+        if cooldown <= 0:
+            return False
+        cutoff = self.now_fn().timestamp() - cooldown * 60
+        for trade in reversed(self.trades):
+            if trade.get("symbol") != symbol:
+                continue
+            timestamp = trade.get("closed_utc") or trade.get("opened_utc")
+            try:
+                return datetime.fromisoformat(str(timestamp)).timestamp() > cutoff
+            except (TypeError, ValueError):
+                return True
+        return False
 
     def open_available(self) -> list[dict[str, Any]]:
         opened: list[dict[str, Any]] = []
+        policy = risk_policy(self.settings.risk_level)
+        scan = {
+            "scanned_utc": self.now_fn().isoformat(),
+            "risk_policy": policy.to_dict(),
+            "market_mode": self.settings.market_mode,
+            "evaluated": 0,
+            "accepted": 0,
+            "opened": 0,
+            "rejected": {},
+            "errors": [],
+        }
         slots = min(
             self.settings.maximum_open_positions - len(self._open_symbols()),
             self.settings.daily_trade_limit - self._today_count(),
         )
         if slots <= 0:
+            scan["rejected"] = {"SESSION_CAPACITY_REACHED": len(self.settings.symbols)}
+            self.state["last_scan"] = scan
+            self.save()
             return opened
-        seen = set(self.state.get("seen_decisions") or [])
         open_symbols = self._open_symbols()
         for symbol in self.settings.symbols:
             if slots <= 0:
                 break
             if symbol in open_symbols:
+                scan["rejected"]["ALREADY_OPEN"] = int(scan["rejected"].get("ALREADY_OPEN", 0)) + 1
+                continue
+            if self._reentry_blocked(symbol):
+                scan["rejected"]["REENTRY_COOLDOWN"] = int(scan["rejected"].get("REENTRY_COOLDOWN", 0)) + 1
                 continue
             try:
-                signal = self._signal(symbol)
-                if not signal or signal["decision_id"] in seen:
+                scan["evaluated"] += 1
+                signal, rejected = self._signal(symbol)
+                if not signal:
+                    reason = str(rejected or "SIGNAL_REJECTED")
+                    scan["rejected"][reason] = int(scan["rejected"].get(reason, 0)) + 1
                     continue
+                scan["accepted"] += 1
                 snapshot = self.market_data.fetch_snapshot(symbol)
                 side = signal["side"]
                 base = float(snapshot.ask if side == "LONG" else snapshot.bid)
@@ -167,11 +214,15 @@ class ShowcaseEngine:
                 stop = entry * (1 - stop_factor if side == "LONG" else 1 + stop_factor)
                 target = entry * (1 + target_factor if side == "LONG" else 1 - target_factor)
                 now = self.now_fn().isoformat()
-                trade_id = "showcase-" + hashlib.sha256(f"{signal['decision_id']}|{now}".encode()).hexdigest()[:12]
+                decision_id = hashlib.sha256(f"{signal['source_signal_id']}|{now}".encode()).hexdigest()[:20]
+                trade_id = "showcase-" + hashlib.sha256(f"{decision_id}|{now}".encode()).hexdigest()[:12]
                 trade = {
                     "trade_id": trade_id,
                     "mode": "SHOWCASE_PAPER",
                     "official_evidence_eligible": False,
+                    "market_mode": self.settings.market_mode,
+                    "risk_level": policy.level,
+                    "risk_profile": policy.key,
                     "status": "OPEN",
                     "symbol": symbol,
                     "side": side,
@@ -188,22 +239,28 @@ class ShowcaseEngine:
                     "close_reason": None,
                     "pnl_pct": 0.0,
                     "pnl_usdt": 0.0,
+                    "decision_id": decision_id,
                     **signal,
                 }
                 self._update_pnl(trade, float(snapshot.bid if side == "LONG" else snapshot.ask))
                 trade["open_card"] = self._card(trade, "open")
                 trade["latest_card"] = trade["open_card"]
                 self.state["trades"].append(trade)
-                self.state["seen_decisions"].append(signal["decision_id"])
+                self.state["seen_decisions"].append(signal["source_signal_id"])
                 opened.append(trade)
-                seen.add(signal["decision_id"])
                 open_symbols.add(symbol)
                 slots -= 1
                 self.save()
             except Exception as exc:
-                self.state["errors"].append({"timestamp_utc": self.now_fn().isoformat(), "symbol": symbol, "error": f"{type(exc).__name__}: {exc}"})
+                error = {"timestamp_utc": self.now_fn().isoformat(), "symbol": symbol, "error": f"{type(exc).__name__}: {exc}"}
+                scan["errors"].append(error)
+                self.state["errors"].append(error)
                 self.state["errors"] = self.state["errors"][-50:]
                 self.save()
+        scan["opened"] = len(opened)
+        self.state["last_scan"] = scan
+        self.state["risk_policy"] = policy.to_dict()
+        self.save()
         return opened
 
     def _update_pnl(self, trade: dict[str, Any], mark: float) -> None:

@@ -80,6 +80,11 @@ the current Data/Replay step finishes before the worker stops, preventing a
 partially written cache. Job history and logs are stored below
 `.freakto-runtime/control-center/jobs/` and are intentionally excluded from Git.
 
+The **Validation & Paper** tab also contains the isolated Showcase Risk Lab.
+Choose Precision, Balanced, or Rapid test, then start the detached worker. See
+[`Showcase Paper Risk Lab`](paper/SHOWCASE_RISK_LAB.md) for the exact admission,
+data-source, and safety semantics.
+
 ## Runtime state
 
 Mutable logs/history are excluded from the source branch. See

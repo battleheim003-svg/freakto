@@ -12,6 +12,7 @@ import streamlit.components.v1 as components
 from freakto.paper.campaign import ACTIVE as CAMPAIGN_ACTIVE
 from freakto.paper.campaign import campaign_status, start_campaign, stop_campaign
 from freakto.showcase_paper import list_showcase_trades, showcase_status, start_showcase, stop_showcase
+from freakto.showcase_paper.risk import risk_policy, session_preset
 from freakto.ui.automation import (
     ensure_scheduler_running,
     list_automations,
@@ -65,6 +66,7 @@ TEXT = {
         "showcase_disclaimer": "این معاملات فقط برای مشاهده رفتار سیستم‌اند و وارد Evidence رسمی Go-live نمی‌شوند.", "daily_limit": "حد معامله روزانه", "scan_interval": "فاصله بررسی (ثانیه)",
         "holding_minutes": "حداکثر زمان نگهداری (دقیقه)", "leverage": "اهرم نمایشی", "start_showcase": "روشن‌کردن Showcase", "stop_showcase": "خاموش‌کردن و بستن موقعیت‌ها",
         "open_positions": "موقعیت باز", "showcase_cards": "کارت‌های آخرین معاملات", "download_card": "دانلود کارت", "showcase_started": "Showcase Paper در پس‌زمینه روشن شد.", "showcase_stopping": "درخواست توقف ثبت شد؛ موقعیت‌ها با قیمت جاری بسته می‌شوند.",
+        "risk_management": "مدیریت ریسک تست", "risk_level": "ریسک‌پذیری (۰ دقیق تا ۱۰۰ اکتشافی)", "session_style": "نوع جلسه", "precision": "دقیق و محتاط", "balanced": "متعادل", "rapid_test": "تست سریع", "market_mode": "منبع اجرای تست", "live_public": "بازار عمومی زنده", "accelerated_replay": "Replay محلی شتاب‌یافته", "scan_activity": "فعالیت آخرین اسکن", "next_scan": "اسکن بعدی", "accepted_signals": "سیگنال پذیرفته", "rejected_signals": "علت‌های رد", "data_errors": "خطاهای اخیر داده", "risk_policy_note": "این کنترل فقط پذیرش فرصت در Showcase را تغییر می‌دهد و منطق موتور اصلی را دست‌کاری نمی‌کند.",
         "reports_title": "گزارش و تاریخچه", "reports_sub": "نتیجه روشن هر اجرا، مراحل موفق، نقطه توقف، Blockerها و لاگ کامل.",
         "refresh_reports": "تولید همه گزارش‌ها", "readiness": "گزارش آمادگی", "blockers": "موانع", "gates": "گیت‌ها", "job_history": "تاریخچه Jobها",
         "select_job": "انتخاب Job", "retry": "اجرای مجدد", "log": "لاگ فنی", "step_results": "نتیجه مراحل", "result": "نتیجه", "duration": "مدت", "current": "مقدار فعلی", "required": "حد لازم", "schedules": "زمان‌بندی",
@@ -105,6 +107,7 @@ TEXT = {
         "showcase_disclaimer": "These trades are for observing system behavior only and never enter official Go-live evidence.", "daily_limit": "Daily trade limit", "scan_interval": "Scan interval (seconds)",
         "holding_minutes": "Maximum holding time (minutes)", "leverage": "Display leverage", "start_showcase": "Enable Showcase", "stop_showcase": "Disable and close positions",
         "open_positions": "Open positions", "showcase_cards": "Latest trade cards", "download_card": "Download card", "showcase_started": "Showcase Paper started in the background.", "showcase_stopping": "Stop requested; positions will close at current prices.",
+        "risk_management": "Test risk management", "risk_level": "Risk tolerance (0 precision to 100 exploratory)", "session_style": "Session style", "precision": "Precision", "balanced": "Balanced", "rapid_test": "Rapid test", "market_mode": "Test execution source", "live_public": "Live public market", "accelerated_replay": "Accelerated local Replay", "scan_activity": "Latest scan activity", "next_scan": "Next scan", "accepted_signals": "Accepted signals", "rejected_signals": "Rejection reasons", "data_errors": "Recent data errors", "risk_policy_note": "This control changes Showcase admission only and never modifies the core engine logic.",
         "reports_title": "Reports & history", "reports_sub": "A clear result for every run: passed steps, stop point, blockers, and full logs.",
         "refresh_reports": "Generate all reports", "readiness": "Readiness report", "blockers": "Blockers", "gates": "Gates", "job_history": "Job history",
         "select_job": "Select job", "retry": "Retry", "log": "Technical log", "step_results": "Step results", "result": "Result", "duration": "Duration", "current": "Current", "required": "Required", "schedules": "schedules",
@@ -510,25 +513,62 @@ elif page == "workflows":
             st.warning(t("showcase_disclaimer"))
             showcase_active = showcase.get("status") in {"STARTING", "RUNNING", "STOP_REQUESTED"}
             showcase_settings = dict(showcase.get("settings") or {})
-            settings_cols = st.columns(4)
-            with settings_cols[0]:
-                daily_limit = st.number_input(t("daily_limit"), min_value=1, max_value=30, value=int(showcase_settings.get("daily_trade_limit", 6)), disabled=showcase_active)
-            with settings_cols[1]:
-                scan_interval = st.number_input(t("scan_interval"), min_value=60, max_value=3600, value=int(showcase_settings.get("scan_interval_seconds", 300)), step=60, disabled=showcase_active)
-            with settings_cols[2]:
-                holding_minutes = st.number_input(t("holding_minutes"), min_value=5, max_value=1440, value=int(showcase_settings.get("maximum_holding_minutes", 60)), step=5, disabled=showcase_active)
-            with settings_cols[3]:
-                leverage = st.number_input(t("leverage"), min_value=1.0, max_value=5.0, value=float(showcase_settings.get("leverage", 1.0)), step=0.5, disabled=showcase_active)
-            showcase_metrics = st.columns(4)
+            section_intro(t("risk_management"), t("risk_policy_note"))
+            preset_names = {"PRECISION": t("precision"), "BALANCED": t("balanced"), "RAPID_TEST": t("rapid_test")}
+            preset_key = st.selectbox(
+                t("session_style"),
+                ["RAPID_TEST", "BALANCED", "PRECISION"],
+                format_func=lambda value: preset_names[value],
+                disabled=showcase_active,
+                key="showcase-session-style",
+            )
+            preset = session_preset(preset_key)
+            primary_settings = st.columns([1.4, 1])
+            with primary_settings[0]:
+                risk_level = st.slider(
+                    t("risk_level"), min_value=0, max_value=100,
+                    value=int(showcase_settings.get("risk_level", preset.risk_level)) if showcase_active else preset.risk_level,
+                    step=5, disabled=showcase_active, key=f"showcase-risk-{preset_key}",
+                )
+            with primary_settings[1]:
+                mode_values = ["ACCELERATED_REPLAY", "LIVE_PUBLIC"]
+                mode_labels = {"ACCELERATED_REPLAY": t("accelerated_replay"), "LIVE_PUBLIC": t("live_public")}
+                selected_mode = str(showcase_settings.get("market_mode", preset.market_mode)) if showcase_active else preset.market_mode
+                market_mode = st.selectbox(
+                    t("market_mode"), mode_values, index=mode_values.index(selected_mode),
+                    format_func=lambda value: mode_labels[value], disabled=showcase_active,
+                    key=f"showcase-mode-{preset_key}",
+                )
+            policy = risk_policy(risk_level)
+            st.caption(
+                f'{policy.key} · Score ≥ {policy.minimum_score} · Confidence ≥ {policy.minimum_confidence}% · '
+                f'Max positions {policy.maximum_open_positions} · Cooldown {policy.reentry_cooldown_minutes}m'
+            )
+            with st.expander(t("advanced")):
+                settings_cols = st.columns(4)
+                with settings_cols[0]:
+                    daily_limit = st.number_input(t("daily_limit"), min_value=1, max_value=30, value=int(showcase_settings.get("daily_trade_limit", preset.daily_trade_limit)) if showcase_active else preset.daily_trade_limit, disabled=showcase_active, key=f"showcase-limit-{preset_key}")
+                with settings_cols[1]:
+                    scan_interval = st.number_input(t("scan_interval"), min_value=5, max_value=3600, value=int(showcase_settings.get("scan_interval_seconds", preset.scan_interval_seconds)) if showcase_active else preset.scan_interval_seconds, step=5, disabled=showcase_active, key=f"showcase-scan-{preset_key}")
+                with settings_cols[2]:
+                    holding_minutes = st.number_input(t("holding_minutes"), min_value=1, max_value=1440, value=int(showcase_settings.get("maximum_holding_minutes", preset.maximum_holding_minutes)) if showcase_active else preset.maximum_holding_minutes, step=1, disabled=showcase_active, key=f"showcase-hold-{preset_key}")
+                with settings_cols[3]:
+                    leverage = st.number_input(t("leverage"), min_value=1.0, max_value=5.0, value=float(showcase_settings.get("leverage", preset.leverage)) if showcase_active else preset.leverage, step=0.5, disabled=showcase_active, key=f"showcase-leverage-{preset_key}")
+            showcase_metrics = st.columns(5)
             showcase_metrics[0].metric(t("system_health"), status_label(showcase.get("status") or "STOPPED"))
             showcase_metrics[1].metric(t("open_positions"), showcase.get("open_trades", 0))
             showcase_metrics[2].metric(t("trades"), showcase.get("closed_trades", 0))
-            showcase_metrics[3].metric(t("latest_result"), showcase.get("total_trades", 0))
+            showcase_metrics[3].metric(t("accepted_signals"), (showcase.get("last_scan") or {}).get("accepted", 0))
+            showcase_metrics[4].metric(t("next_scan"), format_time(showcase.get("next_scan_utc")))
             control_cols = st.columns(3)
             with control_cols[0]:
                 if st.button("▶ " + t("start_showcase"), type="primary", use_container_width=True, disabled=showcase_active):
                     try:
-                        start_showcase(daily_trade_limit=int(daily_limit), scan_interval_seconds=int(scan_interval), maximum_holding_minutes=int(holding_minutes), leverage=float(leverage))
+                        start_showcase(
+                            daily_trade_limit=int(daily_limit), scan_interval_seconds=int(scan_interval),
+                            maximum_holding_minutes=int(holding_minutes), leverage=float(leverage),
+                            risk_level=int(risk_level), market_mode=str(market_mode),
+                        )
                         st.success(t("showcase_started")); st.rerun()
                     except (RuntimeError, ValueError) as exc:
                         st.error(str(exc))
@@ -543,6 +583,19 @@ elif page == "workflows":
                     st.rerun()
             if showcase_active:
                 components.html("<script>setTimeout(function(){window.parent.location.reload();}, 10000);</script>", height=0)
+            last_scan = dict(showcase.get("last_scan") or {})
+            if last_scan:
+                with st.expander(t("scan_activity"), expanded=bool(last_scan.get("errors"))):
+                    st.write(
+                        f'{t("accepted_signals")}: {last_scan.get("accepted", 0)}/{last_scan.get("evaluated", 0)} · '
+                        f'Opened: {last_scan.get("opened", 0)} · Mode: {last_scan.get("market_mode", "—")}'
+                    )
+                    rejected = dict(last_scan.get("rejected") or {})
+                    if rejected:
+                        st.write(t("rejected_signals") + ": " + " · ".join(f"{key}={value}" for key, value in rejected.items()))
+                    errors = list(last_scan.get("errors") or [])
+                    if errors:
+                        st.error(t("data_errors") + ": " + " | ".join(str(item.get("error")) for item in errors[-3:]))
             card_paths = [Path(str(trade.get("latest_card"))) for trade in showcase_trades[:4] if trade.get("latest_card")]
             card_paths = [path for path in card_paths if path.is_file()]
             if card_paths:

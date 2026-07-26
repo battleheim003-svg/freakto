@@ -10,6 +10,8 @@ from PIL import Image
 from freakto.showcase_paper import controller
 from freakto.showcase_paper.card import HEIGHT, WIDTH, render_trade_card
 from freakto.showcase_paper.engine import ShowcaseEngine, ShowcaseSettings
+from freakto.showcase_paper.replay_lab import AcceleratedReplayMarket
+from freakto.showcase_paper.risk import admission_reason, risk_policy, session_preset
 
 
 class FakeMarketData:
@@ -90,14 +92,71 @@ def test_showcase_controller_forces_all_live_flags_off(monkeypatch, tmp_path):
         pid = 7711
 
     monkeypatch.setattr(controller.subprocess, "Popen", lambda command, **kwargs: called.update(command=command, kwargs=kwargs) or Process())
-    state = controller.start_showcase(root=tmp_path, daily_trade_limit=4, scan_interval_seconds=60, maximum_holding_minutes=30, leverage=2)
+    state = controller.start_showcase(root=tmp_path, daily_trade_limit=4, scan_interval_seconds=60, maximum_holding_minutes=30, leverage=2, risk_level=70, market_mode="ACCELERATED_REPLAY")
     assert state["pid"] == 7711
     assert state["official_evidence_eligible"] is False
     assert called["kwargs"]["env"]["LIVE_TRADING_ENABLED"] == "false"
     assert called["kwargs"]["env"]["REAL_CAPITAL_ENABLED"] == "false"
     assert called["kwargs"]["env"]["LIVE_DEMO_EXECUTION_ENABLED"] == "false"
+    assert "--risk-level" in called["command"]
+    assert "ACCELERATED_REPLAY" in called["command"]
 
 
 def test_showcase_settings_reject_excessive_display_leverage():
     with pytest.raises(ValueError, match="leverage"):
         ShowcaseSettings(leverage=20).validated()
+
+
+def test_risk_zero_is_strict_and_higher_risk_widens_admission():
+    candidate = {"side": "LONG", "score": 62, "confidence": 58, "recommendation": "WATCHLIST"}
+    assert admission_reason(candidate, risk_policy(0)) is not None
+    assert admission_reason(candidate, risk_policy(70)) is None
+    assert risk_policy(0).maximum_open_positions < risk_policy(100).maximum_open_positions
+
+
+def test_rapid_preset_is_short_and_uses_accelerated_replay():
+    preset = session_preset("RAPID_TEST")
+    assert preset.scan_interval_seconds == 15
+    assert preset.maximum_holding_minutes == 5
+    assert preset.market_mode == "ACCELERATED_REPLAY"
+
+
+def test_showcase_reports_risk_rejections(tmp_path):
+    weak_signal = lambda _symbol: SimpleNamespace(
+        side="LONG", decision_timestamp="2026-07-26T00:00:00+00:00",
+        score=55, confidence=51, recommendation="WATCHLIST", regime="RANGE",
+    )
+    engine = ShowcaseEngine(
+        tmp_path,
+        ShowcaseSettings(symbols=("BTC/USDT",), risk_level=0),
+        FakeMarketData({"BTC/USDT": 100}),
+        weak_signal,
+    )
+    assert engine.open_available() == []
+    assert engine.state["last_scan"]["rejected"]["SCORE_BELOW_POLICY"] == 1
+
+
+def test_accelerated_replay_advances_local_market_without_network(tmp_path):
+    data_dir = tmp_path / "data" / "market_replay" / "4h"
+    data_dir.mkdir(parents=True)
+    rows = []
+    start = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    for index in range(50):
+        price = 100 + index
+        rows.append({
+            "timestamp": (start + timedelta(hours=4 * index)).isoformat(),
+            "open": price - 1, "high": price + 1, "low": price - 2,
+            "close": price, "volume": 1000, "provider": "test",
+        })
+    import pandas as pd
+    pd.DataFrame(rows).to_csv(data_dir / "BTC_USDT.csv.gz", index=False, compression="gzip")
+
+    replay = AcceleratedReplayMarket(tmp_path, ("BTC/USDT",))
+    first = replay.fetch_snapshot("BTC/USDT").last
+    signal_item = replay.signal("BTC/USDT")
+    replay.advance()
+    second = replay.fetch_snapshot("BTC/USDT").last
+
+    assert signal_item.side == "LONG"
+    assert signal_item.regime == "ACCELERATED_REPLAY"
+    assert second > first

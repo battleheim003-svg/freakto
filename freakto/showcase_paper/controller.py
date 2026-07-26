@@ -53,6 +53,9 @@ def showcase_status(root: Path = ROOT) -> dict[str, Any]:
         official_evidence_eligible=False,
         live_orders_enabled=False,
         real_capital_enabled=False,
+        last_scan=dict(session.get("last_scan") or {}),
+        recent_errors=list(session.get("errors") or [])[-5:],
+        risk_policy=dict(session.get("risk_policy") or {}),
     )
     return state
 
@@ -68,11 +71,20 @@ def start_showcase(
     scan_interval_seconds: int = 300,
     maximum_holding_minutes: int = 60,
     leverage: float = 1.0,
+    risk_level: int = 35,
+    market_mode: str = "LIVE_PUBLIC",
     root: Path = ROOT,
 ) -> dict[str, Any]:
     current = showcase_status(root)
     if current.get("status") in {"STARTING", "RUNNING", "STOP_REQUESTED"}:
         raise RuntimeError(f"Showcase Paper is already active (PID {current.get('pid')})")
+    normalized_mode = str(market_mode).upper()
+    if not 0 <= int(risk_level) <= 100:
+        raise ValueError("risk_level must stay between 0 and 100")
+    if normalized_mode not in {"LIVE_PUBLIC", "ACCELERATED_REPLAY"}:
+        raise ValueError("market_mode must be LIVE_PUBLIC or ACCELERATED_REPLAY")
+    if not 5 <= int(scan_interval_seconds) <= 3600:
+        raise ValueError("scan_interval_seconds must stay between 5 and 3,600")
     runtime = runtime_dir(root)
     runtime.mkdir(parents=True, exist_ok=True)
     (runtime / "stop.requested").unlink(missing_ok=True)
@@ -82,6 +94,8 @@ def start_showcase(
         "--scan-interval-seconds", str(int(scan_interval_seconds)),
         "--maximum-holding-minutes", str(int(maximum_holding_minutes)),
         "--leverage", str(float(leverage)),
+        "--risk-level", str(int(risk_level)),
+        "--market-mode", normalized_mode,
     ]
     environment = os.environ.copy()
     environment.update({"LIVE_TRADING_ENABLED": "false", "REAL_CAPITAL_ENABLED": "false", "LIVE_DEMO_EXECUTION_ENABLED": "false", "PYTHONUTF8": "1"})
@@ -97,6 +111,7 @@ def start_showcase(
         "settings": {
             "daily_trade_limit": int(daily_trade_limit), "scan_interval_seconds": int(scan_interval_seconds),
             "maximum_holding_minutes": int(maximum_holding_minutes), "leverage": float(leverage),
+            "risk_level": int(risk_level), "market_mode": normalized_mode,
         },
         "error": None,
         "live_orders_enabled": False,

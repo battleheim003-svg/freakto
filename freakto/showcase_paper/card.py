@@ -76,7 +76,8 @@ def render_trade_card(trade: dict[str, Any], output_path: str | Path, *, logo_pa
         logo.thumbnail((116, 116))
         image.paste(logo, (68, 62), logo)
     draw.text((205, 74), "FREAKTO", font=_font(48, bold=True), fill="#f4fbff")
-    draw.text((205, 132), "PAPER SHOWCASE", font=_font(22, bold=True), fill="#53dcd1")
+    market_mode = str(trade.get("market_mode", "LIVE_PUBLIC")).replace("_", " ")
+    draw.text((205, 132), f"PAPER SHOWCASE · {market_mode}", font=_font(19, bold=True), fill="#53dcd1")
     draw.text((WIDTH - 68, 86), str(trade.get("updated_utc") or trade.get("opened_utc") or "")[:19].replace("T", " "), font=_font(22), fill="#8aa1b0", anchor="ra")
 
     symbol = str(trade.get("symbol", "—")).replace("/", "")
@@ -102,6 +103,8 @@ def render_trade_card(trade: dict[str, Any], output_path: str | Path, *, logo_pa
         draw.text((68, y + 34), value, font=_font(37, bold=True), fill="#f4fbff")
 
     draw.rounded_rectangle((68, 1196, WIDTH - 68, 1275), radius=18, fill="#0b2b2a", outline="#23746b", width=2)
-    draw.text((WIDTH // 2, 1235), "SIMULATED · ZERO REAL CAPITAL · NOT GO-LIVE EVIDENCE", font=_font(20, bold=True), fill="#79e9d5", anchor="mm")
+    risk = int(trade.get("risk_level", 0) or 0)
+    draw.text((WIDTH // 2, 1226), f"SIMULATED · RISK TEST {risk}/100 · ZERO REAL CAPITAL", font=_font(19, bold=True), fill="#79e9d5", anchor="mm")
+    draw.text((WIDTH // 2, 1253), "NOT GO-LIVE EVIDENCE", font=_font(17, bold=True), fill="#79e9d5", anchor="mm")
     image.save(path, format="PNG", optimize=True)
     return path
