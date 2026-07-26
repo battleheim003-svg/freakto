@@ -1,0 +1,32 @@
+{
+  "status": "FORWARD_TEST_COLLECTING",
+  "complete_evaluations": 111,
+  "closed_paper_trades": 0,
+  "open_paper_trades": 0,
+  "total_paper_trades": 0,
+  "regime_labeled_samples": 61,
+  "unknown_regime_samples": 50,
+  "distinct_symbols_evaluated": 1,
+  "distinct_symbols_scanned": 6,
+  "forward_run_count": 84,
+  "successful_run_count": 82,
+  "first_run_utc": "2026-07-05T17:39:28.376869+00:00",
+  "last_run_utc": "2026-07-26T15:48:37.275354+00:00",
+  "forward_days_observed": 22,
+  "readiness_level": "RESEARCH_ONLY",
+  "paper_ready": false,
+  "live_ready": false,
+  "progress_score": 71,
+  "notes": [
+    "Complete evaluations به حد پایه Forward Test رسیده است.",
+    "Regime-labeled samples برای تحلیل اولیه کافی است."
+  ],
+  "blockers": [
+    "Closed paper trades کمتر از 30 است: 0",
+    "روزهای Forward Test کمتر از 30 است: 22"
+  ],
+  "next_actions": [
+    "اجرای portfolio_scanner.py --paper تا فقط فرصت‌های مجاز Paper ثبت شوند.",
+    "این چرخه را روزانه یا هر کندل 4h اجرا کن تا حداقل 30 روز داده Forward جمع شود."
+  ]
+}
