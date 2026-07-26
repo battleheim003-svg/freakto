@@ -12,7 +12,7 @@ from freakto.showcase_paper.controller import output_dir, runtime_dir, showcase_
 from freakto.showcase_paper.engine import ShowcaseEngine, ShowcaseSettings
 from freakto.showcase_paper.live_intraday import LiveIntradayTechnicalMarket
 from freakto.showcase_paper.performance import performance_report
-from freakto.showcase_paper.quality import quality_profile
+from freakto.showcase_paper.quality import quality_profile, runbook_alignment
 from freakto.showcase_paper.replay_lab import AcceleratedReplayMarket
 from freakto.showcase_paper.risk import risk_policy
 
@@ -20,7 +20,13 @@ from freakto.showcase_paper.risk import risk_policy
 def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds: int) -> int:
     runtime = runtime_dir(root)
     state = showcase_status(root)
-    state.update(status="RUNNING", pid=os.getpid(), heartbeat_utc=datetime.now(timezone.utc).isoformat(), error=None)
+    state.update(
+        status="RUNNING", pid=os.getpid(), heartbeat_utc=datetime.now(timezone.utc).isoformat(), error=None,
+        runbook_alignment=runbook_alignment(
+            quality_mode=settings.quality_mode, risk_level=settings.risk_level, analysis_depth=settings.analysis_depth,
+        ),
+    )
+    state["runbook_aligned"] = bool(state["runbook_alignment"]["runbook_aligned"])
     write_worker_state(state, root)
     replay_market = None
     if settings.market_mode == "ACCELERATED_REPLAY":
@@ -142,8 +148,9 @@ def main() -> int:
     parser.add_argument("--session-profit-target-pct", type=float)
     parser.add_argument("--session-loss-limit-pct", type=float)
     parser.add_argument("--market-mode", choices=("LIVE_PUBLIC", "ACCELERATED_REPLAY"), default="LIVE_PUBLIC")
-    parser.add_argument("--quality-mode", choices=("VOLUME", "BALANCED", "WIN_RATE"), default="BALANCED")
+    parser.add_argument("--quality-mode", choices=("VOLUME", "BALANCED", "WIN_RATE"), default="WIN_RATE")
     parser.add_argument("--replay-timeframe", choices=("AUTO", "15m", "1h", "4h"), default="AUTO")
+    parser.add_argument("--break-even-trigger-r", type=float, default=0.75)
     args = parser.parse_args()
     policy = risk_policy(args.risk_level)
     quality = quality_profile(args.quality_mode)
@@ -161,6 +168,7 @@ def main() -> int:
         market_mode=args.market_mode,
         quality_mode=quality.key,
         replay_timeframe=args.replay_timeframe,
+        break_even_trigger_r=args.break_even_trigger_r,
         session_equity_usdt=args.session_equity_usdt,
         session_profit_target_pct=(policy.session_profit_target_pct if args.session_profit_target_pct is None else args.session_profit_target_pct),
         session_loss_limit_pct=(policy.session_loss_limit_pct if args.session_loss_limit_pct is None else args.session_loss_limit_pct),

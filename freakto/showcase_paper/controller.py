@@ -13,7 +13,7 @@ from typing import Any
 
 from freakto.showcase_paper.risk import risk_policy
 from freakto.showcase_paper.performance import performance_report
-from freakto.showcase_paper.quality import quality_profile
+from freakto.showcase_paper.quality import maturity_report, quality_profile, runbook_alignment
 from freakto.ui.control_center_state import ROOT
 from freakto.ui.job_manager import pid_alive
 
@@ -67,7 +67,25 @@ def showcase_status(root: Path = ROOT) -> dict[str, Any]:
         session_guard=dict(session.get("session_guard") or {}),
     )
     baseline = int((session.get("session_guard") or {}).get("baseline_closed_trades", 0) or 0)
-    state.setdefault("performance", performance_report(trades, session_baseline=baseline))
+    settings = dict(session.get("settings") or state.get("settings") or {})
+    alignment = runbook_alignment(
+        quality_mode=str(settings.get("quality_mode", "WIN_RATE")),
+        risk_level=int(settings.get("risk_level", 30) or 30),
+        analysis_depth=int(settings.get("analysis_depth", 100) or 100),
+    )
+    state["runbook_alignment"] = alignment
+    state["runbook_aligned"] = bool(alignment["runbook_aligned"])
+    maturity_profiles = {
+        key: maturity_report(trades, profile_key=key, session_baseline=baseline)
+        for key in ("WIN_RATE", "BALANCED", "VOLUME")
+    }
+    state["quality_maturity_profiles"] = maturity_profiles
+    state["quality_maturity"] = maturity_profiles.get(
+        str(settings.get("quality_mode", "WIN_RATE")).upper(), maturity_profiles["WIN_RATE"],
+    )
+    # Rebuild read-only diagnostics from the current session on every status
+    # read so worker states written by an older version cannot hide new fields.
+    state["performance"] = performance_report(trades, session_baseline=baseline)
     return state
 
 
@@ -88,8 +106,9 @@ def start_showcase(
     session_profit_target_pct: float | None = None,
     session_loss_limit_pct: float | None = None,
     market_mode: str = "LIVE_PUBLIC",
-    quality_mode: str = "BALANCED",
+    quality_mode: str = "WIN_RATE",
     replay_timeframe: str = "AUTO",
+    break_even_trigger_r: float = 0.75,
     root: Path = ROOT,
 ) -> dict[str, Any]:
     current = showcase_status(root)
@@ -112,8 +131,8 @@ def start_showcase(
         raise ValueError("market_mode must be LIVE_PUBLIC or ACCELERATED_REPLAY")
     if str(replay_timeframe).upper() not in {"AUTO", "15M", "1H", "4H"}:
         raise ValueError("replay_timeframe must be AUTO, 15m, 1h, or 4h")
-    if str(replay_timeframe).upper() not in {"AUTO", "15M", "1H", "4H"}:
-        raise ValueError("replay_timeframe must be AUTO, 15m, 1h, or 4h")
+    if not 0 <= float(break_even_trigger_r) <= 3:
+        raise ValueError("break_even_trigger_r must stay between 0 and 3")
     if not 5 <= int(scan_interval_seconds) <= 3600:
         raise ValueError("scan_interval_seconds must stay between 5 and 3,600")
     runtime = runtime_dir(root)
@@ -133,11 +152,15 @@ def start_showcase(
         "--market-mode", normalized_mode,
         "--quality-mode", quality.key,
         "--replay-timeframe", str(replay_timeframe),
+        "--break-even-trigger-r", str(float(break_even_trigger_r)),
     ]
     environment = os.environ.copy()
     environment.update({"LIVE_TRADING_ENABLED": "false", "REAL_CAPITAL_ENABLED": "false", "LIVE_DEMO_EXECUTION_ENABLED": "false", "PYTHONUTF8": "1"})
     with (runtime / "worker.stdout.log").open("a", encoding="utf-8") as stdout, (runtime / "worker.stderr.log").open("a", encoding="utf-8") as stderr:
         process = subprocess.Popen(command, cwd=root, env=environment, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    alignment = runbook_alignment(
+        quality_mode=quality.key, risk_level=int(risk_level), analysis_depth=int(analysis_depth),
+    )
     state = {
         "schema_version": 1,
         "status": "STARTING",
@@ -150,12 +173,15 @@ def start_showcase(
             "maximum_holding_minutes": int(maximum_holding_minutes), "leverage": float(leverage),
             "risk_level": int(risk_level), "analysis_depth": int(analysis_depth), "market_mode": normalized_mode,
             "quality_mode": quality.key, "replay_timeframe": str(replay_timeframe),
+            "break_even_trigger_r": float(break_even_trigger_r),
             "session_equity_usdt": float(session_equity_usdt),
             "session_profit_target_pct": profit_target,
             "session_loss_limit_pct": loss_limit,
             "minimum_closed_trades_for_profit_stop": policy.minimum_closed_trades_for_profit_stop,
         },
         "error": None,
+        "runbook_alignment": alignment,
+        "runbook_aligned": bool(alignment["runbook_aligned"]),
         "live_orders_enabled": False,
         "real_capital_enabled": False,
         "official_evidence_eligible": False,

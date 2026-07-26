@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
@@ -11,10 +12,22 @@ from freakto.showcase_paper import controller
 from freakto.showcase_paper import live_intraday
 from freakto.showcase_paper.card import HEIGHT, WIDTH, render_trade_card
 from freakto.showcase_paper.engine import ShowcaseEngine, ShowcaseSettings
-from freakto.showcase_paper.performance import performance_summary, walk_forward_quality_comparison
-from freakto.showcase_paper.quality import quality_admission_reason, quality_profile
+from freakto.showcase_paper.performance import (
+    compare_quality_profiles,
+    losing_trade_mfe_distribution,
+    performance_summary,
+    walk_forward_quality_comparison,
+)
+from freakto.showcase_paper.performance_cli import main as performance_cli_main
+from freakto.showcase_paper.quality import (
+    maturity_report,
+    quality_admission_reason,
+    quality_profile,
+    runbook_alignment,
+)
 from freakto.showcase_paper.replay_lab import AcceleratedReplayMarket
 from freakto.showcase_paper.risk import admission_reason, risk_policy, session_preset
+from freakto.showcase_paper import technical as showcase_technical
 
 
 class FakeMarketData:
@@ -129,7 +142,9 @@ def test_showcase_controller_forces_all_live_flags_off(monkeypatch, tmp_path):
     assert "--risk-level" in called["command"]
     assert "--quality-mode" in called["command"]
     assert "--replay-timeframe" in called["command"]
+    assert "--break-even-trigger-r" in called["command"]
     assert "ACCELERATED_REPLAY" in called["command"]
+    assert state["runbook_aligned"] is False
 
 
 def test_controller_state_writes_use_collision_safe_temporary_files(tmp_path):
@@ -139,6 +154,28 @@ def test_controller_state_writes_use_collision_safe_temporary_files(tmp_path):
     import json
     assert json.loads(path.read_text(encoding="utf-8"))["status"] == "STOPPED"
     assert list(path.parent.glob("*.tmp")) == []
+
+
+def test_controller_status_rebuilds_diagnostics_for_every_quality_profile(tmp_path):
+    controller._write(
+        controller.runtime_dir(tmp_path) / "worker.json",
+        {"status": "STOPPED", "settings": {"quality_mode": "VOLUME"}, "performance": {"legacy": True}},
+    )
+    controller._write(
+        controller.output_dir(tmp_path) / "session.json",
+        {
+            "trades": [_quality_trade(index) for index in range(12)],
+            "session_guard": {"baseline_closed_trades": 0},
+        },
+    )
+
+    state = controller.showcase_status(tmp_path)
+
+    assert state["quality_maturity"]["profile"] == "VOLUME"
+    assert state["quality_maturity_profiles"]["WIN_RATE"]["side"]["LONG"]["minimum_samples"] == 40
+    assert state["quality_maturity_profiles"]["BALANCED"]["side"]["SHORT"]["minimum_samples"] == 50
+    assert "legacy" not in state["performance"]
+    assert "losing_trade_mfe" in state["performance"]
 
 
 def test_showcase_settings_reject_excessive_display_leverage():
@@ -299,6 +336,8 @@ def test_win_rate_quality_gate_quarantines_mature_weak_symbol_side_bucket():
     assert reason == "QUALITY_SYMBOL_SIDE_QUARANTINE"
     assert diagnostics["symbol_side"]["samples"] == 10
     assert diagnostics["symbol_side"]["win_rate"] == pytest.approx(0.2)
+    assert diagnostics["maturity"]["bucket_samples_needed"] == 0
+    assert diagnostics["maturity"]["side_samples_needed"] == 30
 
 
 def test_healthy_exact_bucket_can_override_a_weak_global_side():
@@ -318,6 +357,96 @@ def test_quality_walk_forward_comparison_never_uses_future_outcomes():
     assert report["official_evidence_eligible"] is False
     assert report["candidate"]["samples"] < report["baseline"]["samples"]
     assert performance_summary(rows)["profit_factor"] < 1
+
+
+def test_multi_profile_walk_forward_has_segmented_rejections():
+    rows = [_quality_trade(index, pnl=1.0 if index < 2 else -1.0) for index in range(15)]
+    report = compare_quality_profiles(rows, profile_keys=("BALANCED", "WIN_RATE"))
+    assert set(report["profiles"]) == {"BALANCED", "WIN_RATE"}
+    assert report["profiles"]["WIN_RATE"]["rejections_by_symbol_side"]
+    segment = report["profiles"]["WIN_RATE"]["rejections_by_symbol_side"][0]
+    assert segment["symbol"] == "BTC/USDT"
+    assert segment["side"] == "LONG"
+
+
+def test_performance_cli_reads_a_stopped_session_without_worker(tmp_path, capsys):
+    session = tmp_path / "session.json"
+    session.write_text(json.dumps({"trades": [_quality_trade(index) for index in range(12)]}), encoding="utf-8")
+    assert performance_cli_main(["--session", str(session), "--profiles", "BALANCED", "WIN_RATE"]) == 0
+    output = capsys.readouterr().out
+    assert "Showcase causal quality comparison" in output
+    assert "BALANCED" in output and "WIN_RATE" in output
+    assert "LIVE ORDERS: OFF" in output
+
+
+def test_runbook_alignment_and_session_maturity_are_explicit():
+    assert runbook_alignment(quality_mode="WIN_RATE", risk_level=30, analysis_depth=100)["runbook_aligned"] is True
+    assert runbook_alignment(quality_mode="VOLUME", risk_level=100, analysis_depth=100)["runbook_aligned"] is False
+    report = maturity_report([_quality_trade(index) for index in range(8)], session_baseline=0)
+    assert report["session"] == {
+        "organic_closed_trades": 8, "minimum_samples": 50, "samples_needed": 42, "mature": False,
+    }
+
+
+@pytest.mark.parametrize("risk_level,indicator_count", [(0, 3), (35, 6), (70, 10), (100, 12)])
+def test_legacy_confluence_counts_neutral_votes_and_enforces_breadth(monkeypatch, risk_level, indicator_count):
+    import pandas as pd
+
+    policy = risk_policy(risk_level)
+    votes = {name: ("LONG" if index == 0 else "NEUTRAL") for index, name in enumerate(policy.technical_indicators)}
+    monkeypatch.setattr(showcase_technical, "technical_votes", lambda _window, _policy: votes)
+    frame = pd.DataFrame({
+        "open": [100 + index for index in range(40)], "high": [101 + index for index in range(40)],
+        "low": [99 + index for index in range(40)], "close": [100.5 + index for index in range(40)],
+        "volume": [1000] * 40,
+    })
+    item = showcase_technical.build_technical_signal(frame, policy, timestamp="2026-07-26T00:00:00Z", regime="RANGE", provider="test")
+    assert len(item.indicator_votes) == indicator_count
+    assert item.technical_confluence_pct == round(100 / indicator_count)
+    assert item.directional_agreement_pct == 100
+    assert item.breadth_minimum == (indicator_count + 1) // 2
+    assert item.breadth_sufficient is False
+    assert item.recommendation == "MONITOR"
+
+
+def test_legacy_neutral_signal_is_not_directional_and_atr_geometry_has_safe_fallback(monkeypatch):
+    import pandas as pd
+
+    policy = risk_policy(35)
+    neutral_votes = {name: "NEUTRAL" for name in policy.technical_indicators}
+    monkeypatch.setattr(showcase_technical, "technical_votes", lambda _window, _policy: neutral_votes)
+    flat = pd.DataFrame({"open": [100] * 40, "high": [100] * 40, "low": [100] * 40, "close": [100] * 40, "volume": [0] * 40})
+    neutral = showcase_technical.build_technical_signal(flat, policy, timestamp="t", regime="RANGE", provider="test")
+    assert neutral.side == "NEUTRAL"
+    assert neutral.trade_geometry == {}
+    assert admission_reason(vars(neutral), policy) == "NOT_DIRECTIONAL"
+
+    long_votes = {name: "LONG" for name in policy.technical_indicators}
+    monkeypatch.setattr(showcase_technical, "technical_votes", lambda _window, _policy: long_votes)
+    moving = pd.DataFrame({
+        "open": [100 + index for index in range(40)], "high": [102 + index for index in range(40)],
+        "low": [99 + index for index in range(40)], "close": [101 + index for index in range(40)],
+        "volume": [1000] * 40,
+    })
+    directional = showcase_technical.build_technical_signal(moving, policy, timestamp="t", regime="UPTREND", provider="test")
+    geometry = directional.trade_geometry
+    assert geometry["source"] == "SHOWCASE_ATR_RESEARCH_V1"
+    assert geometry["expiry_bars"] == 36
+    assert (geometry["entry"] - geometry["stop"]) / geometry["atr_value"] == pytest.approx(1.2)
+    assert (geometry["target"] - geometry["entry"]) / geometry["atr_value"] == pytest.approx(1.8)
+
+
+def test_losing_trade_mfe_requires_50_samples_before_calibration():
+    immature = losing_trade_mfe_distribution([
+        {**_quality_trade(index), "mfe_r": index / 100} for index in range(10)
+    ])
+    assert immature["calibration"]["status"] == "INSUFFICIENT_SAMPLES"
+    assert immature["calibration"]["recommended_break_even_trigger_r"] is None
+    mature = losing_trade_mfe_distribution([
+        {**_quality_trade(index), "mfe_r": 0.40 + (index % 5) * 0.01} for index in range(50)
+    ])
+    assert mature["calibration"]["status"] == "READY_FOR_REVIEW"
+    assert 0.25 <= mature["calibration"]["recommended_break_even_trigger_r"] < 0.75
 
 
 def test_replay_ohlc_barrier_uses_conservative_stop_first_fill(tmp_path):
@@ -364,11 +493,13 @@ def test_break_even_is_armed_on_close_and_applies_from_next_bar(tmp_path):
     clock["now"] += timedelta(minutes=1)
     assert engine.mark_and_close() == []
     assert trade["break_even_armed"] is True
+    assert trade["max_favorable_r"] > 0.5
     bar.update(index=2, open=100.3, high=100.4, low=100.1, close=100.2)
     clock["now"] += timedelta(minutes=1)
     closed = engine.mark_and_close()[0]
     assert closed["close_reason"] == "BREAK_EVEN"
     assert abs(closed["pnl_pct"]) < 0.01
+    assert closed["mfe_r"] == closed["max_favorable_r"]
 
 
 def test_strong_opposite_signal_closes_an_invalidated_position(tmp_path):
@@ -413,5 +544,7 @@ def test_live_intraday_mode_uses_full_technical_stack(monkeypatch):
 
     assert item.regime == "UPTREND"
     assert len(item.indicators_used) == 12
-    assert item.technical_confluence_pct >= 50
+    assert item.technical_confluence_pct == item.technical_participation_pct
+    assert item.directional_agreement_pct >= item.technical_confluence_pct
+    assert item.breadth_minimum == 6
     assert snapshot.provider == "fixture"

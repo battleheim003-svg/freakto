@@ -106,6 +106,9 @@ def test_showcase_exposes_quality_profile_and_fail_closed_performance_report():
     assert '"quality_test": "تست کیفیت و Win rate"' in source
     assert '"quality_not_promoted"' in source
     assert 'float(candidate.get("profit_factor", 0) or 0) <= 1' in source
+    assert '"runbook_aligned"' in source
+    assert '"evidence_collecting"' in source
+    assert '"mfe_calibration"' in source
 
 
 def test_quick_start_plan_is_ordered_and_ends_with_review_only_gate():

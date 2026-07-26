@@ -14,7 +14,7 @@ from PIL import Image, UnidentifiedImageError
 from freakto.paper.campaign import ACTIVE as CAMPAIGN_ACTIVE
 from freakto.paper.campaign import campaign_status, start_campaign, stop_campaign
 from freakto.showcase_paper import list_showcase_trades, showcase_status, start_showcase, stop_showcase
-from freakto.showcase_paper.quality import quality_profile
+from freakto.showcase_paper.quality import quality_profile, runbook_alignment
 from freakto.showcase_paper.risk import risk_policy, session_preset
 from freakto.ui.automation import (
     ensure_scheduler_running,
@@ -73,6 +73,7 @@ TEXT = {
         "unlimited_trades": "معاملات session نامحدود", "analysis_depth": "عمق تحلیل", "analysis_depth_control": "عمق تحلیل فنی (مستقل از ریسک)", "technical_tools": "ابزار تکنیکال فعال", "confluence": "همگرایی تکنیکال", "technical_v2_report": "گزارش Technical Engine v2", "market_regime": "رژیم بازار", "mtf_agreement": "هماهنگی چند تایم‌فریم", "trade_geometry": "هندسه معامله", "calibration_status": "وضعیت کالیبراسیون", "decision_drivers": "دلایل تصمیم", "decision_warnings": "هشدارها", "session_evaluation": "ارزیابی جلسه v2", "expectancy": "بازده موردانتظار", "sample_count": "حجم نمونه",
         "quality_mode": "پروفایل کیفیت معامله", "quality_win_rate": "تمرکز بر Win rate", "quality_balanced": "کیفیت متعادل", "quality_volume": "حجم معاملات اکتشافی", "replay_timeframe": "تایم‌فریم اجرای Replay", "performance_guard": "سلامت عملکرد جلسه", "profit_factor": "Profit Factor", "break_even_win_rate": "Win rate سربه‌سر", "quality_comparison": "مقایسه علّی Quality Gate", "quality_gate_note": "این گیت فقط از معاملات بسته‌شده پیش از هر تصمیم استفاده می‌کند و داده آینده را نمی‌بیند.",
         "quality_not_promoted": "Quality Gate هنوز PF بالاتر از ۱ و expectancy مثبت را ثابت نکرده است؛ فقط Research/Paper باقی می‌ماند.",
+        "runbook_aligned": "تنظیمات با معیار پیشنهادی Win-rate هم‌راستاست", "runbook_not_aligned": "این تنظیمات معیار پیشنهادی Win-rate نیست", "evidence_collecting": "در حال جمع‌آوری شواهد", "evidence_mature": "نمونه جلسه به حد اولیه رسیده است", "side_maturity": "بلوغ گیت جهت", "break_even_trigger": "آستانه فعال‌سازی Break-even (R)", "mfe_calibration": "کالیبراسیون Break-even با MFE بازنده‌ها",
         "reports_title": "گزارش و تاریخچه", "reports_sub": "نتیجه روشن هر اجرا، مراحل موفق، نقطه توقف، Blockerها و لاگ کامل.",
         "refresh_reports": "تولید همه گزارش‌ها", "readiness": "گزارش آمادگی", "blockers": "موانع", "gates": "گیت‌ها", "job_history": "تاریخچه Jobها",
         "select_job": "انتخاب Job", "retry": "اجرای مجدد", "log": "لاگ فنی", "step_results": "نتیجه مراحل", "result": "نتیجه", "duration": "مدت", "current": "مقدار فعلی", "required": "حد لازم", "schedules": "زمان‌بندی",
@@ -117,6 +118,7 @@ TEXT = {
         "unlimited_trades": "Unlimited session trades", "analysis_depth": "Analysis depth", "analysis_depth_control": "Technical analysis depth (independent of risk)", "technical_tools": "Active technical tools", "confluence": "Technical confluence", "technical_v2_report": "Technical Engine v2 report", "market_regime": "Market regime", "mtf_agreement": "Multi-timeframe agreement", "trade_geometry": "Trade geometry", "calibration_status": "Calibration status", "decision_drivers": "Decision drivers", "decision_warnings": "Warnings", "session_evaluation": "v2 session evaluation", "expectancy": "Expectancy", "sample_count": "Sample size",
         "quality_mode": "Trade quality profile", "quality_win_rate": "Win-rate focus", "quality_balanced": "Balanced quality", "quality_volume": "Exploratory trade volume", "replay_timeframe": "Replay execution timeframe", "performance_guard": "Session performance health", "profit_factor": "Profit Factor", "break_even_win_rate": "Break-even win rate", "quality_comparison": "Causal Quality Gate comparison", "quality_gate_note": "This gate uses only trades closed before each decision and never sees future outcomes.",
         "quality_not_promoted": "The Quality Gate has not yet demonstrated PF above 1 and positive expectancy; it remains Research/Paper only.",
+        "runbook_aligned": "Settings match the recommended win-rate benchmark", "runbook_not_aligned": "These settings do not match the recommended win-rate benchmark", "evidence_collecting": "Collecting evidence", "evidence_mature": "The session reached its initial sample target", "side_maturity": "Directional gate maturity", "break_even_trigger": "Break-even activation threshold (R)", "mfe_calibration": "Break-even calibration from losing-trade MFE",
         "reports_title": "Reports & history", "reports_sub": "A clear result for every run: passed steps, stop point, blockers, and full logs.",
         "refresh_reports": "Generate all reports", "readiness": "Readiness report", "blockers": "Blockers", "gates": "Gates", "job_history": "Job history",
         "select_job": "Select job", "retry": "Retry", "log": "Technical log", "step_results": "Step results", "result": "Result", "duration": "Duration", "current": "Current", "required": "Required", "schedules": "schedules",
@@ -607,6 +609,9 @@ elif page == "workflows":
                 )
             policy = risk_policy(risk_level)
             quality = quality_profile(quality_mode)
+            alignment = runbook_alignment(
+                quality_mode=quality_mode, risk_level=risk_level, analysis_depth=analysis_depth,
+            )
             from freakto.technical_v2.service import analysis_profile
             technical_profile = analysis_profile(analysis_depth)
             st.caption(
@@ -619,6 +624,10 @@ elif page == "workflows":
                 f'∞ {t("unlimited_trades")} · {t("analysis_depth")}: {analysis_depth}/100 · '
                 f'MTF: {", ".join(technical_profile["timeframes"])}'
             )
+            if alignment["runbook_aligned"]:
+                st.success("✓ " + t("runbook_aligned"))
+            else:
+                st.warning("⚠ " + t("runbook_not_aligned") + ": " + ", ".join(alignment["reasons"]))
             with st.expander(t("advanced")):
                 settings_cols = st.columns(3)
                 with settings_cols[0]:
@@ -632,6 +641,11 @@ elif page == "workflows":
                 replay_timeframe = st.selectbox(
                     t("replay_timeframe"), replay_values, index=replay_values.index(selected_replay_timeframe),
                     disabled=showcase_active or market_mode != "ACCELERATED_REPLAY", key=f"showcase-replay-timeframe-{preset_key}",
+                )
+                break_even_trigger_r = st.number_input(
+                    t("break_even_trigger"), min_value=0.0, max_value=3.0,
+                    value=float(showcase_settings.get("break_even_trigger_r", 0.75)) if showcase_active else 0.75,
+                    step=0.05, disabled=showcase_active, key=f"showcase-break-even-{preset_key}",
                 )
                 guard_settings = st.columns(3)
                 with guard_settings[0]:
@@ -693,6 +707,7 @@ elif page == "workflows":
                             maximum_holding_minutes=int(holding_minutes), leverage=float(leverage),
                             risk_level=int(risk_level), analysis_depth=int(analysis_depth), market_mode=str(market_mode),
                             quality_mode=str(quality_mode), replay_timeframe=str(replay_timeframe),
+                            break_even_trigger_r=float(break_even_trigger_r),
                             session_equity_usdt=float(session_equity),
                             session_profit_target_pct=float(session_profit_target),
                             session_loss_limit_pct=float(session_loss_limit),
@@ -731,12 +746,39 @@ elif page == "workflows":
             if session_performance:
                 with st.container(border=True):
                     st.markdown(f'**{t("performance_guard")}**')
+                    maturity_profiles = dict(showcase.get("quality_maturity_profiles") or {})
+                    maturity = dict(maturity_profiles.get(quality_mode) or showcase.get("quality_maturity") or {})
+                    session_maturity = dict(maturity.get("session") or {})
+                    organic_samples = int(session_maturity.get("organic_closed_trades", 0) or 0)
+                    maturity_target = int(session_maturity.get("minimum_samples", 50) or 50)
+                    if not session_maturity.get("mature", False):
+                        st.info(f'{t("evidence_collecting")}: {organic_samples}/{maturity_target}')
+                    else:
+                        st.success(f'{t("evidence_mature")}: {organic_samples}/{maturity_target}')
+                    st.progress(min(1.0, organic_samples / max(1, maturity_target)))
                     performance_cols = st.columns(5)
                     performance_cols[0].metric(t("sample_count"), int(session_performance.get("samples", 0) or 0))
                     performance_cols[1].metric("Win rate", f'{100 * float(session_performance.get("win_rate", 0) or 0):.1f}%')
                     performance_cols[2].metric(t("profit_factor"), f'{float(session_performance.get("profit_factor", 0) or 0):.2f}')
                     performance_cols[3].metric(t("expectancy"), f'{float(session_performance.get("expectancy_usdt", 0) or 0):+.3f} USDT')
                     performance_cols[4].metric(t("break_even_win_rate"), f'{100 * float(session_performance.get("break_even_win_rate", 0) or 0):.1f}%')
+                    side_maturity = dict(maturity.get("side") or {})
+                    if side_maturity:
+                        st.caption(t("side_maturity"))
+                        maturity_cols = st.columns(2)
+                        for column, side in zip(maturity_cols, ("LONG", "SHORT")):
+                            side_data = dict(side_maturity.get(side) or {})
+                            samples = int(side_data.get("samples", 0) or 0)
+                            minimum = int(side_data.get("minimum_samples", 0) or 0)
+                            column.progress(min(1.0, samples / max(1, minimum)), text=f"{side}: {samples}/{minimum}")
+                    mfe = dict(performance.get("losing_trade_mfe") or {})
+                    if mfe:
+                        calibration = dict(mfe.get("calibration") or {})
+                        st.caption(
+                            f'{t("mfe_calibration")}: N={int(mfe.get("samples", 0) or 0)} · '
+                            f'P50={float(mfe.get("median_r", 0) or 0):.2f}R · P75={float(mfe.get("p75_r", 0) or 0):.2f}R · '
+                            f'P90={float(mfe.get("p90_r", 0) or 0):.2f}R · {calibration.get("status", "—")}'
+                        )
                     comparison = dict(performance.get("walk_forward_quality") or {})
                     if comparison:
                         with st.expander(t("quality_comparison")):
