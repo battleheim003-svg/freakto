@@ -14,6 +14,7 @@ from PIL import Image, UnidentifiedImageError
 from freakto.paper.campaign import ACTIVE as CAMPAIGN_ACTIVE
 from freakto.paper.campaign import campaign_status, start_campaign, stop_campaign
 from freakto.showcase_paper import list_showcase_trades, showcase_status, start_showcase, stop_showcase
+from freakto.showcase_paper.quality import quality_profile
 from freakto.showcase_paper.risk import risk_policy, session_preset
 from freakto.ui.automation import (
     ensure_scheduler_running,
@@ -68,8 +69,10 @@ TEXT = {
         "showcase_disclaimer": "این معاملات فقط برای مشاهده رفتار سیستم‌اند و وارد Evidence رسمی Go-live نمی‌شوند.", "daily_limit": "حد معامله روزانه", "scan_interval": "فاصله بررسی (ثانیه)",
         "holding_minutes": "حداکثر زمان نگهداری (دقیقه)", "leverage": "اهرم نمایشی", "start_showcase": "روشن‌کردن Showcase", "stop_showcase": "خاموش‌کردن و بستن موقعیت‌ها",
         "open_positions": "موقعیت باز", "showcase_cards": "کارت‌های آخرین معاملات", "download_card": "دانلود کارت", "showcase_started": "Showcase Paper در پس‌زمینه روشن شد.", "showcase_stopping": "درخواست توقف ثبت شد؛ موقعیت‌ها با قیمت جاری بسته می‌شوند.",
-        "risk_management": "مدیریت ریسک تست", "risk_level": "ریسک‌پذیری (۰ دقیق تا ۱۰۰ اکتشافی)", "session_style": "نوع جلسه", "precision": "دقیق و محتاط", "balanced": "متعادل", "rapid_test": "تست سریع", "market_mode": "منبع اجرای تست", "live_public": "بازار عمومی زنده", "accelerated_replay": "Replay محلی شتاب‌یافته", "scan_activity": "فعالیت آخرین اسکن", "next_scan": "اسکن بعدی", "accepted_signals": "سیگنال پذیرفته", "rejected_signals": "علت‌های رد", "data_errors": "خطاهای اخیر داده", "risk_policy_note": "این کنترل فقط پذیرش فرصت در Showcase را تغییر می‌دهد و منطق موتور اصلی را دست‌کاری نمی‌کند.",
+        "risk_management": "مدیریت ریسک تست", "risk_level": "ریسک‌پذیری (۰ دقیق تا ۱۰۰ اکتشافی)", "session_style": "نوع جلسه", "quality_test": "تست کیفیت و Win rate", "precision": "دقیق و محتاط", "balanced": "متعادل", "rapid_test": "تست سریع", "market_mode": "منبع اجرای تست", "live_public": "بازار عمومی زنده", "accelerated_replay": "Replay محلی شتاب‌یافته", "scan_activity": "فعالیت آخرین اسکن", "next_scan": "اسکن بعدی", "accepted_signals": "سیگنال پذیرفته", "rejected_signals": "علت‌های رد", "data_errors": "خطاهای اخیر داده", "risk_policy_note": "این کنترل فقط پذیرش فرصت در Showcase را تغییر می‌دهد و منطق موتور اصلی را دست‌کاری نمی‌کند.",
         "unlimited_trades": "معاملات session نامحدود", "analysis_depth": "عمق تحلیل", "analysis_depth_control": "عمق تحلیل فنی (مستقل از ریسک)", "technical_tools": "ابزار تکنیکال فعال", "confluence": "همگرایی تکنیکال", "technical_v2_report": "گزارش Technical Engine v2", "market_regime": "رژیم بازار", "mtf_agreement": "هماهنگی چند تایم‌فریم", "trade_geometry": "هندسه معامله", "calibration_status": "وضعیت کالیبراسیون", "decision_drivers": "دلایل تصمیم", "decision_warnings": "هشدارها", "session_evaluation": "ارزیابی جلسه v2", "expectancy": "بازده موردانتظار", "sample_count": "حجم نمونه",
+        "quality_mode": "پروفایل کیفیت معامله", "quality_win_rate": "تمرکز بر Win rate", "quality_balanced": "کیفیت متعادل", "quality_volume": "حجم معاملات اکتشافی", "replay_timeframe": "تایم‌فریم اجرای Replay", "performance_guard": "سلامت عملکرد جلسه", "profit_factor": "Profit Factor", "break_even_win_rate": "Win rate سربه‌سر", "quality_comparison": "مقایسه علّی Quality Gate", "quality_gate_note": "این گیت فقط از معاملات بسته‌شده پیش از هر تصمیم استفاده می‌کند و داده آینده را نمی‌بیند.",
+        "quality_not_promoted": "Quality Gate هنوز PF بالاتر از ۱ و expectancy مثبت را ثابت نکرده است؛ فقط Research/Paper باقی می‌ماند.",
         "reports_title": "گزارش و تاریخچه", "reports_sub": "نتیجه روشن هر اجرا، مراحل موفق، نقطه توقف، Blockerها و لاگ کامل.",
         "refresh_reports": "تولید همه گزارش‌ها", "readiness": "گزارش آمادگی", "blockers": "موانع", "gates": "گیت‌ها", "job_history": "تاریخچه Jobها",
         "select_job": "انتخاب Job", "retry": "اجرای مجدد", "log": "لاگ فنی", "step_results": "نتیجه مراحل", "result": "نتیجه", "duration": "مدت", "current": "مقدار فعلی", "required": "حد لازم", "schedules": "زمان‌بندی",
@@ -110,8 +113,10 @@ TEXT = {
         "showcase_disclaimer": "These trades are for observing system behavior only and never enter official Go-live evidence.", "daily_limit": "Daily trade limit", "scan_interval": "Scan interval (seconds)",
         "holding_minutes": "Maximum holding time (minutes)", "leverage": "Display leverage", "start_showcase": "Enable Showcase", "stop_showcase": "Disable and close positions",
         "open_positions": "Open positions", "showcase_cards": "Latest trade cards", "download_card": "Download card", "showcase_started": "Showcase Paper started in the background.", "showcase_stopping": "Stop requested; positions will close at current prices.",
-        "risk_management": "Test risk management", "risk_level": "Risk tolerance (0 precision to 100 exploratory)", "session_style": "Session style", "precision": "Precision", "balanced": "Balanced", "rapid_test": "Rapid test", "market_mode": "Test execution source", "live_public": "Live public market", "accelerated_replay": "Accelerated local Replay", "scan_activity": "Latest scan activity", "next_scan": "Next scan", "accepted_signals": "Accepted signals", "rejected_signals": "Rejection reasons", "data_errors": "Recent data errors", "risk_policy_note": "This control changes Showcase admission only and never modifies the core engine logic.",
+        "risk_management": "Test risk management", "risk_level": "Risk tolerance (0 precision to 100 exploratory)", "session_style": "Session style", "quality_test": "Quality and win-rate test", "precision": "Precision", "balanced": "Balanced", "rapid_test": "Rapid test", "market_mode": "Test execution source", "live_public": "Live public market", "accelerated_replay": "Accelerated local Replay", "scan_activity": "Latest scan activity", "next_scan": "Next scan", "accepted_signals": "Accepted signals", "rejected_signals": "Rejection reasons", "data_errors": "Recent data errors", "risk_policy_note": "This control changes Showcase admission only and never modifies the core engine logic.",
         "unlimited_trades": "Unlimited session trades", "analysis_depth": "Analysis depth", "analysis_depth_control": "Technical analysis depth (independent of risk)", "technical_tools": "Active technical tools", "confluence": "Technical confluence", "technical_v2_report": "Technical Engine v2 report", "market_regime": "Market regime", "mtf_agreement": "Multi-timeframe agreement", "trade_geometry": "Trade geometry", "calibration_status": "Calibration status", "decision_drivers": "Decision drivers", "decision_warnings": "Warnings", "session_evaluation": "v2 session evaluation", "expectancy": "Expectancy", "sample_count": "Sample size",
+        "quality_mode": "Trade quality profile", "quality_win_rate": "Win-rate focus", "quality_balanced": "Balanced quality", "quality_volume": "Exploratory trade volume", "replay_timeframe": "Replay execution timeframe", "performance_guard": "Session performance health", "profit_factor": "Profit Factor", "break_even_win_rate": "Break-even win rate", "quality_comparison": "Causal Quality Gate comparison", "quality_gate_note": "This gate uses only trades closed before each decision and never sees future outcomes.",
+        "quality_not_promoted": "The Quality Gate has not yet demonstrated PF above 1 and positive expectancy; it remains Research/Paper only.",
         "reports_title": "Reports & history", "reports_sub": "A clear result for every run: passed steps, stop point, blockers, and full logs.",
         "refresh_reports": "Generate all reports", "readiness": "Readiness report", "blockers": "Blockers", "gates": "Gates", "job_history": "Job history",
         "select_job": "Select job", "retry": "Retry", "log": "Technical log", "step_results": "Step results", "result": "Result", "duration": "Duration", "current": "Current", "required": "Required", "schedules": "schedules",
@@ -559,16 +564,16 @@ elif page == "workflows":
             showcase_active = showcase.get("status") in {"STARTING", "RUNNING", "STOP_REQUESTED"}
             showcase_settings = dict(showcase.get("settings") or {})
             section_intro(t("risk_management"), t("risk_policy_note"))
-            preset_names = {"PRECISION": t("precision"), "BALANCED": t("balanced"), "RAPID_TEST": t("rapid_test")}
+            preset_names = {"QUALITY_TEST": t("quality_test"), "PRECISION": t("precision"), "BALANCED": t("balanced"), "RAPID_TEST": t("rapid_test")}
             preset_key = st.selectbox(
                 t("session_style"),
-                ["RAPID_TEST", "BALANCED", "PRECISION"],
+                ["QUALITY_TEST", "RAPID_TEST", "BALANCED", "PRECISION"],
                 format_func=lambda value: preset_names[value],
                 disabled=showcase_active,
                 key="showcase-session-style",
             )
             preset = session_preset(preset_key)
-            primary_settings = st.columns([1, 1, 1])
+            primary_settings = st.columns([1, 1, 1, 1])
             with primary_settings[0]:
                 risk_level = st.slider(
                     t("risk_level"), min_value=0, max_value=100,
@@ -582,6 +587,16 @@ elif page == "workflows":
                     step=5, disabled=showcase_active, key=f"showcase-analysis-{preset_key}",
                 )
             with primary_settings[2]:
+                quality_values = ["WIN_RATE", "BALANCED", "VOLUME"]
+                quality_labels = {"WIN_RATE": t("quality_win_rate"), "BALANCED": t("quality_balanced"), "VOLUME": t("quality_volume")}
+                preset_quality = {"QUALITY_TEST": "WIN_RATE", "RAPID_TEST": "VOLUME", "BALANCED": "BALANCED", "PRECISION": "WIN_RATE"}[preset_key]
+                selected_quality = str(showcase_settings.get("quality_mode", preset_quality)) if showcase_active else preset_quality
+                quality_mode = st.selectbox(
+                    t("quality_mode"), quality_values, index=quality_values.index(selected_quality),
+                    format_func=lambda value: quality_labels[value], disabled=showcase_active,
+                    key=f"showcase-quality-{preset_key}",
+                )
+            with primary_settings[3]:
                 mode_values = ["ACCELERATED_REPLAY", "LIVE_PUBLIC"]
                 mode_labels = {"ACCELERATED_REPLAY": t("accelerated_replay"), "LIVE_PUBLIC": t("live_public")}
                 selected_mode = str(showcase_settings.get("market_mode", preset.market_mode)) if showcase_active else preset.market_mode
@@ -591,12 +606,14 @@ elif page == "workflows":
                     key=f"showcase-mode-{preset_key}",
                 )
             policy = risk_policy(risk_level)
+            quality = quality_profile(quality_mode)
             from freakto.technical_v2.service import analysis_profile
             technical_profile = analysis_profile(analysis_depth)
             st.caption(
-                f'{policy.key} · {technical_profile["label"]} · Technical Engine v2 · '
+                f'{policy.key} · {quality.label} · {technical_profile["label"]} · Technical Engine v2 · '
                 f'Score ≥ {policy.minimum_score} · Confidence ≥ {policy.minimum_confidence}% · '
-                f'Confluence ≥ {policy.minimum_confluence_pct}%'
+                f'Confluence ≥ {max(policy.minimum_confluence_pct, quality.minimum_confluence_pct)}% · '
+                f'Net EV ≥ {quality.minimum_net_expected_value_pct:.2f}% · Cost-adjusted R:R ≥ {quality.minimum_cost_adjusted_reward_risk:.2f}'
             )
             st.success(
                 f'∞ {t("unlimited_trades")} · {t("analysis_depth")}: {analysis_depth}/100 · '
@@ -610,6 +627,12 @@ elif page == "workflows":
                     holding_minutes = st.number_input(t("holding_minutes"), min_value=1, max_value=1440, value=int(showcase_settings.get("maximum_holding_minutes", preset.maximum_holding_minutes)) if showcase_active else preset.maximum_holding_minutes, step=1, disabled=showcase_active, key=f"showcase-hold-{preset_key}")
                 with settings_cols[2]:
                     leverage = st.number_input(t("leverage"), min_value=1.0, max_value=5.0, value=float(showcase_settings.get("leverage", preset.leverage)) if showcase_active else preset.leverage, step=0.5, disabled=showcase_active, key=f"showcase-leverage-{preset_key}")
+                replay_values = ["AUTO", "15m", "1h", "4h"]
+                selected_replay_timeframe = str(showcase_settings.get("replay_timeframe", "AUTO")) if showcase_active else "AUTO"
+                replay_timeframe = st.selectbox(
+                    t("replay_timeframe"), replay_values, index=replay_values.index(selected_replay_timeframe),
+                    disabled=showcase_active or market_mode != "ACCELERATED_REPLAY", key=f"showcase-replay-timeframe-{preset_key}",
+                )
                 guard_settings = st.columns(3)
                 with guard_settings[0]:
                     session_profit_target = st.number_input(
@@ -669,6 +692,7 @@ elif page == "workflows":
                             daily_trade_limit=0, scan_interval_seconds=int(scan_interval),
                             maximum_holding_minutes=int(holding_minutes), leverage=float(leverage),
                             risk_level=int(risk_level), analysis_depth=int(analysis_depth), market_mode=str(market_mode),
+                            quality_mode=str(quality_mode), replay_timeframe=str(replay_timeframe),
                             session_equity_usdt=float(session_equity),
                             session_profit_target_pct=float(session_profit_target),
                             session_loss_limit_pct=float(session_loss_limit),
@@ -702,6 +726,29 @@ elif page == "workflows":
                     st.success(f'{t("profit_guard")}: PROFIT TARGET REACHED')
                 elif guard_status == "LOSS_LIMIT_REACHED":
                     st.error(f'{t("profit_guard")}: LOSS LIMIT REACHED')
+            performance = dict(showcase.get("performance") or {})
+            session_performance = dict(performance.get("session") or {})
+            if session_performance:
+                with st.container(border=True):
+                    st.markdown(f'**{t("performance_guard")}**')
+                    performance_cols = st.columns(5)
+                    performance_cols[0].metric(t("sample_count"), int(session_performance.get("samples", 0) or 0))
+                    performance_cols[1].metric("Win rate", f'{100 * float(session_performance.get("win_rate", 0) or 0):.1f}%')
+                    performance_cols[2].metric(t("profit_factor"), f'{float(session_performance.get("profit_factor", 0) or 0):.2f}')
+                    performance_cols[3].metric(t("expectancy"), f'{float(session_performance.get("expectancy_usdt", 0) or 0):+.3f} USDT')
+                    performance_cols[4].metric(t("break_even_win_rate"), f'{100 * float(session_performance.get("break_even_win_rate", 0) or 0):.1f}%')
+                    comparison = dict(performance.get("walk_forward_quality") or {})
+                    if comparison:
+                        with st.expander(t("quality_comparison")):
+                            candidate = dict(comparison.get("candidate") or {})
+                            baseline = dict(comparison.get("baseline") or {})
+                            st.write(
+                                f'Baseline: {100 * float(baseline.get("win_rate", 0) or 0):.1f}% / PF {float(baseline.get("profit_factor", 0) or 0):.2f} · '
+                                f'Quality: {100 * float(candidate.get("win_rate", 0) or 0):.1f}% / PF {float(candidate.get("profit_factor", 0) or 0):.2f}'
+                            )
+                            st.caption(t("quality_gate_note"))
+                            if float(candidate.get("profit_factor", 0) or 0) <= 1 or float(candidate.get("expectancy_usdt", 0) or 0) <= 0:
+                                st.warning(t("quality_not_promoted"))
             last_scan = dict(showcase.get("last_scan") or {})
             if last_scan:
                 with st.expander(t("scan_activity"), expanded=bool(last_scan.get("errors"))):
