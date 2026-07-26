@@ -28,6 +28,27 @@ The package `freakto/technical_v2/` contains:
   champion/challenger comparison;
 - JSON and Markdown decision explanations.
 
+Version 2.1 additionally provides a professional audit chain:
+
+1. `data_quality.py` checks candle cadence, duplicates, missing candles, robust outliers,
+   freshness, OHLC geometry, and optional cross-source divergence.
+2. `setup_engine.py` selects one regime-compatible setup: Trend Pullback, Breakout + Volume,
+   Liquidity Sweep Reversal, Range Mean Reversion, Momentum Continuation, or Volatility Expansion.
+3. `execution_simulator.py` estimates spread, volatility/liquidity slippage, latency, market impact,
+   and partial fill.
+4. `economics.py` calculates net expected value after fees, execution, funding, and rollover.
+5. `triple_barrier.py` labels Target, Stop, or Time exits and treats ambiguous same-candle hits as
+   Stop-first by default.
+6. `segmented_calibration.py` calibrates by symbol, setup, regime, side, and entry timeframe, with
+   a transparent global fallback.
+7. `futures_microstructure.py` accepts Open Interest, Funding, taker imbalance, order-book
+   imbalance, and liquidation imbalance only when a provider actually supplies them.
+8. `portfolio_risk.py` reduces virtual size for same-side, correlated, concentrated, or excessive
+   gross exposure.
+9. `validation.py` creates purged/embargoed walk-forward splits and sequential OOS stability
+   reports.
+10. `promotion.py` can recommend Research → Shadow only. It never authorizes Live.
+
 ## Dashboard controls
 
 Open the Control Center and select the validation/Paper section.
@@ -35,14 +56,15 @@ Open the Control Center and select the validation/Paper section.
 1. Choose the session style.
 2. Set **Risk tolerance**. This changes paper admission and virtual exposure only.
 3. Set **Technical analysis depth** independently. At full depth, live public mode requests
-   5m, 15m, 1h, and 4h closed-candle frames.
+   1m for entry timing, 5m/15m for setup, and 1h/4h for regime context.
 4. Choose `LIVE_PUBLIC` for current public data or `ACCELERATED_REPLAY` for a fast local lab.
 5. Start Showcase.
 
-The v2 report shows the detected regime, timeframe agreement, cost-adjusted geometry,
-calibration label, family scores, drivers, warnings, session win rate, expectancy, and family
-attribution. Total session trades are unlimited; concurrent exposure remains bounded and one open
-position per symbol prevents accidental duplicate positions.
+The v2 report shows data quality, selected setup, detected regime, timeframe agreement,
+cost-adjusted geometry, net EV, execution cost, portfolio status, calibration label, family scores,
+drivers, warnings, session win rate, expectancy, attribution, walk-forward stability, and automatic
+challenger blockers. Total session trades are unlimited; concurrent exposure remains bounded and
+one open position per symbol prevents accidental duplicate positions.
 
 ## Causality and data rules
 
@@ -53,6 +75,23 @@ position per symbol prevents accidental duplicate positions.
 - At least 40 valid OHLC candles are required.
 - All OHLC values must be numeric, close must be positive, and high cannot be below low.
 - Missing or insufficient data fails closed for that symbol and is reported in the scan errors.
+- A failed quality gate, rejected setup, non-positive net EV, or blocked portfolio exposure cannot
+  open a Showcase trade.
+
+## Optional enriched Futures contract
+
+An enriched provider can attach a `microstructure` mapping to `DataFrame.attrs` or provide these
+columns directly:
+
+- `open_interest_change_pct`
+- `price_change_pct`
+- `funding_rate_pct`
+- `taker_buy_ratio` (0 to 1)
+- `order_book_imbalance` (-1 to 1)
+- `liquidation_imbalance` (-1 to 1)
+
+If none are present, the family is marked `UNAVAILABLE` and stays neutral. Values are never
+invented from OHLCV.
 
 ## Calibration and promotion
 
@@ -75,7 +114,7 @@ Showcase trades must never be copied into official evidence to bypass those gate
 Run focused tests:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests\test_technical_v2.py tests\test_showcase_paper.py -q
+.\.venv\Scripts\python.exe -m pytest tests\test_technical_v2.py tests\test_technical_v2_professional.py tests\test_showcase_paper.py -q
 ```
 
 Run the full suite before promotion or release:

@@ -51,11 +51,28 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
             observations = [
                 (float(trade.get("confidence", 0) or 0) / 100.0, float(trade.get("pnl_pct", 0) or 0) > 0)
                 for trade in engine.trades
-                if trade.get("status") == "CLOSED" and trade.get("engine_version") == "technical-v2.0"
+                if trade.get("status") == "CLOSED" and str(trade.get("engine_version", "")).startswith("technical-v2")
             ]
             adapter = getattr(market_data, "adapter", None)
             if adapter is not None and hasattr(adapter, "set_calibration_observations"):
                 adapter.set_calibration_observations(observations)
+                segmented = []
+                for trade in engine.trades:
+                    if trade.get("status") != "CLOSED" or not str(trade.get("engine_version", "")).startswith("technical-v2"):
+                        continue
+                    technical = dict(trade.get("technical_v2") or {})
+                    setup = dict(technical.get("setup") or {})
+                    segmented.append({
+                        "probability": float(trade.get("confidence", 0) or 0) / 100.0,
+                        "outcome": float(trade.get("pnl_pct", 0) or 0) > 0,
+                        "symbol": str(trade.get("symbol", "")),
+                        "setup": str(setup.get("name", "UNKNOWN")),
+                        "regime": str((technical.get("regime") or {}).get("label", "UNKNOWN")),
+                        "side": str(trade.get("side", "")),
+                        "timeframe": str(setup.get("entry_timeframe", "UNKNOWN")),
+                    })
+                adapter.set_segmented_observations(segmented)
+                adapter.set_portfolio_positions([trade for trade in engine.trades if trade.get("status") == "OPEN"])
             opened = engine.open_available()
             scan_count += 1
             if replay_market is not None:

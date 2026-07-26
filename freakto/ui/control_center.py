@@ -122,6 +122,25 @@ TEXT = {
     },
 }
 
+TEXT["fa"].update({
+    "data_quality": "کیفیت داده",
+    "active_setup": "ستاپ فعال",
+    "net_expected_value": "ارزش موردانتظار خالص",
+    "execution_cost": "هزینه اجرای تخمینی",
+    "portfolio_risk": "ریسک سبد",
+    "promotion_status": "وضعیت Challenger",
+    "validation_stability": "پایداری Walk-forward",
+})
+TEXT["en"].update({
+    "data_quality": "Data quality",
+    "active_setup": "Active setup",
+    "net_expected_value": "Net expected value",
+    "execution_cost": "Estimated execution cost",
+    "portfolio_risk": "Portfolio risk",
+    "promotion_status": "Challenger status",
+    "validation_stability": "Walk-forward stability",
+})
+
 KIND_LABELS = {
     "QUICK_START": ("مسیر کامل", "Complete workflow"), "DATA_REPLAY": ("داده و Replay", "Data & Replay"),
     "MARKET_DATA_AUDIT": ("ممیزی بازار", "Market audit"), "MARKET_REPLAY": ("Replay بازار", "Market Replay"),
@@ -620,12 +639,33 @@ elif page == "workflows":
             if latest_technical:
                 technical = dict(latest_technical.get("technical_v2") or {})
                 with st.expander(t("technical_v2_report"), expanded=True):
-                    report_cols = st.columns(4)
+                    report_cols = st.columns(3)
                     report_cols[0].metric(t("market_regime"), (technical.get("regime") or {}).get("label", "—"))
                     report_cols[1].metric(t("mtf_agreement"), f'{float(technical.get("timeframe_agreement", 0)):.0%}')
                     geometry = dict(technical.get("geometry") or {})
                     report_cols[2].metric(t("trade_geometry"), f'R:R {float(geometry.get("cost_adjusted_reward_risk", 0)):.2f}')
-                    report_cols[3].metric(t("calibration_status"), (technical.get("calibration") or {}).get("status", "—"))
+                    audit_cols = st.columns(3)
+                    quality = dict(technical.get("data_quality") or {})
+                    setup = dict(technical.get("setup") or {})
+                    economics = dict(technical.get("economics") or {})
+                    execution = dict(technical.get("execution") or {})
+                    portfolio = dict(technical.get("portfolio") or {})
+                    audit_cols[0].metric(t("data_quality"), quality.get("status", "—"), f'{float(quality.get("score", 0)):.0%}' if quality else None)
+                    setup_labels = {
+                        "BREAKOUT_VOLUME": "BREAKOUT",
+                        "LIQUIDITY_SWEEP_REVERSAL": "SWEEP REV.",
+                        "MOMENTUM_CONTINUATION": "MOMENTUM",
+                        "RANGE_MEAN_REVERSION": "RANGE REV.",
+                        "VOLATILITY_EXPANSION": "VOL EXP.",
+                    }
+                    audit_cols[1].metric(t("active_setup"), setup_labels.get(setup.get("name"), setup.get("name", "—")), setup.get("status") if setup else None)
+                    audit_cols[2].metric(t("net_expected_value"), f'{float(economics.get("net_expected_value_pct", 0)):+.3f}%')
+                    risk_cols = st.columns(3)
+                    risk_cols[0].metric(t("execution_cost"), f'{float(execution.get("estimated_round_trip_cost_pct", 0)):.3f}%')
+                    risk_cols[1].metric(t("portfolio_risk"), portfolio.get("status", "—"), f'x{float(portfolio.get("size_multiplier", 1)):.2f}')
+                    calibration_status = str((technical.get("calibration") or {}).get("status", "—"))
+                    calibration_label = {"UNCALIBRATED": "UNCALIB.", "NEEDS_REVIEW": "REVIEW"}.get(calibration_status, calibration_status)
+                    risk_cols[2].metric(t("calibration_status"), calibration_label)
                     family_rows = list(technical.get("family_scores") or [])
                     if family_rows:
                         st.dataframe(
@@ -637,6 +677,8 @@ elif page == "workflows":
                     if warnings:
                         st.warning(t("decision_warnings") + ": " + " · ".join(warnings))
                     from freakto.technical_v2.evaluator import evaluate_decisions
+                    from freakto.technical_v2.promotion import promotion_recommendation
+                    from freakto.technical_v2.validation import sequential_oos_report
                     closed_v2 = [trade for trade in showcase_trades if trade.get("status") == "CLOSED" and trade.get("technical_v2")]
                     evaluation = evaluate_decisions(closed_v2)
                     st.markdown("**" + t("session_evaluation") + "**")
@@ -647,6 +689,15 @@ elif page == "workflows":
                     attribution = dict(evaluation.get("family_attribution") or {})
                     if attribution:
                         st.bar_chart(attribution)
+                    champion_rows = [trade for trade in showcase_trades if trade.get("status") == "CLOSED" and not trade.get("technical_v2")]
+                    champion = evaluate_decisions(champion_rows)
+                    validation = sequential_oos_report(closed_v2)
+                    promotion = promotion_recommendation(champion, evaluation, validation)
+                    promotion_cols = st.columns(2)
+                    promotion_cols[0].metric(t("promotion_status"), promotion.get("status", "KEEP_RESEARCH"))
+                    promotion_cols[1].metric(t("validation_stability"), f'{float(validation.get("stability", 0)):.0%}')
+                    if promotion.get("blockers"):
+                        st.info("Promotion blockers: " + " · ".join(promotion["blockers"]))
             card_paths = [Path(str(trade.get("latest_card"))) for trade in showcase_trades[:4] if trade.get("latest_card")]
             card_paths = [path for path in card_paths if path.is_file()]
             if card_paths:

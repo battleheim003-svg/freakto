@@ -20,7 +20,7 @@ class IntradaySnapshot:
 
 
 class LiveIntradayTechnicalMarket:
-    def __init__(self, *, risk_level: int, analysis_depth: int | None = None, timeframe: str = "5m", limit: int = 140):
+    def __init__(self, *, risk_level: int, analysis_depth: int | None = None, timeframe: str = "1m", limit: int = 140):
         self.analysis_depth = int(risk_level if analysis_depth is None else analysis_depth)
         self.timeframe = timeframe
         self.limit = max(40, int(limit))
@@ -52,7 +52,7 @@ class LiveIntradayTechnicalMarket:
         base = frames[next(iter(frames))]
         timestamp = str(base.iloc[-2].get("timestamp", "")) if len(base) > 40 else str(base.iloc[-1].get("timestamp", ""))
         signal = self.adapter.signal(
-            symbol, frames, timestamp=timestamp, provider=provider, drop_forming=True,
+            symbol, frames, timestamp=timestamp, provider=provider, drop_forming=True, require_fresh=True,
         )
         signal.regime = f"LIVE_INTRADAY_{self.timeframe.upper()}"
         return signal

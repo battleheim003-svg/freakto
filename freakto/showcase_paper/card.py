@@ -95,8 +95,12 @@ def render_trade_card(trade: dict[str, Any], output_path: str | Path, *, logo_pa
         ("Mark Price" if status == "OPEN" else "Exit Price", _price(trade.get("current_price") or trade.get("exit_price"))),
         ("Stop / Target", f"{_price(trade.get('stop_price'))}  /  {_price(trade.get('target_price'))}"),
         (
-            "Technical Confluence",
-            f"{float(trade.get('technical_confluence_pct', 0) or 0):.0f}%  ·  {len(trade.get('indicators_used') or [])} tools",
+            "Setup · Confluence · Net EV",
+            (
+                f"{str((trade.get('setup') or {}).get('name', 'LEGACY'))[:22]}  ·  "
+                f"{float(trade.get('technical_confluence_pct', 0) or 0):.0f}%  ·  "
+                f"{float((trade.get('economics') or {}).get('net_expected_value_pct', 0) or 0):+.3f}%"
+            ),
         ),
     ]
     top = 700

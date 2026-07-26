@@ -10,6 +10,15 @@ def evaluate_decisions(records: Iterable[dict[str, object]]) -> dict[str, object
     rows = list(records)
     pnl = [float(row.get("pnl_pct", 0) or 0) for row in rows]
     wins = [value > 0 for value in pnl]
+    equity = 0.0
+    peak = 0.0
+    maximum_drawdown = 0.0
+    for value in pnl:
+        equity += value
+        peak = max(peak, equity)
+        maximum_drawdown = max(maximum_drawdown, peak - equity)
+    gains = sum(value for value in pnl if value > 0)
+    losses = abs(sum(value for value in pnl if value < 0))
     family: dict[str, list[float]] = defaultdict(list)
     tools: dict[str, list[float]] = defaultdict(list)
     for row, outcome in zip(rows, pnl):
@@ -25,6 +34,8 @@ def evaluate_decisions(records: Iterable[dict[str, object]]) -> dict[str, object
         "samples": len(rows),
         "win_rate": round(sum(wins) / len(wins), 4) if wins else None,
         "expectancy_pct": round(sum(pnl) / len(pnl), 6) if pnl else None,
+        "profit_factor": round(gains / losses, 4) if losses else None,
+        "maximum_drawdown_pct": round(maximum_drawdown, 6),
         "family_attribution": {name: round(sum(values) / len(values), 6) for name, values in sorted(family.items())},
         "tool_attribution": {name: round(sum(values) / len(values), 6) for name, values in sorted(tools.items())},
     }

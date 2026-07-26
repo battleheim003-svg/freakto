@@ -9,7 +9,7 @@ import pandas as pd
 from freakto.technical_v2.features import extract_evidence
 
 
-DEFAULT_WEIGHTS = {"5m": 0.15, "15m": 0.20, "1h": 0.30, "4h": 0.35, "base": 1.0}
+DEFAULT_WEIGHTS = {"1m": 0.08, "3m": 0.10, "5m": 0.15, "15m": 0.17, "1h": 0.22, "4h": 0.23, "1d": 0.25, "base": 1.0}
 
 
 def timeframe_score(frame: pd.DataFrame, *, timeframe: str, depth: int) -> float:

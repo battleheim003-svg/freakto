@@ -28,6 +28,7 @@ def assess_regime(frame: pd.DataFrame) -> RegimeAssessment:
         "structure": 1.20,
         "volume": 1.05,
         "volatility": 0.90 if high_vol else 1.0,
+        "microstructure": 1.15 if high_vol else 1.0,
     }
     confidence = min(1.0, 0.5 + abs(trend) * 0.35 + abs(percentile - 0.5) * 0.2)
     return RegimeAssessment(label, round(trend, 4), round(percentile, 4), round(confidence, 4), weights)

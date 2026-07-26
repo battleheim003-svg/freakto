@@ -103,6 +103,15 @@ def test_showcase_controller_forces_all_live_flags_off(monkeypatch, tmp_path):
     assert "ACCELERATED_REPLAY" in called["command"]
 
 
+def test_controller_state_writes_use_collision_safe_temporary_files(tmp_path):
+    path = tmp_path / "runtime" / "worker.json"
+    controller._write(path, {"status": "RUNNING", "pid": 1})
+    controller._write(path, {"status": "STOPPED", "pid": 1})
+    import json
+    assert json.loads(path.read_text(encoding="utf-8"))["status"] == "STOPPED"
+    assert list(path.parent.glob("*.tmp")) == []
+
+
 def test_showcase_settings_reject_excessive_display_leverage():
     with pytest.raises(ValueError, match="leverage"):
         ShowcaseSettings(leverage=20).validated()
@@ -206,7 +215,7 @@ def test_live_intraday_mode_uses_full_technical_stack(monkeypatch):
     item = market.signal("BTC/USDT")
     snapshot = market.fetch_snapshot("BTC/USDT")
 
-    assert item.regime == "LIVE_INTRADAY_5M"
+    assert item.regime == "LIVE_INTRADAY_1M"
     assert len(item.indicators_used) == 12
     assert item.technical_confluence_pct >= 50
     assert snapshot.provider == "fixture"

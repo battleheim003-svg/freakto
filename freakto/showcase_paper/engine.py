@@ -167,6 +167,11 @@ class ShowcaseEngine:
             "trade_geometry": dict(getattr(item, "trade_geometry", {}) or {}),
             "risk_assessment": dict(getattr(item, "risk_assessment", {}) or {}),
             "calibration": dict(getattr(item, "calibration", {}) or {}),
+            "data_quality": dict(getattr(item, "data_quality", {}) or {}),
+            "setup": dict(getattr(item, "setup", {}) or {}),
+            "economics": dict(getattr(item, "economics", {}) or {}),
+            "execution": dict(getattr(item, "execution", {}) or {}),
+            "portfolio": dict(getattr(item, "portfolio", {}) or {}),
             "decision_reasons": list(getattr(item, "decision_reasons", []) or []),
             "decision_warnings": list(getattr(item, "decision_warnings", []) or []),
             "engine_version": str(getattr(item, "engine_version", "legacy-showcase")),
@@ -236,7 +241,12 @@ class ShowcaseEngine:
                 snapshot = self.market_data.fetch_snapshot(symbol)
                 side = signal["side"]
                 base = float(snapshot.ask if side == "LONG" else snapshot.bid)
-                slip = self.settings.slippage_bps / 10_000.0
+                execution = dict(signal.get("execution") or {})
+                slip = (
+                    (float(execution.get("slippage_bps", 0) or 0) + float(execution.get("latency_bps", 0) or 0)) / 10_000.0
+                    if execution
+                    else self.settings.slippage_bps / 10_000.0
+                )
                 entry = base * (1 + slip if side == "LONG" else 1 - slip)
                 geometry = dict(signal.get("trade_geometry") or {})
                 if geometry.get("stop") and geometry.get("target"):
@@ -267,6 +277,8 @@ class ShowcaseEngine:
                     "notional_usdt": round(
                         self.settings.notional_usdt
                         * float((signal.get("risk_assessment") or {}).get("position_scale", 1.0))
+                        * float((signal.get("portfolio") or {}).get("size_multiplier", 1.0))
+                        * float((signal.get("execution") or {}).get("fill_ratio", 1.0))
                         / math.sqrt(
                             1 + sum(
                                 1 for existing in self.trades
@@ -314,7 +326,15 @@ class ShowcaseEngine:
         entry = float(trade["entry_price"])
         direction = 1.0 if trade["side"] == "LONG" else -1.0
         gross_pct = direction * (mark - entry) / entry * 100.0 * float(trade["leverage"])
-        estimated_fees_pct = 2.0 * self.settings.fee_bps_per_side / 100.0
+        economics = dict(trade.get("economics") or {})
+        costs = dict(economics.get("cost_breakdown") or {})
+        estimated_fees_pct = (
+            float(costs.get("fees", 0) or 0)
+            + float(costs.get("funding", 0) or 0)
+            + float(costs.get("rollover", 0) or 0)
+            if costs
+            else 2.0 * self.settings.fee_bps_per_side / 100.0
+        )
         pnl_pct = gross_pct - estimated_fees_pct
         trade.update(
             current_price=mark,

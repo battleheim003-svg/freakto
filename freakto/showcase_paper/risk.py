@@ -116,6 +116,18 @@ def risk_policy(level: int | float) -> RiskPolicy:
 
 
 def admission_reason(signal: dict[str, object], policy: RiskPolicy) -> str | None:
+    quality = signal.get("data_quality") or {}
+    if isinstance(quality, dict) and quality.get("status") == "FAIL":
+        return "DATA_QUALITY_REJECTED"
+    setup = signal.get("setup") or {}
+    if isinstance(setup, dict) and setup.get("status") == "REJECTED":
+        return "NO_VALID_SETUP"
+    economics = signal.get("economics") or {}
+    if isinstance(economics, dict) and economics and float(economics.get("net_expected_value_pct", 0) or 0) <= 0:
+        return "NON_POSITIVE_EXPECTED_VALUE"
+    portfolio = signal.get("portfolio") or {}
+    if isinstance(portfolio, dict) and portfolio.get("status") == "BLOCK":
+        return "PORTFOLIO_RISK_BLOCK"
     side = str(signal.get("side", "NEUTRAL")).upper()
     if side not in {"LONG", "SHORT"}:
         return "NOT_DIRECTIONAL"

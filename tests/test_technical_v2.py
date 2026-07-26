@@ -81,11 +81,11 @@ def test_professional_decision_has_mtf_regime_geometry_and_explanation_fields():
     assert decision.geometry.cost_adjusted_reward_risk < decision.geometry.reward_risk
     assert payload["regime"]["label"].startswith("UPTREND")
     assert payload["reasons"]
-    assert payload["engine_version"] == "technical-v2.0"
+    assert payload["engine_version"] == "technical-v2.1"
 
 
 def test_analysis_depth_is_independent_from_risk_tolerance():
-    assert analysis_profile(100)["timeframes"] == ("5m", "15m", "1h", "4h")
+    assert analysis_profile(100)["timeframes"] == ("1m", "5m", "15m", "1h", "4h")
     low_risk = assess_risk(0, confidence=0.8, timeframe_agreement=0.8, geometry_rr=1.5)
     high_risk = assess_risk(100, confidence=0.8, timeframe_agreement=0.8, geometry_rr=1.5)
     assert low_risk.position_scale < high_risk.position_scale
