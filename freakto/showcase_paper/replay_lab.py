@@ -22,21 +22,38 @@ class ReplaySnapshot:
     last: float
     bid: float
     ask: float
+    open: float
+    high: float
+    low: float
+    timestamp: str
+    bar_index: int
     provider: str = "accelerated-local-replay"
 
 
 class AcceleratedReplayMarket:
-    def __init__(self, root: Path, symbols: tuple[str, ...], *, timeframe: str = "4h", risk_level: int = 70, analysis_depth: int | None = None):
+    def __init__(self, root: Path, symbols: tuple[str, ...], *, timeframe: str = "AUTO", risk_level: int = 70, analysis_depth: int | None = None):
         self.root = Path(root)
         self.symbols = symbols
-        self.timeframe = timeframe
+        requested = str(timeframe or "AUTO")
+        if requested.upper() == "AUTO":
+            requested = next(
+                (
+                    candidate for candidate in ("15m", "1h", "4h")
+                    if all(
+                        (self.root / "data" / "market_replay" / candidate / f'{symbol.replace("/", "_")}.csv.gz').is_file()
+                        for symbol in symbols
+                    )
+                ),
+                "4h",
+            )
+        self.timeframe = requested
         self.analysis_depth = int(risk_level if analysis_depth is None else analysis_depth)
         self.adapter = TechnicalV2FrameAdapter(risk_level=risk_level, analysis_depth=self.analysis_depth)
         self.frames: dict[str, pd.DataFrame] = {}
         self.daily_frames: dict[str, pd.DataFrame] = {}
         self.cursors: dict[str, int] = {}
         for symbol in symbols:
-            path = self.root / "data" / "market_replay" / timeframe / f'{symbol.replace("/", "_")}.csv.gz'
+            path = self.root / "data" / "market_replay" / self.timeframe / f'{symbol.replace("/", "_")}.csv.gz'
             frame = pd.read_csv(path)
             required = {"timestamp", "open", "high", "low", "close"}
             if not required.issubset(frame.columns) or len(frame) < 40:
@@ -59,7 +76,17 @@ class AcceleratedReplayMarket:
         row = self._row(symbol)
         last = float(row["close"])
         spread = max(last * 0.0002, 1e-12)
-        return ReplaySnapshot(symbol=symbol, last=last, bid=last - spread / 2, ask=last + spread / 2)
+        return ReplaySnapshot(
+            symbol=symbol,
+            last=last,
+            bid=last - spread / 2,
+            ask=last + spread / 2,
+            open=float(row["open"]),
+            high=float(row["high"]),
+            low=float(row["low"]),
+            timestamp=str(row["timestamp"]),
+            bar_index=int(self.cursors[symbol]),
+        )
 
     def signal(self, symbol: str):
         frame = self.frames[symbol]
@@ -76,7 +103,6 @@ class AcceleratedReplayMarket:
         signal = self.adapter.signal(
             symbol, frames, timestamp=str(self._row(symbol)["timestamp"]), provider="local-cache",
         )
-        signal.regime = "ACCELERATED_REPLAY"
         return signal
 
     def advance(self) -> None:

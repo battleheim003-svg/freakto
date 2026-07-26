@@ -49,6 +49,7 @@ class SessionPreset:
 
 
 SESSION_PRESETS = {
+    "QUALITY_TEST": SessionPreset("QUALITY_TEST", 30, 0, 30, 20, 1.0, "ACCELERATED_REPLAY"),
     "PRECISION": SessionPreset("PRECISION", 0, 0, 300, 60, 1.0, "LIVE_PUBLIC"),
     "BALANCED": SessionPreset("BALANCED", 35, 0, 60, 20, 1.0, "LIVE_PUBLIC"),
     "RAPID_TEST": SessionPreset("RAPID_TEST", 100, 0, 15, 5, 1.0, "ACCELERATED_REPLAY"),
@@ -72,7 +73,7 @@ TECHNICAL_STACK = (
 
 
 def session_preset(key: str) -> SessionPreset:
-    normalized = str(key or "BALANCED").strip().upper()
+    normalized = str(key or "QUALITY_TEST").strip().upper()
     if normalized not in SESSION_PRESETS:
         raise ValueError(f"Unknown Showcase session preset: {key}")
     return SESSION_PRESETS[normalized]

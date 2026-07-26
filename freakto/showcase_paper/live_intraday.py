@@ -54,7 +54,6 @@ class LiveIntradayTechnicalMarket:
         signal = self.adapter.signal(
             symbol, frames, timestamp=timestamp, provider=provider, drop_forming=True, require_fresh=True,
         )
-        signal.regime = f"LIVE_INTRADAY_{self.timeframe.upper()}"
         return signal
 
     def fetch_snapshot(self, symbol: str) -> IntradaySnapshot:

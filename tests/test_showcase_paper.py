@@ -11,6 +11,8 @@ from freakto.showcase_paper import controller
 from freakto.showcase_paper import live_intraday
 from freakto.showcase_paper.card import HEIGHT, WIDTH, render_trade_card
 from freakto.showcase_paper.engine import ShowcaseEngine, ShowcaseSettings
+from freakto.showcase_paper.performance import performance_summary, walk_forward_quality_comparison
+from freakto.showcase_paper.quality import quality_admission_reason, quality_profile
 from freakto.showcase_paper.replay_lab import AcceleratedReplayMarket
 from freakto.showcase_paper.risk import admission_reason, risk_policy, session_preset
 
@@ -125,6 +127,8 @@ def test_showcase_controller_forces_all_live_flags_off(monkeypatch, tmp_path):
     assert called["kwargs"]["env"]["REAL_CAPITAL_ENABLED"] == "false"
     assert called["kwargs"]["env"]["LIVE_DEMO_EXECUTION_ENABLED"] == "false"
     assert "--risk-level" in called["command"]
+    assert "--quality-mode" in called["command"]
+    assert "--replay-timeframe" in called["command"]
     assert "ACCELERATED_REPLAY" in called["command"]
 
 
@@ -159,6 +163,14 @@ def test_rapid_preset_is_short_and_uses_accelerated_replay():
     assert preset.scan_interval_seconds == 15
     assert preset.maximum_holding_minutes == 5
     assert preset.market_mode == "ACCELERATED_REPLAY"
+
+
+def test_quality_preset_is_the_strict_accelerated_default():
+    preset = session_preset("QUALITY_TEST")
+    assert preset.risk_level == 30
+    assert preset.analysis_depth == 100
+    assert preset.market_mode == "ACCELERATED_REPLAY"
+    assert session_preset("").key == "QUALITY_TEST"
 
 
 def test_showcase_reports_risk_rejections(tmp_path):
@@ -198,7 +210,7 @@ def test_accelerated_replay_advances_local_market_without_network(tmp_path):
     second = replay.fetch_snapshot("BTC/USDT").last
 
     assert signal_item.side == "LONG"
-    assert signal_item.regime == "ACCELERATED_REPLAY"
+    assert signal_item.regime == "UPTREND"
     assert len(signal_item.indicators_used) == 10
     assert signal_item.technical_confluence_pct >= 50
     assert second > first
@@ -269,6 +281,116 @@ def test_session_loss_guard_stops_without_minimum_trade_requirement(tmp_path):
     assert guard["remaining_loss_buffer_pct"] == 0
 
 
+def _quality_trade(index, *, symbol="BTC/USDT", side="LONG", pnl=-1.0):
+    return {
+        "trade_id": f"q-{index}", "status": "CLOSED", "close_reason": "STOP" if pnl <= 0 else "TARGET",
+        "symbol": symbol, "side": side, "pnl_usdt": pnl, "pnl_pct": pnl,
+        "opened_utc": f"2026-07-{index + 1:02d}T00:00:00+00:00",
+        "recommendation": "WATCHLIST", "technical_confluence_pct": 65,
+        "economics": {"net_expected_value_pct": 0.8},
+        "trade_geometry": {"cost_adjusted_reward_risk": 1.4},
+    }
+
+
+def test_win_rate_quality_gate_quarantines_mature_weak_symbol_side_bucket():
+    history = [_quality_trade(index, pnl=1.0 if index < 2 else -1.0) for index in range(10)]
+    candidate = _quality_trade(11)
+    reason, diagnostics = quality_admission_reason(candidate, history, quality_profile("WIN_RATE"))
+    assert reason == "QUALITY_SYMBOL_SIDE_QUARANTINE"
+    assert diagnostics["symbol_side"]["samples"] == 10
+    assert diagnostics["symbol_side"]["win_rate"] == pytest.approx(0.2)
+
+
+def test_healthy_exact_bucket_can_override_a_weak_global_side():
+    healthy = [_quality_trade(index, pnl=1.0 if index < 5 else -1.0) for index in range(10)]
+    weak_other = [
+        _quality_trade(index + 10, symbol="ETH/USDT", pnl=1.0 if index < 5 else -1.0)
+        for index in range(40)
+    ]
+    reason, _ = quality_admission_reason(_quality_trade(60), healthy + weak_other, quality_profile("WIN_RATE"))
+    assert reason is None
+
+
+def test_quality_walk_forward_comparison_never_uses_future_outcomes():
+    rows = [_quality_trade(index, pnl=1.0 if index < 2 else -1.0) for index in range(15)]
+    report = walk_forward_quality_comparison(rows)
+    assert report["method"] == "CAUSAL_WALK_FORWARD_FILTER"
+    assert report["official_evidence_eligible"] is False
+    assert report["candidate"]["samples"] < report["baseline"]["samples"]
+    assert performance_summary(rows)["profit_factor"] < 1
+
+
+def test_replay_ohlc_barrier_uses_conservative_stop_first_fill(tmp_path):
+    clock = {"now": datetime(2026, 7, 26, tzinfo=timezone.utc)}
+    bar = {"index": 0, "open": 100.0, "high": 100.0, "low": 100.0, "close": 100.0}
+
+    class BarMarket:
+        def fetch_snapshot(self, symbol):
+            return SimpleNamespace(
+                symbol=symbol, last=bar["close"], bid=bar["close"], ask=bar["close"],
+                provider="bar-test", bar_index=bar["index"], timestamp=str(bar["index"]),
+                open=bar["open"], high=bar["high"], low=bar["low"],
+            )
+
+    engine = ShowcaseEngine(
+        tmp_path,
+        ShowcaseSettings(symbols=("BTC/USDT",), maximum_open_positions=1, stop_loss_pct=0.6, take_profit_pct=0.9),
+        BarMarket(), signal, now_fn=lambda: clock["now"],
+    )
+    opened = engine.open_available()[0]
+    bar.update(index=1, open=100.0, high=102.0, low=98.0, close=101.0)
+    clock["now"] += timedelta(minutes=1)
+    closed = engine.mark_and_close()[0]
+    assert closed["close_reason"] == "STOP"
+    assert closed["exit_price"] == pytest.approx(opened["initial_stop_price"])
+    assert abs(closed["pnl_pct"]) < 1.0
+
+
+def test_break_even_is_armed_on_close_and_applies_from_next_bar(tmp_path):
+    clock = {"now": datetime(2026, 7, 26, tzinfo=timezone.utc)}
+    bar = {"index": 0, "open": 100.0, "high": 100.0, "low": 100.0, "close": 100.0}
+
+    class BarMarket:
+        def fetch_snapshot(self, symbol):
+            return SimpleNamespace(symbol=symbol, last=bar["close"], bid=bar["close"], ask=bar["close"], provider="bar-test", bar_index=bar["index"], timestamp=str(bar["index"]), open=bar["open"], high=bar["high"], low=bar["low"])
+
+    engine = ShowcaseEngine(
+        tmp_path,
+        ShowcaseSettings(symbols=("BTC/USDT",), maximum_open_positions=1, stop_loss_pct=1.0, take_profit_pct=3.0, break_even_trigger_r=0.5),
+        BarMarket(), signal, now_fn=lambda: clock["now"],
+    )
+    trade = engine.open_available()[0]
+    bar.update(index=1, open=100.0, high=100.7, low=99.5, close=100.6)
+    clock["now"] += timedelta(minutes=1)
+    assert engine.mark_and_close() == []
+    assert trade["break_even_armed"] is True
+    bar.update(index=2, open=100.3, high=100.4, low=100.1, close=100.2)
+    clock["now"] += timedelta(minutes=1)
+    closed = engine.mark_and_close()[0]
+    assert closed["close_reason"] == "BREAK_EVEN"
+    assert abs(closed["pnl_pct"]) < 0.01
+
+
+def test_strong_opposite_signal_closes_an_invalidated_position(tmp_path):
+    current_side = {"value": "LONG"}
+
+    def changing_signal(_symbol):
+        return SimpleNamespace(
+            side=current_side["value"], decision_timestamp=f'2026-07-26T00:00:0{0 if current_side["value"] == "LONG" else 1}+00:00',
+            score=75, confidence=70, recommendation="ACTIONABLE", regime="RANGE", technical_confluence_pct=70,
+        )
+
+    engine = ShowcaseEngine(
+        tmp_path, ShowcaseSettings(symbols=("BTC/USDT",), maximum_open_positions=1),
+        FakeMarketData({"BTC/USDT": 100}), changing_signal,
+    )
+    engine.open_available()
+    current_side["value"] = "SHORT"
+    closed = engine.close_invalidated()
+    assert len(closed) == 1
+    assert closed[0]["close_reason"] == "SIGNAL_INVALIDATED"
+
+
 def test_live_intraday_mode_uses_full_technical_stack(monkeypatch):
     import pandas as pd
 
@@ -289,7 +411,7 @@ def test_live_intraday_mode_uses_full_technical_stack(monkeypatch):
     item = market.signal("BTC/USDT")
     snapshot = market.fetch_snapshot("BTC/USDT")
 
-    assert item.regime == "LIVE_INTRADAY_1M"
+    assert item.regime == "UPTREND"
     assert len(item.indicators_used) == 12
     assert item.technical_confluence_pct >= 50
     assert snapshot.provider == "fixture"

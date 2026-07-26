@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from freakto.showcase_paper.card import render_trade_card
+from freakto.showcase_paper.quality import quality_admission_reason, quality_profile
 from freakto.showcase_paper.risk import admission_reason, risk_policy
 
 
@@ -53,6 +54,10 @@ class ShowcaseSettings:
     analysis_depth: int = 100
     reentry_cooldown_minutes: int = 30
     market_mode: str = "LIVE_PUBLIC"
+    quality_mode: str = "BALANCED"
+    replay_timeframe: str = "AUTO"
+    break_even_trigger_r: float = 0.75
+    exit_on_signal_invalidation: bool = True
     session_equity_usdt: float = 1_000.0
     session_profit_target_pct: float = 1.5
     session_loss_limit_pct: float = 1.0
@@ -79,6 +84,11 @@ class ShowcaseSettings:
             raise ValueError("reentry_cooldown_minutes must stay between 0 and 1,440")
         if self.market_mode not in {"LIVE_PUBLIC", "ACCELERATED_REPLAY"}:
             raise ValueError("market_mode must be LIVE_PUBLIC or ACCELERATED_REPLAY")
+        quality_profile(self.quality_mode)
+        if str(self.replay_timeframe).upper() not in {"AUTO", "15M", "1H", "4H"}:
+            raise ValueError("replay_timeframe must be AUTO, 15m, 1h, or 4h")
+        if not 0 <= float(self.break_even_trigger_r) <= 3:
+            raise ValueError("break_even_trigger_r must stay between 0 and 3")
         if not 100 <= float(self.session_equity_usdt) <= 1_000_000:
             raise ValueError("session_equity_usdt must stay between 100 and 1,000,000")
         if not 0 <= float(self.session_profit_target_pct) <= 20:
@@ -122,6 +132,7 @@ class ShowcaseEngine:
             "schema_version": 2,
             "mode": "SHOWCASE_PAPER",
             "market_mode": self.settings.market_mode,
+            "quality_mode": self.settings.quality_mode,
             "official_evidence_eligible": False,
             "started_utc": self.now_fn().isoformat(),
             "updated_utc": self.now_fn().isoformat(),
@@ -219,13 +230,14 @@ class ShowcaseEngine:
         render_trade_card(trade, path, logo_path=self.logo_path)
         return str(path)
 
-    def _signal(self, symbol: str) -> tuple[dict[str, Any] | None, str | None]:
+    def _signal(self, symbol: str, *, apply_admission: bool = True) -> tuple[dict[str, Any] | None, str | None]:
         item = self.signal_source(symbol)
         side = str(getattr(item, "side", "NEUTRAL")).upper()
         timestamp = str(getattr(item, "decision_timestamp", "") or self.now_fn().isoformat())
         identity = f"{symbol}|{side}|{timestamp}"
         signal = {
             "source_signal_id": hashlib.sha256(identity.encode("utf-8")).hexdigest()[:20],
+            "symbol": symbol,
             "side": side,
             "signal_timestamp": timestamp,
             "score": int(getattr(item, "score", 0) or 0),
@@ -256,7 +268,11 @@ class ShowcaseEngine:
             "decision_warnings": list(getattr(item, "decision_warnings", []) or []),
             "engine_version": str(getattr(item, "engine_version", "legacy-showcase")),
         }
-        reason = admission_reason(signal, risk_policy(self.settings.risk_level))
+        reason = admission_reason(signal, risk_policy(self.settings.risk_level)) if apply_admission else None
+        if reason is None and apply_admission:
+            quality = quality_profile(self.settings.quality_mode)
+            reason, diagnostics = quality_admission_reason(signal, self.trades, quality)
+            signal["quality_diagnostics"] = diagnostics
         return (signal if reason is None else None), reason
 
     def _reentry_blocked(self, symbol: str) -> bool:
@@ -290,9 +306,11 @@ class ShowcaseEngine:
             self.save()
             return opened
         policy = risk_policy(self.settings.risk_level)
+        quality = quality_profile(self.settings.quality_mode)
         scan = {
             "scanned_utc": self.now_fn().isoformat(),
             "risk_policy": policy.to_dict(),
+            "quality_policy": quality.to_dict(),
             "market_mode": self.settings.market_mode,
             "analysis_depth": self.settings.analysis_depth,
             "evaluated": 0,
@@ -301,7 +319,8 @@ class ShowcaseEngine:
             "rejected": {},
             "errors": [],
         }
-        position_slots = self.settings.maximum_open_positions - len(self._open_symbols())
+        quality_capacity = quality.maximum_open_positions or self.settings.maximum_open_positions
+        position_slots = min(self.settings.maximum_open_positions, quality_capacity) - len(self._open_symbols())
         daily_slots = (
             self.settings.daily_trade_limit - self._today_count()
             if self.settings.daily_trade_limit > 0
@@ -363,6 +382,7 @@ class ShowcaseEngine:
                     "market_mode": self.settings.market_mode,
                     "risk_level": policy.level,
                     "risk_profile": policy.key,
+                    "quality_mode": quality.key,
                     "status": "OPEN",
                     "symbol": symbol,
                     "side": side,
@@ -385,6 +405,11 @@ class ShowcaseEngine:
                     "exit_price": None,
                     "stop_price": stop,
                     "target_price": target,
+                    "initial_stop_price": stop,
+                    "break_even_armed": False,
+                    "entry_bar_index": getattr(snapshot, "bar_index", None),
+                    "last_bar_index": getattr(snapshot, "bar_index", None),
+                    "expiry_bars": int(geometry.get("expiry_bars", 0) or 0),
                     "opened_utc": now,
                     "updated_utc": now,
                     "closed_utc": None,
@@ -412,6 +437,7 @@ class ShowcaseEngine:
         scan["opened"] = len(opened)
         self.state["last_scan"] = scan
         self.state["risk_policy"] = policy.to_dict()
+        self.state["quality_policy"] = quality.to_dict()
         self.save()
         return opened
 
@@ -436,6 +462,97 @@ class ShowcaseEngine:
             updated_utc=self.now_fn().isoformat(),
         )
 
+    @staticmethod
+    def _barrier_fill(trade: dict[str, Any], snapshot: Any) -> tuple[str | None, float | None]:
+        entry_bar = trade.get("entry_bar_index")
+        bar_index = getattr(snapshot, "bar_index", None)
+        if entry_bar is None or bar_index is None or int(bar_index) <= int(entry_bar):
+            return None, None
+        try:
+            bar_open = float(snapshot.open)
+            bar_high = float(snapshot.high)
+            bar_low = float(snapshot.low)
+        except (AttributeError, TypeError, ValueError):
+            return None, None
+        stop = float(trade["stop_price"])
+        target = float(trade["target_price"])
+        if trade["side"] == "LONG":
+            hit_stop, hit_target = bar_low <= stop, bar_high >= target
+            stop_fill = bar_open if bar_open <= stop else stop
+            target_fill = bar_open if bar_open >= target else target
+        else:
+            hit_stop, hit_target = bar_high >= stop, bar_low <= target
+            stop_fill = bar_open if bar_open >= stop else stop
+            target_fill = bar_open if bar_open <= target else target
+        if hit_stop:
+            # If both barriers appear inside one OHLC bar, STOP-first is the
+            # conservative, deterministic, non-lookahead resolution.
+            reason = "BREAK_EVEN" if trade.get("break_even_armed") else "STOP"
+            return reason, stop_fill
+        if hit_target:
+            return "TARGET", target_fill
+        return None, None
+
+    def _arm_break_even(self, trade: dict[str, Any], snapshot: Any) -> None:
+        if trade.get("break_even_armed") or float(self.settings.break_even_trigger_r) <= 0:
+            return
+        entry_bar = trade.get("entry_bar_index")
+        bar_index = getattr(snapshot, "bar_index", None)
+        if entry_bar is None or bar_index is None or int(bar_index) <= int(entry_bar):
+            return
+        try:
+            favourable = float(snapshot.high if trade["side"] == "LONG" else snapshot.low)
+        except (AttributeError, TypeError, ValueError):
+            return
+        entry = float(trade["entry_price"])
+        initial_stop = float(trade.get("initial_stop_price") or trade["stop_price"])
+        risk_distance = abs(entry - initial_stop)
+        trigger = entry + (risk_distance * float(self.settings.break_even_trigger_r) if trade["side"] == "LONG" else -risk_distance * float(self.settings.break_even_trigger_r))
+        reached = favourable >= trigger if trade["side"] == "LONG" else favourable <= trigger
+        if not reached:
+            return
+        economics = dict(trade.get("economics") or {})
+        costs = dict(economics.get("cost_breakdown") or {})
+        fee_pct = (
+            float(costs.get("fees", 0) or 0) + float(costs.get("funding", 0) or 0) + float(costs.get("rollover", 0) or 0)
+            if costs else 2.0 * self.settings.fee_bps_per_side / 100.0
+        )
+        break_even = entry * (1 + fee_pct / 100.0 if trade["side"] == "LONG" else 1 - fee_pct / 100.0)
+        trade["stop_price"] = break_even
+        trade["break_even_armed"] = True
+        trade["break_even_armed_utc"] = self.now_fn().isoformat()
+
+    def close_invalidated(self) -> list[dict[str, Any]]:
+        if not self.settings.exit_on_signal_invalidation:
+            return []
+        closed: list[dict[str, Any]] = []
+        for trade in self.state.get("trades") or []:
+            if trade.get("status") != "OPEN":
+                continue
+            try:
+                signal, _ = self._signal(str(trade["symbol"]), apply_admission=False)
+                if not signal or signal["side"] == trade["side"]:
+                    continue
+                if str(signal.get("recommendation", "")).upper() not in {"ELITE", "ACTIONABLE", "WATCHLIST"}:
+                    continue
+                if int(signal.get("confidence", 0) or 0) < 60 or float(signal.get("technical_confluence_pct", 0) or 0) < 55:
+                    continue
+                snapshot = self.market_data.fetch_snapshot(str(trade["symbol"]))
+                mark = float(snapshot.bid if trade["side"] == "LONG" else snapshot.ask)
+                self._update_pnl(trade, mark)
+                trade.update(
+                    status="CLOSED", exit_price=mark, closed_utc=self.now_fn().isoformat(),
+                    close_reason="SIGNAL_INVALIDATED", invalidating_signal_id=signal["source_signal_id"],
+                )
+                trade["close_card"] = self._card(trade, "closed")
+                trade["latest_card"] = trade["close_card"]
+                closed.append(trade)
+            except Exception as exc:
+                self.state["errors"].append({"timestamp_utc": self.now_fn().isoformat(), "symbol": trade.get("symbol"), "error": f"{type(exc).__name__}: {exc}"})
+                self.state["errors"] = self.state["errors"][-50:]
+        self.save()
+        return closed
+
     def mark_and_close(self, *, close_all: bool = False) -> list[dict[str, Any]]:
         closed: list[dict[str, Any]] = []
         now = self.now_fn()
@@ -451,18 +568,39 @@ class ShowcaseEngine:
                 else:
                     snapshot = self.market_data.fetch_snapshot(str(trade["symbol"]))
                     mark = float(snapshot.bid if trade["side"] == "LONG" else snapshot.ask)
-                self._update_pnl(trade, mark)
+                barrier_reason, barrier_mark = (None, None) if close_all else self._barrier_fill(trade, snapshot)
+                self._update_pnl(trade, float(barrier_mark if barrier_mark is not None else mark))
                 opened = datetime.fromisoformat(str(trade["opened_utc"]))
                 held_minutes = max(0.0, (now - opened).total_seconds() / 60.0)
+                bar_index = None if close_all else getattr(snapshot, "bar_index", None)
+                entry_bar = trade.get("entry_bar_index")
+                held_bars = max(0, int(bar_index) - int(entry_bar)) if bar_index is not None and entry_bar is not None else 0
+                trade["held_bars"] = held_bars
+                trade["last_bar_index"] = bar_index
+                expiry_bars = int(trade.get("expiry_bars", 0) or 0)
                 hit_stop = mark <= float(trade["stop_price"]) if trade["side"] == "LONG" else mark >= float(trade["stop_price"])
                 hit_target = mark >= float(trade["target_price"]) if trade["side"] == "LONG" else mark <= float(trade["target_price"])
-                reason = "SESSION_STOP" if close_all else "STOP" if hit_stop else "TARGET" if hit_target else "TIME_EXIT" if held_minutes >= self.settings.maximum_holding_minutes else None
+                if close_all:
+                    reason = "SESSION_STOP"
+                elif barrier_reason:
+                    reason = barrier_reason
+                elif bar_index is None and hit_stop:
+                    reason = "BREAK_EVEN" if trade.get("break_even_armed") else "STOP"
+                elif bar_index is None and hit_target:
+                    reason = "TARGET"
+                elif expiry_bars > 0 and held_bars >= expiry_bars:
+                    reason = "TIME_EXIT"
+                elif bar_index is None and held_minutes >= self.settings.maximum_holding_minutes:
+                    reason = "TIME_EXIT"
+                else:
+                    reason = None
                 if reason:
-                    trade.update(status="CLOSED", exit_price=mark, closed_utc=now.isoformat(), close_reason=reason)
+                    trade.update(status="CLOSED", exit_price=float(barrier_mark if barrier_mark is not None else mark), closed_utc=now.isoformat(), close_reason=reason)
                     trade["close_card"] = self._card(trade, "closed")
                     trade["latest_card"] = trade["close_card"]
                     closed.append(trade)
                 else:
+                    self._arm_break_even(trade, snapshot)
                     trade["latest_card"] = self._card(trade, "open")
             except Exception as exc:
                 self.state["errors"].append({"timestamp_utc": now.isoformat(), "symbol": trade.get("symbol"), "error": f"{type(exc).__name__}: {exc}"})

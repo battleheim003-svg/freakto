@@ -11,6 +11,8 @@ from pathlib import Path
 from freakto.showcase_paper.controller import output_dir, runtime_dir, showcase_status, write_worker_state
 from freakto.showcase_paper.engine import ShowcaseEngine, ShowcaseSettings
 from freakto.showcase_paper.live_intraday import LiveIntradayTechnicalMarket
+from freakto.showcase_paper.performance import performance_report
+from freakto.showcase_paper.quality import quality_profile
 from freakto.showcase_paper.replay_lab import AcceleratedReplayMarket
 from freakto.showcase_paper.risk import risk_policy
 
@@ -25,6 +27,7 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
         replay_market = AcceleratedReplayMarket(
             root, settings.symbols, risk_level=settings.risk_level,
             analysis_depth=settings.analysis_depth,
+            timeframe=settings.replay_timeframe,
         )
         market_data = replay_market
         signal_source = replay_market.signal
@@ -87,12 +90,15 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
                     })
                 adapter.set_segmented_observations(segmented)
                 adapter.set_portfolio_positions([trade for trade in engine.trades if trade.get("status") == "OPEN"])
+            invalidated = engine.close_invalidated()
             opened = engine.open_available()
             scan_count += 1
             if replay_market is not None:
                 replay_market.advance()
             now = datetime.now(timezone.utc)
             scan_payload = dict(engine.state.get("last_scan") or {})
+            session_baseline = int((engine.state.get("session_guard") or {}).get("baseline_closed_trades", 0) or 0)
+            performance = performance_report(engine.trades, session_baseline=session_baseline)
             state.update(
                 status="RUNNING",
                 phase="WAITING",
@@ -104,9 +110,12 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
                 scan_count=scan_count,
                 last_scan=scan_payload,
                 risk_policy=dict(scan_payload.get("risk_policy") or {}),
+                quality_policy=dict(scan_payload.get("quality_policy") or {}),
                 opened_last_scan=len(opened),
+                invalidated_last_scan=len(invalidated),
                 replay_progress=replay_market.progress() if replay_market is not None else None,
                 session_guard=engine.evaluate_session_guard(),
+                performance=performance,
             )
             write_worker_state(state, root)
             remaining = max(5, int(scan_interval_seconds))
@@ -133,11 +142,14 @@ def main() -> int:
     parser.add_argument("--session-profit-target-pct", type=float)
     parser.add_argument("--session-loss-limit-pct", type=float)
     parser.add_argument("--market-mode", choices=("LIVE_PUBLIC", "ACCELERATED_REPLAY"), default="LIVE_PUBLIC")
+    parser.add_argument("--quality-mode", choices=("VOLUME", "BALANCED", "WIN_RATE"), default="BALANCED")
+    parser.add_argument("--replay-timeframe", choices=("AUTO", "15m", "1h", "4h"), default="AUTO")
     args = parser.parse_args()
     policy = risk_policy(args.risk_level)
+    quality = quality_profile(args.quality_mode)
     settings = ShowcaseSettings(
         daily_trade_limit=args.daily_trade_limit,
-        maximum_open_positions=policy.maximum_open_positions,
+        maximum_open_positions=min(policy.maximum_open_positions, quality.maximum_open_positions or policy.maximum_open_positions),
         notional_usdt=policy.notional_usdt,
         maximum_holding_minutes=args.maximum_holding_minutes,
         leverage=args.leverage,
@@ -147,6 +159,8 @@ def main() -> int:
         analysis_depth=args.analysis_depth,
         reentry_cooldown_minutes=policy.reentry_cooldown_minutes,
         market_mode=args.market_mode,
+        quality_mode=quality.key,
+        replay_timeframe=args.replay_timeframe,
         session_equity_usdt=args.session_equity_usdt,
         session_profit_target_pct=(policy.session_profit_target_pct if args.session_profit_target_pct is None else args.session_profit_target_pct),
         session_loss_limit_pct=(policy.session_loss_limit_pct if args.session_loss_limit_pct is None else args.session_loss_limit_pct),
