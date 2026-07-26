@@ -8,6 +8,7 @@ import pytest
 from PIL import Image
 
 from freakto.showcase_paper import controller
+from freakto.showcase_paper import live_intraday
 from freakto.showcase_paper.card import HEIGHT, WIDTH, render_trade_card
 from freakto.showcase_paper.engine import ShowcaseEngine, ShowcaseSettings
 from freakto.showcase_paper.replay_lab import AcceleratedReplayMarket
@@ -112,10 +113,15 @@ def test_risk_zero_is_strict_and_higher_risk_widens_admission():
     assert admission_reason(candidate, risk_policy(0)) is not None
     assert admission_reason(candidate, risk_policy(70)) is None
     assert risk_policy(0).maximum_open_positions < risk_policy(100).maximum_open_positions
+    assert len(risk_policy(0).technical_indicators) == 3
+    assert len(risk_policy(100).technical_indicators) == 12
+    assert risk_policy(100).reentry_cooldown_minutes == 0
 
 
 def test_rapid_preset_is_short_and_uses_accelerated_replay():
     preset = session_preset("RAPID_TEST")
+    assert preset.risk_level == 100
+    assert preset.daily_trade_limit == 0
     assert preset.scan_interval_seconds == 15
     assert preset.maximum_holding_minutes == 5
     assert preset.market_mode == "ACCELERATED_REPLAY"
@@ -159,4 +165,48 @@ def test_accelerated_replay_advances_local_market_without_network(tmp_path):
 
     assert signal_item.side == "LONG"
     assert signal_item.regime == "ACCELERATED_REPLAY"
+    assert len(signal_item.indicators_used) == 10
+    assert signal_item.technical_confluence_pct >= 50
     assert second > first
+
+
+def test_unlimited_session_can_reopen_after_close(tmp_path):
+    clock = {"now": datetime(2026, 7, 26, tzinfo=timezone.utc)}
+    settings = ShowcaseSettings(
+        symbols=("BTC/USDT",), daily_trade_limit=0, maximum_open_positions=1,
+        risk_level=70, reentry_cooldown_minutes=0, take_profit_pct=0.5,
+    )
+    market = FakeMarketData({"BTC/USDT": 100})
+    engine = ShowcaseEngine(tmp_path, settings, market, signal, now_fn=lambda: clock["now"])
+    assert len(engine.open_available()) == 1
+    market.prices["BTC/USDT"] = 101
+    clock["now"] += timedelta(minutes=1)
+    assert len(engine.mark_and_close()) == 1
+    assert len(engine.open_available()) == 1
+    assert len(engine.trades) == 2
+
+
+def test_live_intraday_mode_uses_full_technical_stack(monkeypatch):
+    import pandas as pd
+
+    rows = []
+    start = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    for index in range(45):
+        price = 100 + index * 0.5
+        rows.append({
+            "timestamp": start + timedelta(minutes=5 * index),
+            "open": price - 0.2, "high": price + 0.5, "low": price - 0.5,
+            "close": price, "volume": 1000 + index,
+        })
+    frame = pd.DataFrame(rows)
+    frame.attrs["provider"] = "fixture"
+    monkeypatch.setattr(live_intraday, "fetch_ohlcv", lambda **_kwargs: frame)
+
+    market = live_intraday.LiveIntradayTechnicalMarket(risk_level=100)
+    item = market.signal("BTC/USDT")
+    snapshot = market.fetch_snapshot("BTC/USDT")
+
+    assert item.regime == "LIVE_INTRADAY_5M"
+    assert len(item.indicators_used) == 12
+    assert item.technical_confluence_pct >= 50
+    assert snapshot.provider == "fixture"

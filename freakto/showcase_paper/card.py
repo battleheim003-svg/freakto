@@ -94,7 +94,10 @@ def render_trade_card(trade: dict[str, Any], output_path: str | Path, *, logo_pa
         ("Entry Price", _price(trade.get("entry_price"))),
         ("Mark Price" if status == "OPEN" else "Exit Price", _price(trade.get("current_price") or trade.get("exit_price"))),
         ("Stop / Target", f"{_price(trade.get('stop_price'))}  /  {_price(trade.get('target_price'))}"),
-        ("Paper Notional", f"{float(trade.get('notional_usdt', 0) or 0):,.2f} USDT"),
+        (
+            "Technical Confluence",
+            f"{float(trade.get('technical_confluence_pct', 0) or 0):.0f}%  ·  {len(trade.get('indicators_used') or [])} tools",
+        ),
     ]
     top = 700
     for index, (label, value) in enumerate(fields):

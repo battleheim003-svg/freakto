@@ -67,6 +67,7 @@ TEXT = {
         "holding_minutes": "حداکثر زمان نگهداری (دقیقه)", "leverage": "اهرم نمایشی", "start_showcase": "روشن‌کردن Showcase", "stop_showcase": "خاموش‌کردن و بستن موقعیت‌ها",
         "open_positions": "موقعیت باز", "showcase_cards": "کارت‌های آخرین معاملات", "download_card": "دانلود کارت", "showcase_started": "Showcase Paper در پس‌زمینه روشن شد.", "showcase_stopping": "درخواست توقف ثبت شد؛ موقعیت‌ها با قیمت جاری بسته می‌شوند.",
         "risk_management": "مدیریت ریسک تست", "risk_level": "ریسک‌پذیری (۰ دقیق تا ۱۰۰ اکتشافی)", "session_style": "نوع جلسه", "precision": "دقیق و محتاط", "balanced": "متعادل", "rapid_test": "تست سریع", "market_mode": "منبع اجرای تست", "live_public": "بازار عمومی زنده", "accelerated_replay": "Replay محلی شتاب‌یافته", "scan_activity": "فعالیت آخرین اسکن", "next_scan": "اسکن بعدی", "accepted_signals": "سیگنال پذیرفته", "rejected_signals": "علت‌های رد", "data_errors": "خطاهای اخیر داده", "risk_policy_note": "این کنترل فقط پذیرش فرصت در Showcase را تغییر می‌دهد و منطق موتور اصلی را دست‌کاری نمی‌کند.",
+        "unlimited_trades": "معاملات session نامحدود", "analysis_depth": "عمق تحلیل", "technical_tools": "ابزار تکنیکال فعال", "confluence": "همگرایی تکنیکال",
         "reports_title": "گزارش و تاریخچه", "reports_sub": "نتیجه روشن هر اجرا، مراحل موفق، نقطه توقف، Blockerها و لاگ کامل.",
         "refresh_reports": "تولید همه گزارش‌ها", "readiness": "گزارش آمادگی", "blockers": "موانع", "gates": "گیت‌ها", "job_history": "تاریخچه Jobها",
         "select_job": "انتخاب Job", "retry": "اجرای مجدد", "log": "لاگ فنی", "step_results": "نتیجه مراحل", "result": "نتیجه", "duration": "مدت", "current": "مقدار فعلی", "required": "حد لازم", "schedules": "زمان‌بندی",
@@ -108,6 +109,7 @@ TEXT = {
         "holding_minutes": "Maximum holding time (minutes)", "leverage": "Display leverage", "start_showcase": "Enable Showcase", "stop_showcase": "Disable and close positions",
         "open_positions": "Open positions", "showcase_cards": "Latest trade cards", "download_card": "Download card", "showcase_started": "Showcase Paper started in the background.", "showcase_stopping": "Stop requested; positions will close at current prices.",
         "risk_management": "Test risk management", "risk_level": "Risk tolerance (0 precision to 100 exploratory)", "session_style": "Session style", "precision": "Precision", "balanced": "Balanced", "rapid_test": "Rapid test", "market_mode": "Test execution source", "live_public": "Live public market", "accelerated_replay": "Accelerated local Replay", "scan_activity": "Latest scan activity", "next_scan": "Next scan", "accepted_signals": "Accepted signals", "rejected_signals": "Rejection reasons", "data_errors": "Recent data errors", "risk_policy_note": "This control changes Showcase admission only and never modifies the core engine logic.",
+        "unlimited_trades": "Unlimited session trades", "analysis_depth": "Analysis depth", "technical_tools": "Active technical tools", "confluence": "Technical confluence",
         "reports_title": "Reports & history", "reports_sub": "A clear result for every run: passed steps, stop point, blockers, and full logs.",
         "refresh_reports": "Generate all reports", "readiness": "Readiness report", "blockers": "Blockers", "gates": "Gates", "job_history": "Job history",
         "select_job": "Select job", "retry": "Retry", "log": "Technical log", "step_results": "Step results", "result": "Result", "duration": "Duration", "current": "Current", "required": "Required", "schedules": "schedules",
@@ -541,18 +543,18 @@ elif page == "workflows":
                 )
             policy = risk_policy(risk_level)
             st.caption(
-                f'{policy.key} · Score ≥ {policy.minimum_score} · Confidence ≥ {policy.minimum_confidence}% · '
-                f'Max positions {policy.maximum_open_positions} · Cooldown {policy.reentry_cooldown_minutes}m'
+                f'{policy.key} · {policy.analysis_depth} · {len(policy.technical_indicators)} indicators · '
+                f'Score ≥ {policy.minimum_score} · Confidence ≥ {policy.minimum_confidence}% · '
+                f'Confluence ≥ {policy.minimum_confluence_pct}%'
             )
+            st.success(f'∞ {t("unlimited_trades")} · {t("technical_tools")}: ' + "، ".join(policy.technical_indicators))
             with st.expander(t("advanced")):
-                settings_cols = st.columns(4)
+                settings_cols = st.columns(3)
                 with settings_cols[0]:
-                    daily_limit = st.number_input(t("daily_limit"), min_value=1, max_value=30, value=int(showcase_settings.get("daily_trade_limit", preset.daily_trade_limit)) if showcase_active else preset.daily_trade_limit, disabled=showcase_active, key=f"showcase-limit-{preset_key}")
-                with settings_cols[1]:
                     scan_interval = st.number_input(t("scan_interval"), min_value=5, max_value=3600, value=int(showcase_settings.get("scan_interval_seconds", preset.scan_interval_seconds)) if showcase_active else preset.scan_interval_seconds, step=5, disabled=showcase_active, key=f"showcase-scan-{preset_key}")
-                with settings_cols[2]:
+                with settings_cols[1]:
                     holding_minutes = st.number_input(t("holding_minutes"), min_value=1, max_value=1440, value=int(showcase_settings.get("maximum_holding_minutes", preset.maximum_holding_minutes)) if showcase_active else preset.maximum_holding_minutes, step=1, disabled=showcase_active, key=f"showcase-hold-{preset_key}")
-                with settings_cols[3]:
+                with settings_cols[2]:
                     leverage = st.number_input(t("leverage"), min_value=1.0, max_value=5.0, value=float(showcase_settings.get("leverage", preset.leverage)) if showcase_active else preset.leverage, step=0.5, disabled=showcase_active, key=f"showcase-leverage-{preset_key}")
             showcase_metrics = st.columns(5)
             showcase_metrics[0].metric(t("system_health"), status_label(showcase.get("status") or "STOPPED"))
@@ -565,7 +567,7 @@ elif page == "workflows":
                 if st.button("▶ " + t("start_showcase"), type="primary", use_container_width=True, disabled=showcase_active):
                     try:
                         start_showcase(
-                            daily_trade_limit=int(daily_limit), scan_interval_seconds=int(scan_interval),
+                            daily_trade_limit=0, scan_interval_seconds=int(scan_interval),
                             maximum_holding_minutes=int(holding_minutes), leverage=float(leverage),
                             risk_level=int(risk_level), market_mode=str(market_mode),
                         )
@@ -590,6 +592,13 @@ elif page == "workflows":
                         f'{t("accepted_signals")}: {last_scan.get("accepted", 0)}/{last_scan.get("evaluated", 0)} · '
                         f'Opened: {last_scan.get("opened", 0)} · Mode: {last_scan.get("market_mode", "—")}'
                     )
+                    last_policy = dict(last_scan.get("risk_policy") or {})
+                    if last_policy:
+                        st.write(
+                            f'{t("analysis_depth")}: {last_policy.get("analysis_depth", "—")} · '
+                            f'{t("technical_tools")}: {len(last_policy.get("technical_indicators") or [])} · '
+                            f'{t("confluence")}: ≥ {last_policy.get("minimum_confluence_pct", "—")}%'
+                        )
                     rejected = dict(last_scan.get("rejected") or {})
                     if rejected:
                         st.write(t("rejected_signals") + ": " + " · ".join(f"{key}={value}" for key, value in rejected.items()))

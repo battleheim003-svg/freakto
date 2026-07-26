@@ -67,7 +67,7 @@ def list_showcase_trades(root: Path = ROOT) -> list[dict[str, Any]]:
 
 def start_showcase(
     *,
-    daily_trade_limit: int = 6,
+    daily_trade_limit: int = 0,
     scan_interval_seconds: int = 300,
     maximum_holding_minutes: int = 60,
     leverage: float = 1.0,

@@ -9,9 +9,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from types import SimpleNamespace
 
 import pandas as pd
+
+from freakto.showcase_paper.risk import risk_policy
+from freakto.showcase_paper.technical import build_technical_signal
 
 
 @dataclass(frozen=True)
@@ -24,10 +26,11 @@ class ReplaySnapshot:
 
 
 class AcceleratedReplayMarket:
-    def __init__(self, root: Path, symbols: tuple[str, ...], *, timeframe: str = "4h"):
+    def __init__(self, root: Path, symbols: tuple[str, ...], *, timeframe: str = "4h", risk_level: int = 70):
         self.root = Path(root)
         self.symbols = symbols
         self.timeframe = timeframe
+        self.policy = risk_policy(risk_level)
         self.frames: dict[str, pd.DataFrame] = {}
         self.cursors: dict[str, int] = {}
         for symbol in symbols:
@@ -55,21 +58,10 @@ class AcceleratedReplayMarket:
         frame = self.frames[symbol]
         cursor = self.cursors[symbol]
         window = frame.iloc[max(0, cursor - 29): cursor + 1]
-        closes = pd.to_numeric(window["close"], errors="coerce").dropna()
-        fast = float(closes.ewm(span=4, adjust=False).mean().iloc[-1])
-        slow = float(closes.ewm(span=10, adjust=False).mean().iloc[-1])
-        volatility = max(float(closes.pct_change().std() or 0.0), 0.0001)
-        strength = min(1.0, abs(fast - slow) / max(abs(slow) * volatility, 1e-12))
-        side = "LONG" if fast >= slow else "SHORT"
-        score = round(52 + strength * 38)
-        confidence = round(50 + strength * 36)
-        recommendation = "ACTIONABLE" if score >= 72 else "WATCHLIST" if score >= 60 else "MONITOR"
-        return SimpleNamespace(
-            side=side,
-            decision_timestamp=str(self._row(symbol)["timestamp"]),
-            score=score,
-            confidence=confidence,
-            recommendation=recommendation,
+        return build_technical_signal(
+            window,
+            self.policy,
+            timestamp=str(self._row(symbol)["timestamp"]),
             regime="ACCELERATED_REPLAY",
             provider="local-cache",
         )
@@ -83,6 +75,8 @@ class AcceleratedReplayMarket:
         return {
             "timeframe": self.timeframe,
             "provider": "accelerated-local-replay",
+            "analysis_depth": self.policy.analysis_depth,
+            "indicators_used": list(self.policy.technical_indicators),
             "cursors": {symbol: int(cursor) for symbol, cursor in self.cursors.items()},
             "timestamps": {symbol: str(self._row(symbol)["timestamp"]) for symbol in self.symbols},
         }

@@ -21,6 +21,9 @@ class RiskPolicy:
     stop_loss_pct: float
     take_profit_pct: float
     reentry_cooldown_minutes: int
+    analysis_depth: str
+    technical_indicators: tuple[str, ...]
+    minimum_confluence_pct: int
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)
@@ -41,10 +44,26 @@ class SessionPreset:
 
 
 SESSION_PRESETS = {
-    "PRECISION": SessionPreset("PRECISION", 0, 4, 300, 60, 1.0, "LIVE_PUBLIC"),
-    "BALANCED": SessionPreset("BALANCED", 35, 8, 60, 20, 1.0, "LIVE_PUBLIC"),
-    "RAPID_TEST": SessionPreset("RAPID_TEST", 70, 12, 15, 5, 1.0, "ACCELERATED_REPLAY"),
+    "PRECISION": SessionPreset("PRECISION", 0, 0, 300, 60, 1.0, "LIVE_PUBLIC"),
+    "BALANCED": SessionPreset("BALANCED", 35, 0, 60, 20, 1.0, "LIVE_PUBLIC"),
+    "RAPID_TEST": SessionPreset("RAPID_TEST", 100, 0, 15, 5, 1.0, "ACCELERATED_REPLAY"),
 }
+
+
+TECHNICAL_STACK = (
+    "EMA_4_10",
+    "PRICE_MOMENTUM",
+    "RSI_14",
+    "EMA_10_21",
+    "MACD_12_26_9",
+    "BOLLINGER_POSITION",
+    "ROC_5",
+    "STOCHASTIC_14",
+    "VOLUME_CONFIRMATION",
+    "BREAKOUT_20",
+    "CANDLE_STRUCTURE",
+    "ATR_REGIME",
+)
 
 
 def session_preset(key: str) -> SessionPreset:
@@ -59,15 +78,23 @@ def risk_policy(level: int | float) -> RiskPolicy:
     if parsed <= 20:
         key = "PRECISION"
         allowed = ("ELITE", "ACTIONABLE")
+        indicator_count = 3
+        depth = "FOCUSED"
     elif parsed <= 55:
         key = "CAUTIOUS"
         allowed = ("ELITE", "ACTIONABLE", "WATCHLIST")
+        indicator_count = 6
+        depth = "MULTI_SIGNAL"
     elif parsed <= 80:
         key = "ACTIVE_TEST"
         allowed = ("ELITE", "ACTIONABLE", "WATCHLIST", "MONITOR")
+        indicator_count = 10
+        depth = "DEEP_CONFLUENCE"
     else:
         key = "EXPLORATORY"
         allowed = ("ELITE", "ACTIONABLE", "WATCHLIST", "MONITOR", "IGNORE", "UNRATED")
+        indicator_count = len(TECHNICAL_STACK)
+        depth = "FULL_TECHNICAL_STACK"
 
     # Higher tolerance widens admission while keeping bounded virtual exposure.
     return RiskPolicy(
@@ -76,11 +103,14 @@ def risk_policy(level: int | float) -> RiskPolicy:
         minimum_score=round(78 - parsed * 0.38),
         minimum_confidence=round(72 - parsed * 0.32),
         allowed_recommendations=allowed,
-        maximum_open_positions=min(4, 2 + parsed // 34),
+        maximum_open_positions=min(12, 3 + parsed // 10),
         notional_usdt=round(100 + parsed * 1.5, 2),
         stop_loss_pct=round(0.45 + parsed * 0.0045, 3),
         take_profit_pct=round(0.70 + parsed * 0.005, 3),
-        reentry_cooldown_minutes=max(5, round(45 - parsed * 0.4)),
+        reentry_cooldown_minutes=max(0, round(15 - parsed * 0.22)),
+        analysis_depth=depth,
+        technical_indicators=TECHNICAL_STACK[:indicator_count],
+        minimum_confluence_pct=max(45, round(65 - parsed * 0.2)),
     )
 
 
@@ -95,4 +125,7 @@ def admission_reason(signal: dict[str, object], policy: RiskPolicy) -> str | Non
     recommendation = str(signal.get("recommendation", "UNRATED") or "UNRATED").upper()
     if recommendation not in policy.allowed_recommendations:
         return "RECOMMENDATION_BLOCKED"
+    confluence = signal.get("technical_confluence_pct")
+    if confluence is not None and float(confluence) < policy.minimum_confluence_pct:
+        return "TECHNICAL_CONFLUENCE_BELOW_POLICY"
     return None

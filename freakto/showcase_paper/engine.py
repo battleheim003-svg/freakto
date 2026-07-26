@@ -35,8 +35,11 @@ def _read_json(path: Path, fallback: dict[str, Any]) -> dict[str, Any]:
 
 @dataclass(frozen=True)
 class ShowcaseSettings:
-    symbols: tuple[str, ...] = ("BTC/USDT", "ETH/USDT", "SOL/USDT", "XRP/USDT", "ADA/USDT", "LINK/USDT")
-    daily_trade_limit: int = 6
+    symbols: tuple[str, ...] = (
+        "BTC/USDT", "ETH/USDT", "SOL/USDT", "XRP/USDT", "ADA/USDT", "LINK/USDT",
+        "DOGE/USDT", "AVAX/USDT", "DOT/USDT", "NEAR/USDT", "LTC/USDT", "BCH/USDT",
+    )
+    daily_trade_limit: int = 0
     maximum_open_positions: int = 4
     notional_usdt: float = 250.0
     leverage: float = 1.0
@@ -52,10 +55,10 @@ class ShowcaseSettings:
     def validated(self) -> "ShowcaseSettings":
         if not self.symbols:
             raise ValueError("At least one showcase symbol is required")
-        if not 1 <= self.daily_trade_limit <= 30:
-            raise ValueError("daily_trade_limit must be between 1 and 30")
-        if not 1 <= self.maximum_open_positions <= 10:
-            raise ValueError("maximum_open_positions must be between 1 and 10")
+        if not 0 <= self.daily_trade_limit <= 100_000:
+            raise ValueError("daily_trade_limit must be zero (unlimited) or a positive safety cap")
+        if not 1 <= self.maximum_open_positions <= 30:
+            raise ValueError("maximum_open_positions must be between 1 and 30")
         if not 10 <= self.notional_usdt <= 10_000:
             raise ValueError("notional_usdt must be between 10 and 10,000")
         if not 1 <= self.leverage <= 5:
@@ -145,6 +148,13 @@ class ShowcaseEngine:
             "confidence": int(getattr(item, "confidence", 0) or 0),
             "recommendation": str(getattr(item, "recommendation", "UNRATED")),
             "regime": str(getattr(item, "regime", "UNKNOWN")),
+            "analysis_depth": str(getattr(item, "analysis_depth", risk_policy(self.settings.risk_level).analysis_depth)),
+            "indicators_used": list(getattr(item, "indicators_used", []) or []),
+            "indicator_votes": dict(getattr(item, "indicator_votes", {}) or {}),
+            "technical_long_votes": int(getattr(item, "technical_long_votes", 0) or 0),
+            "technical_short_votes": int(getattr(item, "technical_short_votes", 0) or 0),
+            "technical_neutral_votes": int(getattr(item, "technical_neutral_votes", 0) or 0),
+            "technical_confluence_pct": getattr(item, "technical_confluence_pct", None),
         }
         reason = admission_reason(signal, risk_policy(self.settings.risk_level))
         return (signal if reason is None else None), reason
@@ -177,10 +187,13 @@ class ShowcaseEngine:
             "rejected": {},
             "errors": [],
         }
-        slots = min(
-            self.settings.maximum_open_positions - len(self._open_symbols()),
-            self.settings.daily_trade_limit - self._today_count(),
+        position_slots = self.settings.maximum_open_positions - len(self._open_symbols())
+        daily_slots = (
+            self.settings.daily_trade_limit - self._today_count()
+            if self.settings.daily_trade_limit > 0
+            else position_slots
         )
+        slots = min(position_slots, daily_slots)
         if slots <= 0:
             scan["rejected"] = {"SESSION_CAPACITY_REACHED": len(self.settings.symbols)}
             self.state["last_scan"] = scan

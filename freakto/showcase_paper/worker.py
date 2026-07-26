@@ -8,16 +8,11 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from freakto.research.adapters.showcase_market_data import build_showcase_market_data
 from freakto.showcase_paper.controller import output_dir, runtime_dir, showcase_status, write_worker_state
 from freakto.showcase_paper.engine import ShowcaseEngine, ShowcaseSettings
+from freakto.showcase_paper.live_intraday import LiveIntradayTechnicalMarket
 from freakto.showcase_paper.replay_lab import AcceleratedReplayMarket
 from freakto.showcase_paper.risk import risk_policy
-
-
-def _signal_source(symbol: str):
-    from portfolio_scanner import analyze_symbol
-    return analyze_symbol(symbol)
 
 
 def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds: int) -> int:
@@ -27,12 +22,13 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
     write_worker_state(state, root)
     replay_market = None
     if settings.market_mode == "ACCELERATED_REPLAY":
-        replay_market = AcceleratedReplayMarket(root, settings.symbols)
+        replay_market = AcceleratedReplayMarket(root, settings.symbols, risk_level=settings.risk_level)
         market_data = replay_market
         signal_source = replay_market.signal
     else:
-        market_data = build_showcase_market_data()
-        signal_source = _signal_source
+        live_market = LiveIntradayTechnicalMarket(risk_level=settings.risk_level)
+        market_data = live_market
+        signal_source = live_market.signal
     engine = ShowcaseEngine(output_dir(root), settings, market_data, signal_source, logo_path=root / "assets" / "freakto-logo.png")
     try:
         scan_count = 0
@@ -52,6 +48,7 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
             if replay_market is not None:
                 replay_market.advance()
             now = datetime.now(timezone.utc)
+            scan_payload = dict(engine.state.get("last_scan") or {})
             state.update(
                 status="RUNNING",
                 phase="WAITING",
@@ -61,7 +58,8 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
                     now.timestamp() + max(5, int(scan_interval_seconds)), tz=timezone.utc
                 ).isoformat(),
                 scan_count=scan_count,
-                last_scan=dict(engine.state.get("last_scan") or {}),
+                last_scan=scan_payload,
+                risk_policy=dict(scan_payload.get("risk_policy") or {}),
                 opened_last_scan=len(opened),
                 replay_progress=replay_market.progress() if replay_market is not None else None,
             )
@@ -80,7 +78,7 @@ def run_worker(root: Path, settings: ShowcaseSettings, *, scan_interval_seconds:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, required=True)
-    parser.add_argument("--daily-trade-limit", type=int, default=6)
+    parser.add_argument("--daily-trade-limit", type=int, default=0)
     parser.add_argument("--scan-interval-seconds", type=int, default=300)
     parser.add_argument("--maximum-holding-minutes", type=int, default=60)
     parser.add_argument("--leverage", type=float, default=1.0)
