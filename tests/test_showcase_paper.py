@@ -265,6 +265,8 @@ def test_session_loss_guard_stops_without_minimum_trade_requirement(tmp_path):
     guard = engine.evaluate_session_guard()
     assert guard["status"] == "LOSS_LIMIT_REACHED"
     assert guard["closed_trades"] == 1
+    assert guard["loss_limit_usdt"] == pytest.approx(1.0)
+    assert guard["remaining_loss_buffer_pct"] == 0
 
 
 def test_live_intraday_mode_uses_full_technical_stack(monkeypatch):

@@ -137,6 +137,12 @@ TEXT["fa"].update({
     "session_equity": "سرمایه مجازی جلسه (USDT)",
     "session_return": "بازده خالص جلسه",
     "profit_guard": "محافظ سود جلسه",
+    "session_guard_title": "محافظ سود و زیان جلسه",
+    "loss_stop": "توقف قطعی زیان",
+    "loss_capacity_used": "ظرفیت زیان مصرف‌شده",
+    "remaining_loss_buffer": "فاصله تا توقف زیان",
+    "guard_basis": "مبنای محاسبه: سود و زیان خالص تحقق‌یافته + موقعیت‌های باز، نسبت به سرمایه مجازی جلسه.",
+    "guard_disabled": "این محافظ غیرفعال است؛ مقدار آن را بیشتر از صفر قرار بده.",
 })
 TEXT["en"].update({
     "data_quality": "Data quality",
@@ -151,6 +157,12 @@ TEXT["en"].update({
     "session_equity": "Virtual session equity (USDT)",
     "session_return": "Net session return",
     "profit_guard": "Session profit guard",
+    "session_guard_title": "Session profit and loss guard",
+    "loss_stop": "Hard loss stop",
+    "loss_capacity_used": "Loss capacity used",
+    "remaining_loss_buffer": "Remaining loss buffer",
+    "guard_basis": "Basis: net realized PnL plus open-position PnL, divided by virtual session equity.",
+    "guard_disabled": "This guard is disabled; set its value above zero to enable it.",
 })
 
 KIND_LABELS = {
@@ -617,6 +629,32 @@ elif page == "workflows":
                         value=float(showcase_settings.get("session_equity_usdt", policy.session_equity_usdt)) if showcase_active else float(policy.session_equity_usdt),
                         step=100.0, disabled=showcase_active, key=f"showcase-equity-{preset_key}",
                     )
+            session_guard = dict(showcase.get("session_guard") or {})
+            guard_return = float(session_guard.get("session_return_pct", 0) or 0)
+            guard_pnl = float(session_guard.get("session_pnl_usdt", 0) or 0)
+            guard_equity = float(session_guard.get("session_equity_usdt", session_equity) or session_equity)
+            guard_profit_target = float(session_guard.get("profit_target_pct", session_profit_target) or 0)
+            guard_loss_limit = float(session_guard.get("loss_limit_pct", session_loss_limit) or 0)
+            guard_profit_usdt = guard_equity * guard_profit_target / 100.0
+            guard_loss_usdt = guard_equity * guard_loss_limit / 100.0
+            remaining_loss_pct = max(0.0, guard_return + guard_loss_limit)
+            remaining_loss_usdt = guard_equity * remaining_loss_pct / 100.0
+            with st.container(border=True):
+                st.markdown(f'**{t("session_guard_title")}**')
+                guard_metrics = st.columns(4)
+                guard_metrics[0].metric(t("session_return"), f"{guard_return:+.3f}%", f"{guard_pnl:+.2f} USDT")
+                guard_metrics[1].metric(t("session_profit_target"), f"+{guard_profit_target:.2f}%", f"+{guard_profit_usdt:.2f} USDT")
+                guard_metrics[2].metric(t("loss_stop"), f"-{guard_loss_limit:.2f}%", f"-{guard_loss_usdt:.2f} USDT")
+                guard_metrics[3].metric(t("remaining_loss_buffer"), f"{remaining_loss_pct:.3f}%", f"{remaining_loss_usdt:.2f} USDT")
+                loss_used_pct = max(0.0, -guard_return)
+                loss_progress = min(1.0, loss_used_pct / guard_loss_limit) if guard_loss_limit > 0 else 0.0
+                st.progress(
+                    loss_progress,
+                    text=f'{t("loss_capacity_used")}: {loss_used_pct:.3f}% / {guard_loss_limit:.2f}%'
+                )
+                st.caption(t("guard_basis"))
+                if guard_loss_limit <= 0:
+                    st.warning(f'{t("loss_stop")}: {t("guard_disabled")}')
             showcase_metrics = st.columns(5)
             showcase_metrics[0].metric(t("system_health"), status_label(showcase.get("status") or "STOPPED"))
             showcase_metrics[1].metric(t("open_positions"), showcase.get("open_trades", 0))
@@ -654,7 +692,6 @@ elif page == "workflows":
                 )
                 if showcase_auto_refresh:
                     components.html("<script>setTimeout(function(){window.parent.location.reload();}, 20000);</script>", height=0)
-            session_guard = dict(showcase.get("session_guard") or {})
             if session_guard:
                 session_return = float(session_guard.get("session_return_pct", 0) or 0)
                 profit_target = float(session_guard.get("profit_target_pct", 0) or 0)

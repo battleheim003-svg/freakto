@@ -152,6 +152,15 @@ class ShowcaseEngine:
             "session_pnl_usdt": 0.0,
             "session_return_pct": 0.0,
             "remaining_to_target_pct": float(self.settings.session_profit_target_pct),
+            "remaining_loss_buffer_pct": float(self.settings.session_loss_limit_pct),
+            "profit_target_usdt": round(
+                float(self.settings.session_equity_usdt) * float(self.settings.session_profit_target_pct) / 100.0,
+                6,
+            ),
+            "loss_limit_usdt": round(
+                float(self.settings.session_equity_usdt) * float(self.settings.session_loss_limit_pct) / 100.0,
+                6,
+            ),
         }
         self.state["session_guard"] = guard
         self.save()
@@ -185,6 +194,9 @@ class ShowcaseEngine:
             session_pnl_usdt=round(pnl, 6),
             session_return_pct=round(session_return, 6),
             remaining_to_target_pct=round(max(0.0, target - session_return), 6),
+            remaining_loss_buffer_pct=round(max(0.0, session_return + loss_limit), 6),
+            profit_target_usdt=round(equity * target / 100.0, 6),
+            loss_limit_usdt=round(equity * loss_limit / 100.0, 6),
             updated_utc=self.now_fn().isoformat(),
         )
         self.state["session_guard"] = guard

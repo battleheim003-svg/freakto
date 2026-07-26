@@ -93,6 +93,14 @@ def test_control_center_exposes_every_management_area():
     assert '"fa": {' in source
 
 
+def test_showcase_exposes_an_explicit_loss_guard_summary():
+    source = (ROOT / "freakto" / "ui" / "control_center.py").read_text(encoding="utf-8")
+    assert '"loss_stop": "توقف قطعی زیان"' in source
+    assert '"remaining_loss_buffer": "فاصله تا توقف زیان"' in source
+    assert 'loss_used_pct = max(0.0, -guard_return)' in source
+    assert 'guard_metrics[2].metric(t("loss_stop")' in source
+
+
 def test_quick_start_plan_is_ordered_and_ends_with_review_only_gate():
     plan = state.quick_start_plan(include_data_build=True, include_replay=True)
     assert [step.key for step in plan] == [
