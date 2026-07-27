@@ -23,6 +23,8 @@ PAPER_COMMANDS = (
     "disarm",
     "arm-strategy",
     "go-live-check",
+    "campaign-status",
+    "campaign-snapshot",
 )
 
 EXIT_OK = 0
@@ -152,4 +154,20 @@ class PaperService:
                 self.paper_dir / "go_live_evidence.json",
             )
             return (EXIT_OK if result["status"] == STATUS_ELIGIBLE else EXIT_BLOCKED), result
+        if command == "campaign-status":
+            from freakto.paper.campaign import campaign_status
+
+            result = campaign_status(self.root)
+            return (EXIT_OK if result.get("campaign_health") == "HEALTHY" else EXIT_BLOCKED), result
+        if command == "campaign-snapshot":
+            from freakto.paper.evidence_snapshot import EvidenceSnapshotError, create_evidence_snapshot
+
+            try:
+                return EXIT_OK, create_evidence_snapshot(self.root)
+            except EvidenceSnapshotError as exc:
+                return EXIT_BLOCKED, {
+                    "status": "SNAPSHOT_BLOCKED",
+                    "error": str(exc),
+                    **PAPER_SAFETY.payload(),
+                }
         raise ValueError(f"Unsupported paper command: {command}")

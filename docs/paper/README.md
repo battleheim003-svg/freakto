@@ -7,6 +7,9 @@
 معامله اسپات مجازی فوری با قیمت زنده و ledger جدا:
 [`LEARNING_PAPER.md`](LEARNING_PAPER.md).
 
+بکاپ ممیزی اتمیک و checksumدار: `freakto paper campaign-snapshot`. جزئیات:
+[`EVIDENCE_SNAPSHOTS.md`](EVIDENCE_SNAPSHOTS.md).
+
 رابط canonical مستقل از ویندوز:
 
 ```text

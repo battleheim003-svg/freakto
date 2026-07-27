@@ -904,9 +904,10 @@ elif page == "workflows":
         with top[1]:
             with st.container(border=True):
                 section_intro(t("paper_controls"), t("safe_note"))
-                buttons = st.columns(2)
+                buttons = st.columns(3)
                 with buttons[0]: run_command(t("preflight"), ["paper", "preflight"], key="paper-preflight")
                 with buttons[1]: run_command(t("paper_status"), ["paper", "status"], key="paper-status")
+                with buttons[2]: run_command("Evidence snapshot", ["paper", "campaign-snapshot"], key="paper-snapshot")
                 with st.expander(t("advanced")):
                     confirmed = st.checkbox(t("confirm_sensitive"), key="paper-confirm")
                     controls = st.columns(3)

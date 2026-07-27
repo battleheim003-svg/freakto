@@ -170,6 +170,12 @@ def test_windows_launcher_is_safe_and_repository_relative():
     assert "-m streamlit run freakto_control_center.py" in source
 
 
+def test_control_center_exposes_campaign_evidence_snapshot():
+    source = (ROOT / "freakto" / "ui" / "control_center.py").read_text(encoding="utf-8")
+    assert '["paper", "campaign-snapshot"]' in source
+    assert 'key="paper-snapshot"' in source
+
+
 def test_dashboard_renders_navigation_without_exception():
     app = AppTest.from_file(str(ROOT / "freakto_control_center.py"), default_timeout=20).run()
     assert not app.exception

@@ -39,6 +39,19 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\paper_campaign_statu
 If Task Scheduler metadata is not readable in a restricted terminal, the script
 still prints authoritative application campaign state.
 
+## Evidence snapshots
+
+Create an audit snapshot without stopping the worker:
+
+```powershell
+.\.venv\Scripts\python.exe -m freakto.cli paper campaign-snapshot
+```
+
+The command copies an explicit allowlist into a timestamped ZIP under
+`.freakto-runtime/campaign-backups/`, records SHA-256 for every file and the
+archive, never overwrites an existing backup, and excludes credentials and
+arbitrary runtime files.
+
 ## Stop and resume
 
 The Control Center stop action writes `logs/paper_cycle/campaign_stop.flag`.

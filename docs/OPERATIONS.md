@@ -9,6 +9,10 @@ freakto data status --compact
 freakto data build --symbols BTC/USDT,ETH/USDT --timeframe 4h --years 3
 ```
 
+Create a non-destructive, checksum-manifested audit snapshot with
+`freakto paper campaign-snapshot`. See
+[`Paper evidence snapshots`](paper/EVIDENCE_SNAPSHOTS.md).
+
 ## Causal replay
 
 ```text
@@ -29,6 +33,8 @@ freakto paper status
 freakto paper dashboard
 freakto paper disarm
 freakto paper go-live-check
+freakto paper campaign-status
+freakto paper campaign-snapshot
 ```
 
 `go-live-check` evaluates the frozen Paper evidence contract. Even a passing

@@ -100,6 +100,13 @@ def test_parser_exposes_canonical_areas(capsys):
         assert area in help_text
 
 
+def test_parser_exposes_campaign_snapshot(capsys):
+    with pytest.raises(SystemExit) as raised:
+        cli.main(["paper", "--help"])
+    assert raised.value.code == 0
+    assert "campaign-snapshot" in capsys.readouterr().out
+
+
 def test_forward_report_rejects_cycle_escalation(capsys):
     with pytest.raises(SystemExit) as raised:
         cli.main(["report", "forward", "--cycle"])
