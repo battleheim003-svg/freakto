@@ -102,3 +102,36 @@ def test_stop_cleans_lock_after_worker_is_gone(tmp_path, monkeypatch):
 
     assert status.running is False
     assert not controller.runtime_lock.exists()
+
+
+def test_learning_controller_uses_independent_mode_symbols_and_metadata(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "live_paper.py").write_text("# worker", encoding="utf-8")
+    controller = ShadowProcessController(project, "learning-state", mode="learning")
+    monkeypatch.setattr(
+        controller,
+        "_process_command",
+        lambda pid: f"python {controller.script} --mode learning --loop" if pid == 43210 else "",
+    )
+    captured = {}
+
+    def fake_popen(command, **kwargs):
+        captured["command"] = command
+        return _FakeProcess()
+
+    monkeypatch.setattr("engine.shadow_process_controller.subprocess.Popen", fake_popen)
+
+    status = controller.start(
+        symbols="BTC/USDT, ETH/USDT",
+        interval_seconds=300,
+    )
+    metadata = json.loads(controller.metadata_file.read_text(encoding="utf-8"))
+
+    assert status.running is True
+    assert status.mode == "learning"
+    assert status.symbols == "BTC/USDT,ETH/USDT"
+    assert metadata["mode"] == "learning"
+    assert controller.metadata_file.name == "learning_process.json"
+    assert captured["command"][captured["command"].index("--mode") + 1] == "learning"
+    assert captured["command"][captured["command"].index("--symbols") + 1] == "BTC/USDT,ETH/USDT"

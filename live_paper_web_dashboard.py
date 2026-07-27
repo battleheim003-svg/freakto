@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import base64
 import html
+import os
 from pathlib import Path
 from typing import Any
 
@@ -11,7 +12,7 @@ import streamlit as st
 
 from engine.live_paper_dashboard import (
     equity_curve, excel_report, load_dashboard_data, pdf_report,
-    performance_attribution, regime_heatmap,
+    open_positions, performance_attribution, regime_heatmap,
 )
 from engine.live_paper_runtime import load_runtime_config
 from engine.shadow_process_controller import ShadowProcessController
@@ -30,7 +31,7 @@ TEXT = {
         "restarted": "Shadow rebooted with existing state.", "start_failed": "BOOT FAILURE",
         "stop_failed": "SHUTDOWN FAILURE", "restart_failed": "REBOOT FAILURE",
         "worker_note": "Browser may close. The worker stays alive while the laptop is on.",
-        "light_mode": "LIGHT PROTOCOL", "data_view": "DATA CHANNEL", "shadow": "SHADOW", "paper": "PAPER",
+        "light_mode": "LIGHT PROTOCOL", "data_view": "DATA CHANNEL", "shadow": "SHADOW", "paper": "PAPER", "learning": "LEARNING SPOT",
         "paper_only": "SIMULATION ZONE // ZERO REAL EXCHANGE ORDERS",
         "tagline": "RETRO QUANT TERMINAL // MARKET CHAOS, BUT MAKE IT DATA",
         "latest_trades": "LATEST EXECUTION BOARD", "no_trades": "NO PAPER FILLS YET",
@@ -71,6 +72,8 @@ TEXT = {
     },
 }
 
+TEXT["FA"]["learning"] = "Learning Spot"
+
 CHECK_LABELS = {
     "minimum_days": ("7-day runtime", "اجرای هفت‌روزه"),
     "minimum_unique_decisions": ("Unique decisions", "تصمیم‌های یکتا"),
@@ -84,8 +87,8 @@ CHECK_LABELS = {
 
 
 @st.cache_data(ttl=15, show_spinner=False)
-def _data(mode: str):
-    return load_dashboard_data(mode, CONFIG_PATH)
+def _data(mode: str, operational_root: str):
+    return load_dashboard_data(mode, CONFIG_PATH, operational_root=operational_root)
 
 
 def _refresh() -> None:
@@ -258,23 +261,45 @@ def _latest_trade_board(fills: pd.DataFrame, t: dict[str, str]) -> None:
 def main() -> None:
     st.set_page_config(page_title="Freakto Shadow / Paper", page_icon="📈", layout="wide", initial_sidebar_state="expanded")
     config = load_runtime_config(CONFIG_PATH)
-    controller = ShadowProcessController(PROJECT_ROOT, config.state_roots["shadow"])
-    status = controller.status()
+    operational_root = Path(os.getenv("FREAKTO_OPERATIONAL_ROOT", str(PROJECT_ROOT))).resolve()
+    controllers = {
+        mode: ShadowProcessController(
+            PROJECT_ROOT,
+            operational_root / config.state_roots[mode],
+            mode=mode,
+        )
+        for mode in ("shadow", "learning")
+    }
 
     with st.sidebar:
         language = st.selectbox("LANGUAGE / زبان", ["EN", "FA"], key="ui_language")
         t = TEXT[language]
         light = st.toggle(t["light_mode"], key="light_mode")
+        worker_mode = st.selectbox(
+            "WORKER MODE", ["learning", "shadow"],
+            format_func=lambda value: t[value], key="worker_mode",
+        )
+        controller = controllers[worker_mode]
+        status = controller.status()
         st.markdown(f'<div class="section-title">{html.escape(t["control"])}</div>', unsafe_allow_html=True)
         state_class = "running" if status.running else "stopped"
         state_text = f'{t["running"]} · PID {status.pid}' if status.running else t["stopped"]
         st.markdown(f'<div class="worker-status {state_class}">{html.escape(state_text)}</div>', unsafe_allow_html=True)
         groups = st.selectbox(t["universe"], ["core", "core,growth", "all"], index=0, disabled=status.running)
+        default_symbols = status.symbols or "BTC/USDT,ETH/USDT,SOL/USDT,XRP/USDT"
+        symbols = st.text_input(
+            "SPOT SYMBOLS", value=default_symbols,
+            disabled=status.running or worker_mode != "learning",
+        )
         interval = st.number_input(t["interval"], min_value=60, max_value=3600, value=300, step=60, disabled=status.running)
         left, middle, right = st.columns(3)
         if left.button(t["start"], disabled=status.running, use_container_width=True):
             try:
-                controller.start(groups=groups, interval_seconds=float(interval))
+                controller.start(
+                    groups=groups,
+                    symbols=symbols if worker_mode == "learning" else "",
+                    interval_seconds=float(interval),
+                )
                 st.success(t["started"])
                 _refresh()
             except Exception as exc:
@@ -288,7 +313,11 @@ def main() -> None:
                 st.error(f'{t["stop_failed"]}: {type(exc).__name__}: {exc}')
         if right.button(t["restart"], disabled=not status.running, use_container_width=True):
             try:
-                controller.restart(groups=status.groups, interval_seconds=status.interval_seconds)
+                controller.restart(
+                    groups=status.groups,
+                    symbols=status.symbols,
+                    interval_seconds=status.interval_seconds,
+                )
                 st.success(t["restarted"])
                 _refresh()
             except Exception as exc:
@@ -301,30 +330,61 @@ def main() -> None:
     _brand_header(t, language)
     st.caption(t["paper_only"])
 
-    mode = st.radio(t["data_view"], ["shadow", "paper"], format_func=lambda value: t[value], horizontal=True)
-    data = _data(mode)
+    mode = st.radio(t["data_view"], ["learning", "shadow", "paper"], format_func=lambda value: t[value], horizontal=True)
+    data = _data(mode, str(operational_root))
     metrics = data.state.get("metrics", {})
     cols = st.columns(7)
-    values = [
-        (t["gate"], t["passed"] if data.gate.get("passed") else t["pending"]),
-        (t["elapsed"], f'{data.gate.get("days", 0):.2f} {t["days"]}'),
-        (t["decisions"], metrics.get("unique_decisions", 0)),
-        (t["candles"], metrics.get("complete_4h_candles", 0)),
-        (t["fresh"], f'{data.gate.get("provider_freshness_pct", 0):.1f}%'),
-        (t["handled"], metrics.get("handled_symbol_failures", 0)),
-        (t["crashes"], metrics.get("unhandled_crashes", 0)),
-    ]
+    provider_checks = int(metrics.get("provider_checks", 0) or 0)
+    provider_fresh = int(metrics.get("provider_fresh", 0) or 0)
+    freshness = provider_fresh / provider_checks * 100.0 if provider_checks else 0.0
+    if mode == "learning":
+        positions = dict(data.account.get("positions") or {})
+        values = [
+            ("SCOPE", data.state.get("evidence_scope", "LEARNING_ONLY")),
+            ("VIRTUAL CASH", f'${float(data.account.get("cash_balance_usdt", 0) or 0):,.2f}'),
+            ("OPEN SPOT", len(positions)),
+            (t["decisions"], metrics.get("unique_decisions", 0)),
+            (t["candles"], metrics.get("complete_4h_candles", 0)),
+            (t["fresh"], f'{freshness:.1f}%'),
+            (t["crashes"], metrics.get("unhandled_crashes", 0)),
+        ]
+    else:
+        values = [
+            (t["gate"], t["passed"] if data.gate.get("passed") else t["pending"]),
+            (t["elapsed"], f'{data.gate.get("days", 0):.2f} {t["days"]}'),
+            (t["decisions"], metrics.get("unique_decisions", 0)),
+            (t["candles"], metrics.get("complete_4h_candles", 0)),
+            (t["fresh"], f'{data.gate.get("provider_freshness_pct", 0):.1f}%'),
+            (t["handled"], metrics.get("handled_symbol_failures", 0)),
+            (t["crashes"], metrics.get("unhandled_crashes", 0)),
+        ]
     for column, (label, value) in zip(cols, values):
         column.metric(label, value)
 
-    _latest_trade_board(_data("paper").fills, t)
+    _latest_trade_board(data.fills, t)
+
+    if mode == "learning":
+        _section_title("OPEN VIRTUAL SPOT POSITIONS")
+        current_positions = open_positions(data)
+        if current_positions.empty:
+            st.info("No open virtual spot position.")
+        else:
+            st.dataframe(current_positions, use_container_width=True, hide_index=True)
 
     _section_title(t["gate_matrix"])
     label_index = 1 if language == "FA" else 0
-    checks = pd.DataFrame([
-        {t["check"]: CHECK_LABELS.get(name, (name, name))[label_index], t["status"]: "✓ PASS" if passed else "✕ WAIT"}
-        for name, passed in data.gate.get("checks", {}).items()
-    ])
+    if mode == "learning":
+        checks = pd.DataFrame([
+            {t["check"]: "Official evidence", t["status"]: "DISABLED"},
+            {t["check"]: "Live exchange orders", t["status"]: "DISABLED"},
+            {t["check"]: "Real capital", t["status"]: "DISABLED"},
+            {t["check"]: "Immediate virtual fills", t["status"]: "ENABLED"},
+        ])
+    else:
+        checks = pd.DataFrame([
+            {t["check"]: CHECK_LABELS.get(name, (name, name))[label_index], t["status"]: "✓ PASS" if passed else "✕ WAIT"}
+            for name, passed in data.gate.get("checks", {}).items()
+        ])
     st.dataframe(checks, use_container_width=True, hide_index=True)
 
     _section_title(t["trade_log"])

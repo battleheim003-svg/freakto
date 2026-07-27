@@ -38,3 +38,12 @@ remain excluded because this runtime models spot-long execution only.
 
 Learning results may be used to diagnose and improve the system, but must never
 be copied into the frozen 60-day campaign or used to claim Go-live eligibility.
+
+## Dashboard
+
+Run `run_learning_paper_dashboard.bat` from the project root. The Learning Spot
+tab shows worker state, virtual cash, open positions with stop/targets, intents,
+fills, equity, attribution, regime diagnostics, and downloadable Excel/PDF
+reports. The sidebar can safely start, stop, or restart either the Learning or
+Shadow worker; PID and command validation prevent an unrelated process from
+being controlled.

@@ -41,14 +41,24 @@ def _read_json(path: Path) -> dict[str, Any]:
         return {}
 
 
-def load_dashboard_data(mode: str, config_path: str | Path = "live_paper_config.json") -> DashboardData:
+def load_dashboard_data(
+    mode: str,
+    config_path: str | Path = "live_paper_config.json",
+    *,
+    operational_root: str | Path | None = None,
+) -> DashboardData:
     mode = mode.lower()
-    if mode not in {"shadow", "paper"}:
-        raise ValueError("mode must be shadow or paper")
+    if mode not in {"shadow", "paper", "learning"}:
+        raise ValueError("mode must be shadow, paper, or learning")
     config = load_runtime_config(config_path)
-    root = Path(config.state_roots[mode])
+    configured_root = Path(config.state_roots[mode])
+    base = Path(operational_root).resolve() if operational_root is not None else Path.cwd()
+    root = configured_root if configured_root.is_absolute() else base / configured_root
     store = RuntimeStore(root)
-    gate = shadow_gate_status(RuntimeStore(config.state_roots["shadow"]), config)
+    shadow_root = Path(config.state_roots["shadow"])
+    if not shadow_root.is_absolute():
+        shadow_root = base / shadow_root
+    gate = shadow_gate_status(RuntimeStore(shadow_root), config)
     return DashboardData(
         mode=mode,
         root=root,
@@ -93,6 +103,26 @@ def performance_attribution(data: DashboardData) -> pd.DataFrame:
     )
     result["net_cash_flow"] = result["sell_notional"] - result["buy_notional"] - result["fees"]
     return result.sort_values("net_cash_flow", ascending=False)
+
+
+def open_positions(data: DashboardData) -> pd.DataFrame:
+    """Return current virtual holdings joined to their managed stop/targets."""
+    holdings = dict(data.account.get("positions") or {})
+    managed = dict(data.state.get("managed_positions") or {})
+    rows = []
+    for symbol, position in holdings.items():
+        controls = dict(managed.get(symbol) or {})
+        rows.append({
+            "symbol": symbol,
+            "amount": float(position.get("amount", 0) or 0),
+            "average_entry": float(position.get("average_entry", 0) or 0),
+            "stop": float(controls.get("stop", 0) or 0),
+            "targets": ", ".join(str(value) for value in controls.get("targets", [])),
+            "opened_at_utc": controls.get("opened_at_utc"),
+            "decision_id": controls.get("decision_id"),
+            "evidence_scope": data.state.get("evidence_scope"),
+        })
+    return pd.DataFrame(rows)
 
 
 def excel_report(data: DashboardData) -> bytes:
