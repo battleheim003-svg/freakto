@@ -1,0 +1,11 @@
+{
+  "policy_version": "evidence-integrity-v2",
+  "legacy_forward_edge_status": "INVALIDATED_DATA_CONTRACT",
+  "promotion_frozen": true,
+  "allowed_scope": ["crypto-core", "ledger", "evaluator", "metrics", "paper-observation"],
+  "blocked_promotions": ["live-orders", "real-capital", "ai-trading", "forex-gold", "technical-v2", "showcase-evidence"],
+  "canonical_cohort": ["schema-valid", "unique-decision-id", "LONG-or-SHORT", "terminal-outcome", "net-of-cost"],
+  "minimum_clean_forward_days": 30,
+  "minimum_clean_paper_days": 60,
+  "minimum_closed_paper_observations": 200
+}

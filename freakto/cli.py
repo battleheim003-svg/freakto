@@ -110,6 +110,15 @@ def build_parser() -> argparse.ArgumentParser:
     paper = areas.add_parser("paper", help="Operate fail-closed paper research workflows")
     paper.add_argument("command", choices=PAPER_COMMANDS)
 
+    evidence = areas.add_parser("evidence", help="Inspect or migrate the canonical Ledger v2")
+    evidence_commands = evidence.add_subparsers(dest="command", required=True)
+    _add_passthrough_command(evidence_commands, "status", "Show Evidence Integrity verdict and blockers")
+    migrate = _add_passthrough_command(evidence_commands, "migrate-decisions", "Fail-closed import of a legacy decisions CSV")
+    migrate.add_argument("path", help="Path to a legacy decisions.csv file")
+    funnel = _add_passthrough_command(evidence_commands, "funnel", "Show the six-symbol coverage funnel")
+    lineage = _add_passthrough_command(evidence_commands, "lineage", "Trace a decision from source to terminal outcome")
+    lineage.add_argument("decision_id", help="Ledger v2 decision identifier")
+
     research = areas.add_parser("research", help="Run isolated, registered research workflows")
     research_commands = research.add_subparsers(dest="command", required=True)
     _add_passthrough_command(
@@ -148,6 +157,36 @@ def _run_paper(command: str) -> int:
     return code
 
 
+def _run_evidence(args: argparse.Namespace) -> int:
+    from freakto.evidence.migration import migrate_decisions_csv
+    from freakto.evidence.ledger import decision_lineage
+    from freakto.evidence.read_model import coverage_funnel, evidence_summary
+
+    if args.command == "status":
+        _emit({**evidence_summary(ROOT), **_safety()})
+        return EXIT_OK
+    if args.command == "migrate-decisions":
+        source = Path(args.path).expanduser().resolve()
+        if not source.is_file():
+            _emit({"status": "MIGRATION_BLOCKED", "error": "CSV file not found", "path": str(source), **_safety()})
+            return EXIT_BLOCKED
+        try:
+            _emit({"status": "MIGRATION_COMPLETE", **migrate_decisions_csv(source, ROOT), **_safety()})
+            return EXIT_OK
+        except ValueError as exc:
+            _emit({"status": "MIGRATION_BLOCKED", "error": str(exc), **_safety()})
+            return EXIT_BLOCKED
+    if args.command == "lineage":
+        row = decision_lineage(args.decision_id, ROOT)
+        if row is None:
+            _emit({"status": "LINEAGE_NOT_FOUND", "decision_id": args.decision_id, **_safety()})
+            return EXIT_BLOCKED
+        _emit({"status": "LINEAGE_FOUND", "lineage": row, **_safety()})
+        return EXIT_OK
+    _emit({"status": "EVIDENCE_FUNNEL", "rows": coverage_funnel(["BTC/USDT", "ETH/USDT", "SOL/USDT", "BNB/USDT", "XRP/USDT", "DOGE/USDT"], ROOT), **_safety()})
+    return EXIT_OK
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args, forwarded = parser.parse_known_args(argv)
@@ -166,6 +205,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _run_report(args)
     if args.area == "research":
         return _run_script("champion_challenger_analysis.py", args.arguments)
+    if args.area == "evidence":
+        if forwarded:
+            parser.error(f"unrecognized arguments: {' '.join(forwarded)}")
+        return _run_evidence(args)
     return _run_paper(args.command)
 
 

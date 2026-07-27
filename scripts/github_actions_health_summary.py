@@ -81,7 +81,7 @@ def _value(progress: dict[str, Any], *keys: str, default: Any = None) -> Any:
 
 
 def _run_metrics_from_csv() -> dict[str, Any]:
-    rows = _run_rows()
+    rows = _run_rows(limit=None)
     successes = [row for row in rows if _truthy(row.get("ok") or row.get("success") or row.get("status"))]
     starts: list[datetime] = []
     for row in rows:
@@ -164,8 +164,8 @@ def _extract_progress(status: dict[str, Any]) -> dict[str, Any]:
         "paper_ready": bool(progress.get("paper_ready", False)),
     }
 
-def _run_rows() -> list[dict[str, str]]:
-    return _read_csv_rows(LOGS / "forward_test_runs.csv", limit=10)
+def _run_rows(limit: int | None = 10) -> list[dict[str, str]]:
+    return _read_csv_rows(LOGS / "forward_test_runs.csv", limit=limit)
 
 
 def _status_icon(row: dict[str, str]) -> str:

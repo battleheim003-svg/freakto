@@ -7,6 +7,7 @@
 __pycache__/
 *.py[cod]
 .venv/
+.freakto-runtime/evidence-v2/
 venv/
 
 # Runtime data / generated artifacts
