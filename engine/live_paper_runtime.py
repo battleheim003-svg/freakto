@@ -6,7 +6,7 @@ import hashlib
 import json
 import math
 import os
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterable
@@ -165,6 +165,53 @@ def validate_intent(intent: TradeIntent, config: RuntimeConfig, eligibility: Eli
     if intent.entry <= 0 or intent.stop <= 0 or intent.stop >= intent.entry: blockers.append("invalid long geometry")
     if not intent.targets or intent.targets[0] <= intent.entry: blockers.append("invalid targets")
     if intent.mtf_direction != "LONG": blockers.append("MTF does not confirm LONG")
+    return not blockers, blockers
+
+
+def learning_probe_intent(intent: TradeIntent, snapshot: MarketSnapshot) -> TradeIntent:
+    """Turn directional MTF observations into clearly labelled virtual probes."""
+    if intent.action == "BUY" or intent.mtf_direction != "LONG":
+        return intent
+    entry = float(snapshot.ask)
+    stop = entry * 0.985
+    target = entry * 1.0225
+    probe_id = hashlib.sha256(
+        f"{intent.decision_id}|learning-mtf-probe-v1".encode("utf-8")
+    ).hexdigest()[:20]
+    return replace(
+        intent,
+        decision_id=probe_id,
+        action="BUY",
+        entry=entry,
+        stop=stop,
+        targets=(target,),
+        recommendation="LEARNING_PROBE",
+        first_rr=(target - entry) / (entry - stop),
+        evidence={
+            **intent.evidence,
+            "learning_probe": True,
+            "probe_version": "learning-mtf-probe-v1",
+            "source_decision_id": intent.decision_id,
+            "source_action": intent.action,
+            "source_recommendation": intent.recommendation,
+            "source_confidence": intent.confidence,
+        },
+    )
+
+
+def validate_learning_intent(
+    intent: TradeIntent,
+    eligibility: Eligibility,
+    *,
+    minimum_mtf_consensus: int = 60,
+) -> tuple[bool, list[str]]:
+    """Validate a virtual learning sample without calendar or promotion gates."""
+    blockers = list(eligibility.blockers)
+    if intent.action != "BUY": blockers.append("learning spot probe requires LONG direction")
+    if intent.mtf_direction != "LONG": blockers.append("MTF does not confirm LONG")
+    if intent.mtf_consensus < minimum_mtf_consensus: blockers.append("MTF consensus below learning floor")
+    if intent.entry <= 0 or intent.stop <= 0 or intent.stop >= intent.entry: blockers.append("invalid long geometry")
+    if not intent.targets or intent.targets[0] <= intent.entry: blockers.append("invalid targets")
     return not blockers, blockers
 
 
@@ -361,6 +408,8 @@ class LivePaperRuntime:
         group = symbol_group(symbol, self.universe)
         item = self.analyzer(symbol)
         intent = intent_from_portfolio_item(item, group)
+        if self.mode == "learning":
+            intent = learning_probe_intent(intent, snapshot)
         try:
             candle = _parse_utc(intent.candle_timestamp)
             timeframe_hours = 4 if self.config.timeframe == "4h" else 0
@@ -375,12 +424,21 @@ class LivePaperRuntime:
             eligibility = Eligibility(False, "BLOCKED_INVALID_CANDLE", ("decision candle timestamp invalid",), eligibility.warnings, eligibility.spread_bps, eligibility.history_status)
         if self.store.seen(intent.decision_id):
             return {"symbol": symbol, "status": "DUPLICATE_IGNORED", "decision_id": intent.decision_id}
-        valid, blockers = validate_intent(intent, self.config, eligibility)
+        if self.mode == "learning":
+            valid, blockers = validate_learning_intent(intent, eligibility)
+        else:
+            valid, blockers = validate_intent(intent, self.config, eligibility)
         rollout = self.config.rollout.get(group, "LOCKED")
         if group == "growth" and self.store.state["metrics"]["core_closed_trades"] < 10: blockers.append("growth rollout locked")
         if group == "meme" and self.store.state["metrics"]["closed_trades"] < 20: blockers.append("meme rollout locked")
         valid = valid and not blockers
-        status = "SHADOW_CANDIDATE" if valid else "BLOCKED"
+        status = (
+            "LEARNING_CANDIDATE"
+            if valid and self.mode == "learning"
+            else "SHADOW_CANDIDATE"
+            if valid
+            else "BLOCKED"
+        )
         self.store.record_intent(intent, status, blockers)
         if not valid or not self._execution_authorized():
             return {"symbol": symbol, "status": status, "decision_id": intent.decision_id, "blockers": blockers}

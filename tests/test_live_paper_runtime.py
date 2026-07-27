@@ -1,4 +1,5 @@
 import json
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
@@ -12,10 +13,12 @@ from engine.live_paper_runtime import (
     LivePaperRuntime,
     evaluate_eligibility,
     intent_from_portfolio_item,
+    learning_probe_intent,
     load_runtime_config,
     position_size,
     shadow_gate_status,
     validate_intent,
+    validate_learning_intent,
 )
 
 
@@ -192,3 +195,45 @@ def test_learning_mode_enters_immediately_but_is_never_official_evidence(tmp_pat
     assert runtime.store.state["official_evidence_eligible"] is False
     assert runtime.store.state["live_orders_enabled"] is False
     assert not (tmp_path / "paper" / "account_state.json").exists()
+
+
+def test_learning_probe_turns_long_mtf_hold_into_bounded_virtual_geometry(tmp_path):
+    cfg = config(tmp_path)
+    manifest(tmp_path)
+    original = intent_from_portfolio_item(item(), "core")
+    original = replace(
+        original,
+        action="HOLD",
+        stop=0.0,
+        targets=(),
+        recommendation="IGNORE",
+        confidence=10,
+        mtf_direction="LONG",
+        mtf_consensus=65,
+    )
+    probe = learning_probe_intent(original, snapshot())
+    eligibility = evaluate_eligibility("BTC/USDT", snapshot(), cfg)
+
+    valid, blockers = validate_learning_intent(probe, eligibility)
+
+    assert valid and not blockers
+    assert probe.action == "BUY"
+    assert probe.recommendation == "LEARNING_PROBE"
+    assert probe.stop < probe.entry < probe.targets[0]
+    assert probe.first_rr == pytest.approx(1.5)
+    assert probe.evidence["source_decision_id"] == original.decision_id
+
+
+def test_learning_probe_still_rejects_neutral_direction(tmp_path):
+    cfg = config(tmp_path)
+    manifest(tmp_path)
+    neutral = replace(intent_from_portfolio_item(item(), "core"), action="HOLD", mtf_direction="NEUTRAL")
+    candidate = learning_probe_intent(neutral, snapshot())
+
+    valid, blockers = validate_learning_intent(
+        candidate,
+        evaluate_eligibility("BTC/USDT", snapshot(), cfg),
+    )
+
+    assert valid is False
+    assert "learning spot probe requires LONG direction" in blockers

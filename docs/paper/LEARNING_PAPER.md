@@ -29,5 +29,12 @@ spread, position limits, virtual exposure, daily loss, and drawdown protections
 still apply. Those checks improve the quality of the learning sample and do not
 delay it by calendar age.
 
+When the main scanner reports `HOLD` but its weighted multi-timeframe direction
+is still `LONG` with at least 60% consensus, learning mode may open a labelled
+`LEARNING_PROBE`. The probe uses the current public ask, a 1.5% virtual stop,
+and a 2.25% virtual target. Its original decision, confidence, recommendation,
+and probe version remain attached for diagnosis. Neutral and short directions
+remain excluded because this runtime models spot-long execution only.
+
 Learning results may be used to diagnose and improve the system, but must never
 be copied into the frozen 60-day campaign or used to claim Go-live eligibility.
