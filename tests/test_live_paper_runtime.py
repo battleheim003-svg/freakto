@@ -1,6 +1,7 @@
 import json
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -237,3 +238,9 @@ def test_learning_probe_still_rejects_neutral_direction(tmp_path):
 
     assert valid is False
     assert "learning spot probe requires LONG direction" in blockers
+
+
+def test_live_paper_cli_exposes_explicit_operational_root():
+    source = Path("live_paper.py").read_text(encoding="utf-8")
+    assert '"--operational-root"' in source
+    assert "operational_root / data_path" in source

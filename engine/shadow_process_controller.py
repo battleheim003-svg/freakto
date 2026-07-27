@@ -42,8 +42,16 @@ class ShadowProcessController:
     default; ``mode=learning`` uses an independent lock, metadata, and state root.
     """
 
-    def __init__(self, project_root: str | Path, state_root: str | Path, *, mode: str = "shadow"):
+    def __init__(
+        self,
+        project_root: str | Path,
+        state_root: str | Path,
+        *,
+        mode: str = "shadow",
+        operational_root: str | Path | None = None,
+    ):
         self.project_root = Path(project_root).resolve()
+        self.operational_root = Path(operational_root or self.project_root).resolve()
         self.mode = str(mode).strip().lower()
         if self.mode not in {"shadow", "learning"}:
             raise ValueError("worker controller mode must be shadow or learning")
@@ -162,6 +170,7 @@ class ShadowProcessController:
         command = [
             sys.executable, "-X", "utf8", str(self.script), "--mode", self.mode,
             "--groups", groups, "--loop", "--interval", str(float(interval_seconds)),
+            "--operational-root", str(self.operational_root),
         ]
         normalized_symbols = ",".join(
             item.strip().upper() for item in str(symbols).split(",") if item.strip()
@@ -177,7 +186,7 @@ class ShadowProcessController:
         with self.log_file.open("a", encoding="utf-8") as output:
             process = subprocess.Popen(
                 command,
-                cwd=str(self.project_root),
+                cwd=str(self.operational_root),
                 stdin=subprocess.DEVNULL,
                 stdout=output,
                 stderr=subprocess.STDOUT,
@@ -204,12 +213,14 @@ class ShadowProcessController:
                 break
             lock_pid = self._lock_metadata().get("pid")
             try:
-                lock_matches = int(lock_pid or 0) == process.pid
+                validated_lock_pid = self._validated_process(int(lock_pid or 0))
             except (TypeError, ValueError):
-                lock_matches = False
-            if lock_matches and self._validated_process(process.pid) is not None:
+                validated_lock_pid = None
+            if validated_lock_pid is not None:
+                metadata["pid"] = validated_lock_pid
+                _atomic_json(self.metadata_file, metadata)
                 return ShadowProcessStatus(
-                    True, process.pid, metadata["started_at_utc"], None,
+                    True, validated_lock_pid, metadata["started_at_utc"], None,
                     groups, float(interval_seconds), f"{self.mode.capitalize()} worker started",
                     self.mode, normalized_symbols,
                 )

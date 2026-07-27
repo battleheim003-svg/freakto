@@ -267,6 +267,7 @@ def main() -> None:
             PROJECT_ROOT,
             operational_root / config.state_roots[mode],
             mode=mode,
+            operational_root=operational_root,
         )
         for mode in ("shadow", "learning")
     }

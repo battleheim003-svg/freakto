@@ -135,3 +135,38 @@ def test_learning_controller_uses_independent_mode_symbols_and_metadata(tmp_path
     assert controller.metadata_file.name == "learning_process.json"
     assert captured["command"][captured["command"].index("--mode") + 1] == "learning"
     assert captured["command"][captured["command"].index("--symbols") + 1] == "BTC/USDT,ETH/USDT"
+    assert "--operational-root" in captured["command"]
+
+
+def test_start_accepts_real_windows_child_pid_from_runtime_lock(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "live_paper.py").write_text("# worker", encoding="utf-8")
+    controller = ShadowProcessController(project, "state", mode="learning")
+    real_child_pid = 54321
+    controller.state_root.mkdir(parents=True)
+
+    class LauncherProcess:
+        pid = 43210
+
+        @staticmethod
+        def poll():
+            return None
+
+    def fake_popen(*_args, **_kwargs):
+        controller.runtime_lock.write_text(json.dumps({"pid": real_child_pid}), encoding="utf-8")
+        return LauncherProcess()
+
+    monkeypatch.setattr("engine.shadow_process_controller.subprocess.Popen", fake_popen)
+    monkeypatch.setattr(
+        controller,
+        "_process_command",
+        lambda pid: f"python {controller.script} --mode learning --loop" if pid == real_child_pid else "",
+    )
+
+    status = controller.start(symbols="BTC/USDT")
+
+    assert status.running is True
+    assert status.pid == real_child_pid
+    metadata = json.loads(controller.metadata_file.read_text(encoding="utf-8"))
+    assert metadata["pid"] == real_child_pid

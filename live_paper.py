@@ -4,6 +4,8 @@ from __future__ import annotations
 import argparse
 import json
 import time
+from dataclasses import replace
+from pathlib import Path
 
 from engine.live_demo import CcxtPublicMarketData, DEFAULT_PUBLIC_EXCHANGES
 from engine.live_demo_universe import load_universe, select_symbols
@@ -21,12 +23,29 @@ def main() -> int:
     parser.add_argument("--exchange", default="kucoin")
     parser.add_argument("--config", default="live_paper_config.json")
     parser.add_argument("--universe-file", default="live_demo_universe.json")
+    parser.add_argument(
+        "--operational-root",
+        default="",
+        help="Resolve relative data and state paths under this project root",
+    )
     parser.add_argument("--gate-status", action="store_true")
     parser.add_argument("--once", action="store_true")
     parser.add_argument("--loop", action="store_true", help="Repeat safely; duplicate candle decisions are ignored")
     parser.add_argument("--interval", type=float, default=300.0, help="Seconds between complete universe cycles")
     args = parser.parse_args()
     config = load_runtime_config(args.config)
+    if args.operational_root:
+        operational_root = Path(args.operational_root).resolve()
+        state_roots = {
+            name: str(path if (path := Path(value)).is_absolute() else operational_root / path)
+            for name, value in config.state_roots.items()
+        }
+        data_path = Path(config.data_dir)
+        config = replace(
+            config,
+            data_dir=str(data_path if data_path.is_absolute() else operational_root / data_path),
+            state_roots=state_roots,
+        )
     universe = load_universe(args.universe_file)
     exchanges = (args.exchange, *(x for x in DEFAULT_PUBLIC_EXCHANGES if x != args.exchange))
     try:
