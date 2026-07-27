@@ -1,6 +1,6 @@
 # Freakto GitHub Actions Health Summary
 
-Generated UTC: `2026-07-26T23:45:16.681946+00:00`
+Generated UTC: `2026-07-27T12:44:00.062223+00:00`
 
 ## Current Forward Status
 
@@ -11,7 +11,7 @@ Generated UTC: `2026-07-26T23:45:16.681946+00:00`
 | Readiness Level | `RESEARCH_ONLY` |
 | Paper Ready | `False` |
 | Live Ready | `False` |
-| Complete Evaluations | `111/100` |
+| Complete Evaluations | `113/100` |
 | Closed Paper Trades | `0/30` |
 | Open Paper Trades | `0` |
 | Regime-labeled Samples | `61/30` |
@@ -22,21 +22,21 @@ Generated UTC: `2026-07-26T23:45:16.681946+00:00`
 
 | Field | Value |
 |---|---|
-| run_id | `forward_20260726_234414` |
+| run_id | `forward_20260727_124253` |
 | ok | `True` |
-| started_utc | `2026-07-26T23:44:14.630690+00:00` |
-| finished_utc | `2026-07-26T23:45:11.360600+00:00` |
-| duration | `56.73` |
+| started_utc | `2026-07-27T12:42:53.737431+00:00` |
+| finished_utc | `2026-07-27T12:43:55.715291+00:00` |
+| duration | `61.98` |
 
 ## Recent Runs
 
 | | Run ID | OK | Started UTC | Duration |
 |---|---|---:|---|---:|
-| ✅ | `forward_20260725_234523` | `True` | `2026-07-25T23:45:23.756894+00:00` | `64.34` |
 | ✅ | `forward_20260726_090240` | `True` | `2026-07-26T09:02:40.181148+00:00` | `67.29` |
 | ✅ | `forward_20260726_154837` | `True` | `2026-07-26T15:48:37.275354+00:00` | `59.89` |
 | ✅ | `forward_20260726_201747` | `True` | `2026-07-26T20:17:47.063920+00:00` | `59.43` |
 | ✅ | `forward_20260726_234414` | `True` | `2026-07-26T23:44:14.630690+00:00` | `56.73` |
+| ✅ | `forward_20260727_124253` | `True` | `2026-07-27T12:42:53.737431+00:00` | `61.98` |
 
 ## Operational Notes
 
