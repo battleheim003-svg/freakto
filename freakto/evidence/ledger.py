@@ -220,6 +220,10 @@ class OutcomeLedger(_Ledger):
 
 def canonical_cohort(root: Path | None = None) -> list[dict[str, Any]]:
     """Only schema-valid, unique, directional, terminal, after-cost outcomes."""
+    # Initialize both tables before querying. A Decision-only migration is a
+    # valid intermediate state and must report an empty cohort, never crash.
+    DecisionLedger(root)
+    OutcomeLedger(root)
     root_path = default_ledger_root(root)
     path = root_path / "evidence.sqlite3"
     if not path.exists():
