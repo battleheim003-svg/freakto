@@ -110,6 +110,14 @@ def build_parser() -> argparse.ArgumentParser:
     paper = areas.add_parser("paper", help="Operate fail-closed paper research workflows")
     paper.add_argument("command", choices=PAPER_COMMANDS)
 
+    research = areas.add_parser("research", help="Run isolated, registered research workflows")
+    research_commands = research.add_subparsers(dest="command", required=True)
+    _add_passthrough_command(
+        research_commands,
+        "challenger",
+        "Run a one-shot registered Champion/Challenger Holdout evaluation",
+    )
+
     report = areas.add_parser("report", help="Generate canonical operational reports")
     report_commands = report.add_subparsers(dest="command", required=True)
     _add_passthrough_command(report_commands, "paper", "Generate paper performance outputs")
@@ -156,6 +164,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _run_data_or_replay(args)
     if args.area == "report":
         return _run_report(args)
+    if args.area == "research":
+        return _run_script("champion_challenger_analysis.py", args.arguments)
     return _run_paper(args.command)
 
 

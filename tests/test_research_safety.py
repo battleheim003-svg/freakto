@@ -50,6 +50,13 @@ class ResearchSafetyTests(unittest.TestCase):
             self.assertTrue(registry.claim_holdout("dataset", "family", "a"))
             self.assertFalse(registry.claim_holdout("dataset", "family", "b"))
 
+    def test_registry_can_atomically_refuse_run_replacement(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            registry = ExperimentRegistry(Path(temp_dir) / "registry.sqlite3")
+            registry.start_run("immutable", "CHALLENGER", replace_existing=False)
+            with self.assertRaises(FileExistsError):
+                registry.start_run("immutable", "CHALLENGER", replace_existing=False)
+
     def test_bh_adjustment_is_monotonic_in_rank(self):
         q = benjamini_hochberg([0.001, 0.02, 0.9])
         self.assertLessEqual(q[0], q[1])

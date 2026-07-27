@@ -24,6 +24,11 @@ from freakto import cli
         (["report", "paper", "--no-plot"], "paper_performance_dashboard.py", ["--no-plot"]),
         (["report", "research"], "freakto_research_suite_dashboard.py", []),
         (["report", "forward", "--send"], "forward_test_dashboard.py", ["--status", "--send"]),
+        (
+            ["research", "challenger", "--experiment-id", "candidate-1"],
+            "champion_challenger_analysis.py",
+            ["--experiment-id", "candidate-1"],
+        ),
     ],
 )
 def test_canonical_delegation(monkeypatch, argv, script, arguments):
@@ -86,12 +91,12 @@ def test_missing_target_is_runtime_error_and_reports_safety(monkeypatch, tmp_pat
     assert '"live_orders_enabled": false' in output
 
 
-def test_parser_exposes_four_canonical_areas(capsys):
+def test_parser_exposes_canonical_areas(capsys):
     with pytest.raises(SystemExit) as raised:
         cli.main(["--help"])
     assert raised.value.code == 0
     help_text = capsys.readouterr().out
-    for area in ("data", "replay", "paper", "report"):
+    for area in ("data", "replay", "paper", "report", "research"):
         assert area in help_text
 
 

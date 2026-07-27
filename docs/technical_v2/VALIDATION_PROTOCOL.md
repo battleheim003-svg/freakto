@@ -25,6 +25,26 @@ time, symbols, directions, setups, and regimes. Fast Showcase results are diagno
    random-entry baseline.
 7. Retain negative and ambiguous results; never delete unfavourable folds.
 
+## Registered one-shot Holdout
+
+Use the canonical registered runner for the expectancy-aware challenger:
+
+```powershell
+.\.venv\Scripts\python.exe -m freakto.cli research challenger `
+  --dataset logs\market_replay\market_replay_evaluations.csv
+```
+
+The runner fingerprints the dataset, atomically claims the
+`EXPECTANCY_CHALLENGER_V10_7` Holdout family, and writes results under a unique
+experiment directory. A second attempt against the same dataset/family is
+blocked before outcomes are evaluated. Experiment IDs and output directories
+cannot be reused.
+
+Every report and shadow-prediction row carries
+`official_evidence_eligible=false` and `evidence_scope=RESEARCH_SHADOW_ONLY`.
+These results cannot be copied into the running 60-day Paper campaign or used
+to shorten its frozen evidence requirements.
+
 ## Research-to-Shadow minimums
 
 The automated recommendation requires at least 200 closed challenger samples, passed walk-forward

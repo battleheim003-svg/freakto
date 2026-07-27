@@ -112,6 +112,7 @@ class ExperimentRegistry:
         contract: ModelContract = CURRENT_MODEL_CONTRACT,
         parent_run_id: str = "",
         notes: str = "",
+        replace_existing: bool = True,
     ) -> ExperimentRun:
         run = ExperimentRun(
             run_id=run_id,
@@ -131,18 +132,22 @@ class ExperimentRegistry:
             notes=notes,
         )
         with self._connect() as connection:
-            connection.execute(
-                """INSERT OR REPLACE INTO experiment_runs VALUES
-                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    run.run_id, run.run_type, run.status, run.started_utc, run.finished_utc,
-                    run.feature_set_version, run.model_version, run.calibration_version,
-                    run.execution_model_version, run.split_protocol_version,
-                    run.data_start_utc, run.data_end_utc, run.data_fingerprint,
-                    _canonical_json(run.hyperparameters), _canonical_json(run.results),
-                    run.parent_run_id, run.notes,
-                ),
-            )
+            verb = "INSERT OR REPLACE" if replace_existing else "INSERT"
+            try:
+                connection.execute(
+                    f"""{verb} INTO experiment_runs VALUES
+                    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (
+                        run.run_id, run.run_type, run.status, run.started_utc, run.finished_utc,
+                        run.feature_set_version, run.model_version, run.calibration_version,
+                        run.execution_model_version, run.split_protocol_version,
+                        run.data_start_utc, run.data_end_utc, run.data_fingerprint,
+                        _canonical_json(run.hyperparameters), _canonical_json(run.results),
+                        run.parent_run_id, run.notes,
+                    ),
+                )
+            except sqlite3.IntegrityError as exc:
+                raise FileExistsError(f"experiment run already exists: {run_id}") from exc
         return run
 
     def finish_run(self, run_id: str, status: str, results: Dict[str, Any]) -> None:

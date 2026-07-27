@@ -197,6 +197,8 @@ class ChampionChallengerTests(unittest.TestCase):
             )
             self.assertFalse(result.promotion_applied)
             self.assertFalse(result.paper_live_enabled)
+            self.assertFalse(result.official_evidence_eligible)
+            self.assertEqual(result.evidence_scope, "RESEARCH_SHADOW_ONLY")
             self.assertTrue(result.shadow_only)
             self.assertIn(result.status, {"FAIL", "PASS_RESEARCH_ONLY"})
             self.assertTrue((output / "champion_challenger_report.json").exists())
@@ -204,6 +206,12 @@ class ChampionChallengerTests(unittest.TestCase):
             self.assertFalse(artifacts.summary.empty)
             self.assertTrue((artifacts.holdout_predictions["shadow_only"] == True).all())
             self.assertTrue((artifacts.holdout_predictions["paper_live_enabled"] == False).all())
+            self.assertTrue(
+                (artifacts.holdout_predictions["official_evidence_eligible"] == False).all()
+            )
+            self.assertTrue(
+                (artifacts.holdout_predictions["evidence_scope"] == "RESEARCH_SHADOW_ONLY").all()
+            )
 
 
 if __name__ == "__main__":

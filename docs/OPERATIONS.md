@@ -49,6 +49,17 @@ freakto report forward
 
 `report forward` is read-only and only accepts optional `--send`.
 
+## Registered challenger research
+
+```text
+freakto research challenger --dataset logs/market_replay/market_replay_evaluations.csv
+```
+
+The dataset/family Holdout is one-shot through the Experiment Registry. Outputs
+are isolated by experiment ID and remain explicitly ineligible for official
+Paper or Go-live evidence. See the
+[`Technical v2 validation protocol`](technical_v2/VALIDATION_PROTOCOL.md).
+
 ## Unified control center
 
 On Windows, launch the local management dashboard with:
