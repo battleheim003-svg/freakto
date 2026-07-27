@@ -5,7 +5,8 @@
   "data_dir": "data/market_replay",
   "state_roots": {
     "shadow": "logs/live_demo_shadow",
-    "paper": "logs/live_demo_paper"
+    "paper": "logs/live_demo_paper",
+    "learning": "logs/live_demo_learning"
   },
   "risk": {
     "core_risk_pct": 0.50,

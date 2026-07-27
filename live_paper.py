@@ -15,7 +15,7 @@ from engine.live_paper_runtime import (
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", choices=("shadow", "paper"), default="shadow")
+    parser.add_argument("--mode", choices=("shadow", "paper", "learning"), default="shadow")
     parser.add_argument("--groups", default="core")
     parser.add_argument("--symbols", default="")
     parser.add_argument("--exchange", default="kucoin")
@@ -58,7 +58,13 @@ def main() -> int:
                         results.append(result)
                         if send_telegram_message:
                             send_telegram_message(f"Freakto live-paper symbol failure (handled)\n{symbol}\n{result['error']}")
-                print(json.dumps({"mode": args.mode, "paper_execution_authorized": runtime._execution_authorized(), "results": results}, ensure_ascii=False, indent=2, default=str), flush=True)
+                print(json.dumps({
+                    "mode": args.mode,
+                    "virtual_execution_authorized": runtime._execution_authorized(),
+                    "evidence_scope": runtime.evidence_scope,
+                    "official_evidence_eligible": runtime.official_evidence_eligible,
+                    "results": results,
+                }, ensure_ascii=False, indent=2, default=str), flush=True)
                 if not args.loop:
                     break
                 time.sleep(args.interval)

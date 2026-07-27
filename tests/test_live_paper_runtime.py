@@ -22,7 +22,11 @@ from engine.live_paper_runtime import (
 def config(tmp_path):
     payload = json.loads(open("live_paper_config.json", encoding="utf-8").read())
     payload["data_dir"] = str(tmp_path / "data")
-    payload["state_roots"] = {"shadow": str(tmp_path / "shadow"), "paper": str(tmp_path / "paper")}
+    payload["state_roots"] = {
+        "shadow": str(tmp_path / "shadow"),
+        "paper": str(tmp_path / "paper"),
+        "learning": str(tmp_path / "learning"),
+    }
     path = tmp_path / "config.json"
     path.write_text(json.dumps(payload), encoding="utf-8")
     return load_runtime_config(path)
@@ -110,6 +114,7 @@ def test_actual_unhandled_crash_remains_gate_blocker(tmp_path):
 def test_shadow_and_paper_state_roots_are_distinct(tmp_path):
     cfg = config(tmp_path)
     assert cfg.state_roots["shadow"] != cfg.state_roots["paper"]
+    assert cfg.state_roots["learning"] not in {cfg.state_roots["shadow"], cfg.state_roots["paper"]}
 
 
 def test_meme_risk_is_lower_than_core(tmp_path):
@@ -164,3 +169,26 @@ def test_paper_entry_requires_flag_and_passed_shadow_gate(tmp_path, monkeypatch)
     result = runtime.process_symbol("BTC/USDT")
     assert result["status"] == "PAPER_ENTRY"
     assert runtime.broker.positions["BTC/USDT"].amount > 0
+
+
+def test_learning_mode_enters_immediately_but_is_never_official_evidence(tmp_path, monkeypatch):
+    cfg = config(tmp_path)
+    manifest(tmp_path)
+    monkeypatch.delenv("LIVE_DEMO_EXECUTION_ENABLED", raising=False)
+    runtime = LivePaperRuntime(
+        cfg,
+        universe(),
+        FakeMarket(),
+        mode="learning",
+        analyzer=lambda _symbol: item(),
+    )
+
+    result = runtime.process_symbol("BTC/USDT")
+
+    assert result["status"] == "LEARNING_ENTRY"
+    assert result["evidence_scope"] == "LEARNING_ONLY"
+    assert result["official_evidence_eligible"] is False
+    assert runtime.broker.positions["BTC/USDT"].amount > 0
+    assert runtime.store.state["official_evidence_eligible"] is False
+    assert runtime.store.state["live_orders_enabled"] is False
+    assert not (tmp_path / "paper" / "account_state.json").exists()

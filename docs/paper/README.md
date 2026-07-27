@@ -4,6 +4,9 @@
 
 شروع سریع: `start_paper_trading.bat`. وضعیت: `show_paper_status.bat`. توقف: `stop_paper_trading.bat`.
 
+معامله اسپات مجازی فوری با قیمت زنده و ledger جدا:
+[`LEARNING_PAPER.md`](LEARNING_PAPER.md).
+
 رابط canonical مستقل از ویندوز:
 
 ```text

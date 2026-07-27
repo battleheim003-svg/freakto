@@ -311,10 +311,30 @@ class LivePaperRuntime:
     def __init__(self, config: RuntimeConfig, universe: UniverseConfig, market_data, *, mode: str = "shadow", analyzer: Callable[[str], Any] | None = None, notifier: Callable[[str], bool] | None = None):
         self.config, self.universe, self.market_data = config, universe, market_data
         self.mode = mode.lower()
-        if self.mode not in {"shadow", "paper"}: raise ValueError("mode must be shadow or paper")
-        self.root = Path(config.state_roots[self.mode])
+        if self.mode not in {"shadow", "paper", "learning"}:
+            raise ValueError("mode must be shadow, paper, or learning")
+        self.evidence_scope = {
+            "learning": "LEARNING_ONLY",
+            "shadow": "RESEARCH_SHADOW_ONLY",
+            "paper": "OFFICIAL_PAPER_CANDIDATE",
+        }[self.mode]
+        self.official_evidence_eligible = self.mode == "paper"
+        root_value = config.state_roots.get(self.mode)
+        if root_value is None:
+            if self.mode != "learning":
+                raise ValueError(f"missing state root for mode: {self.mode}")
+            root_value = "logs/live_demo_learning"
+        self.root = Path(root_value)
         self.store = RuntimeStore(self.root)
         self.store.migrate_legacy_failure_metrics()
+        self.store.state.update(
+            mode=self.mode,
+            evidence_scope=self.evidence_scope,
+            official_evidence_eligible=self.official_evidence_eligible,
+            live_orders_enabled=False,
+            real_capital_enabled=False,
+        )
+        self.store.save()
         self.broker = MockBroker(market_data, initial_balance=config.initial_balance_usdt, fee_bps=config.execution["fee_bps"], slippage_bps=config.execution["slippage_bps"], state_path=self.root / "account_state.json", trade_log_path=self.root / "fills.csv")
         self.analyzer = analyzer or self._default_analyzer
         self.notifier = notifier
@@ -325,6 +345,8 @@ class LivePaperRuntime:
         return analyze_symbol(symbol)
 
     def _execution_authorized(self) -> bool:
+        if self.mode == "learning":
+            return True
         flag = os.getenv("LIVE_DEMO_EXECUTION_ENABLED", "false").lower() in {"1", "true", "yes"}
         if self.mode != "paper" or not flag: return False
         shadow = RuntimeStore(self.config.state_roots["shadow"])
@@ -381,7 +403,14 @@ class LivePaperRuntime:
         self.store.state["managed_positions"][symbol] = {"decision_id": intent.decision_id, "group": group, "stop": intent.stop, "targets": list(intent.targets), "next_target_index": 0, "entry": fill.execution_price, "amount": fill.amount, "opened_at_utc": fill.timestamp_utc}
         self.store.save()
         if self.notifier: self.notifier(f"Freakto PAPER ENTRY\n{symbol} amount={amount:.8f} price={fill.execution_price:.8f}\nPaper only; no real order.")
-        return {"symbol": symbol, "status": "PAPER_ENTRY", "fill": asdict(fill), "sizing": sizing}
+        return {
+            "symbol": symbol,
+            "status": "LEARNING_ENTRY" if self.mode == "learning" else "PAPER_ENTRY",
+            "fill": asdict(fill),
+            "sizing": sizing,
+            "evidence_scope": self.evidence_scope,
+            "official_evidence_eligible": self.official_evidence_eligible,
+        }
 
     def manage_exits(self) -> list[dict]:
         events = []
