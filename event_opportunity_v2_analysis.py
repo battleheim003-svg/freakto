@@ -19,12 +19,19 @@ from engine.event_opportunity_benchmarks import (
     write_event_opportunity_outputs,
 )
 from engine.event_opportunity_universe import EventUniverseConfig
+from engine.artifact_protocols import (
+    DEFAULT_ARTIFACT_SELECTOR,
+    GLOBAL_UTC_SELECTOR,
+    resolve_artifact_route,
+    validate_global_replay_manifest,
+)
 
 
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Freakto Event-Based Opportunity Universe & Cost-Aware Label v2")
-    p.add_argument("--replay-root", default=str(DEFAULT_REPLAY_ROOT))
-    p.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
+    p.add_argument("--replay-root", default="")
+    p.add_argument("--output-dir", default="")
+    p.add_argument("--artifact-selector", default=DEFAULT_ARTIFACT_SELECTOR)
     p.add_argument("--cutoff", default="2026-07-09T12:00:00Z")
     p.add_argument("--horizon", type=int, default=6)
     p.add_argument("--purge-timestamps", type=int, default=6)
@@ -38,8 +45,25 @@ def parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     args = parser().parse_args()
+    route = resolve_artifact_route(args.artifact_selector)
+    replay_root = Path(args.replay_root) if args.replay_root else route.replay_root
+    output_dir = Path(args.output_dir) if args.output_dir else route.event_root
+    if replay_root != route.replay_root or output_dir != route.event_root:
+        raise ValueError(
+            "ARTIFACT_SELECTOR_VIOLATION: replay/output roots do not match the selected protocol"
+        )
     event = EventUniverseConfig(development_cutoff_utc=args.cutoff)
     label = CostAwareLabelConfig(horizon_candles=args.horizon)
+    frames = load_multi_cycle_replays(replay_root)
+    upstream_manifest = None
+    if route.selector == GLOBAL_UTC_SELECTOR:
+        manifest_path = replay_root / "global_utc_replay_manifest.json"
+        if not manifest_path.exists() or "FULL" not in frames:
+            raise ValueError(
+                "GLOBAL_UTC_MANIFEST_VIOLATION: v3 replay manifest or FULL replay is missing"
+            )
+        upstream_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        validate_global_replay_manifest(upstream_manifest, frames["FULL"])
     config = EventMetaLabelConfig(
         event=event,
         label=label,
@@ -47,10 +71,11 @@ def main() -> int:
         minimum_train_events=args.minimum_train_events,
         minimum_holdout_events=args.minimum_holdout_events,
         bootstrap_samples=args.bootstrap_samples,
+        artifact_selector=args.artifact_selector,
+        upstream_split_manifest=upstream_manifest,
     )
-    frames = load_multi_cycle_replays(args.replay_root)
     report, artifacts = analyze_event_opportunity_universe(frames, config)
-    files = write_event_opportunity_outputs(report, artifacts, args.output_dir)
+    files = write_event_opportunity_outputs(report, artifacts, output_dir)
 
     print("=" * 116)
     print("Freakto Event-Based Opportunity Universe & Cost-Aware Label v2")
@@ -89,7 +114,7 @@ def main() -> int:
             raise SystemExit("--frozen-model and --fresh-oos-file must be supplied together")
         fresh = pd.read_csv(args.fresh_oos_file, low_memory=False)
         result, selected = evaluate_frozen_event_candidate(args.frozen_model, fresh)
-        output = Path(args.output_dir)
+        output = output_dir
         (output / "fresh_oos_fixed_event_evaluation.json").write_text(
             json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8"
         )

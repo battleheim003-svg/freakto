@@ -92,6 +92,14 @@ def synthetic_event_rows(rows: int = 1800, start: str = "2019-01-01") -> pd.Data
             "net_signed_return_after_6c_pct": fixed_return,
             "market_return_after_6c_pct": rng.normal(0, 1.2, rows),
         }
+    ).assign(
+        replay_split=np.where(
+            idx < int(rows * 0.60),
+            "TRAIN_60",
+            np.where(idx < int(rows * 0.80), "VALIDATION_20", "TEST_20"),
+        ),
+        replay_data_fingerprint="synthetic-replay-fingerprint",
+        replay_experiment_id="synthetic-replay-experiment",
     )
 
 
@@ -111,14 +119,15 @@ def test_leakage_fields_are_rejected_for_event_detection():
         validate_event_feature_names(["mfe_pct"])
 
 
-def test_prepare_event_rows_enforces_cutoff_and_deduplicates():
+def test_prepare_event_rows_enforces_cutoff_and_rejects_duplicates():
     frame = synthetic_event_rows(300)
     duplicate = frame.tail(1).copy()
     duplicate["candle_timestamp"] = pd.Timestamp("2027-01-01", tz="UTC")
-    prepared = prepare_event_rows(pd.concat([frame, frame.tail(1), duplicate], ignore_index=True), config())
-    assert prepared["decision_id"].is_unique
+    prepared = prepare_event_rows(pd.concat([frame, duplicate], ignore_index=True), config())
     assert prepared["__timestamp"].max() <= pd.Timestamp(config().development_cutoff_utc)
     assert set(prepared["side"]) == {"LONG", "SHORT"}
+    with pytest.raises(ValueError, match="duplicate decision_id"):
+        prepare_event_rows(pd.concat([frame, frame.tail(1)], ignore_index=True), config())
 
 
 def test_breakout_proxy_is_detected_from_entry_time_fields():
@@ -240,6 +249,11 @@ def production_replay_schema(rows: int = 1200) -> pd.DataFrame:
         "targets": "[102.0, 104.0, 106.0]",
         "stop_zone": "98.0 - 98.5",
         "net_signed_return_after_6c_pct": rng.normal(-0.2, 1.5, rows),
+        "replay_split": np.where(
+            idx < int(rows * 0.60),
+            "TRAIN_60",
+            np.where(idx < int(rows * 0.80), "VALIDATION_20", "TEST_20"),
+        ),
     })
 
 

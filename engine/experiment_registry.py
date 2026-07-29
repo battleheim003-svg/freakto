@@ -15,9 +15,19 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from engine.model_contract import CURRENT_MODEL_CONTRACT, ModelContract
+from engine.research_contracts import LEGACY_EVENT_META_WALK_FORWARD_CONTRACT
 
 
 DEFAULT_REGISTRY_PATH = Path("logs") / "experiments" / "experiment_registry.sqlite3"
+DEFAULT_GOVERNANCE_PATH = Path(__file__).resolve().parents[1] / "config" / "research_experiment_governance.json"
+TERMINAL_HOLDOUT_STATUS = "HOLDOUT_CONSUMED_NOT_VALIDATED"
+TERMINAL_RESEARCH_OUTCOME = "HOLDOUT_CRITERIA_FAILED"
+GOVERNANCE_BLOCKERS = (
+    TERMINAL_HOLDOUT_STATUS,
+    TERMINAL_RESEARCH_OUTCOME,
+    "PROMOTION_NOT_ELIGIBLE",
+    "NO_VALID_DEVELOPMENT_CANDIDATE",
+)
 
 
 def _utc_now() -> str:
@@ -30,6 +40,112 @@ def _canonical_json(value: Any) -> str:
 
 def fingerprint(value: Any) -> str:
     return hashlib.sha256(_canonical_json(value).encode("utf-8")).hexdigest()
+
+
+@dataclass(frozen=True)
+class GovernedExperiment:
+    payload: Dict[str, Any]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return dict(self.payload)
+
+    @property
+    def experiment_id(self) -> str:
+        return str(self.payload["experiment_id"])
+
+    @property
+    def blockers(self) -> tuple[str, ...]:
+        return tuple(dict.fromkeys((*GOVERNANCE_BLOCKERS, *self.payload["failure_reasons"])))
+
+
+class ResearchGovernanceRegistry:
+    """Read-only, version-controlled terminal research governance."""
+
+    def __init__(self, path: str | Path = DEFAULT_GOVERNANCE_PATH):
+        self.path = Path(path)
+        self._records = self._load()
+
+    def _load(self) -> Dict[str, GovernedExperiment]:
+        try:
+            document = json.loads(self.path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ValueError(f"GOVERNANCE_REGISTRY_INVALID: {type(exc).__name__}") from exc
+        if document.get("schema_version") != "1.0.0":
+            raise ValueError("GOVERNANCE_REGISTRY_INVALID: unknown schema version")
+        records: Dict[str, GovernedExperiment] = {}
+        digests: Dict[str, str] = {}
+        for payload in document.get("experiments", []):
+            self._validate(payload)
+            experiment_id = str(payload["experiment_id"])
+            digest = fingerprint(payload)
+            if experiment_id in records and digests[experiment_id] != digest:
+                raise ValueError(f"GOVERNANCE_RECORD_CONFLICT: {experiment_id}")
+            records[experiment_id] = GovernedExperiment(dict(payload))
+            digests[experiment_id] = digest
+        return records
+
+    @staticmethod
+    def _validate(payload: Dict[str, Any]) -> None:
+        required = {
+            "experiment_id", "code_commit", "artifact_selector", "replay_fingerprint",
+            "event_evidence_digest", "split_protocol", "split_profile",
+            "walk_forward_contract_version", "walk_forward_folds",
+            "experiment_status", "research_outcome", "promotion_eligible",
+            "terminal", "development_candidate_selected", "failure_reasons",
+            "evidence_roots", "evidence_hashes",
+        }
+        missing = sorted(required - set(payload))
+        if missing:
+            raise ValueError(f"GOVERNANCE_REGISTRY_INVALID: missing {missing}")
+        if payload["experiment_status"] != TERMINAL_HOLDOUT_STATUS:
+            raise ValueError("GOVERNANCE_REGISTRY_INVALID: unknown experiment status")
+        if payload["research_outcome"] != TERMINAL_RESEARCH_OUTCOME:
+            raise ValueError("GOVERNANCE_REGISTRY_INVALID: unknown research outcome")
+        if payload["promotion_eligible"] is not False or payload["terminal"] is not True:
+            raise ValueError("GOVERNANCE_REGISTRY_INVALID: terminal experiment is not immutable")
+        if payload["development_candidate_selected"] is not False:
+            raise ValueError("GOVERNANCE_REGISTRY_INVALID: terminal experiment cannot select a candidate")
+        if (
+            payload["walk_forward_contract_version"] != LEGACY_EVENT_META_WALK_FORWARD_CONTRACT
+            or int(payload["walk_forward_folds"]) != 3
+        ):
+            raise ValueError("GOVERNANCE_REGISTRY_INVALID: Phase 6G legacy contract mismatch")
+        for value in (payload["replay_fingerprint"], payload["event_evidence_digest"]):
+            if len(str(value)) != 64:
+                raise ValueError("GOVERNANCE_REGISTRY_INVALID: evidence fingerprint mismatch")
+
+    def get(self, experiment_id: str) -> GovernedExperiment | None:
+        return self._records.get(str(experiment_id))
+
+    def for_selector(self, selector: str) -> GovernedExperiment | None:
+        matches = [r for r in self._records.values() if r.payload["artifact_selector"] == selector]
+        if len(matches) > 1:
+            raise ValueError(f"GOVERNANCE_RECORD_CONFLICT: selector {selector}")
+        return matches[0] if matches else None
+
+    def require_promotion_eligible(
+        self,
+        *,
+        experiment_id: str = "",
+        artifact_selector: str = "",
+        replay_fingerprint: str = "",
+    ) -> GovernedExperiment:
+        record = self.get(experiment_id) if experiment_id else self.for_selector(artifact_selector)
+        if record is None:
+            raise ValueError("PROMOTION_NOT_ELIGIBLE: governance record is missing")
+        if replay_fingerprint and replay_fingerprint != record.payload["replay_fingerprint"]:
+            raise ValueError("PROMOTION_NOT_ELIGIBLE: evidence fingerprint mismatch")
+        if record.payload["terminal"] or not record.payload["promotion_eligible"]:
+            raise ValueError(" | ".join(record.blockers))
+        return record
+
+    def require_contract(self, experiment_id: str, contract_version: str) -> GovernedExperiment:
+        record = self.get(experiment_id)
+        if record is None:
+            raise ValueError("GOVERNANCE_REGISTRY_INVALID: experiment is missing")
+        if record.payload["walk_forward_contract_version"] != contract_version:
+            raise ValueError("LEGACY_REINTERPRETATION_FORBIDDEN: contract mismatch")
+        return record
 
 
 @dataclass
@@ -112,6 +228,7 @@ class ExperimentRegistry:
         contract: ModelContract = CURRENT_MODEL_CONTRACT,
         parent_run_id: str = "",
         notes: str = "",
+        replace_existing: bool = True,
     ) -> ExperimentRun:
         run = ExperimentRun(
             run_id=run_id,
@@ -131,18 +248,22 @@ class ExperimentRegistry:
             notes=notes,
         )
         with self._connect() as connection:
-            connection.execute(
-                """INSERT OR REPLACE INTO experiment_runs VALUES
-                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    run.run_id, run.run_type, run.status, run.started_utc, run.finished_utc,
-                    run.feature_set_version, run.model_version, run.calibration_version,
-                    run.execution_model_version, run.split_protocol_version,
-                    run.data_start_utc, run.data_end_utc, run.data_fingerprint,
-                    _canonical_json(run.hyperparameters), _canonical_json(run.results),
-                    run.parent_run_id, run.notes,
-                ),
-            )
+            verb = "INSERT OR REPLACE" if replace_existing else "INSERT"
+            try:
+                connection.execute(
+                    f"""{verb} INTO experiment_runs VALUES
+                    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (
+                        run.run_id, run.run_type, run.status, run.started_utc, run.finished_utc,
+                        run.feature_set_version, run.model_version, run.calibration_version,
+                        run.execution_model_version, run.split_protocol_version,
+                        run.data_start_utc, run.data_end_utc, run.data_fingerprint,
+                        _canonical_json(run.hyperparameters), _canonical_json(run.results),
+                        run.parent_run_id, run.notes,
+                    ),
+                )
+            except sqlite3.IntegrityError as exc:
+                raise FileExistsError(f"experiment run already exists: {run_id}") from exc
         return run
 
     def finish_run(self, run_id: str, status: str, results: Dict[str, Any]) -> None:

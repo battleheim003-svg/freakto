@@ -24,9 +24,24 @@ from sklearn.preprocessing import OneHotEncoder, RobustScaler
 
 from engine.baseline_benchmarks import block_bootstrap_expectancy_ci, strategy_metrics
 from engine.event_opportunity_universe import EventUniverseConfig, build_event_opportunity_universe
+from engine.artifact_protocols import (
+    DEFAULT_ARTIFACT_SELECTOR,
+    GLOBAL_UTC_SELECTOR,
+    resolve_artifact_route,
+    validate_v3_upstream_purge_manifest,
+    validate_v3_upstream_purge_metadata,
+)
+from engine.research_contracts import FUTURE_WALK_FORWARD_CONTRACT
 
 VERSION = "2.0.0"
 MODE = "COST_AWARE_EVENT_META_LABEL_DEVELOPMENT_ONLY"
+SPLIT_PROTOCOL_VERSION = "upstream-preserving-60-20-20-purge6-v1"
+UPSTREAM_SPLIT_COLUMN = "replay_split"
+UPSTREAM_TO_DOWNSTREAM = {
+    "TRAIN_60": "train",
+    "VALIDATION_20": "optimize",
+    "TEST_20": "holdout",
+}
 
 NET_RETURN_CANDIDATES = (
     "net_signed_return_after_{h}c_pct",
@@ -87,7 +102,7 @@ class EventMetaLabelConfig:
     label: CostAwareLabelConfig = field(default_factory=CostAwareLabelConfig)
     train_fraction: float = 0.60
     optimize_fraction: float = 0.20
-    purge_timestamps: int = 6
+    purge_timestamps: int = FUTURE_WALK_FORWARD_CONTRACT.purge_timestamps
     minimum_train_events: int = 300
     minimum_optimize_events: int = 80
     minimum_holdout_events: int = 100
@@ -96,8 +111,8 @@ class EventMetaLabelConfig:
     optimize_min_samples: int = 40
     optimize_min_expectancy_pct: float = 0.0
     optimize_min_profit_factor: float = 1.0
-    walk_forward_folds: int = 3
-    minimum_walk_forward_train_events: int = 300
+    walk_forward_folds: int = FUTURE_WALK_FORWARD_CONTRACT.walk_forward_folds
+    minimum_walk_forward_train_events: int = FUTURE_WALK_FORWARD_CONTRACT.event_meta_minimum_fit_rows
     minimum_walk_forward_test_events: int = 60
     bootstrap_samples: int = 300
     bootstrap_block_size: int = 24
@@ -106,10 +121,19 @@ class EventMetaLabelConfig:
     promotion_min_expectancy_pct: float = 0.0
     promotion_min_profit_factor: float = 1.05
     promotion_min_positive_walk_forward_fraction: float = 2.0 / 3.0
+    minimum_valid_walk_forward_folds: int = FUTURE_WALK_FORWARD_CONTRACT.minimum_valid_folds
     promotion_min_ci_low_pct: float = 0.0
     promotion_baseline_margin_pct: float = 0.02
+    split_protocol_version: str = SPLIT_PROTOCOL_VERSION
+    upstream_split_column: str = UPSTREAM_SPLIT_COLUMN
+    artifact_selector: str = DEFAULT_ARTIFACT_SELECTOR
+    upstream_split_manifest: Optional[Mapping[str, Any]] = None
 
     def validate(self) -> None:
+        FUTURE_WALK_FORWARD_CONTRACT.validate()
+        resolve_artifact_route(self.artifact_selector)
+        if self.artifact_selector == GLOBAL_UTC_SELECTOR:
+            validate_v3_upstream_purge_manifest(self.upstream_split_manifest)
         self.event.validate()
         self.label.validate()
         if not 0.40 <= self.train_fraction < 0.85:
@@ -120,6 +144,16 @@ class EventMetaLabelConfig:
             raise ValueError("train + optimize must leave Holdout")
         if not self.probability_thresholds:
             raise ValueError("probability_thresholds cannot be empty")
+        if self.split_protocol_version != SPLIT_PROTOCOL_VERSION:
+            raise ValueError(f"split_protocol_version must be {SPLIT_PROTOCOL_VERSION}")
+        if self.upstream_split_column != UPSTREAM_SPLIT_COLUMN:
+            raise ValueError(f"upstream_split_column must be {UPSTREAM_SPLIT_COLUMN}")
+        if int(self.purge_timestamps) != 6:
+            raise ValueError("upstream-preserving split requires exactly 6 unique timestamp purges")
+        if int(self.walk_forward_folds) != FUTURE_WALK_FORWARD_CONTRACT.walk_forward_folds:
+            raise ValueError("future Event meta experiments require the authoritative four-fold contract")
+        if int(self.minimum_valid_walk_forward_folds) != FUTURE_WALK_FORWARD_CONTRACT.minimum_valid_folds:
+            raise ValueError("minimum valid folds must match the authoritative contract")
 
 
 @dataclass(frozen=True)
@@ -128,6 +162,7 @@ class EventChronologicalSplit:
     optimize: pd.DataFrame
     holdout: pd.DataFrame
     boundaries: Dict[str, str]
+    manifest: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -250,40 +285,220 @@ def build_cost_aware_labels(
     return work
 
 
-def chronological_event_split(frame: pd.DataFrame, config: EventMetaLabelConfig) -> EventChronologicalSplit:
+def _provenance_violation(message: str) -> ValueError:
+    return ValueError(f"UPSTREAM_SPLIT_PROVENANCE_VIOLATION: {message}")
+
+
+def _split_summary(frame: pd.DataFrame) -> Dict[str, Any]:
+    timestamps = pd.Index(frame["__timestamp"].dropna().sort_values().unique())
+    return {
+        "rows": int(len(frame)),
+        "unique_timestamps": int(len(timestamps)),
+        "first_timestamp_utc": pd.Timestamp(timestamps[0]).isoformat() if len(timestamps) else None,
+        "last_timestamp_utc": pd.Timestamp(timestamps[-1]).isoformat() if len(timestamps) else None,
+    }
+
+
+def _pairwise_overlap_counts(
+    train: pd.DataFrame,
+    optimize: pd.DataFrame,
+    holdout: pd.DataFrame,
+) -> Dict[str, Dict[str, int]]:
+    frames = {"train": train, "optimize": optimize, "holdout": holdout}
+    result: Dict[str, Dict[str, int]] = {}
+    for left, right in (("train", "optimize"), ("train", "holdout"), ("optimize", "holdout")):
+        result[f"{left}_{right}"] = {
+            "timestamps": int(len(set(frames[left]["__timestamp"]) & set(frames[right]["__timestamp"]))),
+            "decision_ids": int(len(set(frames[left]["decision_id"]) & set(frames[right]["decision_id"]))),
+        }
+    return result
+
+
+def _validate_upstream_split_frame(
+    frame: pd.DataFrame,
+    config: EventMetaLabelConfig,
+) -> pd.DataFrame:
+    required = {"__timestamp", "decision_id", config.upstream_split_column}
+    missing = sorted(required - set(frame.columns))
+    if missing:
+        raise _provenance_violation(f"missing required columns: {', '.join(missing)}")
+    work = frame.copy()
+    if work["__timestamp"].isna().any():
+        raise _provenance_violation(
+            f"null timestamps detected: {int(work['__timestamp'].isna().sum())}"
+        )
+    if work["decision_id"].isna().any():
+        raise _provenance_violation(
+            f"null decision_id values detected: {int(work['decision_id'].isna().sum())}"
+        )
+    duplicate_count = int(work["decision_id"].duplicated(keep=False).sum())
+    if duplicate_count:
+        raise _provenance_violation(f"duplicate decision_id rows detected: {duplicate_count}")
+    provenance = work[config.upstream_split_column]
+    if provenance.isna().any():
+        raise _provenance_violation(
+            f"null {config.upstream_split_column} values detected: {int(provenance.isna().sum())}"
+        )
+    normalized = provenance.astype(str).str.strip().str.upper()
+    unknown = sorted(set(normalized) - set(UPSTREAM_TO_DOWNSTREAM))
+    if unknown:
+        counts = normalized[normalized.isin(unknown)].value_counts().to_dict()
+        raise _provenance_violation(f"unknown replay_split labels: {counts}")
+    work[config.upstream_split_column] = normalized
+    work["__timestamp"] = pd.to_datetime(work["__timestamp"], utc=True, errors="coerce")
+    if work["__timestamp"].isna().any():
+        raise _provenance_violation(
+            f"invalid timestamps detected: {int(work['__timestamp'].isna().sum())}"
+        )
+    return work.sort_values(["__timestamp", "decision_id"], kind="stable").reset_index(drop=True)
+
+
+def _purge_first_unique_timestamps(
+    frame: pd.DataFrame,
+    count: int,
+    *,
+    boundary: str,
+) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+    unique = pd.Index(frame["__timestamp"].dropna().sort_values().unique())
+    if len(unique) <= count:
+        raise _provenance_violation(
+            f"{boundary} has {len(unique)} unique timestamps; cannot purge {count}"
+        )
+    removed_timestamps = unique[:count]
+    removed = frame[frame["__timestamp"].isin(removed_timestamps)].copy()
+    retained = frame[~frame["__timestamp"].isin(removed_timestamps)].copy()
+    return retained, {
+        "boundary": boundary,
+        "removed_from": "VALIDATION_20" if boundary == "TRAIN_60_TO_VALIDATION_20" else "TEST_20",
+        "rows_removed": int(len(removed)),
+        "unique_timestamps_removed": int(len(removed_timestamps)),
+        "first_removed_timestamp_utc": pd.Timestamp(removed_timestamps[0]).isoformat(),
+        "last_removed_timestamp_utc": pd.Timestamp(removed_timestamps[-1]).isoformat(),
+    }
+
+
+def chronological_event_split(
+    frame: pd.DataFrame,
+    config: EventMetaLabelConfig,
+) -> EventChronologicalSplit:
+    """Preserve replay provenance and purge the downstream side of each boundary."""
     config.validate()
     if frame is None or frame.empty:
         raise ValueError("event label frame is empty")
-    work = frame.sort_values("__timestamp", kind="stable").reset_index(drop=True)
-    unique = pd.Index(work["__timestamp"].dropna().sort_values().unique())
-    purge = int(config.purge_timestamps)
-    usable = len(unique) - 2 * purge
-    if usable < 10:
-        raise ValueError("not enough unique timestamps after purge")
-    train_end = max(1, int(len(unique) * config.train_fraction))
-    optimize_end = max(train_end + purge + 1, int(len(unique) * (config.train_fraction + config.optimize_fraction)))
-    if optimize_end + purge >= len(unique):
-        raise ValueError("chronological split leaves no Holdout")
-    train_cut = unique[train_end - 1]
-    optimize_start = unique[train_end + purge]
-    optimize_cut = unique[optimize_end - 1]
-    holdout_start = unique[optimize_end + purge]
-    train = work[work["__timestamp"] <= train_cut].copy()
-    optimize = work[(work["__timestamp"] >= optimize_start) & (work["__timestamp"] <= optimize_cut)].copy()
-    holdout = work[work["__timestamp"] >= holdout_start].copy()
+    if config.artifact_selector == GLOBAL_UTC_SELECTOR:
+        validate_v3_upstream_purge_metadata(frame)
+    work = _validate_upstream_split_frame(frame, config)
+    column = config.upstream_split_column
+    upstream = {
+        label: work[work[column].eq(label)].copy()
+        for label in UPSTREAM_TO_DOWNSTREAM
+    }
+    empty = [label for label, rows in upstream.items() if rows.empty]
+    if empty:
+        raise _provenance_violation(f"empty upstream splits: {', '.join(empty)}")
+    if not (
+        upstream["TRAIN_60"]["__timestamp"].max()
+        < upstream["VALIDATION_20"]["__timestamp"].min()
+        < upstream["TEST_20"]["__timestamp"].min()
+    ):
+        raise _provenance_violation(
+            "invalid upstream chronological order before purge"
+        )
+
+    train = upstream["TRAIN_60"]
+    optimize, train_optimize_purge = _purge_first_unique_timestamps(
+        upstream["VALIDATION_20"],
+        int(config.purge_timestamps),
+        boundary="TRAIN_60_TO_VALIDATION_20",
+    )
+    holdout, optimize_holdout_purge = _purge_first_unique_timestamps(
+        upstream["TEST_20"],
+        int(config.purge_timestamps),
+        boundary="VALIDATION_20_TO_TEST_20",
+    )
     if min(len(train), len(optimize), len(holdout)) == 0:
-        raise ValueError("empty chronological split")
+        raise _provenance_violation("purge produced an empty downstream role")
+
+    provenance_matrix = {
+        "test_rows_in_train": int(train[column].eq("TEST_20").sum()),
+        "test_rows_in_optimize": int(optimize[column].eq("TEST_20").sum()),
+        "train_rows_in_optimize": int(optimize[column].eq("TRAIN_60").sum()),
+        "train_rows_in_holdout": int(holdout[column].eq("TRAIN_60").sum()),
+        "validation_rows_in_train": int(train[column].eq("VALIDATION_20").sum()),
+        "validation_rows_in_holdout": int(holdout[column].eq("VALIDATION_20").sum()),
+    }
+    violations = {name: value for name, value in provenance_matrix.items() if value}
+    if violations:
+        raise _provenance_violation(f"forbidden downstream provenance counts: {violations}")
+
+    overlap = _pairwise_overlap_counts(train, optimize, holdout)
+    overlap_violations = {
+        pair: counts for pair, counts in overlap.items() if any(counts.values())
+    }
+    if overlap_violations:
+        raise _provenance_violation(f"downstream overlap detected: {overlap_violations}")
+    if not (
+        train["__timestamp"].max()
+        < optimize["__timestamp"].min()
+        < holdout["__timestamp"].min()
+    ):
+        raise _provenance_violation("invalid chronological order after upstream mapping and purge")
+
+    boundaries = {
+        "train_end_utc": pd.Timestamp(train["__timestamp"].max()).isoformat(),
+        "optimize_start_utc": pd.Timestamp(optimize["__timestamp"].min()).isoformat(),
+        "optimize_end_utc": pd.Timestamp(optimize["__timestamp"].max()).isoformat(),
+        "holdout_start_utc": pd.Timestamp(holdout["__timestamp"].min()).isoformat(),
+        "purge_timestamps": str(config.purge_timestamps),
+    }
+    input_fingerprints = (
+        sorted(work["replay_data_fingerprint"].dropna().astype(str).unique())
+        if "replay_data_fingerprint" in work.columns
+        else []
+    )
+    experiment_ids = (
+        sorted(work["replay_experiment_id"].dropna().astype(str).unique())
+        if "replay_experiment_id" in work.columns
+        else []
+    )
+    manifest = {
+        "split_protocol_version": config.split_protocol_version,
+        "artifact_selector": config.artifact_selector,
+        "upstream_split_protocol": resolve_artifact_route(config.artifact_selector).split_protocol,
+        "upstream_split_profile": resolve_artifact_route(config.artifact_selector).split_profile,
+        "upstream_provenance_column": column,
+        "input_replay_fingerprints": input_fingerprints,
+        "input_replay_experiment_ids": experiment_ids,
+        "allowed_provenance_mapping": dict(UPSTREAM_TO_DOWNSTREAM),
+        "input_upstream_splits": {
+            label: _split_summary(rows) for label, rows in upstream.items()
+        },
+        "retained_downstream_roles": {
+            "train": _split_summary(train),
+            "optimize": _split_summary(optimize),
+            "holdout": _split_summary(holdout),
+        },
+        "purge": {
+            "size": int(config.purge_timestamps),
+            "unit": "unique timestamps",
+            "train_to_optimize": train_optimize_purge,
+            "optimize_to_holdout": optimize_holdout_purge,
+        },
+        "purge_owner": "EVENT_PIPELINE",
+        "purge_applied": True,
+        "purge_timestamps": int(config.purge_timestamps),
+        "purge_unit": "unique UTC timestamps",
+        "boundaries": boundaries,
+        "overlap_counts": overlap,
+        **provenance_matrix,
+        "leakage_validation": "PASSED_UPSTREAM_SPLIT_PROVENANCE",
+    }
     return EventChronologicalSplit(
         train=train.reset_index(drop=True),
         optimize=optimize.reset_index(drop=True),
         holdout=holdout.reset_index(drop=True),
-        boundaries={
-            "train_end_utc": pd.Timestamp(train_cut).isoformat(),
-            "optimize_start_utc": pd.Timestamp(optimize_start).isoformat(),
-            "optimize_end_utc": pd.Timestamp(optimize_cut).isoformat(),
-            "holdout_start_utc": pd.Timestamp(holdout_start).isoformat(),
-            "purge_timestamps": str(purge),
-        },
+        boundaries=boundaries,
+        manifest=manifest,
     )
 
 
@@ -295,7 +510,26 @@ def _available_features(frame: pd.DataFrame) -> Tuple[List[str], List[str]]:
     return numeric, categorical
 
 
+def _reject_test_rows_from_tuning(frame: pd.DataFrame, stage: str) -> None:
+    if UPSTREAM_SPLIT_COLUMN not in frame.columns:
+        raise _provenance_violation(
+            f"missing required columns before {stage}: {UPSTREAM_SPLIT_COLUMN}"
+        )
+    provenance = frame[UPSTREAM_SPLIT_COLUMN]
+    nulls = int(provenance.isna().sum())
+    if nulls:
+        raise _provenance_violation(
+            f"null {UPSTREAM_SPLIT_COLUMN} values before {stage}: {nulls}"
+        )
+    test_rows = int(provenance.astype(str).str.upper().eq("TEST_20").sum())
+    if test_rows:
+        raise _provenance_violation(
+            f"TEST_20 rows detected in {stage}: {test_rows}"
+        )
+
+
 def fit_event_meta_model(train: pd.DataFrame, config: EventMetaLabelConfig) -> EventMetaModel:
+    _reject_test_rows_from_tuning(train, "model fitting")
     if len(train) < config.minimum_train_events:
         raise ValueError(f"at least {config.minimum_train_events} train events are required")
     training = train[train["cost_gate_pass"].astype(bool)].copy()
@@ -367,6 +601,7 @@ def select_meta_threshold(
     optimize_predictions: pd.DataFrame,
     config: EventMetaLabelConfig,
 ) -> MetaThresholdSelection:
+    _reject_test_rows_from_tuning(optimize_predictions, "threshold selection")
     records: List[Dict[str, Any]] = []
     for threshold in config.probability_thresholds:
         selected = optimize_predictions[
@@ -439,7 +674,12 @@ def event_family_benchmarks(frame: pd.DataFrame, *, scope: str) -> pd.DataFrame:
 def walk_forward_event_meta(frame: pd.DataFrame, config: EventMetaLabelConfig) -> pd.DataFrame:
     if frame is None or frame.empty:
         return pd.DataFrame()
-    work = frame.sort_values("__timestamp", kind="stable").reset_index(drop=True)
+    work = _validate_upstream_split_frame(frame, config)
+    forbidden = int(work[config.upstream_split_column].eq("TEST_20").sum())
+    if forbidden:
+        raise _provenance_violation(
+            f"TEST_20 rows detected in walk-forward tuning: {forbidden}"
+        )
     unique = pd.Index(work["__timestamp"].dropna().sort_values().unique())
     folds = max(1, int(config.walk_forward_folds))
     boundaries = np.linspace(0.45, 1.0, folds + 1)

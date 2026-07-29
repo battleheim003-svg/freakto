@@ -119,5 +119,32 @@ def log_decision(opportunity, latest_timestamp, price, provider=None):
 
         writer.writerow(row)
 
+    # Transitional dual-write: the legacy CSV remains an operator trace only.
+    # Promotion/readiness consumes Ledger v2, whose primary key makes retries
+    # idempotent and whose payload hash preserves lineage.
+    try:
+        from freakto.evidence.ledger import DecisionLedger
+
+        targets = list(opportunity.targets) if isinstance(opportunity.targets, (list, tuple)) else []
+        DecisionLedger().append(
+            {
+                "decision_id": decision_id,
+                "created_utc": row["logged_at_utc"],
+                "candle_timestamp_utc": str(latest_timestamp),
+                "symbol": opportunity.symbol,
+                "timeframe": opportunity.timeframe,
+                "side": opportunity.side,
+                "entry_price": float(price),
+                "stop_price": opportunity.stop_zone,
+                "targets": targets,
+                "features": row,
+                "code_sha256": "decision-logger-dual-write-v2",
+            }
+        )
+    except Exception as exc:
+        # Do not silently treat a failed write as evidence. The CSV is retained
+        # for forensic repair; readiness remains blocked until v2 has a cohort.
+        print(f"⚠️ Ledger v2 write rejected; evidence remains blocked: {exc}")
+
     print(f"🧾 تصمیم ثبت شد: {LOG_FILE}")
     print(f"🆔 Decision ID: {decision_id}")

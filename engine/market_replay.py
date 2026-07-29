@@ -37,6 +37,14 @@ from engine.historical_data_store import (
 from engine.execution_model import adaptive_horizon, estimate_execution_cost
 from engine.experiment_registry import ExperimentRegistry, fingerprint
 from engine.model_contract import CURRENT_MODEL_CONTRACT
+from engine.artifact_protocols import (
+    DEFAULT_ARTIFACT_SELECTOR,
+    GLOBAL_UTC_PROFILE,
+    GLOBAL_UTC_SELECTOR,
+    assign_global_utc_split,
+    resolve_artifact_route,
+    validate_global_utc_request,
+)
 
 
 VERSION = "v10.3.0"
@@ -90,6 +98,9 @@ class MarketReplayConfig:
     checkpoint_every: int = 250
     strict_leakage_audit: bool = True
     source: str = "MARKET_REPLAY"
+    artifact_selector: str = DEFAULT_ARTIFACT_SELECTOR
+    split_window: str = ""
+    split_profile: str = ""
 
 
 @dataclass
@@ -259,6 +270,9 @@ def _config_fingerprint(config: MarketReplayConfig) -> str:
         "context_digest": context_digest,
         "context_max_age_hours": config.context_max_age_hours,
         "replay_safety": "learning_off_historical_edge_off",
+        "artifact_selector": config.artifact_selector,
+        "split_window": config.split_window,
+        "split_profile": config.split_profile,
     }
     raw = json.dumps(payload, sort_keys=True, ensure_ascii=True)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
@@ -286,7 +300,7 @@ def _context_file_frame(path: str) -> pd.DataFrame:
     file_path = Path(path)
     if not file_path.exists():
         return pd.DataFrame()
-    frame = pd.read_csv(file_path)
+    frame = pd.read_csv(file_path, low_memory=False)
     timestamp_column = "timestamp_utc" if "timestamp_utc" in frame.columns else "timestamp" if "timestamp" in frame.columns else ""
     if not timestamp_column:
         raise ValueError("historical context file needs timestamp_utc or timestamp")
@@ -563,6 +577,18 @@ def _chronological_split(position: int, total: int) -> str:
     return "TEST_20"
 
 
+def _assign_replay_split(
+    config: MarketReplayConfig,
+    *,
+    timestamp: Any,
+    position: int,
+    total: int,
+) -> str:
+    if config.artifact_selector == GLOBAL_UTC_SELECTOR:
+        return assign_global_utc_split(timestamp)
+    return _chronological_split(position, total)
+
+
 def _row_from_opportunity(
     *,
     run_id: str,
@@ -627,7 +653,12 @@ def _row_from_opportunity(
         "symbol": symbol,
         "timeframe": config.timeframe,
         "provider": provider,
-        "replay_split": _chronological_split(replay_position, replay_total),
+        "replay_split": _assign_replay_split(
+            config,
+            timestamp=timestamp,
+            position=replay_position,
+            total=replay_total,
+        ),
         "replay_position": replay_position,
         "replay_total_positions": replay_total,
         "replay_safe": bool(raw.get("replay_safe", False)),
@@ -669,6 +700,21 @@ def _row_from_opportunity(
         "onchain_signal_score": raw.get("onchain_signal_score", 0.0),
         "cross_exchange_volume_ratio": raw.get("cross_exchange_volume_ratio", 1.0),
     }
+    if config.artifact_selector == GLOBAL_UTC_SELECTOR:
+        row.update(
+            {
+                "artifact_selector": GLOBAL_UTC_SELECTOR,
+                "split_protocol": GLOBAL_UTC_PROFILE.protocol_id,
+                "split_profile": GLOBAL_UTC_PROFILE.profile_id,
+                "boundaries_frozen_before_holdout": True,
+                "purge_owner": GLOBAL_UTC_PROFILE.purge_owner,
+                "purge_applied": False,
+                "purge_timestamps": GLOBAL_UTC_PROFILE.purge_timestamps,
+                "purge_unit": GLOBAL_UTC_PROFILE.purge_unit,
+                "canonical": False,
+                "split_assignment_version": GLOBAL_UTC_PROFILE.split_assignment_version,
+            }
+        )
     row.update(path)
 
     # v10.1.5 canonical evaluation recorder.  The replay engine already
@@ -940,6 +986,16 @@ def run_market_replay(
     from engine.decision import DecisionEngine
     from features import add_features
 
+    route = resolve_artifact_route(config.artifact_selector)
+    if route.selector == GLOBAL_UTC_SELECTOR:
+        validate_global_utc_request(
+            protocol_id=route.split_protocol,
+            profile_id=config.split_profile or route.split_profile,
+            window=config.split_window,
+            symbols=config.symbols,
+            timeframe=config.timeframe,
+            cutoff_utc=config.end_utc,
+        )
     run_id = run_id or make_run_id()
     run = MarketReplayRun(
         run_id=run_id,
@@ -1161,7 +1217,7 @@ def load_market_replay_status(path: Path | str = CUMULATIVE_REPLAY_FILE) -> Mark
             metric_horizon_candles=6, timeframe="4h"
         )
     try:
-        frame = pd.read_csv(file_path, encoding="utf-8-sig")
+        frame = pd.read_csv(file_path, encoding="utf-8-sig", low_memory=False)
     except Exception:
         frame = pd.DataFrame()
     results: List[ReplaySymbolResult] = []

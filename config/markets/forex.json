@@ -1,0 +1,26 @@
+{
+  "schema_version": "ohlcv-v1",
+  "asset_class": "forex",
+  "provider": "dukascopy",
+  "symbols": [
+    "EUR/USD",
+    "GBP/USD",
+    "USD/JPY"
+  ],
+  "price_basis": "mid",
+  "volume_semantics": "best_bid_plus_best_ask_quote_volume",
+  "session_calendar": "DUKASCOPY_UTC_DAILY_EXPLICIT_PLACEHOLDERS_AUDITED_2023_2025",
+  "execution": {
+    "cost_model_status": "UNVERIFIED",
+    "spread_source": "DUKASCOPY_BID_ASK_DAILY_CLOSE_2023_2025",
+    "slippage_source": "1.25_X_HALF_OF_OBSERVED_P95_DAILY_CLOSE_SPREAD",
+    "commission_source": "https://www.dukascopy.com/swiss/english/about/fee-schedule/",
+    "rollover_source": "https://www.dukascopy.com/swiss/english/forex/mt4-accounts/",
+    "account_currency_conversion": null
+  },
+  "safety": {
+    "research_only": true,
+    "paper_enabled": false,
+    "live_enabled": false
+  }
+}

@@ -114,6 +114,8 @@ class ChampionChallengerResult:
     mode: str = "RESEARCH_SHADOW_ONLY"
     shadow_only: bool = True
     paper_live_enabled: bool = False
+    official_evidence_eligible: bool = False
+    evidence_scope: str = "RESEARCH_SHADOW_ONLY"
     promotion_applied: bool = False
     recommended_variant: Optional[str] = None
     recommended_threshold_pct: Optional[float] = None
@@ -822,6 +824,9 @@ def run_champion_challenger(
     summary.to_csv(summary_path, index=False, encoding="utf-8-sig")
     candidates.to_csv(candidates_path, index=False, encoding="utf-8-sig")
     walk_forward.to_csv(walk_forward_path, index=False, encoding="utf-8-sig")
+    holdout_predictions = holdout_predictions.copy()
+    holdout_predictions["official_evidence_eligible"] = False
+    holdout_predictions["evidence_scope"] = "RESEARCH_SHADOW_ONLY"
     holdout_predictions.to_csv(predictions_path, index=False, encoding="utf-8-sig")
     result.output_files = {
         "summary_csv": str(summary_path),
@@ -848,6 +853,7 @@ def _markdown_report(result: ChampionChallengerResult, summary: pd.DataFrame) ->
         f"- Recommended threshold: `{result.recommended_threshold_pct}`",
         f"- Promotion applied: **{result.promotion_applied}**",
         f"- Paper/Live enabled: **{result.paper_live_enabled}**",
+        f"- Official evidence eligible: **{result.official_evidence_eligible}**",
         "",
         "## Champion Holdout",
         "",

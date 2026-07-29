@@ -15,25 +15,54 @@ from engine.cost_gate_diagnostics import (
     funnel_table,
 )
 from engine.cost_aware_label_v2 import EventMetaLabelConfig, chronological_event_split
+from engine.artifact_protocols import (
+    DEFAULT_ARTIFACT_SELECTOR,
+    GLOBAL_UTC_SELECTOR,
+    resolve_artifact_route,
+    validate_global_replay_manifest,
+)
 
 
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Freakto Cost Gate Diagnostics & Geometry Parser Fix")
-    p.add_argument("--replay-root", default="logs/multi_cycle_archive_v2")
-    p.add_argument("--output-dir", default="logs/cost_gate_diagnostics")
+    p.add_argument("--replay-root", default="")
+    p.add_argument("--output-dir", default="")
+    p.add_argument("--artifact-selector", default=DEFAULT_ARTIFACT_SELECTOR)
     p.add_argument("--cutoff", default="2026-07-09T12:00:00Z")
     return p
 
 
 def main() -> int:
     args = parser().parse_args()
-    out = Path(args.output_dir)
+    route = resolve_artifact_route(args.artifact_selector)
+    replay_root = Path(args.replay_root) if args.replay_root else route.replay_root
+    out = Path(args.output_dir) if args.output_dir else route.cost_root
+    if replay_root != route.replay_root or out != route.cost_root:
+        raise ValueError(
+            "ARTIFACT_SELECTOR_VIOLATION: replay/output roots do not match the selected protocol"
+        )
+    frames = load_multi_cycle_replays(replay_root)
+    upstream_manifest = None
+    if route.selector == GLOBAL_UTC_SELECTOR:
+        manifest_path = replay_root / "global_utc_replay_manifest.json"
+        if not manifest_path.exists() or "FULL" not in frames:
+            raise ValueError(
+                "GLOBAL_UTC_MANIFEST_VIOLATION: v3 replay manifest or FULL replay is missing"
+            )
+        upstream_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        validate_global_replay_manifest(upstream_manifest, frames["FULL"])
     out.mkdir(parents=True, exist_ok=True)
-    frames = load_multi_cycle_replays(args.replay_root)
     selected_name, selected = select_longest_replay(frames)
     config = EventUniverseConfig(development_cutoff_utc=args.cutoff)
     events, diagnostics = build_event_opportunity_universe(selected, config)
-    split_cfg = EventMetaLabelConfig(event=config, minimum_train_events=1, minimum_optimize_events=1, minimum_holdout_events=1)
+    split_cfg = EventMetaLabelConfig(
+        event=config,
+        minimum_train_events=1,
+        minimum_optimize_events=1,
+        minimum_holdout_events=1,
+        artifact_selector=args.artifact_selector,
+        upstream_split_manifest=upstream_manifest,
+    )
     if events.empty:
         report = {"status": "INSUFFICIENT_EVENT_UNIVERSE", "selected_replay_window": selected_name, "event_rows": 0}
         (out / "cost_gate_diagnostics_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
@@ -65,6 +94,9 @@ def main() -> int:
         "schema_mode": diagnostics.schema_mode,
         "promotion_applied": False,
         "paper_live_enabled": False,
+        "artifact_selector": args.artifact_selector,
+        "split_protocol": route.split_protocol,
+        "split_profile": route.split_profile,
     }
     (out / "cost_gate_diagnostics_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     md = ["# Freakto Cost Gate Diagnostics", "", f"- Status: `{report['status']}`", f"- Window: `{selected_name}`", f"- Events: `{len(events)}`", f"- Valid geometry: `{report['geometry_valid_rows']}`", f"- Fixed gate: `{report['fixed_gate_rows']}`", f"- Train-derived diagnostic gate: `{report['train_derived_gate_rows']}`", "", "No runtime threshold, Paper, or Live setting was changed."]

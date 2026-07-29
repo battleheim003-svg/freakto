@@ -303,7 +303,12 @@ def prepare_event_rows(
             + work["side"].astype(str)
         )
         work["decision_id"] = stable.map(lambda x: hashlib.sha256(x.encode("utf-8")).hexdigest()[:20])
-    work = work.drop_duplicates("decision_id", keep="last")
+    duplicate_count = int(work["decision_id"].duplicated(keep=False).sum())
+    if duplicate_count:
+        raise ValueError(
+            "UPSTREAM_SPLIT_PROVENANCE_VIOLATION: "
+            f"duplicate decision_id rows detected before event construction: {duplicate_count}"
+        )
     sort_columns = [c for c in ("symbol", "timeframe", "__timestamp", "decision_id") if c in work.columns]
     return work.sort_values(sort_columns, kind="stable").reset_index(drop=True)
 

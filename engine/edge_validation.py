@@ -238,32 +238,25 @@ def _metrics_from_returns(
 
 
 def decision_edge_metrics() -> EdgeMetrics:
+    # v2 is the only source allowed to contribute to readiness. Legacy CSVs
+    # are retained for forensic migration but have an invalid data contract.
+    from freakto.evidence.ledger import canonical_cohort
+
+    cohort = canonical_cohort()
+    if cohort:
+        frame = pd.DataFrame(cohort)
+        return _metrics_from_returns(
+            source="decision_outcome_ledger_v2",
+            unit="pct",
+            returns=pd.to_numeric(frame["net_return_pct"], errors="coerce"),
+            stop_hits=frame["terminal_status"].eq("STOP"),
+            win_rate_label="Directional Net-of-Cost Win Rate",
+        )
     df = _load_csv(DECISION_EVALS_FILE)
+    warning = "Legacy decision_evaluations.csv is INVALIDATED_DATA_CONTRACT; migrate into Ledger v2."
     if df.empty:
-        return EdgeMetrics(source="decision_evaluations", unit="pct", warnings=["logs/decision_evaluations.csv پیدا نشد یا خالی است."])
-    if "evaluation_status" in df.columns:
-        df = df[df["evaluation_status"].astype(str) == "COMPLETE"].copy()
-    if df.empty:
-        return EdgeMetrics(source="decision_evaluations", unit="pct", warnings=["هیچ ارزیابی COMPLETE وجود ندارد."])
-
-    returns = pd.to_numeric(df.get("return_after_24h_pct"), errors="coerce")
-    if returns.dropna().empty:
-        returns = pd.to_numeric(df.get("return_after_12h_pct"), errors="coerce")
-    if returns.dropna().empty:
-        returns = pd.to_numeric(df.get("return_after_4h_pct"), errors="coerce")
-
-    return _metrics_from_returns(
-        source="decision_evaluations",
-        unit="pct",
-        returns=returns,
-        stop_hits=_bool_series(df, "stop_hit"),
-        t1_hits=_bool_series(df, "target_1_hit"),
-        t2_hits=_bool_series(df, "target_2_hit"),
-        t3_hits=_bool_series(df, "target_3_hit"),
-        mfe=pd.to_numeric(df.get("mfe_pct"), errors="coerce") if "mfe_pct" in df.columns else None,
-        mae=pd.to_numeric(df.get("mae_pct"), errors="coerce") if "mae_pct" in df.columns else None,
-        win_rate_label="Directional Win Rate",
-    )
+        warning = "No Ledger v2 cohort exists; legacy evidence remains invalidated."
+    return EdgeMetrics(source="decision_outcome_ledger_v2", unit="pct", quality="INVALIDATED_DATA_CONTRACT", warnings=[warning])
 
 
 def paper_edge_metrics() -> EdgeMetrics:
@@ -313,7 +306,10 @@ def run_edge_validation() -> EdgeValidationResult:
     elif paper.expectancy > 0:
         notes.append("Paper edge فعلاً مثبت است؛ باید با نمونه بیشتر تأیید شود.")
 
-    if not blockers and decision.quality in {"ROBUST_POSITIVE", "POSITIVE_BUT_NEEDS_FILTERING"} and paper.expectancy > 0:
+    if decision.quality == "INVALIDATED_DATA_CONTRACT":
+        blockers.append("LEGACY_FORWARD_EDGE_INVALIDATED_DATA_CONTRACT")
+        quality = "INVALIDATED_DATA_CONTRACT"
+    elif not blockers and decision.quality in {"ROBUST_POSITIVE", "POSITIVE_BUT_NEEDS_FILTERING"} and paper.expectancy > 0:
         quality = "LIVE_VALIDATION_CANDIDATE"
     elif decision.expectancy > 0 or paper.expectancy > 0:
         quality = "EARLY_EDGE_OBSERVED"

@@ -24,6 +24,49 @@ SAFE_CHUNK_SIZE = 3600
 TELEGRAM_TIMEOUT_SECONDS = 12
 
 
+def _number(value: float, digits: int = 2, suffix: str = "") -> str:
+    return f"{float(value):+.{digits}f}{suffix}"
+
+
+def format_paper_trade_open(trade: dict, *, debug: str = "", mode: str = "NORMAL") -> str:
+    """پیام کوتاه و صریح معامله شبیه‌سازی‌شده؛ بدون ارسال شبکه."""
+    text = "\n".join([
+        "🧪 معامله آزمایشی جدید", "", f"نماد: {trade.get('symbol', 'نامشخص')}",
+        f"جهت: {trade.get('side', 'نامشخص')}", f"ورود فرضی: {trade.get('entry', 'نامشخص')}",
+        f"حد ضرر: {trade.get('stop', 'نامشخص')}", f"هدف: {trade.get('target', trade.get('target_1', 'نامشخص'))}",
+        f"ریسک فرضی: {trade.get('risk_r', 1)}R", f"هزینه تخمینی: {float(trade.get('cost_pct', 0)):.2f}%",
+        "", "وضعیت: باز", "سرمایه واقعی: صفر",
+    ])
+    return text + (f"\n\nجزئیات DEBUG:\n{debug}" if mode.upper() == "DEBUG" and debug else "")
+
+
+def format_paper_trade_closed(trade: dict, stats: dict, *, debug: str = "", mode: str = "NORMAL") -> str:
+    net_r = float(trade.get("net_r", 0)); icon = "✅" if net_r > 0 else "❌"
+    label = "سود" if net_r > 0 else "زیان"
+    pf = stats.get("profit_factor", 0)
+    text = "\n".join([
+        f"{icon} معامله آزمایشی بسته شد", "", f"نماد: {trade.get('symbol', 'نامشخص')}",
+        f"نتیجه: {_number(net_r)}R", f"{label} خالص فرضی: {_number(trade.get('net_return_pct', 0), suffix='%')}",
+        f"علت خروج: {trade.get('close_reason', 'نامشخص')}", f"مدت معامله: {trade.get('duration', 'نامشخص')}", "",
+        "آمار کلی:", f"برد/باخت: {stats.get('wins', 0)} / {stats.get('losses', 0)}",
+        f"وین‌ریت: {float(stats.get('win_rate_pct', 0)):.1f}%", f"Profit Factor: {pf}",
+        f"Expectancy: {_number(stats.get('expectancy_r', 0))}R", f"سود تجمعی: {_number(stats.get('cumulative_r', 0))}R",
+        f"Max Drawdown: {float(stats.get('max_drawdown_r', 0)):.2f}R", "سرمایه واقعی: صفر",
+    ])
+    return text + (f"\n\nجزئیات DEBUG:\n{debug}" if mode.upper() == "DEBUG" and debug else "")
+
+
+def format_paper_daily_summary(stats: dict) -> str:
+    return "\n".join([
+        "📊 خلاصه معاملات آزمایشی", "", f"سیگنال‌ها: {stats.get('total_signals', 0)}",
+        f"معاملات بسته: {stats.get('closed_trades', 0)}", f"معاملات باز: {stats.get('open_trades', 0)}",
+        f"برد/باخت: {stats.get('wins', 0)} / {stats.get('losses', 0)}",
+        f"وین‌ریت: {float(stats.get('win_rate_pct', 0)):.1f}%", f"Profit Factor: {stats.get('profit_factor', 0)}",
+        f"Expectancy: {_number(stats.get('expectancy_r', 0))}R", f"سود تجمعی: {_number(stats.get('cumulative_r', 0))}R",
+        f"Max Drawdown: {float(stats.get('max_drawdown_r', 0)):.2f}R", "", "وضعیت: جمع‌آوری داده پژوهشی", "سرمایه واقعی: صفر",
+    ])
+
+
 @dataclass
 class TelegramSendResult:
     ok: bool
