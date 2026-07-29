@@ -8,6 +8,10 @@ from pathlib import Path
 from typing import List
 
 from engine.multi_cycle_archive import MultiCycleArchiveConfig, run_multi_cycle_archive
+from engine.artifact_protocols import (
+    DEFAULT_ARTIFACT_SELECTOR,
+    resolve_artifact_route,
+)
 from engine.multi_cycle_validation import (
     MultiCycleValidationConfig,
     load_replay_files,
@@ -27,7 +31,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--cutoff", default="", help="Frozen development cutoff. Defaults to Fresh OOS manifest.")
     parser.add_argument("--full-start", default="2017-01-01T00:00:00+00:00")
     parser.add_argument("--archive-root", default="data/multi_cycle_archive_v2")
-    parser.add_argument("--output-dir", default="logs/multi_cycle_archive_v2")
+    parser.add_argument("--output-dir", default="")
+    parser.add_argument("--artifact-selector", default=DEFAULT_ARTIFACT_SELECTOR)
     parser.add_argument("--source-data-dir", default="data/market_replay")
     parser.add_argument("--fresh-freeze-dir", default="logs/fresh_oos_v2/development_freeze")
     parser.add_argument("--exchange", default="auto")
@@ -114,6 +119,12 @@ def _write_markdown(archive_report, validation_report, output_dir: Path) -> None
 
 def main() -> int:
     args = build_parser().parse_args()
+    route = resolve_artifact_route(args.artifact_selector)
+    output_dir_value = args.output_dir or str(route.replay_root)
+    if Path(output_dir_value) != route.replay_root:
+        raise ValueError(
+            "ARTIFACT_SELECTOR_VIOLATION: output-dir does not match the selected protocol"
+        )
     archive_config = MultiCycleArchiveConfig(
         symbols=_csv_list(args.symbols),
         timeframe=args.timeframe,
@@ -121,7 +132,7 @@ def main() -> int:
         development_cutoff_utc=args.cutoff,
         full_history_start_utc=args.full_start,
         archive_root=args.archive_root,
-        output_dir=args.output_dir,
+        output_dir=output_dir_value,
         source_data_dir=args.source_data_dir,
         fresh_freeze_dir=args.fresh_freeze_dir,
         exchange=args.exchange,
@@ -134,11 +145,12 @@ def main() -> int:
         max_listing_probes=max(1, int(args.max_listing_probes)),
         replay_step=max(1, int(args.step)),
         fixed_score_threshold=float(args.score_threshold),
+        artifact_selector=args.artifact_selector,
     )
     archive_report = run_multi_cycle_archive(archive_config)
-    frames = load_replay_files(args.output_dir)
+    frames = load_replay_files(output_dir_value)
     validation_config = MultiCycleValidationConfig(
-        output_dir=args.output_dir,
+        output_dir=output_dir_value,
         fixed_score_threshold=float(args.score_threshold),
         rolling_window_days=max(1, int(args.rolling_days)),
         rolling_step_days=max(1, int(args.rolling_step_days)),
@@ -147,7 +159,7 @@ def main() -> int:
         min_window_samples=max(1, int(args.min_window_samples)),
     )
     validation_report = run_multi_cycle_validation(frames, validation_config)
-    output_dir = Path(args.output_dir)
+    output_dir = Path(output_dir_value)
     _write_markdown(archive_report, validation_report, output_dir)
 
     print("=" * 116)

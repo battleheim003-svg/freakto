@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0.0",
+  "experiments": [
+    {
+      "experiment_id": "market_replay_20260728_183716",
+      "branch": "fix/phase6f-global-utc-split",
+      "code_commit": "50300604ce2692b3d9e678e795980b60b5a1fb77",
+      "artifact_selector": "v3-global-utc-candidate",
+      "replay_fingerprint": "d3963dd9425858b60fb59985262f94f9d810ac115abb6dd192f0b13b87768ed3",
+      "event_evidence_digest": "94977ce1bfd9aaaae4dfbb8705c2fc9fdb1ad7b648b0693a5c7b04a07148504c",
+      "split_protocol": "global-utc-pooled-60-20-20-purge6-v1",
+      "split_profile": "full-btc-eth-sol-4h-cutoff-20260709-v1",
+      "walk_forward_contract_version": "event-meta-walk-forward-3fold-purge6-v1",
+      "walk_forward_folds": 3,
+      "experiment_status": "HOLDOUT_CONSUMED_NOT_VALIDATED",
+      "research_outcome": "HOLDOUT_CRITERIA_FAILED",
+      "promotion_eligible": false,
+      "terminal": true,
+      "development_candidate_selected": false,
+      "event_rows": 3589,
+      "initial_cost_gated_rows": 816,
+      "holdout_evaluated_rows": 78,
+      "required_holdout_rows": 100,
+      "holdout_ci_low_pct": -1.158603,
+      "valid_walk_forward_folds": 0,
+      "failure_reasons": [
+        "HOLDOUT_CRITERIA_FAILED",
+        "PROMOTION_NOT_ELIGIBLE",
+        "NO_VALID_DEVELOPMENT_CANDIDATE",
+        "COST_DIAGNOSTICS_MISSING",
+        "FRESH_OOS_MISSING"
+      ],
+      "evidence_roots": {
+        "replay": "logs/multi_cycle_archive_v3_global_utc",
+        "event": "logs/event_opportunity_v3_global_utc",
+        "cost": "logs/cost_gate_diagnostics_v3_global_utc"
+      },
+      "evidence_hashes": {
+        "replay_manifest_sha256": "e70622ff59d0e9a5a4a014e62159e0ce8c38a02dd725fe06e4dfb4dc491feb2e",
+        "replay_csv_sha256": "79b2789f3947854c4097329953eb4b7ecdd4fa55daaff61244192aa3b2775fc9",
+        "event_manifest_sha256": "94977ce1bfd9aaaae4dfbb8705c2fc9fdb1ad7b648b0693a5c7b04a07148504c",
+        "event_universe_sha256": "708ab9eda96b322e67e6688019ed871ab3bb5d94be11cc9d49905e0420e18c33",
+        "holdout_benchmarks_sha256": "99c3af7ebbe755d3eeb6d7ff625bf4b41119ad581f61bda0f58142740096b893"
+      }
+    }
+  ]
+}

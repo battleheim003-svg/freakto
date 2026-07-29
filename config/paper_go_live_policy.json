@@ -1,0 +1,32 @@
+{
+  "policy_version": "paper-go-live-v1",
+  "frozen_contract": {
+    "strategy": "EVENT_COST_GATED",
+    "feature_set_version": "technical-causal-v1",
+    "model_version": "heuristic-score-v4",
+    "calibration_version": "replay-calibration-v2",
+    "execution_model_version": "vol-liquidity-cost-v1",
+    "split_protocol_version": "chronological-60-20-20-v1",
+    "symbols": ["BTC/USDT", "ETH/USDT", "SOL/USDT", "BNB/USDT", "XRP/USDT", "DOGE/USDT"],
+    "timeframe": "4h",
+    "closed_candles_only": true,
+    "decision_at_bar_close": true,
+    "fill_at_next_bar_open": true,
+    "daily_loss_limit_r": 3.0
+  },
+  "thresholds": {
+    "minimum_closed_trades": 200,
+    "minimum_observation_days": 60,
+    "minimum_after_cost_expectancy_r": 0.05,
+    "minimum_expectancy_ci95_lower_r": 0.0,
+    "minimum_profit_factor": 1.1,
+    "maximum_drawdown_r": 12.0,
+    "minimum_regimes": 3,
+    "minimum_trades_per_regime": 30,
+    "minimum_positive_regime_fraction": 0.6666666667,
+    "minimum_cycle_success_rate": 0.99,
+    "minimum_data_freshness_rate": 0.99,
+    "maximum_critical_incidents": 0,
+    "minimum_independent_approvals": 2
+  }
+}

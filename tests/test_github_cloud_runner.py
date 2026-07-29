@@ -24,10 +24,10 @@ def test_discover_cycle_command_uses_python(tmp_path: Path):
     (tmp_path / "paper_research_orchestrator.py").write_text("print('ok')", encoding="utf-8")
     command = runner.discover_cycle_command(tmp_path)
     assert command[-1] == "--once"
-    assert "paper_research_orchestrator.py" in command
+    assert command[-3:] == ["-m", "freakto.paper.orchestrator", "--once"]
 
 
 def test_live_flags_are_not_enabled_in_source():
-    source = Path(runner.__file__).read_text(encoding="utf-8")
+    source = Path(runner.main.__code__.co_filename).read_text(encoding="utf-8")
     assert '"live_orders_enabled": False' in source
     assert '"real_capital_enabled": False' in source

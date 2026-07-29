@@ -1,0 +1,11 @@
+"""Typed exit and status contract shared by ingestion and Paper orchestration."""
+
+NETWORK_EXHAUSTED_EXIT_CODE = 75
+STEP_NETWORK_SKIPPED = "SKIPPED_DUE_TO_NETWORK"
+CYCLE_NETWORK_SKIPPED = "SKIPPED_DUE_TO_NETWORK"
+
+__all__ = [
+    "CYCLE_NETWORK_SKIPPED",
+    "NETWORK_EXHAUSTED_EXIT_CODE",
+    "STEP_NETWORK_SKIPPED",
+]

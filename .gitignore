@@ -7,6 +7,9 @@
 __pycache__/
 *.py[cod]
 .venv/
+/build/
+*.egg-info/
+.freakto-runtime/evidence-v2/
 venv/
 
 # Runtime data / generated artifacts
@@ -14,6 +17,11 @@ venv/
 live_enriched_data_log.csv
 paper_trading_log.json
 *.joblib
+/logs/**
+!/logs/.gitkeep
+/history/**
+!/history/.gitkeep
+/.freakto-runtime/
 
 # OS / editor
 .DS_Store
@@ -24,3 +32,7 @@ paper_trading_log.json
 /data/market_replay/
 /logs/experiments/*.sqlite3*
 /logs/market_replay/checkpoints/
+/.cloud-state/
+*.tmp
+*.lock
+freakto_source.zip

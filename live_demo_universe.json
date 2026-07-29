@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "quote": "USDT",
+  "groups": {
+    "core": [
+      "BTC/USDT", "ETH/USDT", "SOL/USDT", "XRP/USDT", "ADA/USDT",
+      "LINK/USDT", "AVAX/USDT", "DOT/USDT", "LTC/USDT", "BCH/USDT"
+    ],
+    "growth": [
+      "SUI/USDT", "NEAR/USDT", "APT/USDT"
+    ],
+    "meme": [
+      "DOGE/USDT", "SHIB/USDT", "PEPE/USDT", "BONK/USDT",
+      "FLOKI/USDT", "WIF/USDT"
+    ]
+  },
+  "history": {
+    "timeframe": "4h",
+    "target_years": 3.0,
+    "minimum_coverage_pct": 90.0,
+    "discover_listing_boundary": true
+  },
+  "risk_notes": {
+    "core": "Normal research-paper eligibility rules still apply.",
+    "growth": "Requires the same liquidity, history, and readiness gates as core assets.",
+    "meme": "High-volatility research sleeve; never bypass liquidity, cost, or position-size gates."
+  }
+}

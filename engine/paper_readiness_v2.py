@@ -22,6 +22,13 @@ import numpy as np
 import pandas as pd
 
 from engine.baseline_benchmarks import block_bootstrap_expectancy_ci, strategy_metrics
+from engine.artifact_protocols import (
+    DEFAULT_ARTIFACT_SELECTOR,
+    GLOBAL_UTC_SELECTOR,
+    resolve_artifact_route,
+)
+from engine.experiment_registry import ResearchGovernanceRegistry
+from engine.research_contracts import FUTURE_WALK_FORWARD_CONTRACT
 
 VERSION = "1.0.0"
 MODE = "PAPER_LAUNCH_FAIL_CLOSED"
@@ -41,15 +48,15 @@ class PaperReadinessConfig:
     )
     minimum_event_rows: int = 300
     minimum_cost_gated_rows: int = 100
-    minimum_holdout_samples: int = 100
+    minimum_holdout_samples: int = FUTURE_WALK_FORWARD_CONTRACT.holdout_candidate_minimum_samples
     minimum_holdout_expectancy_pct: float = 0.0
     minimum_holdout_profit_factor: float = 1.05
     minimum_holdout_ci_low_pct: float = 0.0
-    walk_forward_folds: int = 4
-    walk_forward_purge_timestamps: int = 6
-    minimum_fold_samples: int = 30
-    minimum_valid_folds: int = 3
-    minimum_positive_fold_fraction: float = 2.0 / 3.0
+    walk_forward_folds: int = FUTURE_WALK_FORWARD_CONTRACT.walk_forward_folds
+    walk_forward_purge_timestamps: int = FUTURE_WALK_FORWARD_CONTRACT.purge_timestamps
+    minimum_fold_samples: int = FUTURE_WALK_FORWARD_CONTRACT.paper_fold_minimum_samples
+    minimum_valid_folds: int = FUTURE_WALK_FORWARD_CONTRACT.minimum_valid_folds
+    minimum_positive_fold_fraction: float = FUTURE_WALK_FORWARD_CONTRACT.minimum_positive_fraction
     fresh_oos_min_directional_rows: int = 300
     fresh_oos_min_fixed_gate_samples: int = 50
     fresh_oos_min_expectancy_pct: float = 0.0
@@ -95,6 +102,10 @@ class PaperLaunchReadiness:
     warnings: List[str] = field(default_factory=list)
     paper_live_enabled: bool = False
     live_orders_enabled: bool = False
+    artifact_selector: str = DEFAULT_ARTIFACT_SELECTOR
+    canonical: bool = True
+    governance_experiment_id: str = ""
+    walk_forward_contract_version: str = FUTURE_WALK_FORWARD_CONTRACT.version
 
     def to_dict(self) -> Dict[str, Any]:
         payload = asdict(self)
@@ -254,10 +265,28 @@ def build_paper_launch_readiness(
     cost_dir: str | Path = DEFAULT_COST_DIR,
     fresh_report_path: str | Path = DEFAULT_FRESH_REPORT,
     config: Optional[PaperReadinessConfig] = None,
+    artifact_selector: str = DEFAULT_ARTIFACT_SELECTOR,
+    experiment_id: str = "",
+    governance_path: str | Path | None = None,
 ) -> Tuple[PaperLaunchReadiness, pd.DataFrame]:
     config = config or PaperReadinessConfig()
+    route = resolve_artifact_route(artifact_selector)
+    FUTURE_WALK_FORWARD_CONTRACT.validate()
+    governed = None
+    if route.selector == GLOBAL_UTC_SELECTOR:
+        registry = ResearchGovernanceRegistry(governance_path) if governance_path else ResearchGovernanceRegistry()
+        governed = registry.get(experiment_id) if experiment_id else registry.for_selector(route.selector)
     event_dir = Path(event_dir)
     cost_dir = Path(cost_dir)
+    if route.selector == GLOBAL_UTC_SELECTOR:
+        if event_dir == DEFAULT_EVENT_DIR:
+            event_dir = route.event_root
+        if cost_dir == DEFAULT_COST_DIR:
+            cost_dir = route.cost_root
+        if event_dir != route.event_root or cost_dir != route.cost_root:
+            raise ValueError(
+                "ARTIFACT_SELECTOR_VIOLATION: Paper readiness inputs do not match v3 roots"
+            )
     universe = _read_csv(event_dir / "event_universe.csv")
     holdout = _read_csv(event_dir / "holdout_benchmarks.csv")
     cost_report = _read_json(cost_dir / "cost_gate_diagnostics_report.json")
@@ -268,6 +297,29 @@ def build_paper_launch_readiness(
     cost_rows = int(event_report.get("cost_gated_event_rows", universe.get("cost_gate_pass", pd.Series(dtype=bool)).astype(bool).sum() if not universe.empty else 0) or 0)
     blockers: List[str] = []
     warnings: List[str] = []
+    if route.selector == GLOBAL_UTC_SELECTOR:
+        if governed is None:
+            blockers.append("PROMOTION_NOT_ELIGIBLE: governance record is missing.")
+        else:
+            blockers.extend(governed.blockers)
+    if route.selector == GLOBAL_UTC_SELECTOR:
+        expected_metadata = {
+            "artifact_selector": route.selector,
+            "split_protocol": route.split_protocol,
+            "split_profile": route.split_profile,
+            "canonical": False,
+        }
+        for name, payload in (("Event", event_report), ("Cost", cost_report)):
+            if payload:
+                mismatches = {
+                    key: payload.get(key)
+                    for key, value in expected_metadata.items()
+                    if payload.get(key) != value
+                }
+                if mismatches:
+                    blockers.append(
+                        f"{name} v3 artifact protocol metadata mismatch: {mismatches}."
+                    )
     if universe.empty:
         blockers.append("Event universe is missing; run event_opportunity_v2_analysis.py.")
     if holdout.empty:
@@ -338,6 +390,10 @@ def build_paper_launch_readiness(
         warnings=warnings,
         paper_live_enabled=False,
         live_orders_enabled=False,
+        artifact_selector=route.selector,
+        canonical=route.canonical,
+        governance_experiment_id=governed.experiment_id if governed else "",
+        walk_forward_contract_version=FUTURE_WALK_FORWARD_CONTRACT.version,
     )
     return readiness, walk_table
 

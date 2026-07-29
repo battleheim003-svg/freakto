@@ -17,6 +17,14 @@ from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Seque
 
 import pandas as pd
 
+from engine.artifact_protocols import (
+    DEFAULT_ARTIFACT_SELECTOR,
+    GLOBAL_UTC_SELECTOR,
+    build_global_replay_manifest,
+    resolve_artifact_route,
+    validate_global_replay_manifest,
+    validate_global_utc_request,
+)
 from engine.historical_data_store import (
     DEFAULT_EXCHANGE_ORDER,
     HistoricalDataRequest,
@@ -70,6 +78,7 @@ class MultiCycleArchiveConfig:
     full_history_discovery: bool = True
     listing_probe_days: int = 90
     max_listing_probes: int = 80
+    artifact_selector: str = DEFAULT_ARTIFACT_SELECTOR
 
 
 @dataclass
@@ -114,6 +123,10 @@ class MultiCycleArchiveReport:
     warnings: List[str]
     promotion_applied: bool = False
     paper_live_enabled: bool = False
+    artifact_selector: str = DEFAULT_ARTIFACT_SELECTOR
+    split_protocol: str = ""
+    split_profile: str = ""
+    canonical: bool = True
 
 
 def utc_now_iso() -> str:
@@ -459,6 +472,9 @@ def _replay_window(
         include_neutral=True,
         strict_leakage_audit=True,
         source=f"MULTI_CYCLE_{window.name}",
+        artifact_selector=config.artifact_selector,
+        split_window=window.name,
+        split_profile=resolve_artifact_route(config.artifact_selector).split_profile,
     )
     run, summary, rows = run_market_replay(replay_config, save=False)
     payload = {
@@ -491,6 +507,20 @@ def run_multi_cycle_archive(
     *,
     exchange_factory: Optional[Callable[[str], Any]] = None,
 ) -> MultiCycleArchiveReport:
+    route = resolve_artifact_route(config.artifact_selector)
+    if route.selector == GLOBAL_UTC_SELECTOR:
+        validate_global_utc_request(
+            protocol_id=route.split_protocol,
+            profile_id=route.split_profile,
+            window=",".join(config.windows),
+            symbols=config.symbols,
+            timeframe=config.timeframe,
+            cutoff_utc=config.development_cutoff_utc,
+        )
+        if Path(config.output_dir) != route.replay_root:
+            raise ValueError(
+                "ARTIFACT_SELECTOR_VIOLATION: v3 output_dir must use the registered replay root"
+            )
     validate_archive_separation(config)
     cutoff = resolve_development_cutoff(config)
     windows = resolve_archive_windows(config, cutoff)
@@ -529,6 +559,7 @@ def run_multi_cycle_archive(
             verified_keys.add((manifest.window, manifest.symbol))
 
     replay_runs: List[Dict[str, Any]] = []
+    global_replay_rows = pd.DataFrame()
     if config.run_replays and not blockers:
         for window in windows:
             available_symbols = [
@@ -577,6 +608,8 @@ def run_multi_cycle_archive(
             payload["symbols_replayed"] = available_symbols
             payload["missing_symbols"] = [s for s in config.symbols if s not in available_symbols]
             payload["output_csv"] = _write_replay_rows(config, window.name, rows)
+            if route.selector == GLOBAL_UTC_SELECTOR:
+                global_replay_rows = rows.copy()
             replay_runs.append(payload)
             if payload.get("leakage_audit_status") not in {"PASSED_NO_LOOKAHEAD", "PASSED"}:
                 blockers.append(
@@ -615,6 +648,10 @@ def run_multi_cycle_archive(
         warnings=sorted(set(warnings)),
         promotion_applied=False,
         paper_live_enabled=False,
+        artifact_selector=route.selector,
+        split_protocol=route.split_protocol,
+        split_profile=route.split_profile,
+        canonical=route.canonical,
     )
     output = Path(config.output_dir)
     output.mkdir(parents=True, exist_ok=True)
@@ -624,5 +661,47 @@ def run_multi_cycle_archive(
     dataset_rows = [asdict(item) for item in manifests]
     pd.DataFrame(dataset_rows).to_csv(output / "archive_dataset_manifest.csv", index=False, encoding="utf-8-sig")
     pd.DataFrame(build_issues).to_csv(output / "archive_build_issues.csv", index=False, encoding="utf-8-sig")
+    if route.selector == GLOBAL_UTC_SELECTOR and not global_replay_rows.empty:
+        source_fingerprints = {
+            item.symbol: item.sha256
+            for item in manifests
+            if item.window == "FULL" and item.symbol in config.symbols
+        }
+        counts_by_split = (
+            global_replay_rows.groupby("replay_split").size().astype(int).to_dict()
+        )
+        counts_by_symbol_and_split = {
+            str(symbol): group.groupby("replay_split").size().astype(int).to_dict()
+            for symbol, group in global_replay_rows.groupby("symbol")
+        }
+        timestamps = global_replay_rows.assign(
+            __manifest_timestamp=pd.to_datetime(
+                global_replay_rows["candle_timestamp"], utc=True, errors="raise"
+            )
+        )
+        first_last = {
+            str(label): {
+                "first": group["__manifest_timestamp"].min().isoformat(),
+                "last": group["__manifest_timestamp"].max().isoformat(),
+            }
+            for label, group in timestamps.groupby("replay_split")
+        }
+        conflicts = int(
+            global_replay_rows.groupby("candle_timestamp")["replay_split"]
+            .nunique()
+            .gt(1)
+            .sum()
+        )
+        global_manifest = build_global_replay_manifest(
+            source_fingerprints=source_fingerprints,
+            counts_by_split=counts_by_split,
+            counts_by_symbol_and_split=counts_by_symbol_and_split,
+            first_last_timestamp_by_split=first_last,
+            cross_asset_timestamp_label_conflicts=conflicts,
+        )
+        validate_global_replay_manifest(global_manifest, global_replay_rows)
+        (output / "global_utc_replay_manifest.json").write_text(
+            json.dumps(global_manifest, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
     return report
-

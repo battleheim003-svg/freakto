@@ -2,8 +2,8 @@
 monitor.py - نقطه شروع Freakto
 """
 
-import time
 import argparse
+import time
 import schedule
 
 from config import (
@@ -15,7 +15,11 @@ from config import (
     SEND_NEUTRAL_REPORTS,
 )
 
-from data_fetcher import fetch_ohlcv
+from data_fetcher import (
+    FetchStatus,
+    NETWORK_EXHAUSTED_EXIT_CODE,
+    fetch_ohlcv_result,
+)
 from features import add_features
 from telegram_notifier import send_telegram_message
 from alert_rules import evaluate_all_rules, ALL_RULES_DESCRIPTION
@@ -145,11 +149,12 @@ def _get_latest_timestamp(df):
 
 
 def _prepare_market_dataframe():
-    raw = fetch_ohlcv(limit=220)
+    fetch_result = fetch_ohlcv_result(limit=220)
+    raw = fetch_result.frame
 
     if raw is None or raw.empty:
         print("❌ داده‌ای دریافت نشد.")
-        return None
+        return None, fetch_result.status
 
     provider = _extract_provider(raw)
     df = add_features(raw)
@@ -172,23 +177,23 @@ def _prepare_market_dataframe():
 
     if len(df) < 35:
         print("❌ داده‌ی کافی برای محاسبه‌ی اندیکاتورها وجود ندارد.")
-        return None
+        return None, FetchStatus.DATA_VALIDATION_ERROR
 
-    return df
+    return df, FetchStatus.SUCCESS
 
 
 def check_market():
     global _last_checked_timestamp
 
-    df = _prepare_market_dataframe()
+    df, fetch_status = _prepare_market_dataframe()
     if df is None:
-        return
+        return fetch_status
 
     latest_timestamp = _get_latest_timestamp(df)
 
     if str(latest_timestamp) == str(_last_checked_timestamp):
         print(f"[{latest_timestamp}] کندل تکراری، رد شد.")
-        return
+        return FetchStatus.SUCCESS
 
     row = df.iloc[-1]
     prev_row = df.iloc[-2]
@@ -242,6 +247,7 @@ def check_market():
             print("ℹ️ پیام ارسال نشد؛ وضعیت هنوز قابل اقدام یا قابل گزارش نیست.")
 
     _last_checked_timestamp = latest_timestamp
+    return FetchStatus.SUCCESS
 
 
 def main():
@@ -261,11 +267,13 @@ def main():
     print(f"Opportunity Min Score: {OPPORTUNITY_MIN_SCORE}")
     print(f"Send Neutral Reports: {SEND_NEUTRAL_REPORTS}")
 
-    check_market()
+    status = check_market()
 
     if args.once:
         print("✅ اجرای یک‌باره انجام شد.")
-        return
+        if status is FetchStatus.NETWORK_EXHAUSTED:
+            return NETWORK_EXHAUSTED_EXIT_CODE
+        return 0
 
     schedule.every(CHECK_INTERVAL_MINUTES).minutes.do(check_market)
 
@@ -275,4 +283,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

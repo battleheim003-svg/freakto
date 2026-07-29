@@ -12,6 +12,8 @@ import joblib
 import numpy as np
 import pandas as pd
 
+from engine.artifact_protocols import resolve_artifact_route
+from engine.research_contracts import FUTURE_WALK_FORWARD_CONTRACT
 from engine.baseline_benchmarks import (
     block_bootstrap_expectancy_ci,
     load_multi_cycle_replays,
@@ -22,6 +24,7 @@ from engine.cost_aware_label_v2 import (
     EventMetaLabelConfig,
     EventMetaModel,
     MetaThresholdSelection,
+    SPLIT_PROTOCOL_VERSION,
     apply_meta_threshold,
     build_cost_aware_labels,
     chronological_event_split,
@@ -65,9 +68,14 @@ class EventOpportunityReport:
     key_findings: List[str]
     blockers: List[str]
     warnings: List[str]
+    split_protocol_version: str = SPLIT_PROTOCOL_VERSION
     output_files: Dict[str, str] = field(default_factory=dict)
     promotion_applied: bool = False
     paper_live_enabled: bool = False
+    artifact_selector: str = "v2-canonical"
+    split_protocol: str = ""
+    split_profile: str = ""
+    canonical: bool = True
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -208,6 +216,8 @@ def _fresh_candidate_eligible(
         blockers.append("Meta-label Holdout confidence interval does not stay above zero.")
     if wf_fraction < config.promotion_min_positive_walk_forward_fraction:
         blockers.append("Meta-label walk-forward positive-fold fraction is insufficient.")
+    if len(valid_folds) < config.minimum_valid_walk_forward_folds:
+        blockers.append("Meta-label valid walk-forward fold count is insufficient.")
     if holdout_record["expectancy"] < best_baseline_expectancy + config.promotion_baseline_margin_pct:
         blockers.append(
             "Meta-label Holdout expectancy did not beat the best adequately sampled simple/event baseline by the required margin."
@@ -221,6 +231,15 @@ def analyze_event_opportunity_universe(
 ) -> Tuple[EventOpportunityReport, EventOpportunityArtifacts]:
     config = config or EventMetaLabelConfig()
     config.validate()
+    route = resolve_artifact_route(config.artifact_selector)
+
+    def stamp_route(report: EventOpportunityReport) -> EventOpportunityReport:
+        report.artifact_selector = route.selector
+        report.split_protocol = route.split_protocol
+        report.split_profile = route.split_profile
+        report.canonical = route.canonical
+        return report
+
     created = datetime.now(timezone.utc).isoformat()
     selected_name, selected = select_longest_replay(replay_frames)
     available = sorted(str(name).upper() for name, frame in replay_frames.items() if frame is not None and not frame.empty)
@@ -245,7 +264,7 @@ def analyze_event_opportunity_universe(
             blockers=["No multi-cycle replay rows were available."],
             warnings=[],
         )
-        return report, EventOpportunityArtifacts()
+        return stamp_route(report), EventOpportunityArtifacts()
 
     directional = prepare_event_rows(selected, config.event, time_scope="development")
     event_rows, diagnostics = build_event_opportunity_universe(selected, config.event, time_scope="development")
@@ -296,11 +315,13 @@ def analyze_event_opportunity_universe(
                 "paper_live_enabled": False,
             },
         )
-        return report, artifacts
+        return stamp_route(report), artifacts
 
     try:
         split = chronological_event_split(labels, config)
     except ValueError as exc:
+        if str(exc).startswith("UPSTREAM_SPLIT_PROVENANCE_VIOLATION:"):
+            raise
         report = EventOpportunityReport(
             status="INSUFFICIENT_CHRONOLOGICAL_EVENTS",
             mode=MODE,
@@ -321,7 +342,7 @@ def analyze_event_opportunity_universe(
             blockers=[str(exc)],
             warnings=warnings,
         )
-        return report, EventOpportunityArtifacts(event_universe=labels)
+        return stamp_route(report), EventOpportunityArtifacts(event_universe=labels)
 
     model: Optional[EventMetaModel] = None
     selection = MetaThresholdSelection(None, False, "Meta model was not fitted", [])
@@ -395,7 +416,7 @@ def analyze_event_opportunity_universe(
         ["expectancy", "profit_factor", "sample_count"], ascending=False
     ).reset_index(drop=True)
 
-    walk = walk_forward_event_meta(labels, config)
+    walk = walk_forward_event_meta(split.train, config)
     baseline_pool = holdout_table[
         ~holdout_table["strategy"].eq("EVENT_META_LABEL_V2")
         & holdout_table["sample_count"].ge(config.promotion_min_samples)
@@ -436,6 +457,10 @@ def analyze_event_opportunity_universe(
     status = "COMPLETE_DEVELOPMENT_CANDIDATE_FROZEN" if candidate_ok else "COMPLETE_NO_DEVELOPMENT_CANDIDATE"
     manifest = {
         "version": VERSION,
+        "walk_forward_contract_version": FUTURE_WALK_FORWARD_CONTRACT.version,
+        "walk_forward_folds": config.walk_forward_folds,
+        "minimum_valid_walk_forward_folds": config.minimum_valid_walk_forward_folds,
+        "split_protocol_version": config.split_protocol_version,
         "status": status,
         "candidate": candidate_name,
         "selected_probability_threshold": selection.threshold,
@@ -448,6 +473,7 @@ def analyze_event_opportunity_universe(
         "threshold_reselection_on_fresh_oos_forbidden": True,
         "promotion_applied": False,
         "paper_live_enabled": False,
+        "split_provenance": split.manifest,
         "blockers": candidate_blockers,
     }
     frozen_payload = None
@@ -458,6 +484,8 @@ def analyze_event_opportunity_universe(
             "selection": selection,
             "config": config,
             "development_cutoff_utc": config.event.development_cutoff_utc,
+            "split_protocol_version": config.split_protocol_version,
+            "split_provenance": split.manifest,
         }
 
     report = EventOpportunityReport(
@@ -511,7 +539,7 @@ def analyze_event_opportunity_universe(
         candidate_manifest=manifest,
         frozen_candidate_payload=frozen_payload,
     )
-    return report, artifacts
+    return stamp_route(report), artifacts
 
 
 def write_event_opportunity_outputs(

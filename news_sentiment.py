@@ -18,13 +18,13 @@ import xml.etree.ElementTree as ET
 
 import requests
 
-from config import OPENAI_API_KEY, OPENAI_MODEL
+from config import GAPGPT_API_KEY, GAPGPT_BASE_URL, GAPGPT_MODEL
 
 RSS_FEEDS = [
     "https://www.coindesk.com/arc/outboundfeeds/rss/",
     "https://cointelegraph.com/rss",
 ]
-OPENAI_API_URL = "https://api.gapgpt.app/v1/chat/completions"
+GAPGPT_API_URL = GAPGPT_BASE_URL.rstrip("/") + "/chat/completions"
 
 
 def _parse_rss(xml_text: str, max_items: int = 10) -> list:
@@ -82,17 +82,19 @@ def score_sentiment_with_openai(headlines: list) -> dict:
     )
 
     headers = {
-        "Authorization": f"Bearer {OPENAI_API_KEY}",
+        "Authorization": f"Bearer {GAPGPT_API_KEY}",
         "Content-Type": "application/json",
     }
     payload = {
-        "model": OPENAI_MODEL,
+        "model": GAPGPT_MODEL,
         "messages": [{"role": "user", "content": prompt}],
         "response_format": {"type": "json_object"},
         "temperature": 0,
     }
 
-    resp = requests.post(OPENAI_API_URL, headers=headers, json=payload, timeout=30)
+    if not GAPGPT_API_KEY:
+        return {"score": 0.0, "summary": "sentiment_unavailable: missing GAPGPT_API_KEY"}
+    resp = requests.post(GAPGPT_API_URL, headers=headers, json=payload, timeout=30)
     resp.raise_for_status()
     result = resp.json()
 

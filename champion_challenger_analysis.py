@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 from engine.champion_challenger import (
@@ -13,6 +15,23 @@ from engine.champion_challenger import (
     run_champion_challenger,
 )
 from engine.expectancy_challenger import ChallengerConfig, DEFAULT_VARIANTS
+from engine.experiment_registry import DEFAULT_REGISTRY_PATH, ExperimentRegistry
+
+
+EXPERIMENT_FAMILY = "EXPECTANCY_CHALLENGER_V10_7"
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _experiment_id(dataset_fingerprint: str) -> str:
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    return f"challenger_{stamp}_{dataset_fingerprint[:10]}"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -26,6 +45,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dataset", default=str(DEFAULT_DATASET))
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
     parser.add_argument("--run-id", default=None)
+    parser.add_argument("--experiment-id", default="")
+    parser.add_argument(
+        "--experiment-family",
+        default=EXPERIMENT_FAMILY,
+        choices=(EXPERIMENT_FAMILY,),
+    )
+    parser.add_argument("--registry-path", default=str(DEFAULT_REGISTRY_PATH))
     parser.add_argument(
         "--minimum-holdout-selected",
         type=int,
@@ -53,18 +79,91 @@ def main() -> int:
             print(f"{variant.name}: {variant.description}")
         return 0
 
+    dataset = Path(args.dataset)
+    if not dataset.is_file():
+        print(json.dumps({"status": "BLOCKED", "blocker": "DATASET_MISSING"}))
+        return 2
+    dataset_fingerprint = _sha256(dataset)
+    experiment_id = args.experiment_id or _experiment_id(dataset_fingerprint)
+    output_dir = Path(args.output_dir) / experiment_id
+    if output_dir.exists():
+        print(json.dumps({
+            "status": "BLOCKED",
+            "blocker": "EXPERIMENT_OUTPUT_ALREADY_EXISTS",
+            "experiment_id": experiment_id,
+        }))
+        return 2
+
     config = ChampionChallengerConfig(
         minimum_holdout_selected=args.minimum_holdout_selected,
     )
     challenger_config = ChallengerConfig(
         additional_execution_cost_pct=args.additional_execution_cost_pct,
     )
-    result, artifacts = run_champion_challenger(
-        Path(args.dataset),
-        output_dir=Path(args.output_dir),
-        run_id=args.run_id,
-        config=config,
-        challenger_config=challenger_config,
+    registry = ExperimentRegistry(args.registry_path)
+    if registry.get_run(experiment_id) is not None:
+        print(json.dumps({
+            "status": "BLOCKED",
+            "blocker": "EXPERIMENT_ID_ALREADY_REGISTERED",
+            "experiment_id": experiment_id,
+        }))
+        return 2
+    registry.start_run(
+        experiment_id,
+        "CHAMPION_CHALLENGER",
+        hyperparameters={
+            "experiment_family": args.experiment_family,
+            "selected_replay_run_id": args.run_id,
+            "minimum_holdout_selected": args.minimum_holdout_selected,
+            "additional_execution_cost_pct": args.additional_execution_cost_pct,
+            "official_evidence_eligible": False,
+            "evidence_scope": "RESEARCH_SHADOW_ONLY",
+        },
+        data_fingerprint=dataset_fingerprint,
+        notes="One-shot research Holdout; never eligible for official Paper or Go-live evidence.",
+        replace_existing=False,
+    )
+    if not registry.claim_holdout(dataset_fingerprint, args.experiment_family, experiment_id):
+        blocked = {
+            "status": "BLOCKED",
+            "blocker": "HOLDOUT_ALREADY_CONSUMED",
+            "experiment_id": experiment_id,
+            "dataset_fingerprint": dataset_fingerprint,
+            "official_evidence_eligible": False,
+        }
+        registry.finish_run(experiment_id, "BLOCKED", blocked)
+        print(json.dumps(blocked, ensure_ascii=False))
+        return 2
+
+    try:
+        result, artifacts = run_champion_challenger(
+            dataset,
+            output_dir=output_dir,
+            run_id=args.run_id,
+            config=config,
+            challenger_config=challenger_config,
+        )
+    except Exception as exc:
+        registry.finish_run(
+            experiment_id,
+            "FAILED",
+            {
+                "status": "FAILED",
+                "error": f"{type(exc).__name__}: {exc}",
+                "official_evidence_eligible": False,
+            },
+        )
+        raise
+    registry.finish_run(
+        experiment_id,
+        "COMPLETED",
+        {
+            **result.to_dict(),
+            "experiment_id": experiment_id,
+            "dataset_fingerprint": dataset_fingerprint,
+            "official_evidence_eligible": False,
+            "evidence_scope": "RESEARCH_SHADOW_ONLY",
+        },
     )
 
     print("=" * 116)
@@ -80,6 +179,8 @@ def main() -> int:
     print(f"Recommended challenger    : {result.recommended_variant}")
     print(f"Recommended EV threshold  : {result.recommended_threshold_pct}")
     print(f"Promotion applied         : {result.promotion_applied}")
+    print(f"Experiment ID            : {experiment_id}")
+    print(f"Official evidence         : {result.official_evidence_eligible}")
     if not artifacts.summary.empty:
         print("Challenger Holdout:")
         for _, row in artifacts.summary.iterrows():
@@ -109,9 +210,12 @@ def main() -> int:
     # deployment or promotion action.
     print(json.dumps({
         "status": result.status,
+        "experiment_id": experiment_id,
         "recommended_variant": result.recommended_variant,
         "promotion_applied": result.promotion_applied,
         "paper_live_enabled": result.paper_live_enabled,
+        "official_evidence_eligible": result.official_evidence_eligible,
+        "evidence_scope": result.evidence_scope,
     }, ensure_ascii=False))
     return 0
 
