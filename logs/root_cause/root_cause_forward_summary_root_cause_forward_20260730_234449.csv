@@ -1,0 +1,6 @@
+﻿root_cause_primary,root_cause_direction,samples_total,evidence_quality_mode,confidence_mode,avg_probability_pct,samples_4h,hit_rate_4h,avg_signed_return_4h_pct,median_signed_return_4h_pct,samples_12h,hit_rate_12h,avg_signed_return_12h_pct,median_signed_return_12h_pct,samples_24h,hit_rate_24h,avg_signed_return_24h_pct,median_signed_return_24h_pct,validation_score,verdict
+MACRO_POLICY_PRESSURE,BEARISH,52,HIGH,MEDIUM,55.4721,52,51.92,-0.0238,0.01,51,54.9,-0.0033,0.0632,51,58.82,-0.0354,0.2608,11.658,WEAK_OR_NEGATIVE_FORWARD_EVIDENCE
+LIQUIDITY_VOLUME_FLOW,BEARISH,4,MEDIUM,LOW,34.0075,4,50.0,0.0195,-0.0725,4,50.0,-0.2389,-0.1266,4,25.0,-0.1027,-0.1061,0.2244,LOW_SAMPLE
+REGULATORY_RISK,BEARISH,3,MEDIUM,LOW,40.08,3,0.0,-0.8557,-1.0795,3,0.0,-1.002,-0.8135,3,0.0,-0.5968,-0.4322,-21.0453,LOW_SAMPLE
+TECHNICAL_STRUCTURE_MOMENTUM,BEARISH,1,MEDIUM,LOW,23.51,1,0.0,-0.6106,-0.6106,1,0.0,-0.6592,-0.6592,1,0.0,-1.8858,-1.8858,-24.9149,LOW_SAMPLE
+LIQUIDITY_VOLUME_FLOW,BULLISH,1,MEDIUM,LOW,39.28,1,0.0,-1.8623,-1.8623,1,0.0,-2.2654,-2.2654,1,0.0,-1.6602,-1.6602,-31.9344,LOW_SAMPLE
