@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "created_at_utc": "2026-08-03T21:17:24.394200+00:00",
+  "created_at_utc": "2026-08-04T03:32:52.790997+00:00",
   "archive": "cloud_state.tar.gz",
-  "file_count": 135,
-  "total_bytes": 8058949,
+  "file_count": 137,
+  "total_bytes": 8208309,
   "files": [
     {
       "relative_path": "history/freakto_history.db",
-      "size_bytes": 851968,
-      "sha256": "d0e36e68c1bcfdac897263d02a8a4e083dec19d9c6ec20dff0066006d3c1e348"
+      "size_bytes": 856064,
+      "sha256": "571d4c5740ab26ca895a46b44b02526de884e3f67ace54f77bf92ac88e81df7e"
     },
     {
       "relative_path": "logs/decisions.csv",
-      "size_bytes": 262203,
-      "sha256": "bc129ac60b2fae9848c6f69b52003b0480d032c351c0efe4b481ecafb4ef336d"
+      "size_bytes": 265791,
+      "sha256": "26017c689f16e0cfc362042f5f84f0686b7acd7b6c2052acb824dc4b60fa229a"
     },
     {
       "relative_path": "logs/paper_cycle/cycle_history.jsonl",
@@ -47,8 +47,8 @@
     },
     {
       "relative_path": "logs/paper_launch_v2/cycle_history.jsonl",
-      "size_bytes": 1271864,
-      "sha256": "21b5de3768d4654d57189af703c26d96cca25a52ada1a843f53ef0c4aeb37dc4"
+      "size_bytes": 1337808,
+      "sha256": "ba6c6ea2a7fb54408b72064adb12762226b76a4b714a8f322d8dde5996e44844"
     },
     {
       "relative_path": "logs/paper_launch_v2/deterministic_candidate_assessments.csv",
@@ -62,23 +62,23 @@
     },
     {
       "relative_path": "logs/paper_launch_v2/last_cycle.json",
-      "size_bytes": 32829,
-      "sha256": "9cb3726e48bdd72b48703aaed667dcca811a6fe60240ed9abac76a58174b6596"
+      "size_bytes": 37574,
+      "sha256": "5dba331eb0e83759caa618bc57fd5609fc2e805a1b67705eeb09caab5f7c63e4"
     },
     {
       "relative_path": "logs/paper_launch_v2/orchestrator_state.json",
       "size_bytes": 298,
-      "sha256": "2bc8a1c112b2eec1403187b80c343453a2b572b276898048406a36c46311663f"
+      "sha256": "1545e20ea7181104ab7840d47e89fde7860c8fe0f4412a461870ff68730610f1"
     },
     {
       "relative_path": "logs/paper_launch_v2/paper_cycle.log",
-      "size_bytes": 1360054,
-      "sha256": "fec1c2af4fcc572a90f90bd04883dd991e133f6621494d340f7cbb60f25f874c"
+      "size_bytes": 1430939,
+      "sha256": "3364a6ee71db0fa333d2d64d8437317c1fdaf35809487aaa25ee46390601efcc"
     },
     {
       "relative_path": "logs/paper_launch_v2/paper_launch_readiness.json",
       "size_bytes": 2913,
-      "sha256": "74c08c068466ac3dffd763fa134bcf55361ea678d77dcf4a7cd7261b63ac7df0"
+      "sha256": "0ca9c60d5929beb656451e6679bfba1f0da45a5767f2d2a50988c16e25e3d955"
     },
     {
       "relative_path": "logs/paper_launch_v2/paper_launch_readiness.md",
@@ -108,7 +108,7 @@
     {
       "relative_path": "logs/paper_performance/paper_performance_dashboard.md",
       "size_bytes": 808,
-      "sha256": "711cf159a9fdefa8f89be8b6e19ff08cd639fa32b131c8b4f7d2d69ec076405c"
+      "sha256": "230634fe31ff62649e0e21df9ee197070ba836b721a616ae06e0c977de800175"
     },
     {
       "relative_path": "logs/paper_performance/paper_performance_ledger.csv",
@@ -118,7 +118,7 @@
     {
       "relative_path": "logs/paper_performance/paper_performance_summary.json",
       "size_bytes": 596,
-      "sha256": "bc259a23bad8b16bf556b3c4f5e67b35f8ee7d3d3f0ff6ad2b44e510a1a97419"
+      "sha256": "9f5965d88e8f3e5c815f508f120c9fa157dda8c612dbf80ffad5b140fec1b48d"
     },
     {
       "relative_path": "logs/paper_trading/paper_evaluation_report_20260705_162530.md",
@@ -677,6 +677,16 @@
     },
     {
       "relative_path": "logs/paper_trading/paper_evaluation_report_20260803_211720.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20260804_033140.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20260804_033215.md",
       "size_bytes": 51,
       "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
     }
