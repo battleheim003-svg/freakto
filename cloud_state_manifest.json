@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "created_at_utc": "2026-08-09T02:25:11.311408+00:00",
+  "created_at_utc": "2026-08-09T05:15:44.885608+00:00",
   "archive": "cloud_state.tar.gz",
-  "file_count": 193,
-  "total_bytes": 12099875,
+  "file_count": 195,
+  "total_bytes": 12235795,
   "files": [
     {
       "relative_path": "history/freakto_history.db",
-      "size_bytes": 970752,
-      "sha256": "b67eca64f87898ca7dfcad868904362c8e8ff5bc83612826604cf8b1bc5ec4c8"
+      "size_bytes": 974848,
+      "sha256": "0413d81cb79c3ad462d4d2d4596fb0a290a79066f08be5b354c7f39331d49214"
     },
     {
       "relative_path": "logs/decisions.csv",
-      "size_bytes": 372375,
-      "sha256": "f4d9c1fe19061ffd81de0c596d1eb7cda0c87a6a680b7dfa38fcbc82ad7461ae"
+      "size_bytes": 375965,
+      "sha256": "1cc6c25dd0199ee1b762250d878552eae3ad0a22397d10d0738b57ea7df3971a"
     },
     {
       "relative_path": "logs/paper_cycle/cycle_history.jsonl",
@@ -47,8 +47,8 @@
     },
     {
       "relative_path": "logs/paper_launch_v2/cycle_history.jsonl",
-      "size_bytes": 3112114,
-      "sha256": "c0e2c00c3810dcecfea203338d135fb9794b21b1f5106d777c7fd004e2838fd1"
+      "size_bytes": 3174218,
+      "sha256": "c1a163ea0264780852d332f6862ff4615c69615af33c85b6f04a816b7651e4b7"
     },
     {
       "relative_path": "logs/paper_launch_v2/deterministic_candidate_assessments.csv",
@@ -62,23 +62,23 @@
     },
     {
       "relative_path": "logs/paper_launch_v2/last_cycle.json",
-      "size_bytes": 33209,
-      "sha256": "fd14f43da93a1fe98f1dcc421e6cdc9d47d54f530f03c4d07fcea317a05e4b87"
+      "size_bytes": 33113,
+      "sha256": "969c2427b7e8f1a51d7a64b8d68f5e25a487c5a8d1eb558a65059bde20373589"
     },
     {
       "relative_path": "logs/paper_launch_v2/orchestrator_state.json",
-      "size_bytes": 298,
-      "sha256": "bf8295db7aea03a4fe253887f493d0bfa88e076b376fdbd7b268dcf03c72e1e3"
+      "size_bytes": 299,
+      "sha256": "af779ce16915ce1dc786969b6524949f02a4bdd6be66865b34526fb4990126ff"
     },
     {
       "relative_path": "logs/paper_launch_v2/paper_cycle.log",
-      "size_bytes": 3328436,
-      "sha256": "c393a2af97b99e64f6a565694dbc59b5f2246fa4420c78c7738e00d35b8deee0"
+      "size_bytes": 3394559,
+      "sha256": "830fa91f37ba9748eff251fb45097a2a34f4b4fec90fd6c8548d1b9f75e17ae1"
     },
     {
       "relative_path": "logs/paper_launch_v2/paper_launch_readiness.json",
       "size_bytes": 2913,
-      "sha256": "56f389afd66f3b846cf8b7a57cb661e7681e9101442d173e99b175442104ccbf"
+      "sha256": "9bfff3d73015d718a8f97633b6649322b04b8991619cacdd06e50c841b50ccf4"
     },
     {
       "relative_path": "logs/paper_launch_v2/paper_launch_readiness.md",
@@ -108,7 +108,7 @@
     {
       "relative_path": "logs/paper_performance/paper_performance_dashboard.md",
       "size_bytes": 808,
-      "sha256": "9bf313b931442543bc8badbc05aff5dcdf244b14899d630f005a58299c234e42"
+      "sha256": "19bf116220a2b7a7837e40777dedc88550dfaea5d96ea0c6d3c2a743aa65c2b9"
     },
     {
       "relative_path": "logs/paper_performance/paper_performance_ledger.csv",
@@ -118,7 +118,7 @@
     {
       "relative_path": "logs/paper_performance/paper_performance_summary.json",
       "size_bytes": 596,
-      "sha256": "65a97fb89ea340afc4eaa0bfd1ce8ba54037e3bd328165d94f75a6cb5cf17191"
+      "sha256": "4110d5555aa564e39438fe4864f1d53452c843ea09bf43b2ac962ef2e553a2ef"
     },
     {
       "relative_path": "logs/paper_trading/paper_evaluation_report_20260705_162530.md",
@@ -967,6 +967,16 @@
     },
     {
       "relative_path": "logs/paper_trading/paper_evaluation_report_20260809_022508.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20260809_051506.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20260809_051540.md",
       "size_bytes": 51,
       "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
     }
