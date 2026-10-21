@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "created_at_utc": "2026-10-21T20:06:10.165392+00:00",
+  "created_at_utc": "2026-10-21T23:14:03.938945+00:00",
   "archive": "cloud_state.tar.gz",
-  "file_count": 822,
-  "total_bytes": 56466035,
+  "file_count": 824,
+  "total_bytes": 56615361,
   "files": [
     {
       "relative_path": "history/freakto_history.db",
@@ -12,8 +12,8 @@
     },
     {
       "relative_path": "logs/decisions.csv",
-      "size_bytes": 1564622,
-      "sha256": "96dfd6793f3b386ed628b9ea44def6e72b8aad17d67e77431fee37a90106f8f5"
+      "size_bytes": 1569190,
+      "sha256": "6bb424e9297129bb19042c62a7a208559d7a4ded126ef4f75ebf3904405dfbb6"
     },
     {
       "relative_path": "logs/paper_cycle/cycle_history.jsonl",
@@ -47,8 +47,8 @@
     },
     {
       "relative_path": "logs/paper_launch_v2/cycle_history.jsonl",
-      "size_bytes": 23143683,
-      "sha256": "8241afe046187dff7cdbc2c337744bd70925b2e2cdd98eb573dfae24d8daded3"
+      "size_bytes": 23208723,
+      "sha256": "161d16c46987caf670c23ba90a2bf40d08c14564569538310a7a504a12050acb"
     },
     {
       "relative_path": "logs/paper_launch_v2/deterministic_candidate_assessments.csv",
@@ -62,18 +62,18 @@
     },
     {
       "relative_path": "logs/paper_launch_v2/last_cycle.json",
-      "size_bytes": 34553,
-      "sha256": "b2cccc1b91d892e5374031104e9cb8b24b7f32cdef442a7b82f5891a1df508cb"
+      "size_bytes": 34634,
+      "sha256": "228f92faba10405d05eba468ec69a74223721c7ec34903b50758ed46ae4eb212"
     },
     {
       "relative_path": "logs/paper_launch_v2/orchestrator_state.json",
       "size_bytes": 299,
-      "sha256": "814397f23976b8f69cc054fe8ab11e12336814ce2f2c66a585d391f048153e73"
+      "sha256": "2bcd7e3bc2bd78a8dfbf4b3e83bc9be756accc8c3479095e2d93200b96086d6b"
     },
     {
       "relative_path": "logs/paper_launch_v2/paper_cycle.log",
-      "size_bytes": 197357,
-      "sha256": "af1d34fd626fd779d0db76f6fb29a87b1b7890472ca5fb40102e03cdd8e269be"
+      "size_bytes": 276892,
+      "sha256": "f5a5002a63102da66fba73cb683730d0515b2bd424a5378b53f24b38be9973ff"
     },
     {
       "relative_path": "logs/paper_launch_v2/paper_cycle.log.1",
@@ -103,7 +103,7 @@
     {
       "relative_path": "logs/paper_launch_v2/paper_launch_readiness.json",
       "size_bytes": 2913,
-      "sha256": "d6412ae9658dd5a049647b517447f1e3c0692abc1bf036b3ad4f698e62e6c72f"
+      "sha256": "922605a354719427658eb5f15eb534d8b80c8dea8a0fd0a7ad9fe8713386a763"
     },
     {
       "relative_path": "logs/paper_launch_v2/paper_launch_readiness.md",
@@ -133,7 +133,7 @@
     {
       "relative_path": "logs/paper_performance/paper_performance_dashboard.md",
       "size_bytes": 808,
-      "sha256": "19bc78d5fe9688ebc4c4a615f3ab7b48e27e759f340d4ff5af26c19ea40e9c30"
+      "sha256": "7fa2699954ab8105759240db4809293ee9d4a6a81a09484638d895a15b72b7ff"
     },
     {
       "relative_path": "logs/paper_performance/paper_performance_ledger.csv",
@@ -143,7 +143,7 @@
     {
       "relative_path": "logs/paper_performance/paper_performance_summary.json",
       "size_bytes": 596,
-      "sha256": "fd9e7f03c0036d0a0d573c6b54f6aaf2b8e6a8357c555dde0e3f68365e4c7608"
+      "sha256": "c59aa5c4ed7a5e704356dd66c240c68a316a1ab6365a31576d869cc3f7a09cb2"
     },
     {
       "relative_path": "logs/paper_trading/paper_evaluation_report_20260705_162530.md",
@@ -4112,6 +4112,16 @@
     },
     {
       "relative_path": "logs/paper_trading/paper_evaluation_report_20261021_200604.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20261021_231323.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20261021_231358.md",
       "size_bytes": 51,
       "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
     }
