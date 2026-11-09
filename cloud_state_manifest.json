@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "created_at_utc": "2026-11-09T06:06:28.733009+00:00",
+  "created_at_utc": "2026-11-09T18:43:53.271730+00:00",
   "archive": "cloud_state.tar.gz",
-  "file_count": 944,
-  "total_bytes": 61661714,
+  "file_count": 946,
+  "total_bytes": 61852705,
   "files": [
     {
       "relative_path": "history/freakto_history.db",
-      "size_bytes": 2514944,
-      "sha256": "f656386d34ef10450bb95faabcaeea815767ab154db2ccf470f97f8631ae750b"
+      "size_bytes": 2519040,
+      "sha256": "5549968386dddebbaf05813ef8b3e2a1fa18d44cf9523e2426b2defc156e474d"
     },
     {
       "relative_path": "logs/decisions.csv",
-      "size_bytes": 1801152,
-      "sha256": "921f926134404af5e2e5083e3fba71f0297a1090ccb3b3bce24015b1d8239acf"
+      "size_bytes": 1804130,
+      "sha256": "f918e33efa89f308fb592f87fbae19eab664d1197d790a0972e6d0433a73dd6f"
     },
     {
       "relative_path": "logs/paper_cycle/cycle_history.jsonl",
@@ -47,8 +47,8 @@
     },
     {
       "relative_path": "logs/paper_launch_v2/cycle_history.jsonl",
-      "size_bytes": 27173302,
-      "sha256": "0040c1bdab1a345ba712b8413a5640577f2c2abbd0ef5151e1291a10940170eb"
+      "size_bytes": 27241791,
+      "sha256": "f0a73865417c93f02cf16a40e9cc167893517771d79789f48a2ebf65fdd5480b"
     },
     {
       "relative_path": "logs/paper_launch_v2/deterministic_candidate_assessments.csv",
@@ -62,18 +62,18 @@
     },
     {
       "relative_path": "logs/paper_launch_v2/last_cycle.json",
-      "size_bytes": 34540,
-      "sha256": "45904fe3a2de1cb65a6f89881de4ad8178309ecade43ccadc56bb46438fa41c0"
+      "size_bytes": 38917,
+      "sha256": "8cbb005998e31033986d508a33d155be2a09872ac2fcc80ce199a06047dcbed1"
     },
     {
       "relative_path": "logs/paper_launch_v2/orchestrator_state.json",
       "size_bytes": 299,
-      "sha256": "b6e6246b9ec325042bc10f1f0e1c562cdad5ea174178ca760eb1ec0afce406d3"
+      "sha256": "ad94452a67e0096e1c0f960c136d79d6cf841a2b63d01988e1755edd55d8458e"
     },
     {
       "relative_path": "logs/paper_launch_v2/paper_cycle.log",
-      "size_bytes": 856510,
-      "sha256": "75e2627bc5d84834f4babd28daec8a94a14a6f5230f60c95420db0efba4eae6f"
+      "size_bytes": 967459,
+      "sha256": "bd9ba779765fc8663ad1736e418fad8827399ab230c9b960d917a5ea290cbce4"
     },
     {
       "relative_path": "logs/paper_launch_v2/paper_cycle.log.1",
@@ -103,7 +103,7 @@
     {
       "relative_path": "logs/paper_launch_v2/paper_launch_readiness.json",
       "size_bytes": 2913,
-      "sha256": "64d70e4e38ec46bc882e95c1727b3ff4abb44179b56c078701358098c96ab5dd"
+      "sha256": "9723de7e97660c094ae13c8d5c032bbe7284927111a2c2dd6f6b183ab4d58559"
     },
     {
       "relative_path": "logs/paper_launch_v2/paper_launch_readiness.md",
@@ -133,7 +133,7 @@
     {
       "relative_path": "logs/paper_performance/paper_performance_dashboard.md",
       "size_bytes": 808,
-      "sha256": "76f577c3fcfa3f2e2a2795bd8407a394519da9d816810460288f4ed9119f21e7"
+      "sha256": "14edeb33361536e5bb97786aea57e6f330514f5465f7dc8b75a305584e4d02ea"
     },
     {
       "relative_path": "logs/paper_performance/paper_performance_ledger.csv",
@@ -143,7 +143,7 @@
     {
       "relative_path": "logs/paper_performance/paper_performance_summary.json",
       "size_bytes": 596,
-      "sha256": "283405d1f1cd6a8167348e1bd6e45bb046495c296fde05e08f1d5dc1abf94cf6"
+      "sha256": "48117b0955b6d5fdd07699b151e7e3f0caaa8ebeef897bba359f34bf6976a9e7"
     },
     {
       "relative_path": "logs/paper_trading/paper_evaluation_report_20260705_162530.md",
@@ -4722,6 +4722,16 @@
     },
     {
       "relative_path": "logs/paper_trading/paper_evaluation_report_20261109_060624.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20261109_184236.md",
+      "size_bytes": 51,
+      "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
+    },
+    {
+      "relative_path": "logs/paper_trading/paper_evaluation_report_20261109_184312.md",
       "size_bytes": 51,
       "sha256": "eab6b8ff4dbd52f1fa6e53acc2e006d6a2dab18e9250ed9f63e206b2e461cf97"
     }
